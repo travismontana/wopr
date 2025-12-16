@@ -16,3 +16,4 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: cd wopr/systems/wopr-config-system/config-service/docker build . --file Dockerfile --tag wopr-config_service:$(date +%Y%m%d-%H%M%S)
+            type=raw,value=latest,enable={{is_default_branch}}
