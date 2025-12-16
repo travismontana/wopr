@@ -1,12 +1,11 @@
 # Build stage
 # Use official Python image as base
 FROM python:3.11-slim as builder
-
+RUN useradd -m -u 1000 wopr
+USER 1000:1000
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN useradd -m -u 1000 wopr
-USER 1000:1000
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
