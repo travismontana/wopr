@@ -1,0 +1,76 @@
+name: Package and Push Helm Chart
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags
+    paths:
+      - 'helm/wopr-config-service/**'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  REGISTRY: ghcr.io
+  CHART_PATH: helm/wopr-config-service
+
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: '3.13.0'
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ${{ env.REGISTRY }} \
+            --username ${{ github.actor }} \
+            --password-stdin
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION="0.0.0-${GITHUB_SHA::7}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Chart version: ${VERSION}"
+
+      - name: Update Chart version
+        run: |
+          sed -i "s/^version:.*/version: ${{ steps.version.outputs.version }}/" \
+            ${{ env.CHART_PATH }}/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${{ steps.version.outputs.version }}\"/" \
+            ${{ env.CHART_PATH }}/Chart.yaml
+
+      - name: Lint Helm chart
+        run: helm lint ${{ env.CHART_PATH }}
+
+      - name: Package Helm chart
+        run: |
+          helm package ${{ env.CHART_PATH }} --destination .
+
+      - name: Push Helm chart to GHCR
+        run: |
+          CHART_NAME=$(grep '^name:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
+          helm push ${CHART_NAME}-${{ steps.version.outputs.version }}.tgz \
+            oci://${{ env.REGISTRY }}/${{ github.repository_owner }}
+
+      - name: Chart info
+        run: |
+          CHART_NAME=$(grep '^name:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
+          echo "✅ Chart pushed successfully!"
+          echo ""
+          echo "Install with:"
+          echo "  helm install wopr-config oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/${CHART_NAME} \\"
+          echo "    --version ${{ steps.version.outputs.version }} \\"
+          echo "    -n wopr --create-namespace"
