@@ -5,7 +5,8 @@ replicaCount: 1
 image:
   repository: ghcr.io/travismontana/wopr/wopr-config_service
   pullPolicy: IfNotPresent
-  tag: "latest"
+  #tag: "latest"
+  tag: "001630b"
 
 imagePullSecrets: []
 nameOverride: ""
