@@ -27,14 +27,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
-    - host: wopr-config.studio.tailandtraillabs.org
+    - host: wopr-config.studio.abode.tailandtraillabs.org
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: wopr-config-tls
       hosts:
-        - wopr-config.studio.tailandtraillabs.org
+        - wopr-config.studio.abode.tailandtraillabs.org
 
 resources:
   limits:
