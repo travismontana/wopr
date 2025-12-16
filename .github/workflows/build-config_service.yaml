@@ -46,7 +46,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./wopr/systems/wopr-config-system/config-service
+          context: ./systems/wopr-config-system/config-service
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
