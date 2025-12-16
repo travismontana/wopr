@@ -23,7 +23,7 @@ service:
 
 ingress:
   enabled: true
-  className: "traefik"
+  className: "studio-traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
