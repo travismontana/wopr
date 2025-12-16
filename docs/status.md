@@ -45,9 +45,9 @@ git log --oneline -10 > recent_work.txt
 ```
 
 **Where to pick up:**
-- Get wopr_config in k8s
+- Get wopr_config in k8s (done)
 - python module distribution
-- 
+- Logging
 
 **Time estimate to complete current tasks:** 
 
