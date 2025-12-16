@@ -1,6 +1,6 @@
 # Build stage
 # Use official Python image as base
-FROM python:3.11-slim as builder
+FROM python:3.13-slim as builder
 RUN useradd -m -u 1000 wopr
 USER 1000:1000
 WORKDIR /app

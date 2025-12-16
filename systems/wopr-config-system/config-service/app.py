@@ -5,14 +5,16 @@ WOPR Config Service - Database-backed Configuration Service
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Any, Optional, List
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import json
 import os
 import yaml
 import logging
 from contextlib import contextmanager
-from psycopg2.extras import RealDictCursor, Json
+
+# Switch to psycopg (psycopg3)
+import psycopg
+from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,7 +32,7 @@ ENVIRONMENT = os.getenv('WOPR_ENVIRONMENT', 'default')
 @contextmanager
 def get_db():
     """Database connection context manager"""
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
     finally:
