@@ -49,7 +49,7 @@ spec:
             command:
             - sh
             - -c
-            - pg_isready -U {{ .Values.postgresql.username }}
+            - pg_isready -U {{ .Values.postgresql.username }} #
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -69,7 +69,7 @@ spec:
       volumes:
       - name: initdb
         configMap:
-          name: {{ include "wopr-config-service.fullname" . }}-initdb
+          name: {{ include "wopr-config.fullname" . }}-initdb 
   volumeClaimTemplates:
   - metadata:
       name: data
