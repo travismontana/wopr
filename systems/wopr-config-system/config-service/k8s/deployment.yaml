@@ -16,7 +16,7 @@ data:
     # This will be imported into PostgreSQL on first run
     
     storage:
-      base_path: /mnt/nas/twat
+      base_path: /remote/wopr
       games_subdir: games
       image_extensions:
         - jpg
@@ -37,6 +37,12 @@ data:
         4k:
           width: 4608
           height: 2592
+        3k:
+          width: 3072
+          height: 1728
+        2k:
+          width: 2048
+          height: 1152
         1080p:
           width: 1920
           height: 1080

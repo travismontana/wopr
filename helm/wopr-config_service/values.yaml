@@ -1,0 +1,82 @@
+# Default values for wopr-config-service
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/travismontana/wopr-config_service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: wopr-config.studio.tailandtraillabs.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: wopr-config-tls
+      hosts:
+        - wopr-config.studio.tailandtraillabs.org
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+env:
+  - name: WOPR_ENVIRONMENT
+    value: "production"
+
+postgresql:
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+  
+  database: config_db
+  username: wopr
+  password: "changeme-in-production"  # Override with --set postgresql.password=xxx
+  
+  persistence:
+    storageClass: "local-path"
+    size: 5Gi
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
