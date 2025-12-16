@@ -9,4 +9,4 @@ USER 1000:1000
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
