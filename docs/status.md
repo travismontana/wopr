@@ -17,6 +17,12 @@
 
 ---
 
+## 20251215 - 2025, Dec 15**
+What I got done:
+* wopr-config.studio is running in the cluster and works.
+* Next: webui + api
+* and fire the new ai, go back to reggie claude.
+
 ## 🎯 Current Focus
 
 **20251214 - 2025, Dec 14**
