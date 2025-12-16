@@ -3,7 +3,7 @@ name: wopr-config-service
 description: WOPR Configuration Service - Centralized config management with PostgreSQL backend
 type: application
 version: 0.1.0
-appVersion: "92c80c2"
+appVersion: "be7fb12"
 keywords:
   - wopr
   - configuration
