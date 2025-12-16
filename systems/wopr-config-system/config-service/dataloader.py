@@ -39,7 +39,7 @@ try:
 except FileNotFoundError:
     print(f"❌ File not found: {schema_file}")
     sys.exit(1)
-except psycopg2.Error as e:
+except psycopg.Error as e:
     print(f"❌ Database error: {e}")
     sys.exit(1)
 except Exception as e:
