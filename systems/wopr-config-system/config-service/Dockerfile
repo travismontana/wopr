@@ -6,6 +6,13 @@ USER 1000:1000
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --user \
+    opentelemetry-distro \
+    opentelemetry-exporter-otlp
+
+# Run bootstrap to auto-install instrumentations
+RUN /home/wopr/.local/bin/opentelemetry-bootstrap -a install
+
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
@@ -16,5 +23,5 @@ ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://tempo.monitoring.abode.tailandtrai
 ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ENV OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://prometheus.monitoring.abode.tailandtraillabs.org/api/v1/otlp/v1/metrics
 
-CMD ["opentelemetry-bootstrap", "-a", "install"]
+
 CMD ["/home/wopr/.local/bin/opentelemetry-instrument", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

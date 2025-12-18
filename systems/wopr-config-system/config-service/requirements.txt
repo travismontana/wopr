@@ -3,7 +3,3 @@ uvicorn[standard]~=0.32.1
 psycopg[binary]~=3.2.3
 pyyaml~=6.0.1
 pydantic~=2.10.4
-
-# OpenTelemetry (fixed)
-opentelemetry-distro~=0.49b2
-opentelemetry-exporter-otlp~=1.28.0
