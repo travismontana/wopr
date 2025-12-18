@@ -4,7 +4,8 @@ psycopg[binary]~=3.2.3
 pyyaml~=6.0.1
 pydantic~=2.10.4
 
-#otel
-opentelemetry-distro[otlp]~=0.0.1
-opentelemetry-exporter-otlp~=0.0.1
-opentelemetry-bootstrap~=0.0.1
+# OpenTelemetry (fixed)
+opentelemetry-distro~=0.49b2
+opentelemetry-bootstrap~=0.49b2
+
+opentelemetry-exporter-otlp~=1.28.0
