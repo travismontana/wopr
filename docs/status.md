@@ -17,8 +17,14 @@
 
 ---
 
-**20251216 - 2025, Dec 16**
+**20251217 - 2025, Dec 17**
+* Grafana/loki/prom up and running.
+* all 3 clusters reporting in.
+* tagged v0.1.0
+* going to enable tracing in the config
 
+**20251216 - 2025, Dec 16**
+Stuff....
 
 **20251215 - 2025, Dec 15**
 What I got done:

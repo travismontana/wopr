@@ -3,3 +3,8 @@ uvicorn[standard]~=0.32.1
 psycopg[binary]~=3.2.3
 pyyaml~=6.0.1
 pydantic~=2.10.4
+
+#otel
+opentelemetry-distro 
+opentelemetry-exporter-otlp
+opentelemetry-bootstrap 
