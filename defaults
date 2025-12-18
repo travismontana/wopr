@@ -1,0 +1,2 @@
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://prometheus.monitoring.abode.tailandtraillabs.org/api/v1/otlp/v1/metrics

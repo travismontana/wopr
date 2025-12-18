@@ -17,7 +17,10 @@
 
 ---
 
-## 20251215 - 2025, Dec 15**
+**20251216 - 2025, Dec 16**
+
+
+**20251215 - 2025, Dec 15**
 What I got done:
 * wopr-config.studio is running in the cluster and works.
 * Next: webui + api
