@@ -10,6 +10,7 @@ import os
 import yaml
 import logging
 from contextlib import contextmanager
+from psycopg.rows import dict_row
 
 # Switch to psycopg (psycopg3)
 import psycopg
@@ -142,7 +143,7 @@ def get_value(key: str, environment: str = None):
         environment = ENVIRONMENT
     
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row)as cur:
             # Try exact match first
             cur.execute(
                  """
