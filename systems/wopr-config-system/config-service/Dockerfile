@@ -16,4 +16,4 @@ ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://tempo.monitoring.abode.tailandtrai
 ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ENV OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://prometheus.monitoring.abode.tailandtraillabs.org/api/v1/otlp/v1/metrics
 
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["opentelemetry-instrument", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
