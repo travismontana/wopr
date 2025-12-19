@@ -10,6 +10,24 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:16-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h wopr-config-db-cluster-rw.wopr -p 5432 -U app; do
+            echo "Waiting for database to be ready..."
+            sleep 5
+          done
+          echo "Database is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wopr-config-db-cluster-app
+              key: password
       containers:
       - name: init-schema
         image: postgres:16-alpine
