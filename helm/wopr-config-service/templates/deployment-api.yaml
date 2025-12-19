@@ -28,18 +28,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
-      initContainers:
-      - name: wait-for-db
-        image: busybox:1.36
-        command:
-        - sh
-        - -c
-        - |
-          until nc -z {{ include "wopr-config.fullname" . }}-db 5432; do
-            echo "Waiting for database..."
-            sleep 2
-          done
-          echo "Database is ready"
       containers:
       - name: config-service
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
