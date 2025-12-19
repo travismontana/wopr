@@ -12,6 +12,8 @@ COPY --chown=1000:1000 requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --user -r /app/requirements.txt
 
 COPY --chown=1000:1000 app.py /app/app.py
+COPY --chown=1000:1000 wopr-pymod/ /app/wopr-pymod/
+RUN pip install --no-cache-dir --user -e /app/wopr-pymod
 COPY --chown=1000:1000 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
