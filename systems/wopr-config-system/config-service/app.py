@@ -204,7 +204,7 @@ def get_multiple(request: dict):
     environment = request.get('environment', ENVIRONMENT)
     
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row)as cur:
             placeholders = ','.join(['%s'] * len(keys))
             cur.execute(
                 f"""
@@ -244,7 +244,7 @@ def get_section(section: str, environment: str = None):
         environment = ENVIRONMENT
     
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row)as cur:    
             # Find all keys that start with section prefix
             cur.execute(
                 """
@@ -295,7 +295,7 @@ def get_all(environment: str = None):
         environment = ENVIRONMENT
     
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
                 SELECT key, value::text AS value, value_type
@@ -350,7 +350,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
     value_json = json.dumps(update.value)
     
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row) as cur:
             # Get old value for history
             cur.execute(
                 "SELECT value FROM settings WHERE key = %s AND environment = %s",
@@ -433,7 +433,7 @@ def delete_value(key: str, environment: str = None):
 def get_history(key: str, limit: int = 10):
     """Get change history for a key"""
     with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
                 SELECT key, old_value, new_value, changed_by, changed_at, environment
