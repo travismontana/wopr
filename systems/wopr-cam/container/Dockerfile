@@ -12,13 +12,18 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-RUN if [ -n "${STARTTRACE}" ]; then pip install --no-cache-dir --user \
+RUN if [ -n "${STARTTRACE}" ]; then
+      pip install --no-cache-dir --user \
       opentelemetry-distro \
       opentelemetry-exporter-otlp && \
-      /home/wopr/.local/bin/opentelemetry-bootstrap -a install; fi
+      /home/wopr/.local/bin/opentelemetry-bootstrap -a install && \
+      STARTCMD="/home/wopr/.local/bin/opentelemetry-instrument python ./app.py"; \
+    else \
+      STARTCMD="python ./app.py"; \
+    fi
 
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
 #ENV STARTTRACE=${DOTRACE:+/home/wopr/.local/bin/opentelemetry-instrument}
-CMD [${STARTTRACE}, "python", "app.py"]
+CMD [${STARTCMD}]]
