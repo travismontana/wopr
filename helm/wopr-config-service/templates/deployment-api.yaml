@@ -49,8 +49,8 @@ spec:
           containerPort: 8080
           protocol: TCP
         env:
-        - name: DATABASE_URL
-          value: {{ include "wopr-config.databaseUrl" . }}
+        #- name: DATABASE_URL
+        #  value: {{ include "wopr-config.databaseUrl" . }}
         {{- with .Values.env }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
