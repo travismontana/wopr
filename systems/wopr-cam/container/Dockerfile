@@ -11,19 +11,11 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY --chown=1000:1000 app.py app.py
+COPY --chown=1000:1000 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-RUN export STARTCMD="yomom" && if [ -n "${STARTTRACE}" ]; then \
-      pip install --no-cache-dir --user \
-      opentelemetry-distro \
-      opentelemetry-exporter-otlp && \
-      /home/wopr/.local/bin/opentelemetry-bootstrap -a install && \
-      STARTCMD="/home/wopr/.local/bin/opentelemetry-instrument python ./app.py"; \
-    else \
-      STARTCMD="python ./app.py"; \
-    fi
-
-COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
-#ENV STARTTRACE=${DOTRACE:+/home/wopr/.local/bin/opentelemetry-instrument}
-CMD ["${STARTCMD}"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD []
