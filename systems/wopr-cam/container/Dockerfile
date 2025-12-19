@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN if [ -n "${STARTTRACE}" ]; then pip install --no-cache-dir --user \
       opentelemetry-distro \
       opentelemetry-exporter-otlp && \
-      /home/wopr/.local/bin/opentelemetry-bootstrap -a install ||  ;fi
+      /home/wopr/.local/bin/opentelemetry-bootstrap -a install; fi
 
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
