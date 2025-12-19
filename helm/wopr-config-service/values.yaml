@@ -60,27 +60,26 @@ env:
         key: uri
 
 
-postgresql:
-  image:
-    repository: postgres
-    tag: "16-alpine"
-    pullPolicy: IfNotPresent
-  
-  database: config_db
-  username: wopr
-  password: "changeme-in-production"  # Override with --set postgresql.password=xxx
-  
-  persistence:
-    storageClass: "local-path"
-    size: 5Gi
-  
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
+#postgresql:
+#  image:
+#    repository: postgres
+#    tag: "16-alpine"
+#    pullPolicy: IfNotPresent
+#  
+# username: wopr
+#  password: "changeme-in-production"  # Override with --set postgresql.password=xxx
+#  
+#  persistence:
+#    storageClass: "local-path"
+#    size: 5Gi
+#  
+#  resources:
+#    limits:
+#      cpu: 500m
+#      memory: 512Mi
+#    requests:
+#      cpu: 100m
+#      memory: 128Mi
 
 nodeSelector: {}
 
