@@ -14,6 +14,4 @@ spec:
       database: app
       owner: app
       postInitApplicationSQL:
-        - configMapRefs:
-          - name: {{ include "wopr-config.fullname" . }}-db-init
-            key: schema.sql
+{{ .Files.Get "files/schema.sql" | indent 8 }}
