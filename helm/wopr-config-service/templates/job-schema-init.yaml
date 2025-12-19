@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "wopr-config.fullname" . }}-db-schema-init
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-schema
+        image: postgres:16-alpine
+        command:
+        - sh
+        - -c
+        - |
+          psql "${DATABASE_URL}" -f /schema/schema.sql
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: wopr-config-db-cluster-app
+              key: uri
+        volumeMounts:
+        - name: schema
+          mountPath: /schema
+      volumes:
+      - name: schema
+        configMap:
+          name: {{ include "wopr-config.fullname" . }}-db-init
+      restartPolicy: Never
+  backoffLimit: 3

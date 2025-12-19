@@ -13,6 +13,3 @@ spec:
     initdb:
       database: app
       owner: app
-      postInitApplicationSQL:
-        - |
-{{ .Files.Get "files/schema.sql" | indent 8 }}
