@@ -53,33 +53,13 @@ autoscaling:
 env:
   - name: WOPR_ENVIRONMENT
     value: "production"
-  - name: DATABASE_URL
+
+postgresql:
+  uri:
     valueFrom:
       secretKeyRef:
         name: wopr-config-db-cluster-app
         key: uri
-
-
-#postgresql:
-#  image:
-#    repository: postgres
-#    tag: "16-alpine"
-#    pullPolicy: IfNotPresent
-#  
-# username: wopr
-#  password: "changeme-in-production"  # Override with --set postgresql.password=xxx
-#  
-#  persistence:
-#    storageClass: "local-path"
-#    size: 5Gi
-#  
-#  resources:
-#    limits:
-#      cpu: 500m
-#      memory: 512Mi
-#    requests:
-#      cpu: 100m
-#      memory: 128Mi
 
 nodeSelector: {}
 

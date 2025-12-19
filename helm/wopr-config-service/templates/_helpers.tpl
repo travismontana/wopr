@@ -63,5 +63,6 @@ Create the name of the service account to use
 Database connection URL
 */}}
 {{- define "wopr-config.databaseUrl" -}}
-postgresql://{{ .Values.postgresql.username }}:{{ .Values.postgresql.password }}@{{ include "wopr-config.fullname" . }}-db:5432/{{ .Values.postgresql.database }}
+/*postgresql://{{ .Values.postgresql.username }}:{{ .Values.postgresql.password }}@{{ include "wopr-config.fullname" . }}:5432/{{ .Values.postgresql.database }}*/
+{{- .Values.postgresql.uri }}
 {{- end }}
