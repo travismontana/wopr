@@ -58,11 +58,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/*
-Database connection URL
-*/}}
-{{- define "wopr-config.databaseUrl" -}}
-/*postgresql://{{ .Values.postgresql.username }}:{{ .Values.postgresql.password }}@{{ include "wopr-config.fullname" . }}:5432/{{ .Values.postgresql.database }}*/
-{{- .Values.postgresql.uri }}
-{{- end }}

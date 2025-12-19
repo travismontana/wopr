@@ -55,11 +55,8 @@ env:
     value: "production"
 
 postgresql:
-  uri:
-    valueFrom:
-      secretKeyRef:
-        name: wopr-config-db-cluster-app
-        key: uri
+  uriSecretName: wopr-config-db-cluster-app
+  uriKey: uri
 
 nodeSelector: {}
 
