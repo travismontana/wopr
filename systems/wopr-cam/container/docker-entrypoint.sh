@@ -11,6 +11,7 @@ if [ -n "${STARTTRACE:-}" ]; then
     opentelemetry-instrumentation \
     opentelemetry-instrumentation-wsgi \
     opentelemetry-instrumentation-flask 
+  ls -ln /remote/wopr
   exec /home/wopr/.local/bin/opentelemetry-instrument python /app/app.py
 else
   echo "[entrypoint] tracing disabled"
