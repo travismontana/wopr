@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-RUN if [ -n "${STARTTRACE}" ]; then
+RUN if [ -n "${STARTTRACE}" ]; then \
       pip install --no-cache-dir --user \
       opentelemetry-distro \
       opentelemetry-exporter-otlp && \
