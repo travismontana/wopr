@@ -30,6 +30,6 @@ spec:
       volumes:
       - name: schema
         configMap:
-          name: {{ include "wopr-config.fullname" . }}-db-init
+          name: {{ include "wopr-config.fullname" . }}-initdb
       restartPolicy: Never
   backoffLimit: 3
