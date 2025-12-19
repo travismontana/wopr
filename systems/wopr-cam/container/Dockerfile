@@ -26,4 +26,4 @@ ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
 ENV OTEL_PYTHON_EXCLUDED_URLS="(/health|/metrics)$"
 
-CMD ["/home/wopr/.local/bin/opentelemetry-instrument", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["/home/wopr/.local/bin/opentelemetry-instrument", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
