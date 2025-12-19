@@ -1,4 +1,4 @@
-name: Build wopr-config_service
+name: Build wopr-config_service Docker Image
 
 on:
   push:
