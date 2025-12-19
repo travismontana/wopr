@@ -1,1 +1,15 @@
-flask>=3.0
+# --- web ---
+flask>=3.0,<4.0
+
+# --- cv ---
+opencv-python-headless>=4.9,<5.0
+
+# --- OpenTelemetry core (aligned) ---
+opentelemetry-api==1.39.1
+opentelemetry-sdk==1.39.1
+opentelemetry-exporter-otlp==1.39.1
+
+# --- OpenTelemetry instrumentation (same train) ---
+opentelemetry-instrumentation==0.60b1
+opentelemetry-instrumentation-wsgi==0.60b1
+opentelemetry-instrumentation-flask==0.60b1
