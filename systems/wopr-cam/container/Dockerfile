@@ -21,4 +21,4 @@ COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
 #ENV STARTTRACE=${DOTRACE:+/home/wopr/.local/bin/opentelemetry-instrument}
-CMD ["${STARTTRACE}}", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["${STARTTRACE}", "python", "app.py"]
