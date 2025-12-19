@@ -1,6 +1,7 @@
 # Build stage
 # Use official Python image as base
 FROM python:3.13-slim as builder
+ARG DOTRACE
 RUN apt-get update \
 && apt-get install -y --no-install-recommends netcat-openbsd \
 && rm -rf /var/lib/apt/lists/*
@@ -19,11 +20,5 @@ RUN /home/wopr/.local/bin/opentelemetry-bootstrap -a install
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
-ENV OTEL_SERVICE_NAME=wopr-config-service 
-ENV OTEL_TRACES_EXPORTER=console,otlp 
-ENV OTEL_METRICS_EXPORTER=console,otlp
-ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
-ENV OTEL_PYTHON_EXCLUDED_URLS="(/health|/metrics)$"
-
-CMD ["/home/wopr/.local/bin/opentelemetry-instrument", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+#ENV STARTTRACE=${DOTRACE:+/home/wopr/.local/bin/opentelemetry-instrument}
+CMD ["${STARTTRACE}}", "python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]

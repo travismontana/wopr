@@ -17,6 +17,8 @@
 <!-- >>> NEW >>> -->
 - **WOPR-EDM**: Edge device management platform for full infrastructure lifecycle (containers, tofu, ansible, psql, ssh, etc.)
 - Edge agent with 72h config cache + graceful degradation
+- in the Dockerfile's:  
+- Pull what they are from a central service and have wopr-edm start it.
 <!-- >>> END NEW >>> -->
 
 ---

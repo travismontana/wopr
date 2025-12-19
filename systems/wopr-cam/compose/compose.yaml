@@ -1,5 +1,5 @@
 services:
-  openwebui:
+  wopr-cam:
     image: ghcr.io/travismontana/wopr/wopr-cam:latest
     ports:
       - "5000:5000"
@@ -10,3 +10,4 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - WOPR_CONFIG_SERVICE_URL=https://wopr-config.studio.abode.tailandtraillabs.org
+      - STARTTRACE=/home/wopr/.local/bin/opentelemetry-instrument
