@@ -5,6 +5,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
+      - /dev/video0:/dev/video0:ro
       - /remote/wopr:/remote/wopr:rw
 #      - /remote/config:/config:ro
     environment:
