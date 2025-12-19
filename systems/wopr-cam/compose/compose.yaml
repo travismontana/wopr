@@ -2,12 +2,15 @@ services:
   wopr-cam:
     image: ghcr.io/travismontana/wopr/wopr-cam:latest
     user: "2222:2222"
+    group_add:
+      - 44  # video group
     ports:
       - "5000:5000"
     volumes:
-      - /dev/video0:/dev/video0:ro
       - /remote/wopr:/remote/wopr:rw
 #      - /remote/config:/config:ro
+    devices:
+      - /dev/video0:/dev/video0
     environment:
       - OTEL_SERVICE_NAME=wopr-cam
       - OTEL_TRACES_EXPORTER=console,otlp
