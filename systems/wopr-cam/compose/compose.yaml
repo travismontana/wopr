@@ -1,6 +1,7 @@
 services:
   wopr-cam:
     image: ghcr.io/travismontana/wopr/wopr-cam:latest
+    user: "2222:2222"
     ports:
       - "5000:5000"
     volumes:
