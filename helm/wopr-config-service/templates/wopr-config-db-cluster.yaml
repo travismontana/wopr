@@ -1,24 +1,4 @@
 ---
-apiVersion: v1
-data:
-  password: cm9vdA==
-  username: cm9vdA==
-kind: Secret
-metadata:
-  name: wopr-config-db-cluster-superuser
-  namespace: wopr
-type: kubernetes.io/basic-auth
----
-apiVersion: v1
-data:
-  username: d29wci1jb25maWctZGItZGF0YWJhc2Utb3duZXI=
-  password: d29wci1jb25maWctZGItZGF0YWJhc2Utb3duZXI=
-kind: Secret
-metadata:
-  name: wopr-config-db-database-owner-password
-  namespace: wopr
-type: kubernetes.io/basic-auth
----
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -29,15 +9,11 @@ spec:
   storage:
     size: 1Gi
   enableSuperuserAccess: true
-  superuserSecret:
-    name: wopr-config-db-cluster-superuser
-  managed:
-    roles:
-    - name: wopr-config-db-database-owner
-      ensure: present
-      login: true
-      superuser: false
-      createdb: true
-      createrole: false
-      passwordSecret:
-        name: wopr-config-db-database-owner-password
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      postInitApplicationSQL:
+        - configMapRefs:
+          - name: {{ include "wopr-config.fullname" . }}-db-init
+            key: schema.sql
