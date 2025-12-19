@@ -3,6 +3,9 @@ services:
     image: ghcr.io/travismontana/wopr/wopr-cam:latest
     ports:
       - "5000:5000"
+    volumes:
+      - /remote/wopr:/remote/wopr:rw
+#      - /remote/config:/config:ro
     environment:
       - OTEL_SERVICE_NAME=wopr-cam
       - OTEL_TRACES_EXPORTER=console,otlp

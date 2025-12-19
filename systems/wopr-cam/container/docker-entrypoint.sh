@@ -3,6 +3,14 @@ set -eu
 
 if [ -n "${STARTTRACE:-}" ]; then
   echo "[entrypoint] tracing enabled"
+  pip install --no-cache-dir --user opencv-python-headless \
+    opencv-python-headless \
+    opentelemetry-api \
+    opentelemetry-sdk \
+    opentelemetry-exporter-otlp \
+    opentelemetry-instrumentation \
+    opentelemetry-instrumentation-wsgi \
+    opentelemetry-instrumentation-flask 
   exec /home/wopr/.local/bin/opentelemetry-instrument python /app/app.py
 else
   echo "[entrypoint] tracing disabled"
