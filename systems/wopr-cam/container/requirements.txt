@@ -1,4 +1,1 @@
 flask>=3.0
-# OpenTelemetry (fixed)
-opentelemetry-distro~=0.49b2
-opentelemetry-exporter-otlp~=1.28.0

@@ -10,12 +10,12 @@ USER 1000:1000
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir --user \
-    opentelemetry-distro \
-    opentelemetry-exporter-otlp
 
-# Run bootstrap to auto-install instrumentations
-RUN /home/wopr/.local/bin/opentelemetry-bootstrap -a install
+
+RUN if [ -n "${STARTTRACE}" ]; then pip install --no-cache-dir --user \
+      opentelemetry-distro \
+      opentelemetry-exporter-otlp && \
+      /home/wopr/.local/bin/opentelemetry-bootstrap -a install || exit 1 ;fi
 
 COPY --chown=1000:1000 app.py .
 EXPOSE 8080
