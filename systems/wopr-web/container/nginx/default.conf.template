@@ -10,7 +10,7 @@ server {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
 
-    proxy_pass http://${WOPR_API_UPSTREAM}:${WOPR_API_UPSTREAM_PORT}/;
+    #proxy_pass http://${WOPR_API_UPSTREAM}:${WOPR_API_UPSTREAM_PORT}/;
   }
 
   location /ml/api/ {
@@ -19,7 +19,7 @@ server {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
 
-    proxy_pass http://${WOPR_ML_UPSTREAM}:${WOPR_ML_UPSTREAM_PORT}/;
+    #proxy_pass http://${WOPR_ML_UPSTREAM}:${WOPR_ML_UPSTREAM_PORT}/;
   }
 
   location / {
