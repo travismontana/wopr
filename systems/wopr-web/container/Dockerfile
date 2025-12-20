@@ -11,7 +11,7 @@ RUN npm install
 COPY src ./src
 COPY public ./public
 COPY web/index.html ./index.html
-COPY vite.config.ts .
+COPY vite.config.ts ./vite.config.ts
 RUN npm run build
 
 # runtime stage

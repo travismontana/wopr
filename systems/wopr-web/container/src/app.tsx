@@ -1,16 +1,13 @@
 import { Routes, Route, Link } from "react-router-dom";
 import "./pages/css/theme.css";
 
-import Dashboard from "./pages/Dashboard";
-import Games from "./pages/Games";
-import Images from "./pages/Images";
-import MLHome from "./pages/MLHome";
-import MLPieces from "./pages/MLPieces";
-import MLLabel from "./pages/MLLabel";
-import MLDatasets from "./pages/MLDatasets";
-import MLTrain from "./pages/MLTrain";
+import Dashboard from "./pages/dashboard";
+import Games from "./pages/games";
+import Images from "./pages/images";
+import ML from "./pages/ml"; 
+import Control from "./pages/control"; 
 
-export default function App() {
+export default function Main() {
   return (
     <div className="app">
       <div className="layout">
@@ -18,43 +15,22 @@ export default function App() {
           <h1>WOPR</h1>
           <h2>Wargaming Oversight &amp; Position Recognition</h2>
         </header>
-
-        <section className="camera-panel">
-          <h1>Camera Controls</h1>
-          <div className="actions">
-            <button>Capture</button>
-            <button>View</button>
-            <button>Confirm</button>
-          </div>
-        </section>
-
-        <section className="control-panel">
-          <h1>Control Controls</h1>
-          <div className="actions">
-            <button>Edit wopr configs</button>
-          </div>
-        </section>
-
         <section className="nav-panel">
-          <nav className="nav">
-            <Link to="/">Dashboard</Link> |{" "}
-            <Link to="/games">Games</Link> |{" "}
-            <Link to="/images">Images</Link> |{" "}
-            <Link to="/ml">ML</Link>
+          <nav className="panel nav-grid">
+            <Link to="/"><button>Dashboard</button></Link>
+            <Link to="/games"><button>Games</button></Link>
+            <Link to="/images"><button>Images</button></Link>
+            <Link to="/ml"><button>ML</button></Link>
+            <Link to="/control"><button>Control</button></Link>
           </nav>
         </section>
-
-        <main className="page">
+        <main className="content">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/games" element={<Games />} />
             <Route path="/images" element={<Images />} />
-
-            <Route path="/ml" element={<MLHome />} />
-            <Route path="/ml/pieces" element={<MLPieces />} />
-            <Route path="/ml/label" element={<MLLabel />} />
-            <Route path="/ml/datasets" element={<MLDatasets />} />
-            <Route path="/ml/train" element={<MLTrain />} />
+            <Route path="/ml" element={<ML />} />
+            <Route path="/control" element={<Control />} />
           </Routes>
         </main>
       </div>

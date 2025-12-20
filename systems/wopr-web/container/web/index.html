@@ -1,33 +1,15 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>WOPR</title>
-    </head>
-    <body data-pg-name="app">
-        <div id="root" class="app">
-            <script type="module" src="/src/main.tsx"></script>
-            <div class="layout">
-                <div class="wopr-header">
-                    <h1>WOPR</h1>
-                    <h2>Wargaming Oversight & Position Recognition</h2>
-                </div>
-                <div class="camera-panel">
-                    <h1>Camera Controls</h1>
-                    <div class="actions">
-                        <button>Capture</button>
-                        <button>View</button>
-                        <button>Confirm</button>
-                    </div>
-                </div>
-                <div class="control-panel">
-                    <h1>Control Controls</h1>
-                    <div class="actions">
-                        <button>Edit wopr configs</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WOPR</title>
+
+    <!-- optional favicon(s) -->
+    <link rel="icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

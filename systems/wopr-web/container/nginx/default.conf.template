@@ -1,4 +1,3 @@
-
 server {
   listen 8080;
 
@@ -8,25 +7,64 @@ server {
   # Static assets: must be real files, no SPA fallback
   location ^~ /assets/ {
     try_files $uri =404;
+    expires 1y;
+    add_header Cache-Control "public, immutable";
   }
 
-  location ^~ /css/ {
-    try_files $uri =404;
-  }
+  location ^~ /app/assets/ {
+    alias /usr/share/nginx/html/assets/;
+    try_files $request_filename =404;
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
 
   location = /favicon.ico {
     try_files $uri =404;
+    expires 30d;
   }
 
-  # Your SPA (React Router). Fallback is OK here.
+  # Optional: if you still serve /css/theme.css as a real file
+  location ^~ /css/ {
+    try_files $uri =404;
+    expires 30d;
+  }
+
+  # Make /app redirect to / (avoids two "bases")
+  #location = /app {
+  #  return 301 /;
+  #}
+
+  # SPA fallback (React Router)
   location / {
     try_files $uri $uri/ /index.html;
   }
 
-  # (optional) if you serve app under /app
-  location /app {
-    try_files $uri $uri/ /index.html;
+  # API proxies (example)
+  # location /api/ {
+  #   proxy_pass http://${WOPR_API_UPSTREAM}:${WOPR_API_UPSTREAM_PORT}/;
+  # }
+  #
+  # location /ml/ {
+  #   proxy_pass http://${WOPR_ML_UPSTREAM}:${WOPR_ML_UPSTREAM_PORT}/;
+  # }
+  location /api/cam/ {
+    proxy_pass http://172.16.2.246:5000/;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  
+    # === NEW: don't mask upstream errors ===
+    proxy_intercept_errors off;
+
+    # === NEW: timeouts so slow capture doesn't look like "random 500" ===
+    proxy_connect_timeout 5s;
+    proxy_read_timeout 120s;
+    proxy_send_timeout 120s;
   }
 
-  # API proxies here, if any...
+
+
 }

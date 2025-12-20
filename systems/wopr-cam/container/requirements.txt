@@ -1,2 +1,13 @@
-# --- web ---
-flask>=3.0,<4.0
+# Core web API
+fastapi~=0.115.6
+uvicorn[standard]~=0.34.0
+
+# Data validation (FastAPI depends on pydantic, but we pin explicitly)
+pydantic~=2.10.4
+
+# Camera capture
+opencv-python-headless~=4.10.0.84
+
+# If your existing code already depends on these, keep them here:
+# (wopr.config / yaml / etc.)
+PyYAML~=6.0.2

@@ -11,10 +11,12 @@ via USB webcam and saves to a path.
 """
 
 import cv2
-import time
-import random
-import string
-from datetime import datetime
+from enum import Enum
+from typing import Optional
+
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse, PlainTextResponse
+from pydantic import BaseModel, Field
 
 from wopr.config import init_config, get_str, get_int
 from wopr.logging import setup_logging
@@ -25,30 +27,65 @@ init_config()
 
 logger = setup_logging("wopr-camera")
 
-from flask import Flask, request, jsonify
-import os
+app = FastAPI(title="wopr-cam", version="0.1.0")
 
-app = Flask(__name__)
 
-@app.route('/capture', methods=['POST'])
-def capture():
-    data = request.json
-    game_id = data['game_id']
-    subject = data['subject']
-    sequence = data['sequence']
+class Subject(str, Enum):
+    setup = "setup"
+    capture = "capture"
+    move = "move"
+    thumbnail = "thumbnail"
 
-    # Generate filepath from config
-    filepath = imagefilename(game_id, subject)
-    
-    resolution = get_str('camera.default_resolution')
+
+class CaptureRequest(BaseModel):
+    game_id: str = Field(..., min_length=1, description="Game identifier, e.g. dune_imperium")
+    subject: Subject = Field(..., description="Capture subject")
+    sequence: int = Field(..., ge=1, description="Sequence number >= 1")
+
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request, exc: ValueError):
+    # Use 400 for invalid input that passes JSON parsing but fails business rules
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": "invalid_request",
+            "message": str(exc),
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request, exc: Exception):
+    # Avoid leaking stack traces to clients; keep them in logs/otel
+    logger.exception("Unhandled exception")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "internal_error",
+            "message": "Capture failed due to an internal error.",
+        },
+    )
+
+
+@app.post("/capture", response_class=PlainTextResponse)
+def capture(req: CaptureRequest):
+    # Generate filepath from config (may raise ValueError; handled above)
+    filepath = imagefilename(req.game_id, req.subject.value)
+
+    resolution = get_str("camera.default_resolution")
     logger.info(f"Res: {resolution}")
-    width = get_int(f'camera.resolutions.{resolution}.width')
-    height = get_int(f'camera.resolutions.{resolution}.height')
+    width = get_int(f"camera.resolutions.{resolution}.width")
+    height = get_int(f"camera.resolutions.{resolution}.height")
     logger.info(f"Capturing {width}x{height} to {filepath}")
-        
+
     # Initialize camera (0 = default camera)
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    if not cap.isOpened():
+        # This will be turned into a 500 JSON by the generic handler
+        raise RuntimeError("Camera device could not be opened")
+
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
 
     # Set resolution (may or may not work depending on camera)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
@@ -56,16 +93,17 @@ def capture():
 
     # Capture
     ret, frame = cap.read()
-    if ret:
-        print(f"File: {filepath}")
-        cv2.imwrite(filepath, frame)
-
     cap.release()
-    return filepath
 
-@app.route('/status', methods=['GET'])
+    if not ret:
+        raise RuntimeError("Camera capture failed (no frame read)")
+
+    cv2.imwrite(filepath, frame)
+
+    # Return newline so curl doesn't stick your prompt ("%") on the end
+    return f"{filepath}\n"
+
+
+@app.get("/status")
 def status():
-    return jsonify({'status': 'ready'})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    return {"status": "ready"}
