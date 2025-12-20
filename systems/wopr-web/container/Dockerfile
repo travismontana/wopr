@@ -11,7 +11,6 @@ RUN npm install
 COPY src ./src
 COPY vite.config.ts .
 COPY web/index.html .
-COPY web/css /usr/share/nginx/html/
 RUN npm run build
 
 # runtime stage
