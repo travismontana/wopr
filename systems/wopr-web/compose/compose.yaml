@@ -1,20 +1,19 @@
 services:
   wopr-web:
     image: ghcr.io/travismontana/wopr/wopr-web:latest
-    user: "2222:2222"
     ports:
       - "8080:8080"
     volumes:
       - /remote/wopr:/remote/wopr:rw
     environment:
-      - OTEL_SERVICE_NAME: wopr-web
-      - OTEL_TRACES_EXPORTER: console,otlp
-      - OTEL_METRICS_EXPORTER: console,otlp
-      - OTEL_EXPORTER_OTLP_ENDPOINT: https://otel.monitoring.abode.tailandtraillabs.org
-      - OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
-      - WOPR_CONFIG_SERVICE_URL: https://wopr-config.studio.abode.tailandtraillabs.org
-      - STARTTRACE: /home/wopr/.local/bin/opentelemetry-instrument
-      - WOPR_API_UPSTREAM: wopr-api
-      - WOPR_API_UPSTREAM_PORT: 8080
-      - WOPR_ML_UPSTREAM: wopr-ml
-      - WOPR_ML_UPSTREAM_PORT: 8080
+      - OTEL_SERVICE_NAME=wopr-web
+      - OTEL_TRACES_EXPORTER=console,otlp
+      - OTEL_METRICS_EXPORTER=console,otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - WOPR_CONFIG_SERVICE_URL=https://wopr-config.studio.abode.tailandtraillabs.org
+      - STARTTRACE=/home/wopr/.local/bin/opentelemetry-instrument
+      - WOPR_API_UPSTREAM=wopr-api
+      - WOPR_API_UPSTREAM_PORT=8080
+      - WOPR_ML_UPSTREAM=wopr-ml
+      - WOPR_ML_UPSTREAM_PORT=8080
