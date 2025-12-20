@@ -4,6 +4,8 @@
 
 WOPR tracks tabletop game state through computer vision.  Players use a web interface to capture overhead images of their game board. WOPR analyzes the images, detects game pieces, validates moves against rules, and maintains a complete game history.
 
+when playing a game, the idea is that you get setup, then start the game in WOPR, it'll ask when you're ready for the first image to be taken, and when yes, it'll take it.  The system should be able to take that image and identify to within 90% accuracy as to what's on the board, note where the pieces are, who has what cards, etc...., then after each round, a pic is taken, and is compared to what it was before, and maybe some questions are asked if the model isnt sure, but ultimatly, the user and wopr agree to the state (the user can adjust the game in wopr as necessary), then the next round is played, the process repeated.
+
 ## User Flow
 
 1. User browses to [https://wopr](https://wopr/) (resolves to k8s ingress)

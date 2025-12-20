@@ -5,3 +5,8 @@
 - Synchronous endpoints: game CRUD, status queries
 - Async task queueing: vision analysis, rule validation
 - Direct database access for reads/writes
+
+## Service List:
+
+
+Kong?
