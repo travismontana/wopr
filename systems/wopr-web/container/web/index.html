@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>WOPR</title>
+        <link href="css/theme.css" rel="stylesheet" type="text/css">
+    </head>
+    <body data-pg-name="app" class="layout">
+        <div id="root" class="app">
+            <div data-pg-name="layout" title="layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; min-height: 100vh; padding: 1rem;">
+                <div data-pg-name="wopr-header" style="background: #2222D6;border-radius: 8px;text-align: center;grid-area:1 / 1 / 2 / 3;">
+                    <h1>WOPR</h1>
+                    <h2>Wargaming Oversight & Position Recognition</h2>
+                </div>
+                <div data-pg-name="camera-panel" style="background: #111; border-radius: 8px; min-height: 200px; font-family: monospace; display: flex; align-items: stretch; color: #2222d6; flex-direction: column; gap: 0.75rem; padding: 1rem; align-content: center; background-position: center top; text-align: center;">
+                    <header>
+                        <h1>Camera Controls</h1>
+                    </header>
+                    <button>Capture</button>
+                    <button>View</button>
+                    <button>Confirm</button>
+                </div>
+                <div data-pg-name="control-panel" style="background: #111; border-radius: 8px; min-height: 200px; font-family: monospace; display: flex; align-items: stretch; color: #2222d6; flex-direction: column; gap: 0.75rem; padding: 1rem; align-content: center; background-position: center top; text-align: center;">
+                    <header>
+                        <h1>Control Controls</h1>
+                    </header>
+                    <button>Edit wopr configs</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
