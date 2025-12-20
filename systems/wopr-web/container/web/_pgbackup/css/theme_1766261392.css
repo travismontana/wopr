@@ -39,7 +39,6 @@ template{display:none;}[hidden]
     --dark: #212529;
 }body, html {
     min-height: 100vh;
-    background: #56585a;
 }
 /* ======================
    Layout
@@ -51,8 +50,8 @@ template{display:none;}[hidden]
   gap: 0.75rem;
   /*min-height: 100vh;*/
   padding: 1rem;
-  align-content: start;
-
+  align-content: stretch;
+  justify-items: stretch;
 }
 
 /* Desktop layout */
@@ -68,13 +67,12 @@ template{display:none;}[hidden]
 
 .wopr-header {
   background: #2222D6;
-  border-radius: 30px;
+  border-radius: 10px;
   text-align: center;
   grid-column: 1 / -1;
-  padding: 1rem 2rem;
+  padding: 1px 8px;
   color: white;
   min-height: 0px;
-  
 }
 
 .wopr-header h1 {
@@ -96,16 +94,15 @@ template{display:none;}[hidden]
    ====================== */
 
 .camera-panel {
-  background: #000000;
-  border-radius: 30px;
+  background: #111;
+  border-radius: 8px;
+  min-height: 0px;
   font-family: monospace;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
   color: #2222D6;
-  text-align: center;
-  justify-items: flex-start;
 }
 
 /* Title inside camera panel */
@@ -117,12 +114,10 @@ template{display:none;}[hidden]
 }
 
 /* Button row */
-.actions {
+.camera-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: center;
-  flex-wrap: wrap;
-  
 }
 
 /* ======================
@@ -130,23 +125,15 @@ template{display:none;}[hidden]
    ====================== */
 
 .control-panel {
-  background: #000000;
-  border-radius: 30px;
+  background: #111;
+  border-radius: 8px;
+  /*min-height: 120px;*/
   font-family: monospace;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
   color: #2222D6;
-  text-align: center;
-  justify-items: flex-start;
-}
-
-.control-panel h1,
-.control-panel h2,
-.control-panel h3 {
-  margin: 0;
-  text-align: center;
 }
 
 /* ======================
@@ -157,7 +144,7 @@ button {
   background: #2222D6;
   color: white;
   border: none;
-  border-radius: 30px;
+  border-radius: 6px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
 }

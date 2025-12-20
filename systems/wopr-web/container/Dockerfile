@@ -8,8 +8,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
-COPY App.tsx .
-COPY main.tsx .
+COPY src ./src
 COPY vite.config.ts .
 COPY web/index.html .
 COPY web/css .

@@ -1,12 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import { Routes, Route, Link } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-);
+import Dashboard from "./pages/Dashboard";
+import Games from "./pages/games";
+import Images from "./pages/images";
+
+/*
+import MLHome from "./pages/MLHome";
+import MLPieces from "./pages/MLPieces";
+import MLLabel from "./pages/MLLabel";
+import MLDatasets from "./pages/MLDatasets";
+import MLTrain from "./pages/MLTrain";
+*/
+
+import ml from "./pages/ml";
+
+
