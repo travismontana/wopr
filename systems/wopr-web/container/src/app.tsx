@@ -1,5 +1,5 @@
 import { Routes, Route, Link } from "react-router-dom";
-import "./css/theme.css";
+import "./pages/css/theme.css";
 
 import Dashboard from "./pages/Dashboard";
 import Games from "./pages/Games";
