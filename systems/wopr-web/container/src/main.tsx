@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard";
 import Games from "./pages/games";
 import Images from "./pages/images";
 
