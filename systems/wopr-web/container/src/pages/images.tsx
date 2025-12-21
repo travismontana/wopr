@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./css/theme.css";
 
 type Subject = "setup" | "capture" | "move" | "thumbnail";
@@ -35,9 +35,16 @@ export default function Images() {
   const [images, setImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
 
+  // NEW: subdirectory selection for gallery
+  const [folders, setFolders] = useState<string[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<string>(""); // "" = root
+
   // Pagination controls
   const [pageSize, setPageSize] = useState<PageSize>(20);
   const [page, setPage] = useState<number>(1); // 1-based
+
+  // NEW: prevent stale fetch responses from overwriting newer ones
+  const loadTokenRef = useRef<number>(0);
 
   const canGo = useMemo(() => {
     const gidOk = gameId.trim().length > 0;
@@ -73,6 +80,80 @@ export default function Images() {
     return newPage;
   }
 
+  // nginx autoindex directory entries often come as "name/" — normalize that
+  function normalizeDirName(name: string) {
+    return name.endsWith("/") ? name.slice(0, -1) : name;
+  }
+
+  // build the URL for the directory we are viewing (root or selected folder)
+  function buildDirUrl(gid: string, folder: string) {
+    const base = `/wopr/games/${encodeURIComponent(gid)}/`;
+    if (!folder) return base;
+    return `${base}${encodeURIComponent(folder)}/`;
+  }
+
+  // loads folder list (from root only) + image list for a given folder
+  async function loadGallery(gid: string, folder: string) {
+    const myToken = ++loadTokenRef.current;
+
+    setLoadingImages(true);
+    setStatus(null);
+    setImages([]);
+
+    try {
+      const dirUrl = buildDirUrl(gid, folder);
+
+      const res = await fetch(dirUrl, { headers: { Accept: "application/json" } });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status}: ${txt}`);
+      }
+
+      const entries = (await res.json()) as NginxAutoIndexEntry[];
+
+      // If this request is stale, ignore it
+      if (myToken !== loadTokenRef.current) return;
+
+      // Only populate folders from ROOT listing
+      if (!folder) {
+        const dirs = entries
+          .filter((e) => e.type === "directory")
+          .map((e) => normalizeDirName(e.name))
+          .filter((n) => n && n !== ".." && n !== ".")
+          .sort((a, b) => a.localeCompare(b));
+
+        setFolders(dirs);
+      }
+
+      const exts = [".jpg", ".jpeg", ".png", ".webp"];
+      const imgs = entries
+        .filter((e) => e.type === "file")
+        .map((e) => e.name)
+        .filter((name) => exts.some((x) => name.toLowerCase().endsWith(x)))
+        // Your filenames are YYYYMMDD-HHMMSS-... so string sort works.
+        // If you want newest first, reverse after sort.
+        .sort()
+        .reverse()
+        .map((name) => `${dirUrl}${encodeURIComponent(name)}`);
+
+      setImages(imgs);
+      setPage(1);
+    } catch (e: any) {
+      setStatus({ type: "error", message: e?.message ?? "Failed to load images" });
+    } finally {
+      // Only the newest request controls loading state
+      if (myToken === loadTokenRef.current) setLoadingImages(false);
+    }
+  }
+
+  async function onFolderChange(nextFolder: string) {
+    const gid = gameId.trim();
+    if (!gid) return;
+
+    setSelectedFolder(nextFolder);
+    await loadGallery(gid, nextFolder);
+  }
+
   async function toggleGallery() {
     if (showGallery) {
       setShowGallery(false);
@@ -85,45 +166,11 @@ export default function Images() {
       return;
     }
 
-    setLoadingImages(true);
-    setImages([]);
-    setStatus(null);
+    setShowGallery(true);
 
-    try {
-      // nginx autoindex JSON listing of the directory
-      // Include trailing slash so nginx treats it as a directory.
-      const baseUrl = `/wopr/games/${encodeURIComponent(gid)}/`;
-
-      const res = await fetch(baseUrl, {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`HTTP ${res.status}: ${txt}`);
-      }
-
-      const entries = (await res.json()) as NginxAutoIndexEntry[];
-
-      const exts = [".jpg", ".jpeg", ".png", ".webp"];
-      const imgs = entries
-        .filter((e) => e.type === "file")
-        .map((e) => e.name)
-        .filter((name) => exts.some((x) => name.toLowerCase().endsWith(x)))
-        // Your filenames are YYYYMMDD-HHMMSS-... so string sort works.
-        // If you want newest first, reverse after sort.
-        .sort()
-        .reverse()
-        .map((name) => `${baseUrl}${encodeURIComponent(name)}`);
-
-      setImages(imgs);
-      setPage(1); // reset pagination when opening
-      setShowGallery(true);
-    } catch (e: any) {
-      setStatus({ type: "error", message: e?.message ?? "Failed to load images" });
-    } finally {
-      setLoadingImages(false);
-    }
+    // Start from root when opening
+    setSelectedFolder("");
+    await loadGallery(gid, "");
   }
 
   async function doCapture() {
@@ -159,7 +206,7 @@ export default function Images() {
       setSequence((s) => s + 1);
       setShowCaptureDialog(false);
 
-      // Optional: if gallery is open, refresh list
+      // Optional: if gallery is open, you can refresh.
       // Keeping simple for now: user can click View again.
     } catch (e: any) {
       setStatus({ type: "error", message: e?.message ?? String(e) });
@@ -170,7 +217,7 @@ export default function Images() {
 
   function onChangePageSize(v: PageSize) {
     setPageSize(v);
-    setPage(1); // reset to first page whenever size changes
+    setPage(1);
   }
 
   const pageLabel = useMemo(() => {
@@ -181,6 +228,18 @@ export default function Images() {
     const end = Math.min(page * pageSize, totalCount);
     return `${start}-${end} of ${totalCount}`;
   }, [showGallery, totalCount, page, pageSize]);
+
+  // OPTIONAL: if gameId changes while view is open, reload root + reset folder
+  useEffect(() => {
+    if (!showGallery) return;
+
+    const gid = gameId.trim();
+    if (!gid) return;
+
+    setSelectedFolder("");
+    loadGallery(gid, "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameId, showGallery]);
 
   return (
     <section className="camera-panel">
@@ -274,10 +333,40 @@ export default function Images() {
       {/* Gallery */}
       {showGallery && (
         <section className="gallery-panel">
-          <div className="gallery-header" style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-            <h2 style={{ margin: 0 }}>Images for {gameId.trim()}</h2>
+          <div
+            className="gallery-header"
+            style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}
+          >
+            <h2 style={{ margin: 0 }}>
+              Images for {gameId.trim()}
+              {selectedFolder ? ` / ${selectedFolder}` : ""}
+            </h2>
 
-            <div style={{ marginLeft: "auto", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+            <div
+              style={{
+                marginLeft: "auto",
+                display: "flex",
+                gap: "0.75rem",
+                alignItems: "center",
+              }}
+            >
+              {/* Folder dropdown */}
+              <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                Folder
+                <select
+                  value={selectedFolder}
+                  onChange={(e) => onFolderChange(e.target.value)}
+                  disabled={loadingImages}
+                >
+                  <option value="">(root)</option>
+                  {folders.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
               <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                 Show
                 <select
@@ -300,10 +389,7 @@ export default function Images() {
 
               {pageSize !== "all" && totalPages > 1 && (
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <button
-                    onClick={() => setPage((p) => clampPage(p - 1))}
-                    disabled={page <= 1}
-                  >
+                  <button onClick={() => setPage((p) => clampPage(p - 1))} disabled={page <= 1}>
                     Prev
                   </button>
                   <span style={{ opacity: 0.85, whiteSpace: "nowrap" }}>

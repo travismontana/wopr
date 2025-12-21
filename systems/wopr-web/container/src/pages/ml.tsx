@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./css/theme.css";
 
 type Subject = "setup" | "capture" | "move" | "thumbnail";
@@ -35,9 +35,16 @@ export default function ML() {
   const [images, setImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
 
+  // NEW: subdirectory selection for gallery
+  const [folders, setFolders] = useState<string[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<string>(""); // "" = root
+
   // Pagination controls
   const [pageSize, setPageSize] = useState<PageSize>(20);
   const [page, setPage] = useState<number>(1); // 1-based
+
+  // NEW: prevent stale fetch responses from overwriting newer ones
+  const loadTokenRef = useRef<number>(0);
 
   const canGo = useMemo(() => {
     const gidOk = gameId.trim().length > 0;
@@ -73,6 +80,78 @@ export default function ML() {
     return newPage;
   }
 
+  // nginx autoindex directory entries often come as "name/" — normalize that
+  function normalizeDirName(name: string) {
+    return name.endsWith("/") ? name.slice(0, -1) : name;
+  }
+
+  // build the URL for the directory we are viewing (root or selected folder)
+  function buildDirUrl(gid: string, folder: string) {
+    const base = `/wopr/ml/${encodeURIComponent(gid)}/`;
+    if (!folder) return base;
+    return `${base}${encodeURIComponent(folder)}/`;
+  }
+
+  // loads folder list (from root only) + image list for a given folder
+  async function loadGallery(gid: string, folder: string) {
+    const myToken = ++loadTokenRef.current;
+
+    setLoadingImages(true);
+    setStatus(null);
+    setImages([]);
+
+    try {
+      const dirUrl = buildDirUrl(gid, folder);
+
+      const res = await fetch(dirUrl, { headers: { Accept: "application/json" } });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status}: ${txt}`);
+      }
+
+      const entries = (await res.json()) as NginxAutoIndexEntry[];
+
+      // If this request is stale, ignore it
+      if (myToken !== loadTokenRef.current) return;
+
+      // Only populate folders from ROOT listing
+      if (!folder) {
+        const dirs = entries
+          .filter((e) => e.type === "directory")
+          .map((e) => normalizeDirName(e.name))
+          .filter((n) => n && n !== ".." && n !== ".")
+          .sort((a, b) => a.localeCompare(b));
+
+        setFolders(dirs);
+      }
+
+      const exts = [".jpg", ".jpeg", ".png", ".webp"];
+      const imgs = entries
+        .filter((e) => e.type === "file")
+        .map((e) => e.name)
+        .filter((name) => exts.some((x) => name.toLowerCase().endsWith(x)))
+        .sort()
+        .reverse()
+        .map((name) => `${dirUrl}${encodeURIComponent(name)}`);
+
+      setImages(imgs);
+      setPage(1);
+    } catch (e: any) {
+      setStatus({ type: "error", message: e?.message ?? "Failed to load images" });
+    } finally {
+      // Only the newest request controls loading state
+      if (myToken === loadTokenRef.current) setLoadingImages(false);
+    }
+  }
+
+  async function onFolderChange(nextFolder: string) {
+    const gid = gameId.trim();
+    if (!gid) return;
+
+    setSelectedFolder(nextFolder);
+    await loadGallery(gid, nextFolder);
+  }
+
   async function toggleGallery() {
     if (showGallery) {
       setShowGallery(false);
@@ -85,45 +164,11 @@ export default function ML() {
       return;
     }
 
-    setLoadingImages(true);
-    setImages([]);
-    setStatus(null);
+    setShowGallery(true);
 
-    try {
-      // nginx autoindex JSON listing of the directory
-      // Include trailing slash so nginx treats it as a directory.
-      const baseUrl = `/wopr/games/${encodeURIComponent(gid)}/`;
-
-      const res = await fetch(baseUrl, {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`HTTP ${res.status}: ${txt}`);
-      }
-
-      const entries = (await res.json()) as NginxAutoIndexEntry[];
-
-      const exts = [".jpg", ".jpeg", ".png", ".webp"];
-      const imgs = entries
-        .filter((e) => e.type === "file")
-        .map((e) => e.name)
-        .filter((name) => exts.some((x) => name.toLowerCase().endsWith(x)))
-        // Your filenames are YYYYMMDD-HHMMSS-... so string sort works.
-        // If you want newest first, reverse after sort.
-        .sort()
-        .reverse()
-        .map((name) => `${baseUrl}${encodeURIComponent(name)}`);
-
-      setImages(imgs);
-      setPage(1); // reset pagination when opening
-      setShowGallery(true);
-    } catch (e: any) {
-      setStatus({ type: "error", message: e?.message ?? "Failed to load images" });
-    } finally {
-      setLoadingImages(false);
-    }
+    // Start from root when opening
+    setSelectedFolder("");
+    await loadGallery(gid, "");
   }
 
   async function doCapture() {
@@ -159,7 +204,7 @@ export default function ML() {
       setSequence((s) => s + 1);
       setShowCaptureDialog(false);
 
-      // Optional: if gallery is open, refresh list
+      // Optional: if gallery is open, you can refresh.
       // Keeping simple for now: user can click View again.
     } catch (e: any) {
       setStatus({ type: "error", message: e?.message ?? String(e) });
@@ -182,6 +227,18 @@ export default function ML() {
     return `${start}-${end} of ${totalCount}`;
   }, [showGallery, totalCount, page, pageSize]);
 
+  // OPTIONAL: if gameId changes while view is open, reload root + reset folder
+  useEffect(() => {
+    if (!showGallery) return;
+
+    const gid = gameId.trim();
+    if (!gid) return;
+
+    setSelectedFolder("");
+    loadGallery(gid, "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameId, showGallery]);
+
   return (
     <section className="camera-panel">
       <h1>ML Controls</h1>
@@ -194,147 +251,4 @@ export default function ML() {
         <button onClick={toggleGallery} disabled={busy || loadingImages}>
           {showGallery ? "Close View" : loadingImages ? "Loading…" : "View"}
         </button>
-      </div>
-
-      {status && (
-        <div className={`status status-${status.type}`}>
-          {status.message}
-          {status.path && (
-            <>
-              :{" "}
-              <a href={status.path} target="_blank" rel="noreferrer">
-                {status.path}
-              </a>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Capture dialog */}
-      {showCaptureDialog && (
-        <div className="wopr-dialog-backdrop" role="dialog" aria-modal="true">
-          <div className="wopr-dialog">
-            <h2>Capture</h2>
-
-            <div className="form">
-              <label>
-                Game ID
-                <input
-                  type="text"
-                  value={gameId}
-                  onChange={(e) => setGameId(e.target.value)}
-                  placeholder="dune_imperium"
-                />
-              </label>
-
-              <label>
-                Subject
-                <select value={subject} onChange={(e) => setSubject(e.target.value as Subject)}>
-                  <option value="setup">setup</option>
-                  <option value="capture">capture</option>
-                  <option value="move">move</option>
-                  <option value="thumbnail">thumbnail</option>
-                </select>
-              </label>
-
-              <label>
-                Subject Name
-                <input
-                  type="text"
-                  value={subjectName}
-                  onChange={(e) => setSubjectName(e.target.value)}
-                  placeholder="Enter subject name"
-                />
-              </label>
-
-              <label>
-                Sequence
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={sequence}
-                  onChange={(e) => setSequence(Number(e.target.value))}
-                />
-              </label>
-            </div>
-
-            <div className="wopr-dialog-actions">
-              <button onClick={toggleCaptureDialog} disabled={busy}>
-                Close
-              </button>
-              <button onClick={doCapture} disabled={!canGo}>
-                {busy ? "Capturing…" : "Go"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Gallery */}
-      {showGallery && (
-        <section className="gallery-panel">
-          <div className="gallery-header" style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-            <h2 style={{ margin: 0 }}>Images for {gameId.trim()}</h2>
-
-            <div style={{ marginLeft: "auto", display: "flex", gap: "0.75rem", alignItems: "center" }}>
-              <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                Show
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    const next: PageSize =
-                      v === "20" ? 20 : v === "50" ? 50 : v === "100" ? 100 : "all";
-                    onChangePageSize(next);
-                  }}
-                >
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                  <option value="all">all</option>
-                </select>
-              </label>
-
-              <span style={{ opacity: 0.8, whiteSpace: "nowrap" }}>{pageLabel}</span>
-
-              {pageSize !== "all" && totalPages > 1 && (
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <button
-                    onClick={() => setPage((p) => clampPage(p - 1))}
-                    disabled={page <= 1}
-                  >
-                    Prev
-                  </button>
-                  <span style={{ opacity: 0.85, whiteSpace: "nowrap" }}>
-                    Page {page} / {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => clampPage(p + 1))}
-                    disabled={page >= totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {totalCount === 0 ? (
-            <p>(No images found)</p>
-          ) : (
-            <ul className="gallery-links">
-              {visibleImages.map((img) => (
-                <li key={img}>
-                  <a href={img} target="_blank" rel="noreferrer">
-                    {decodeURIComponent(img.split("/").pop() || img)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
-    </section>
-  );
-}
+      </d
