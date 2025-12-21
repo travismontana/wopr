@@ -40,6 +40,7 @@ class Subject(str, Enum):
 class CaptureRequest(BaseModel):
     game_id: str = Field(..., min_length=1, description="Game identifier, e.g. dune_imperium")
     subject: Subject = Field(..., description="Capture subject")
+    subject_name: str = Field(..., min_length=1, description="Subject name")
     sequence: int = Field(..., ge=1, description="Sequence number >= 1")
 
 
@@ -72,6 +73,48 @@ async def unhandled_exception_handler(request, exc: Exception):
 def capture(req: CaptureRequest):
     # Generate filepath from config (may raise ValueError; handled above)
     filepath = imagefilename(req.game_id, req.subject.value)
+
+    resolution = get_str("camera.default_resolution")
+    logger.info(f"Res: {resolution}")
+    width = get_int(f"camera.resolutions.{resolution}.width")
+    height = get_int(f"camera.resolutions.{resolution}.height")
+    logger.info(f"Capturing {width}x{height} to {filepath}")
+
+    # Initialize camera (0 = default camera)
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    if not cap.isOpened():
+        # This will be turned into a 500 JSON by the generic handler
+        raise RuntimeError("Camera device could not be opened")
+
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+
+    # Set resolution (may or may not work depending on camera)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+    # Capture
+    ret, frame = cap.read()
+    cap.release()
+
+    if not ret:
+        raise RuntimeError("Camera capture failed (no frame read)")
+
+    cv2.imwrite(filepath, frame)
+
+    # Return newline so curl doesn't stick your prompt ("%") on the end
+    return f"{filepath}\n"
+
+    @app.post("/capture_ml", response_class=PlainTextResponse)
+def capture_ml(req: CaptureRequest):
+    # Generate filepath from config (may raise ValueError; handled above)
+    filepath1 = imagefilename(req.game_id, req.subject.value)
+    base_path = get_str('storage.base_path')
+    subject_name = req.subject_name
+    ml_subdir = "ml" # get_str('storage.ml_subdir')
+    ml_dir = Path(base_path) / ml_subdir / game_id
+    filename = filepath1.split('/')[-1]
+    filepath = ml_dir / f"{subject_name}-{filename}"
+    ensure_path(ml_dir)
 
     resolution = get_str("camera.default_resolution")
     logger.info(f"Res: {resolution}")
