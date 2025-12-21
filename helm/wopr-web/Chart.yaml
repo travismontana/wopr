@@ -1,0 +1,13 @@
+apiVersion: v2
+name: wopr-config-service
+description: WOPR Configuration Service - Centralized config management with PostgreSQL backend
+type: application
+version: 0.1.0
+appVersion: "main-0d42092"
+keywords:
+  - wopr
+  - configuration
+  - fastapi
+maintainers:
+  - name: Bob Bomar
+    email: bob@bomar.us

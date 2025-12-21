@@ -4,7 +4,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /remote/wopr:/remote/wopr:rw
+      - /remote/wopr:/remote/wopr:ro
     environment:
       - OTEL_SERVICE_NAME=wopr-web
       - OTEL_TRACES_EXPORTER=console,otlp
