@@ -21,6 +21,7 @@ export default function Images() {
   // Capture dialog values (only shown in dialog)
   const [gameId, setGameId] = useState<string>("dune_imperium");
   const [subject, setSubject] = useState<Subject>("setup");
+  const [subjectName, setSubjectName] = useState<string>("");
   const [sequence, setSequence] = useState<number>(1);
 
   // UI state
@@ -141,6 +142,7 @@ export default function Images() {
         body: JSON.stringify({
           game_id: gameId.trim(),
           subject,
+          subject_name: subjectName.trim(),
           sequence: Number(sequence),
         }),
       });
@@ -233,6 +235,16 @@ export default function Images() {
                   <option value="move">move</option>
                   <option value="thumbnail">thumbnail</option>
                 </select>
+              </label>
+
+              <label>
+                Subject Name
+                <input
+                  type="text"
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  placeholder="Enter subject name"
+                />
               </label>
 
               <label>
