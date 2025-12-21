@@ -7,7 +7,6 @@ type StatusState =
   | { type: "ok" | "error" | "info"; message: string; path?: string }
   | null;
 
-// nginx autoindex JSON entries look like: { "name": "...", "type": "file|directory", ... }
 type NginxAutoIndexEntry = {
   name: string;
   type: "file" | "directory";
@@ -17,8 +16,8 @@ type NginxAutoIndexEntry = {
 
 type PageSize = 20 | 50 | 100 | "all";
 
-export default function ML() {
-  // Capture dialog values (only shown in dialog)
+export default function Images() {
+  // Capture dialog values
   const [gameId, setGameId] = useState<string>("dune_imperium");
   const [subject, setSubject] = useState<Subject>("setup");
   const [subjectName, setSubjectName] = useState<string>("");
@@ -31,19 +30,22 @@ export default function ML() {
   const [showCaptureDialog, setShowCaptureDialog] = useState<boolean>(false);
   const [showGallery, setShowGallery] = useState<boolean>(false);
 
-  // Image list (full list, client-side paginated)
+  // NEW: available games (dirs under /wopr/ml/)
+  const [games, setGames] = useState<string[]>([]);
+  const [loadingGames, setLoadingGames] = useState<boolean>(false);
+
+  // Gallery state
   const [images, setImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState<boolean>(false);
 
-  // NEW: subdirectory selection for gallery
+  // Optional: subfolders inside selected game
   const [folders, setFolders] = useState<string[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<string>(""); // "" = root
 
-  // Pagination controls
+  // Pagination
   const [pageSize, setPageSize] = useState<PageSize>(20);
-  const [page, setPage] = useState<number>(1); // 1-based
+  const [page, setPage] = useState<number>(1);
 
-  // NEW: prevent stale fetch responses from overwriting newer ones
   const loadTokenRef = useRef<number>(0);
 
   const canGo = useMemo(() => {
@@ -67,7 +69,6 @@ export default function ML() {
 
   const visibleImages = useMemo(() => {
     if (pageSize === "all") return images;
-
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     return images.slice(start, end);
@@ -80,19 +81,55 @@ export default function ML() {
     return newPage;
   }
 
-  // nginx autoindex directory entries often come as "name/" — normalize that
   function normalizeDirName(name: string) {
     return name.endsWith("/") ? name.slice(0, -1) : name;
   }
 
-  // build the URL for the directory we are viewing (root or selected folder)
+  // /wopr/ml/ -> list of game dirs
+  async function loadGamesList() {
+    const myToken = ++loadTokenRef.current;
+
+    setLoadingGames(true);
+    setStatus(null);
+
+    try {
+      const res = await fetch(`/wopr/ml/`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status}: ${txt}`);
+      }
+
+      const entries = (await res.json()) as NginxAutoIndexEntry[];
+
+      if (myToken !== loadTokenRef.current) return;
+
+      const dirs = entries
+        .filter((e) => e.type === "directory")
+        .map((e) => normalizeDirName(e.name))
+        .filter((n) => n && n !== "." && n !== "..")
+        .sort((a, b) => a.localeCompare(b));
+
+      setGames(dirs);
+
+      // If current gameId isn't valid, pick the first one
+      if (dirs.length > 0 && !dirs.includes(gameId.trim())) {
+        setGameId(dirs[0]);
+      }
+    } catch (e: any) {
+      setStatus({ type: "error", message: e?.message ?? "Failed to load game list" });
+    } finally {
+      if (myToken === loadTokenRef.current) setLoadingGames(false);
+    }
+  }
+
   function buildDirUrl(gid: string, folder: string) {
     const base = `/wopr/ml/${encodeURIComponent(gid)}/`;
     if (!folder) return base;
     return `${base}${encodeURIComponent(folder)}/`;
   }
 
-  // loads folder list (from root only) + image list for a given folder
   async function loadGallery(gid: string, folder: string) {
     const myToken = ++loadTokenRef.current;
 
@@ -111,15 +148,14 @@ export default function ML() {
 
       const entries = (await res.json()) as NginxAutoIndexEntry[];
 
-      // If this request is stale, ignore it
       if (myToken !== loadTokenRef.current) return;
 
-      // Only populate folders from ROOT listing
+      // Populate subfolders from the game root listing only
       if (!folder) {
         const dirs = entries
           .filter((e) => e.type === "directory")
           .map((e) => normalizeDirName(e.name))
-          .filter((n) => n && n !== ".." && n !== ".")
+          .filter((n) => n && n !== "." && n !== "..")
           .sort((a, b) => a.localeCompare(b));
 
         setFolders(dirs);
@@ -139,16 +175,28 @@ export default function ML() {
     } catch (e: any) {
       setStatus({ type: "error", message: e?.message ?? "Failed to load images" });
     } finally {
-      // Only the newest request controls loading state
       if (myToken === loadTokenRef.current) setLoadingImages(false);
     }
   }
 
+  async function onGameChange(nextGameId: string) {
+    setGameId(nextGameId);
+    setSelectedFolder("");
+
+    if (!showGallery) return;
+    const gid = nextGameId.trim();
+    if (!gid) return;
+
+    await loadGallery(gid, "");
+  }
+
   async function onFolderChange(nextFolder: string) {
+    setSelectedFolder(nextFolder);
+
+    if (!showGallery) return;
     const gid = gameId.trim();
     if (!gid) return;
 
-    setSelectedFolder(nextFolder);
     await loadGallery(gid, nextFolder);
   }
 
@@ -160,13 +208,11 @@ export default function ML() {
 
     const gid = gameId.trim();
     if (!gid) {
-      setStatus({ type: "info", message: "Set game_id first (Capture panel)." });
+      setStatus({ type: "info", message: "Pick a game first." });
       return;
     }
 
     setShowGallery(true);
-
-    // Start from root when opening
     setSelectedFolder("");
     await loadGallery(gid, "");
   }
@@ -181,13 +227,13 @@ export default function ML() {
     setStatus({ type: "info", message: "Capturing…" });
 
     try {
-      const res = await fetch("/api/cam/capture_ml", {
+      const res = await fetch("/api/cam/capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           game_id: gameId.trim(),
           subject,
-          subject_name: subjectName.trim() || subject,
+          subject_name: subjectName.trim(),
           sequence: Number(sequence),
         }),
       });
@@ -203,9 +249,6 @@ export default function ML() {
 
       setSequence((s) => s + 1);
       setShowCaptureDialog(false);
-
-      // Optional: if gallery is open, you can refresh.
-      // Keeping simple for now: user can click View again.
     } catch (e: any) {
       setStatus({ type: "error", message: e?.message ?? String(e) });
     } finally {
@@ -215,7 +258,7 @@ export default function ML() {
 
   function onChangePageSize(v: PageSize) {
     setPageSize(v);
-    setPage(1); // reset to first page whenever size changes
+    setPage(1);
   }
 
   const pageLabel = useMemo(() => {
@@ -227,13 +270,17 @@ export default function ML() {
     return `${start}-${end} of ${totalCount}`;
   }, [showGallery, totalCount, page, pageSize]);
 
-  // OPTIONAL: if gameId changes while view is open, reload root + reset folder
+  // Load available games once
+  useEffect(() => {
+    loadGamesList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // If gameId changes while view is open (e.g., typing), reload root
   useEffect(() => {
     if (!showGallery) return;
-
     const gid = gameId.trim();
     if (!gid) return;
-
     setSelectedFolder("");
     loadGallery(gid, "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -241,7 +288,7 @@ export default function ML() {
 
   return (
     <section className="camera-panel">
-      <h1>ML Controls</h1>
+      <h1>Camera Controls</h1>
 
       <div className="actions">
         <button onClick={toggleCaptureDialog} disabled={busy}>
@@ -336,7 +383,8 @@ export default function ML() {
             style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}
           >
             <h2 style={{ margin: 0 }}>
-              Images for {gameId.trim()}
+              Images
+              {gameId.trim() ? ` for ${gameId.trim()}` : ""}
               {selectedFolder ? ` / ${selectedFolder}` : ""}
             </h2>
 
@@ -348,7 +396,27 @@ export default function ML() {
                 alignItems: "center",
               }}
             >
-              {/* Folder dropdown */}
+              {/* Game selector from /wopr/ml/ */}
+              <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                Game
+                <select
+                  value={gameId}
+                  onChange={(e) => onGameChange(e.target.value)}
+                  disabled={loadingGames || loadingImages}
+                >
+                  {games.length === 0 ? (
+                    <option value={gameId}>{loadingGames ? "Loading…" : "(none found)"}</option>
+                  ) : (
+                    games.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </label>
+
+              {/* Subfolder selector inside selected game */}
               <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                 Folder
                 <select
