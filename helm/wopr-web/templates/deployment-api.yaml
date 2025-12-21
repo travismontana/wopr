@@ -42,9 +42,9 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
-          volumeMounts:
-            - name: wopr-data
-              mountPath: /remote/wopr
+        volumeMounts:
+          - name: wopr-data
+            mountPath: /remote/wopr
       volumes:
         - name: wopr-data
           persistentVolumeClaim:
