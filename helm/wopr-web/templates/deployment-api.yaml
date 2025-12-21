@@ -42,6 +42,13 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+          volumeMounts:
+            - name: wopr-data
+              mountPath: /remote/wopr
+      volumes:
+        - name: wopr-data
+          persistentVolumeClaim:
+            claimName: wopr-nfs-pvc
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -54,10 +61,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumeMounts:
-        - name: wopr-data
-          mountPath: /remote/wopr
-      volumes:
-        - name: wopr-data
-          persistentVolumeClaim:
-            claimName: wopr-nfs-pvc
