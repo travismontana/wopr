@@ -248,16 +248,6 @@ export default function ML() {
               </label>
 
               <label>
-                Subject
-                <select value={subject} onChange={(e) => setSubject(e.target.value as Subject)}>
-                  <option value="setup">setup</option>
-                  <option value="capture">capture</option>
-                  <option value="move">move</option>
-                  <option value="thumbnail">thumbnail</option>
-                </select>
-              </label>
-
-              <label>
                 Sequence
                 <input
                   type="number"

@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 from wopr.config import init_config, get_str, get_int
 from wopr.logging import setup_logging
 from wopr.storage import imagefilename
+from pathlib import Path
 
 # get configs
 init_config()
@@ -111,10 +112,10 @@ def capture_ml(req: CaptureRequest):
     base_path = get_str('storage.base_path')
     subject_name = req.subject_name
     ml_subdir = "ml" # get_str('storage.ml_subdir')
-    ml_dir = Path(base_path) / ml_subdir / game_id
+    ml_dir = Path(base_path) / ml_subdir / req.game_id
     filename = filepath1.split('/')[-1]
     filepath = ml_dir / f"{subject_name}-{filename}"
-    ensure_path(ml_dir)
+    ml_dir.mkdir(parents=True, exist_ok=True)
 
     resolution = get_str("camera.default_resolution")
     logger.info(f"Res: {resolution}")
