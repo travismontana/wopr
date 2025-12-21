@@ -288,7 +288,7 @@ export default function Images() {
 
   return (
     <section className="camera-panel">
-      <h1>Camera Controls</h1>
+      <h1>Machine Learning Controls</h1>
 
       <div className="actions">
         <button onClick={toggleCaptureDialog} disabled={busy}>
