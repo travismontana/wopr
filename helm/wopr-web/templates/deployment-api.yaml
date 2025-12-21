@@ -57,7 +57,6 @@ spec:
       volumeMounts:
         - name: wopr-data
           mountPath: /remote/wopr
-
       volumes:
         - name: wopr-data
           persistentVolumeClaim:
