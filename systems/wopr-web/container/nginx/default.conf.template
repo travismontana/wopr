@@ -65,6 +65,8 @@ server {
     proxy_send_timeout 120s;
     # Browse WOPR storage
   }
+
+  
   
   location ^~ /wopr/ {
     alias /remote/wopr/;
