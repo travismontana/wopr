@@ -54,3 +54,11 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumeMounts:
+        - name: wopr-data
+          mountPath: /remote/wopr
+
+      volumes:
+        - name: wopr-data
+          persistentVolumeClaim:
+            claimName: wopr-nfs-pvc
