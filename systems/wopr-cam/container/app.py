@@ -107,3 +107,28 @@ def capture(req: CaptureRequest):
 @app.get("/status")
 def status():
     return {"status": "ready"}
+
+
+@app.get("/images/{game_id}")
+def list_images(game_id: str):
+    game_dir = WOPR_ROOT / "games" / game_id
+
+    if not game_dir.exists():
+        raise HTTPException(status_code=404, detail="Game not found")
+
+    images = sorted(
+        p for p in game_dir.rglob("*.jpg")
+        if p.is_file()
+    )
+
+    # Convert filesystem paths to HTTP paths served by nginx (/wopr/)
+    result = [
+        f"/wopr/{p.relative_to(WOPR_ROOT)}"
+        for p in images
+    ]
+
+    return {
+        "game_id": game_id,
+        "count": len(result),
+        "images": result,
+    }
