@@ -67,7 +67,6 @@ server {
   }
 
   
-  
   location ^~ /wopr/ {
     alias /remote/wopr/;
 

@@ -184,7 +184,7 @@ export default function ML() {
 
   return (
     <section className="camera-panel">
-      <h1>Camera Controls</h1>
+      <h1>ML Controls</h1>
 
       <div className="actions">
         <button onClick={toggleCaptureDialog} disabled={busy}>
@@ -224,6 +224,26 @@ export default function ML() {
                   value={gameId}
                   onChange={(e) => setGameId(e.target.value)}
                   placeholder="dune_imperium"
+                />
+              </label>
+
+              <label>
+                Subject
+                <select value={subject} onChange={(e) => setSubject(e.target.value as Subject)}>
+                  <option value="setup">setup</option>
+                  <option value="capture">capture</option>
+                  <option value="move">move</option>
+                  <option value="thumbnail">thumbnail</option>
+                </select>
+              </label>
+
+              <label>
+                Subject Name
+                <input
+                  type="text"
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  placeholder="Enter subject name"
                 />
               </label>
 
