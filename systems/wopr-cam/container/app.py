@@ -104,7 +104,7 @@ def capture(req: CaptureRequest):
     # Return newline so curl doesn't stick your prompt ("%") on the end
     return f"{filepath}\n"
 
-    @app.post("/capture_ml", response_class=PlainTextResponse)
+@app.post("/capture_ml", response_class=PlainTextResponse)
 def capture_ml(req: CaptureRequest):
     # Generate filepath from config (may raise ValueError; handled above)
     filepath1 = imagefilename(req.game_id, req.subject.value)

@@ -1,22 +1,44 @@
 #!/bin/sh
 set -eu
 
+# FastAPI app path: "app:app" means /app/app.py contains `app = FastAPI(...)`
+APP_MODULE="${APP_MODULE:-app:app}"
+HOST="${HOST:-0.0.0.0}"
+PORT="${PORT:-5000}"
+
 if [ -n "${STARTTRACE:-}" ]; then
   echo "[entrypoint] tracing enabled"
-  pip install --no-cache-dir --user opencv-python-headless \
+
+  # Install runtime deps (as you were doing). You can/should bake these into the image later.
+  pip install --no-cache-dir --user \
     opencv-python-headless \
-    opentelemetry-api \
-    opentelemetry-sdk \
+    opentelemetry-distro \
     opentelemetry-exporter-otlp \
     opentelemetry-instrumentation \
-    opentelemetry-instrumentation-wsgi \
-    opentelemetry-instrumentation-flask 
-  ls -ln /dev/video0
-  stat -c "mode=%a uid=%u gid=%g %n" /dev/video0
-  exec /home/wopr/.local/bin/opentelemetry-instrument python /app/app.py
+    opentelemetry-instrumentation-asgi \
+    opentelemetry-instrumentation-fastapi \
+    opentelemetry-instrumentation-logging \
+    fastapi \
+    "uvicorn[standard]" \
+    pydantic
+
+  # Optional camera device sanity checks (keep if you're on a host with /dev/video0)
+  if [ -e /dev/video0 ]; then
+    ls -ln /dev/video0
+    stat -c "mode=%a uid=%u gid=%g %n" /dev/video0
+  else
+    echo "[entrypoint] NOTE: /dev/video0 not found (ok if running without camera device)"
+  fi
+
+  # (Optional but handy) ensure distro is bootstrapped.
+  # If you already have this done elsewhere, you can remove it.
+  #/home/wopr/.local/bin/opentelemetry-bootstrap -a install || true
+
+  # Launch uvicorn under OpenTelemetry auto-instrumentation
+  exec /home/wopr/.local/bin/opentelemetry-instrument \
+    uvicorn "$APP_MODULE" --host "$HOST" --port "$PORT"
+
 else
   echo "[entrypoint] tracing disabled"
-  exec python /app/app.py
+  exec uvicorn "$APP_MODULE" --host "$HOST" --port "$PORT"
 fi
-
-exit 0
