@@ -29,11 +29,11 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-      - name: config-service
+      - name: {{ include "wpor-web.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - name: http
+        - name: {{ include "wpor-web.fullname" . }}-port
           containerPort: 8080
           protocol: TCP
         env:
