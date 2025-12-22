@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     curl \
+    git \
+    netcat \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app user
@@ -31,6 +33,7 @@ RUN useradd -m -u 1000 wopr && \
 WORKDIR /app
 
 # Install Python dependencies
+RUN pip install --upgrade pip setuptools wheel git+github.com
 COPY --chown=wopr:wopr requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
