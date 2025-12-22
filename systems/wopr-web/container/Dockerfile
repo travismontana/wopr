@@ -18,4 +18,5 @@ COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 RUN chgrp -R 1000 /var/cache/nginx /var/run /var/log/nginx && \
     chmod -R 770 /var/cache/nginx /var/run /var/log/nginx
+    
 EXPOSE 8080
