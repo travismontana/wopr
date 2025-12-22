@@ -1,11 +1,11 @@
 # build stage
 FROM node:20-alpine AS build
-USER 2222:2222
 ENV HOME=/app
 WORKDIR /app
 RUN addgroup -g 2222 wopr && \
     adduser -D -u 2222 -G wopr wopr
 COPY --chown=2222:2222 package.json package-lock.json* ./
+USER 2222:2222
 RUN npm install
 COPY --chown=2222:2222 src ./src
 COPY --chown=2222:2222 public ./public
