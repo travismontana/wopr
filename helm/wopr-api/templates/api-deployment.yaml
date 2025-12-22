@@ -58,8 +58,8 @@ spec:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: {{ include "wopr-api.fullname" . }}
-              key: database-url
+              name: {{ .Values.postgresql.uriSecretName }}
+              key: {{ .Values.postgresql.uriKey }}
         - name: JWT_SECRET_KEY
           valueFrom:
             secretKeyRef:

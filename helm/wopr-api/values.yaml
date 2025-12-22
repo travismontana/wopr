@@ -61,7 +61,7 @@ api:
 
 # Worker deployment
 worker:
-  enabled: true
+  enabled: false
   replicaCount: 1
   
   resources:

@@ -17,3 +17,24 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
 
 export WOPR_CONFIG_SERVICE_URL=https://wopr-config.studio.abode.tailandtraillabs.org
+
+
+---
+Deployment snippet:
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgresql.uriSecretName }}
+              key: {{ .Values.postgresql.uriKey }}
+---
+postgresql:
+  uriSecretName: wopr-config-db-cluster-app
+  uriKey: uri
+---
+
+---
+        - name: WOPR_CONFIG_SERVICE_URL
+          value: {{ .Values.env.WOPR_CONFIG_SERVICE_URL }}
+---
+        - name: OTEL_ENABLED
