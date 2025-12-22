@@ -7,14 +7,19 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
+# Copy config files first (needed for TypeScript path resolution)
 COPY package.json package-lock.json* ./
+COPY tsconfig.json tsconfig.node.json ./
+COPY vite.config.ts ./
+COPY postcss.config.js tailwind.config.js ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
-# Copy source
-COPY . .
+# Copy source code
+COPY src ./src
+COPY public ./public
+COPY index.html ./
 
 # Build app
 RUN npm run build
