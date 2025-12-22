@@ -18,7 +18,7 @@ fullnameOverride: ""
 # API deployment
 api:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   
   service:
     type: ClusterIP
@@ -62,7 +62,7 @@ api:
 # Worker deployment
 worker:
   enabled: true
-  replicaCount: 3
+  replicaCount: 1
   
   resources:
     limits:
@@ -108,7 +108,7 @@ env:
   REDIS_URL: "redis://wopr-redis.svc:6379/0"
   
   # OpenTelemetry
-  OTEL_ENABLED: "true"
+  OTEL_ENABLED: "false"
   OTEL_ENDPOINT: "https://otel.monitoring.abode.tailandtraillabs.org"
   OTEL_SERVICE_NAME: "wopr-api"
 
