@@ -62,7 +62,7 @@ api:
 # Worker deployment
 worker:
   enabled: false
-  replicaCount: 1
+  replicaCount: 0
   
   resources:
     limits:
