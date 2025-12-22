@@ -18,6 +18,6 @@ RUN npm run build
 FROM nginx:alpine
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
-RUN chgrp -R root /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d && \
-    chmod -R 770 /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d
+RUN chgrp -R root /var/cache/nginx /var/run /var/log/nginx && \
+    chmod -R 770 /var/cache/nginx /var/run /var/log/nginx
 EXPOSE 8080
