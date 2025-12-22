@@ -18,5 +18,5 @@ COPY --chown=2222:2222 nginx/default.conf.template /etc/nginx/templates/default.
 COPY --chown=2222:2222 --from=build /app/dist /usr/share/nginx/html
 RUN chgrp -R 2222 /var/cache/nginx /var/run /var/log/nginx && \
     chmod -R 770 /var/cache/nginx /var/run /var/log/nginx
-RUN sed -i 's/user.*nginx/user 2222/g' /etc/nginx/nginx.conf
+RUN sed -i '1i user wopr wopr;' /etc/nginx/nginx.conf
 EXPOSE 8080
