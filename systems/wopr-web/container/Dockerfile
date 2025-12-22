@@ -12,7 +12,7 @@ COPY vite.config.ts ./vite.config.ts
 RUN npm run build
 
 # runtime stage
-FROM nginx-unprivileged:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
