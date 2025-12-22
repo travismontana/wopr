@@ -31,7 +31,8 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.config
+#COPY nginx.conf /etc/nginx/conf.d/default.config
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /docker-entrypoint.sh
