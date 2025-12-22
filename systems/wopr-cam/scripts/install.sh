@@ -3,7 +3,7 @@
 set -eu
 
 BASEDIR="/home/wopr/wopr"
-WCAM_DIR="$BASEDIR/systems/wopr_cam"
+WCAM_DIR="$BASEDIR/systems/wopr-cam"
 WCAM_SHARE="$WCAM_DIR/share"
 WCAM_SERVICE="/etc/systemd/system/wopr-cam.service"
 WCAM_TOBEINSTALLED_SERVICE="$WCAM_SHARE/wopr-cam.service"
