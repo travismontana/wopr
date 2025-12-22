@@ -33,7 +33,7 @@ class Camera(Base):
     status: Mapped[str] = mapped_column(String(32), default="offline")
     
     capabilities: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    mdata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
@@ -80,7 +80,7 @@ class CameraSession(Base):
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="active")
     capture_count: Mapped[int] = mapped_column(Integer, default=0)
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    mdata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     
     # Relationships
     camera: Mapped["Camera"] = relationship("Camera", back_populates="sessions")

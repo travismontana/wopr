@@ -24,7 +24,7 @@ class CameraBase(BaseModel):
 class CameraCreate(CameraBase):
     """Camera creation schema"""
     capabilities: Dict[str, Any] | None = None
-    metadata: Dict[str, Any] | None = None
+    mdata: Dict[str, Any] | None = None
 
 
 class CameraUpdate(BaseModel):
@@ -33,7 +33,7 @@ class CameraUpdate(BaseModel):
     service_url: str | None = None
     status: str | None = None
     capabilities: Dict[str, Any] | None = None
-    metadata: Dict[str, Any] | None = None
+    mdata: Dict[str, Any] | None = None
 
 
 class CameraResponse(CameraBase):
@@ -41,7 +41,7 @@ class CameraResponse(CameraBase):
     id: UUID
     status: str
     capabilities: Dict[str, Any] | None
-    metadata: Dict[str, Any] | None
+    mdata: Dict[str, Any] | None
     created_at: datetime
     updated_at: datetime
     last_heartbeat: datetime | None
@@ -52,14 +52,14 @@ class CameraResponse(CameraBase):
 class CameraHeartbeat(BaseModel):
     """Camera heartbeat request"""
     status: str
-    metadata: Dict[str, Any] | None = None
+    mdata: Dict[str, Any] | None = None
 
 
 class CaptureRequest(BaseModel):
     """Camera capture request"""
     game_instance_id: UUID | None = None
     subject: str = "capture"
-    metadata: Dict[str, Any] | None = None
+    mdata: Dict[str, Any] | None = None
 
 
 class CaptureResponse(BaseModel):

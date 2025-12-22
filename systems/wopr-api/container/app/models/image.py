@@ -54,7 +54,7 @@ class Image(Base):
         nullable=True
     )
     
-    # Image metadata
+    # Image mdata
     subject: Mapped[str | None] = mapped_column(String(64), nullable=True)
     width: Mapped[int | None] = mapped_column(Integer, nullable=True)
     height: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -76,7 +76,7 @@ class Image(Base):
         nullable=True
     )
     
-    metadata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    mdata: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -113,7 +113,7 @@ class PieceImage(Base):
         index=True
     )
     
-    # Training metadata
+    # Training mdata
     rotation_angle: Mapped[int | None] = mapped_column(Integer, nullable=True)
     position_context: Mapped[str | None] = mapped_column(String(64), nullable=True)
     lighting_condition: Mapped[str | None] = mapped_column(String(64), nullable=True)
