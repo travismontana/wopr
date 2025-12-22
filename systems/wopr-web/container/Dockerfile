@@ -5,6 +5,7 @@ ARG WOPR_ML_UPSTREAM_PORT="8080"
 
 # build stage
 FROM node:20-alpine AS build
+USER 2222:2222
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
