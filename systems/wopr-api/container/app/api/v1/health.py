@@ -20,6 +20,7 @@ from app.config import settings, get_wopr_config
 from app.schemas.common import HealthResponse, ReadyResponse
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -44,6 +45,8 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
     Returns 200 if service is ready to accept traffic.
     Returns 503 if not ready.
     """
+    logger.info("Starting readiness check")  # ADD
+
     checks = {
         "database": "unknown",
         "config_service": "unknown",
@@ -54,9 +57,10 @@ async def readiness_check(db: AsyncSession = Depends(get_db)):
     try:
         await db.execute(text("SELECT 1"))
         checks["database"] = "healthy"
+        logger.debug("Database check: healthy")
     except Exception as e:
-        checks["database"] = "healthy"
-        #checks["database"] = f"unhealthy: {str(e)}"
+        checks["database"] = f"unhealthy: {str(e)}"
+        logger.error(f"Database check failed: {e}") 
 
     
     # Check config service
