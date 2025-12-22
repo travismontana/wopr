@@ -38,47 +38,59 @@ function App() {
           <Route
             path="/"
             element={
-              <Navigate to="/dashboard" replace />
+              <ProtectedRoute>
+                <Navigate to="/dashboard" replace />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/dashboard"
             element={
-              <Layout>
-                <Dashboard />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/games"
             element={
-              <Layout>
-                <Games />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Games />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/cameras"
             element={
-              <Layout>
-                <Cameras />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Cameras />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/ml"
             element={
-              <Layout>
-                <MLTraining />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <MLTraining />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/admin"
             element={
-              <Layout>
-                <Admin />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Admin />
+                </Layout>
+              </ProtectedRoute>
             }
           />
 
