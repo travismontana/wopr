@@ -14,9 +14,11 @@ RUN npm run build
 
 # runtime stage
 FROM nginx:alpine
+RUN addgroup -g 2222 wopr && \
+    adduser -D -u 2222 -G wopr wopr
+RUN sed -i '1i user wopr wopr;' /etc/nginx/nginx.conf
 COPY --chown=2222:2222 nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --chown=2222:2222 --from=build /app/dist /usr/share/nginx/html
 RUN chgrp -R 2222 /var/cache/nginx /var/run /var/log/nginx && \
     chmod -R 770 /var/cache/nginx /var/run /var/log/nginx
-RUN sed -i '1i user wopr wopr;' /etc/nginx/nginx.conf
 EXPOSE 8080
