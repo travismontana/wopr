@@ -53,6 +53,10 @@ autoscaling:
 env:
   - name: WOPR_ENVIRONMENT
     value: "production"
+  - name: WOPR_API_SERVICE_HOST
+    value: "wopr-api.wopr.svc"
+  - name: WOPR_API_SERVICE_PORT
+    value: "8000"
 
 nodeSelector: {}
 
