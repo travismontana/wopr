@@ -11,7 +11,7 @@ WCAM_TOBEINSTALLED_SERVICE="${WCAM_SHARE}/wopr-cam.service"
 WOPR_CORE_PYMOD="git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core"
 
 # Install Python dependencies
-pip3 install --user --upgrade ${WOPR_CORE_PYMOD}
+pip3 install --user --upgrade --break-system-packages ${WOPR_CORE_PYMOD}
 
 mkdir -p ${SYSTEMD_DIR}
 cp ${WCAM_TOBEINSTALLED_SERVICE} ${WCAM_SERVICE}
