@@ -12,7 +12,7 @@ WOPR_CORE_PYMOD="git+https://github.com/travismontana/wopr.git#subdirectory=pymo
 
 # Install Python dependencies
 pip3 install --user --upgrade --break-system-packages ${WOPR_CORE_PYMOD}
-
+pip3 install --no-cache-dir --user --break-system-packages -r ${WCAM_DIR}/app/requirements.txt
 mkdir -p ${SYSTEMD_DIR}
 cp ${WCAM_TOBEINSTALLED_SERVICE} ${WCAM_SERVICE}
 chown wopr:wopr ${WCAM_SERVICE}
