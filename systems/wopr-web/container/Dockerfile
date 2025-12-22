@@ -1,6 +1,7 @@
 # build stage
 FROM node:20-alpine AS build
 USER 2222:2222
+ENV HOME=/app
 WORKDIR /app
 COPY --chown=2222:2222 package.json package-lock.json* ./
 RUN npm install
