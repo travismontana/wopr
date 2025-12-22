@@ -74,7 +74,7 @@ async def create_camera(
         device_id=camera_data.device_id,
         service_url=camera_data.service_url,
         capabilities=camera_data.capabilities,
-        metadata=camera_data.metadata,
+        mdata=camera_data.mdata,
         status="offline"
     )
     
@@ -126,8 +126,8 @@ async def camera_heartbeat(
     
     camera.status = heartbeat_data.status
     camera.last_heartbeat = datetime.utcnow()
-    if heartbeat_data.metadata:
-        camera.metadata = heartbeat_data.metadata
+    if heartbeat_data.mdata:
+        camera.mdata = heartbeat_data.mdata
     
     await db.commit()
     
@@ -144,7 +144,7 @@ async def trigger_capture(
     """
     Trigger camera capture.
     
-    Calls wopr-cam service, saves image metadata to database.
+    Calls wopr-cam service, saves image mdata to database.
     """
     # Get camera
     result = await db.execute(select(Camera).where(Camera.id == camera_id))
@@ -182,7 +182,7 @@ async def trigger_capture(
         camera_id=camera_id,
         game_instance_id=capture_data.game_instance_id,
         captured_by=current_user.id,
-        metadata=capture_data.metadata,
+        mdata=capture_data.mdata,
         analysis_status="pending"
     )
     
