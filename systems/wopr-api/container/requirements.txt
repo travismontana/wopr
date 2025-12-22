@@ -56,3 +56,6 @@ httpx[http2]==0.26.0  # For testing
 
 # Email validator
 pydantic[email] >= 2.10.5
+
+# WOPR Core
+git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core
