@@ -7,7 +7,7 @@
 # Image configuration
 image:
   repository: ghcr.io/travismontana/wopr/wopr-api
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 #  tag: "0.1.0"
   tag: "latest"
 
