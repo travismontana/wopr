@@ -52,9 +52,11 @@ function App() {
           <Route
             path="/games"
             element={
-              <Layout>
-                <Games />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Games />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
