@@ -2,6 +2,6 @@
 git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core
 
 # Web Framework
-fastapi>=0.115.14
-uvicorn[standard]>=0.32.1
-python-multipart>=0.0.20
+fastapi>=0.114.12
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.19

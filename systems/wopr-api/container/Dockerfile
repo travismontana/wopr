@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM python:3.12-slim
 LABEL maintainer="Bob Bomar"
 LABEL description="WOPR API - Wargaming Oversight & Position Recognition API Service"
 
@@ -12,21 +12,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     git \
     && pip install --upgrade pip setuptools wheel \
-    && rm -rf /var/lib/apt/lists/*
+    && apt clean \
+    && apt autoclean \
+    && rm -rf /var/lib/apt/lists/* 
 
-RUN useradd -m -u 2222 -d /app wopr && \
+RUN useradd -m wopr && \
     mkdir -p /app /var/log/wopr && \
     chown -R wopr:wopr /app /var/log/wopr
+
+USER wopr
 
 WORKDIR /app
 
 COPY --chown=wopr:wopr requirements.txt .
 RUN pip install --user -r requirements.txt
 
-COPY --chown=wopr:wopr app/ /app
+COPY --chown=wopr:wopr app/ ./app/
 
-USER wopr
+
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/home/wopr/.local/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
