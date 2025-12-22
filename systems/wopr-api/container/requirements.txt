@@ -53,3 +53,6 @@ black==24.1.1
 ruff==0.1.13
 mypy==1.8.0
 httpx[http2]==0.26.0  # For testing
+
+# Email validator
+pydantic[email] >= 2.10.5
