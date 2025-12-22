@@ -1,0 +1,24 @@
+# WOPR API - Environment Variables Template
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+#
+# Copy to .env and fill in actual values
+
+# ===== DATABASE =====
+DATABASE_URL=postgresql://wopr:changeme@localhost:5432/wopr_main
+DATABASE_URL=postgresql://app:2UH3Uy4pjC4bEnJcYbDLHUNU2A0mUGqYspWJIkHjLyiVYJwqjAMo7AQ8Q53kZRFy@wopr-config-db-cluster-rw.wopr:5432/app%
+
+# ===== SECRETS =====
+JWT_SECRET_KEY=your-secret-key-change-in-production-use-secrets-token-urlsafe-32
+
+# ===== REDIS =====
+REDIS_URL=redis://localhost:6379/0
+
+# ===== WOPR CONFIG SERVICE =====
+WOPR_CONFIG_SERVICE_URL=http://localhost:8080
+
+# ===== OPENTELEMETRY (optional overrides) =====
+# OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo.studio:4317
+
+# ===== CORS (optional) =====
+# CORS_ORIGINS=["http://localhost:3000","https://wopr.example.com"]

@@ -1,0 +1,55 @@
+# WOPR API - Python Dependencies
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy[asyncio]==2.0.25
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Task Queue
+celery==5.3.6
+redis==5.0.1
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dateutil==2.8.2
+
+# OpenTelemetry
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-instrumentation-fastapi==0.43b0
+opentelemetry-instrumentation-sqlalchemy==0.43b0
+opentelemetry-instrumentation-redis==0.43b0
+opentelemetry-exporter-otlp-proto-grpc==1.22.0
+
+# Prometheus
+prometheus-client==0.19.0
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# WOPR Core (local development - install from path)
+# For production, install from package or git
+# wopr-core @ git+https://github.com/yourusername/wopr-core.git
+
+# Utils
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+
+# Development
+pytest==7.4.4
+pytest-asyncio==0.23.3
+black==24.1.1
+ruff==0.1.13
+mypy==1.8.0
+httpx[http2]==0.26.0  # For testing

@@ -1,0 +1,74 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wopr-db
+    environment:
+      POSTGRES_USER: wopr
+      POSTGRES_PASSWORD: wopr
+      POSTGRES_DB: wopr_main
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wopr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: wopr-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: wopr-api
+    environment:
+      DATABASE_URL: postgresql://wopr:wopr@postgres:5432/wopr_main
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
+      WOPR_CONFIG_SERVICE_URL: http://host.docker.internal:8080
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app:ro
+      - /remote/wopr:/remote/wopr
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build: .
+    container_name: wopr-worker
+    environment:
+      DATABASE_URL: postgresql://wopr:wopr@postgres:5432/wopr_main
+      REDIS_URL: redis://redis:6379/0
+      WOPR_CONFIG_SERVICE_URL: http://host.docker.internal:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app:ro
+      - /remote/wopr:/remote/wopr
+    command: celery -A app.tasks worker --loglevel=info
+
+volumes:
+  postgres_data:

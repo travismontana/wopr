@@ -1,16 +1,16 @@
-OTEL_SERVICE_NAME=wopr-config_service 
+OTEL_SERVICE_NAME=
 OTEL_TRACES_EXPORTER=otlp 
 OTEL_METRICS_EXPORTER=otlp
 OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
 
-ENV OTEL_SERVICE_NAME=wopr-config_service 
+ENV OTEL_SERVICE_NAME
 ENV OTEL_TRACES_EXPORTER=otlp 
 ENV OTEL_METRICS_EXPORTER=otlp
 ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
 
-export OTEL_SERVICE_NAME=wopr-config_service 
+export OTEL_SERVICE_NAME=
 export OTEL_TRACES_EXPORTER=otlp 
 export OTEL_METRICS_EXPORTER=otlp
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf

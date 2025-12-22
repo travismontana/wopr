@@ -1,23 +1,37 @@
-ARG WOPR_API_UPSTREAM="wopr-api"
-ARG WOPR_API_UPSTREAM_PORT="8080"
-ARG WOPR_ML_UPSTREAM="wopr-ml"
-ARG WOPR_ML_UPSTREAM_PORT="8080"
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
 
-# build stage
+# Build stage
 FROM node:20-alpine AS build
+
 WORKDIR /app
+
+# Copy package files
 COPY package.json package-lock.json* ./
-RUN npm install
-COPY src ./src
-COPY public ./public
-COPY web/index.html ./index.html
-COPY vite.config.ts ./vite.config.ts
+
+# Install dependencies
+RUN npm ci
+
+# Copy source
+COPY . .
+
+# Build app
 RUN npm run build
 
-# runtime stage
+# Production stage
 FROM nginx:alpine
-COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+
+# Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
-RUN chgrp -R root /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d && \
-    chmod -R 770 /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d
-EXPOSE 8080
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

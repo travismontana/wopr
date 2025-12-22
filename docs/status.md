@@ -17,6 +17,13 @@
 
 ---
 
+**20251221 - 2025, Dec 21**
+* Current status: 
+* wopr-cam is running, switched from flask to fastapi
+* wopr-web is running, react ui
+* started capturing images for the ML
+* going to start on the API so that capturing images will be hair easier
+
 **20251217 - 2025, Dec 17**
 * Grafana/loki/prom up and running.
 * all 3 clusters reporting in.
