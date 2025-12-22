@@ -3,15 +3,17 @@
 set -eu
 
 BASEDIR="/home/wopr/wopr"
-WCAM_DIR="$BASEDIR/systems/wopr-cam"
-WCAM_SHARE="$WCAM_DIR/share"
-WCAM_SERVICE="/etc/systemd/system/wopr-cam.service"
-WCAM_TOBEINSTALLED_SERVICE="$WCAM_SHARE/wopr-cam.service"
+WCAM_DIR="${BASEDIR}/systems/wopr-cam"
+WCAM_SHARE="${WCAM_DIR}/share"
+SYSTEMD_DIR="/home/wopr/.config/systemd/user/"
+WCAM_SERVICE="${SYSTEMD_DIR}/wopr-cam.service"
+WCAM_TOBEINSTALLED_SERVICE="${WCAM_SHARE}/wopr-cam.service"
 
+mkdir -p ${SYSTEMD_DIR}
 cp ${WCAM_TOBEINSTALLED_SERVICE} ${WCAM_SERVICE}
-chown root:root ${WCAM_SERVICE}
+chown wopr:wopr ${WCAM_SERVICE}
 chmod 644 ${WCAM_SERVICE}
-systemctl daemon-reload
-systemctl enable wopr-cam.service
+systemctl --user daemon-reload
+systemctl --user enable wopr-cam.service
 
 exit 0
