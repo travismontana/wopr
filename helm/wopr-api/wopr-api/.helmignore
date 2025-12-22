@@ -1,0 +1,24 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+
+# Patterns to ignore when building packages
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+.DS_Store
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+*.tgz
+.idea/
+*.tmproj
+.vscode/
+examples/
+ci/

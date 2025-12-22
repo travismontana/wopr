@@ -1,0 +1,182 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+
+# Default values for wopr-api
+
+# Image configuration
+image:
+  repository: ghcr.io/travismontana/wopr/wopr-api
+  pullPolicy: IfNotPresent
+#  tag: "0.1.0"
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# API deployment
+api:
+  enabled: true
+  replicaCount: 2
+  
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+    annotations: {}
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Worker deployment
+worker:
+  enabled: true
+  replicaCount: 3
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  
+  # Celery worker configuration
+  concurrency: 4
+  logLevel: info
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "studio-traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: wopr-api.studio.abode.tailandtraillabs.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: wopr-api-tls
+      hosts:
+        - wopr-api.studio.abode.tailandtraillabs.org
+
+# Environment variables
+env:
+  # WOPR Config Service
+  WOPR_CONFIG_SERVICE_URL: "https://wopr-config.studio.abode.tailandtraillabs.org"
+  
+  # Redis
+  REDIS_URL: "redis://wopr-redis.svc:6379/0"
+  
+  # OpenTelemetry
+  OTEL_ENABLED: "true"
+  OTEL_ENDPOINT: "https://otel.monitoring.abode.tailandtraillabs.org"
+  OTEL_SERVICE_NAME: "wopr-api"
+
+# Secrets (use Kubernetes secrets for these)
+secrets:
+  # Database connection string
+  DATABASE_URL: "postgresql://wopr:changeme@wopr-db.svc:5432/wopr_main"
+  
+  # JWT secret key (generate with: python -c "import secrets; print(secrets.token_urlsafe(32))")
+  JWT_SECRET_KEY: "CHANGE-ME-IN-PRODUCTION"
+
+# External dependencies
+postgresql:
+  enabled: false  # Set to true to deploy PostgreSQL with this chart
+  host: "wopr-db.svc"
+  port: 5432
+  database: "wopr_main"
+  username: "wopr"
+  uriSecretName: wopr-config-db-cluster-app
+  uriKey: uri
+  # password: provided via secrets
+
+redis:
+  enabled: false  # Set to true to deploy Redis with this chart
+  host: "wopr-redis.svc"
+  port: 6379
+
+# ServiceAccount
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+
+# Node selection
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# PodDisruptionBudget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Monitoring
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    path: /metrics

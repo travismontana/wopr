@@ -1,0 +1,18 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+# SPDX-License-Identifier: MIT
+
+apiVersion: v2
+name: wopr-api
+description: WOPR API and Worker deployment - Wargaming Oversight & Position Recognition
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - wopr
+  - api
+  - fastapi
+  - celery
+maintainers:
+  - name: Bob Bomar
+    email: bob@bomar.us

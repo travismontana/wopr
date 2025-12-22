@@ -1,0 +1,17 @@
+{{/*
+WOPR - Wargaming Oversight & Position Recognition
+Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+SPDX-License-Identifier: MIT
+*/}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wopr-api.fullname" . }}
+  labels:
+    {{- include "wopr-api.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  REDIS_URL: {{ include "wopr-api.redisUrl" . | quote }}

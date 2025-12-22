@@ -1,0 +1,114 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Production values example
+
+image:
+  repository: your-registry/wopr-api
+  pullPolicy: Always
+  tag: "0.1.0"
+
+api:
+  enabled: true
+  replicaCount: 3
+  
+  service:
+    type: ClusterIP
+    port: 8000
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+worker:
+  enabled: true
+  replicaCount: 5
+  
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 50
+    targetCPUUtilizationPercentage: 75
+  
+  concurrency: 8
+  logLevel: warning
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
+  hosts:
+    - host: wopr.production.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: wopr-prod-tls
+      hosts:
+        - wopr.production.com
+
+env:
+  WOPR_CONFIG_SERVICE_URL: "http://wopr-config-service.production.svc:8080"
+  REDIS_URL: "redis://wopr-redis.production.svc:6379/0"
+  OTEL_ENABLED: "true"
+  OTEL_ENDPOINT: "http://tempo.observability.svc:4317"
+  OTEL_SERVICE_NAME: "wopr-api"
+
+secrets:
+  # Use external secrets operator or sealed secrets in production
+  # DATABASE_URL: managed externally
+  # JWT_SECRET_KEY: managed externally
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - api
+          topologyKey: kubernetes.io/hostname

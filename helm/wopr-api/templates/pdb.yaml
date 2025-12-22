@@ -1,0 +1,25 @@
+{{/*
+WOPR - Wargaming Oversight & Position Recognition
+Copyright (c) 2025 Bob Bomar <bob@bomar.us>
+SPDX-License-Identifier: MIT
+*/}}
+
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "wopr-api.fullname" . }}-api
+  labels:
+    {{- include "wopr-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "wopr-api.api.selectorLabels" . | nindent 6 }}
+{{- end }}

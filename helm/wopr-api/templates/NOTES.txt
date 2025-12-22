@@ -1,0 +1,71 @@
+WOPR API has been deployed!
+
+Chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+COMPONENTS DEPLOYED:
+{{- if .Values.api.enabled }}
+✓ API ({{ .Values.api.replicaCount }} replicas)
+{{- end }}
+{{- if .Values.worker.enabled }}
+✓ Worker ({{ .Values.worker.replicaCount }} replicas)
+{{- end }}
+
+SERVICE ACCESS:
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+  URL: https://{{ .host }}
+{{- end }}
+{{- else }}
+  Get the application URL by running:
+  
+  {{- if contains "NodePort" .Values.api.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "wopr-api.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+  {{- else if contains "LoadBalancer" .Values.api.service.type }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "wopr-api.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.api.service.port }}
+  {{- else if contains "ClusterIP" .Values.api.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "wopr-api.fullname" . }} 8000:{{ .Values.api.service.port }}
+  echo http://127.0.0.1:8000
+  {{- end }}
+{{- end }}
+
+HEALTH CHECKS:
+  Liveness:  GET /health
+  Readiness: GET /ready
+  Metrics:   GET /metrics
+
+USEFUL COMMANDS:
+  # View API logs
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=api -f
+  
+  # View worker logs
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=worker -f
+  
+  # Scale API
+  kubectl scale deployment {{ include "wopr-api.fullname" . }}-api --replicas=5 -n {{ .Release.Namespace }}
+  
+  # Scale workers
+  kubectl scale deployment {{ include "wopr-api.fullname" . }}-worker --replicas=10 -n {{ .Release.Namespace }}
+
+{{- if .Values.api.autoscaling.enabled }}
+AUTOSCALING:
+  API: {{ .Values.api.autoscaling.minReplicas }}-{{ .Values.api.autoscaling.maxReplicas }} replicas
+{{- end }}
+{{- if .Values.worker.autoscaling.enabled }}
+  Worker: {{ .Values.worker.autoscaling.minReplicas }}-{{ .Values.worker.autoscaling.maxReplicas }} replicas
+{{- end }}
+
+API DOCS:
+  {{- if .Values.ingress.enabled }}
+  {{- range .Values.ingress.hosts }}
+  https://{{ .host }}/docs
+  {{- end }}
+  {{- else }}
+  Access via port-forward, then: http://127.0.0.1:8000/docs
+  {{- end }}
+
+For more information, visit: https://github.com/yourusername/wopr

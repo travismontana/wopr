@@ -1,0 +1,67 @@
+# WOPR - Wargaming Oversight & Position Recognition
+# Development/Testing values example
+
+image:
+  repository: localhost:5000/wopr-api  # Local registry
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+api:
+  enabled: true
+  replicaCount: 1
+  
+  service:
+    type: NodePort
+    port: 8000
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  autoscaling:
+    enabled: false
+
+worker:
+  enabled: true
+  replicaCount: 1
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  
+  autoscaling:
+    enabled: false
+  
+  concurrency: 2
+  logLevel: debug
+
+ingress:
+  enabled: false  # Use port-forward or NodePort for dev
+
+env:
+  WOPR_CONFIG_SERVICE_URL: "http://wopr-config-service.svc:8080"
+  REDIS_URL: "redis://wopr-redis.svc:6379/0"
+  OTEL_ENABLED: "false"  # Disable for dev
+  OTEL_ENDPOINT: ""
+  OTEL_SERVICE_NAME: "wopr-api-dev"
+
+secrets:
+  DATABASE_URL: "postgresql://wopr:dev123@wopr-db.svc:5432/wopr_dev"
+  JWT_SECRET_KEY: "dev-secret-key-not-for-production"
+
+podDisruptionBudget:
+  enabled: false
+
+monitoring:
+  enabled: false
+
+podSecurityContext: {}
+securityContext: {}
