@@ -33,7 +33,7 @@ RUN useradd -m -u 1000 wopr && \
 WORKDIR /app
 
 # Install Python dependencies
-RUN pip install --upgrade pip setuptools wheel git+github.com
+RUN pip install --upgrade pip setuptools wheel
 COPY --chown=wopr:wopr requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
