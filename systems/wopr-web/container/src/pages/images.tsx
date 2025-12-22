@@ -227,7 +227,7 @@ export default function Images() {
     setStatus({ type: "info", message: "Capturing…" });
 
     try {
-      const res = await fetch("/api/cam/capture", {
+      const res = await fetch("http://wopr-cam.hangar.bpfx.org:5000/capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
