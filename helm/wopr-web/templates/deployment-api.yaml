@@ -25,10 +25,10 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "wpor-web.serviceAccountName" . }}
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 2222
-        runAsGroup: 2222
-        fsGroup: 2222
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
       containers:
       - name: {{ include "wpor-web.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
