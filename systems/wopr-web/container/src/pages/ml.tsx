@@ -9,6 +9,11 @@ type StatusState =
   | null;
 
 export default function MLPage() {
+
+    const gameList = [
+        { value: "dune_imperium", label: "Dune Imperium" },
+        { value: "cyberpunk_red", label: "Cyberpunk Red" },]
+
     const ImageTypes = [
         "setup", 
         "capture", 
@@ -31,6 +36,60 @@ export default function MLPage() {
         { value: "random", label: "Random" }
         ];
 
+    // Placeholder until the api is more .
+    const pieces =[
+        { value: "1", label: "1_solari" },
+        { value: "2", label: "5_solari" },
+        { value: "3", label: "1_spice" },
+        { value: "4", label: "5_spice" },
+        { value: "5", label: "infantry" },
+        { value: "6", label: "cavalry" },
+        { value: "7", label: "siege_engine" },
+        { value: "8", label: "agent" },
+        { value: "9", label: "hero" },
+        { value: "10", label: "ornithopter" },
+        { value: "11", label: "fremen_warrior" },
+        { value: "12", label: "sandworm" },
+        { value: "13", label: "carryall" },
+        { value: "14", label: "deployer" },
+        { value: "15", label: "obj_15" },
+        { value: "16", label: "obj_16" },
+        { value: "17", label: "obj_17" },
+        { value: "18", label: "obj_18" },
+        { value: "19", label: "obj_19" },
+        { value: "20", label: "obj_20" },
+        { value: "21", label: "obj_21" },
+        { value: "22", label: "obj_22" },
+        { value: "23", label: "obj_23" },
+        { value: "24", label: "obj_24" },
+        { value: "25", label: "obj_25" },
+        { value: "26", label: "obj_26" },
+        { value: "27", label: "obj_27" },
+        { value: "28", label: "obj_28" },
+        { value: "29", label: "obj_29" },
+        { value: "30", label: "obj_30" },
+        { value: "31", label: "obj_31" },
+        { value: "32", label: "obj_32" },
+        { value: "33", label: "obj_33" },
+        { value: "34", label: "obj_34" },
+        { value: "35", label: "obj_35" },
+        { value: "36", label: "obj_36" },
+        { value: "37", label: "obj_37" },
+        { value: "38", label: "obj_38" },
+        { value: "39", label: "obj_39" },
+        { value: "40", label: "obj_40" },
+        { value: "41", label: "obj_41" },
+        { value: "42", label: "obj_42" },
+        { value: "43", label: "obj_43" },
+        { value: "44", label: "obj_44" },
+        { value: "45", label: "obj_45" },
+        { value: "46", label: "obj_46" },
+        { value: "47", label: "obj_47" },
+        { value: "48", label: "obj_48" },
+        { value: "49", label: "obj_49" },
+        { value: "50", label: "obj_50" }
+    ]
+
     type ObjPos = typeof ObjectPositions[number]["value"];
 
     const ColorTemperatures = ["neutral", "hot", "cold"];
@@ -44,6 +103,7 @@ export default function MLPage() {
     const [showViewDialog, setShowViewDialog] = useState(false);
 
     const [gameName, setGameName] = useState<string>("dune_imperium");
+    const [pieceName, setPieceName] = useState<string>("1_solari");
     type ImgType = typeof ImageTypes[number];
     const [subject, setImgType] = useState<ImgType>("setup");
     const [objrotation, setObjRotation] = useState<number>(0);
@@ -95,7 +155,7 @@ export default function MLPage() {
             
             const raw = (await res.json()) as CameraDictResponse;
             const cameraDict: Record<number, CameraInfo> = {};
-            raw.cameras.forEach((cam) => {
+            raw.camera.forEach((cam) => {
                 cameraDict[cam.id] = cam;
             });
             return cameraDict;
@@ -112,11 +172,78 @@ export default function MLPage() {
     const [pageSize, setPageSize] = useState<number | "all">(10);
     const [totalCount, setTotalCount] = useState(0);
 
-    // Add missing function
+
+
     async function doCapture() {
         setBusy(true)
         setStatus({ type: "info", message: "Capturing…" });
         const camdict = await getCameraDict(1);
+        console.log("Got camera dictionary:", camdict);
+        const url = camdict[1]?.url;
+        const port = camdict[1]?.port || "5000";
+        if (!url) {
+            setStatus({ type: "error", message: "Camera not found" });
+            setBusy(false);
+            return;
+        } else {
+        // subject, objrotation, objposition, colortemperature, lightintensity
+        // Here you would add the logic to capture the image using the camera URL and parameters
+        // For now, we just log the parameters
+        console.log("Capturing image with parameters:");
+        console.log("Game Name:", gameName);
+        console.log("Image Type:", subject);
+        console.log("Piece Name:", pieceName);
+        console.log("Object Rotation:", objrotation);
+        console.log("Object Position:", objposition);
+        console.log("Color Temperature:", colortemperature);
+        console.log("Light Intensity:", lightintensity);
+        
+
+        // subject, objrotation, objposition, colortemperature, lightintensity
+        // Here you would add the logic to capture the image using the camera URL and parameters
+        const gameId = gameName;
+        const timestamp = new Date()
+            .toISOString()
+            .replace(/[-:]/g, '')
+            .replace('T', '-')
+            .slice(0, 15);  // "20241222-143022"
+        const randomId = Math.random().toString(36).substring(2, 8);  // e.g., "7k3x9m"
+        // ${pieceName}-${objposition}-rot${objrotation}-pct${lightintensity}-temp${colortemperature}-${timestamp}
+
+        const fName = `${pieceName}-${objposition}-rot${objrotation}-pct${lightintensity}-temp${colortemperature}-${timestamp}-${randomId}`;
+        const subjectName = fName;
+        const sequence = 1; // You might want to manage sequence differently
+
+        try {
+            const res = await fetch(`${url}:${port}/capture_ml`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                game_id: gameId.trim(),
+                subject,
+                subject_name: subjectName.trim(),
+                sequence: Number(sequence),
+                }),
+            });
+
+            const raw = (await res.text()).trim();
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${raw}`);
+
+            const httpPath = raw.startsWith("/remote/wopr/")
+                ? `/wopr/${raw.slice("/remote/wopr/".length)}`
+                : raw;
+
+            setStatus({ type: "ok", message: "Saved", path: httpPath });
+
+            setSequence((s) => s + 1);
+            setShowCaptureDialog(false);
+            } catch (e: any) {
+            setStatus({ type: "error", message: e?.message ?? String(e) });
+            } finally {
+            setBusy(false);
+            }
+
+        }
         console.log("Capture not implemented yet");
     }
 
@@ -159,16 +286,26 @@ export default function MLPage() {
                         <div className="wopr-dialog">
                             <div className="form">
                                 <label>
-                                    Game Name:
-                                    <input 
-                                    type="text" 
-                                    name="gameName" 
-                                    value={gameName} 
-                                    onChange={(e) => setGameName(e.target.value)}
-                                    placeholder="dune_imperium"
-                                    />
+                                    Game Name
+                                    <select value={gameName} onChange={(e) => setGameName(e.target.value)}>
+                                        {gameList.map((game) => (
+                                            <option key={game.value} value={game.value}>
+                                                {game.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </label>
                                 <br></br>
+                                <label>
+                                    Piece Name:
+                                    <select value={pieceName} onChange={(e) => setPieceName(e.target.value)}>
+                                        {pieces.map((piece) => (
+                                            <option key={piece.value} value={piece.value}>
+                                                {piece.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
                                 <label>
                                     Image Type
                                     <select value={subject} onChange={(e) => setImgType(e.target.value as ImgType)}>
