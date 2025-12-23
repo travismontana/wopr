@@ -1,5 +1,6 @@
 # build stage
 FROM node:20-alpine AS build
+
 ENV HOME=/app
 WORKDIR /app
 

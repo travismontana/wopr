@@ -22,6 +22,7 @@ logger = woprlogging.setup_logging(woprvar.APP_NAME)
 logger.info("WOPR API application: booting up...")
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 
 async def lifespan(app: FastAPI):
@@ -45,6 +46,15 @@ app = FastAPI(
         "name": woprvar.APP_AUTHOR,
         "email": woprvar.APP_AUTHOR_EMAIL,
     },
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])

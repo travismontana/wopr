@@ -57,6 +57,8 @@ env:
     value: "wopr-api.wopr.svc"
   - name: WOPR_API_SERVICE_PORT
     value: "8000"
+  - name: WOPR_API_URL
+    value: "http://wopr-api.wopr.svc:8000"
 
 nodeSelector: {}
 
