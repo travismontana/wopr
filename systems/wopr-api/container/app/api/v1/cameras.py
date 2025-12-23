@@ -31,10 +31,10 @@ async def listall():
 async def get_camera(camera_id: str):
     logger.debug(f"Getting camera {camera_id}")
     """Get camera by ID (stub)"""
-    camera = camera_dict.get(camera_id)
+    camera = list(camera_dict.values())
     if not camera:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Camera with ID {camera_id} not found"
         )
-    return camera
+    return {"camera": camera}
