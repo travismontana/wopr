@@ -24,6 +24,7 @@ logger.info("WOPR API application: booting up...")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
+from typing import List
 
 async def lifespan(app: FastAPI):
     """Lifespan events"""
