@@ -76,6 +76,7 @@ app = FastAPI(
 )
 
 if tracing_enabled:
+    logger.info("Instrumenting FastAPI application with OpenTelemetry")
     FastAPIInstrumentor.instrument_app(app)
 
 # CORS
