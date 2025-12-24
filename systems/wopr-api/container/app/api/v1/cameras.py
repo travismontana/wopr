@@ -51,9 +51,9 @@ async def capture_image(
     """Capture image from camera (stub)"""
 
     if captureType == "ml_capture":
-        const camUrl = "http://wopr-cam.hangar.bpfx.org:5000/api/v1/capture_ml";
+        camUrl = "http://wopr-cam.hangar.bpfx.org:5000/api/v1/capture_ml";
     else:
-        const camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
+        camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
 
     try {
         const res = await fetch(camUrl, {
