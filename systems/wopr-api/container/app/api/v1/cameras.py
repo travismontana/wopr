@@ -55,7 +55,7 @@ async def capture_image(
     else:
         camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
 
-     try:
+    try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
                 f"{camUrl}",
