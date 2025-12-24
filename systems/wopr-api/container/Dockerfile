@@ -29,6 +29,8 @@ COPY --chown=wopr:wopr requirements.txt .
 RUN pip install --user -r requirements.txt
 
 COPY --chown=wopr:wopr app/ ./app/
+RUN touch /var/log/wopr-api.log
+RUN chown wopr:wopr /var/log/wopr-api.log
 
 
 
