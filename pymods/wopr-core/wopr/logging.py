@@ -32,15 +32,15 @@ def setup_logging(
     
     # Get level from config if not provided
     if level is None:
-        level = get_str('logging.default_level')
+        level = get_str('logging.default_level', default='INFO')
     
     logger.setLevel(getattr(logging, level.upper()))
     logger.handlers.clear()
     
     # Get format from config
-    log_format = get_str('logging.format')
-    date_format = get_str('logging.date_format')
-    
+    log_format = get_str('logging.format', default='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    date_format = get_str('logging.date_format', default='%Y-%m-%d %H:%M:%S')
+
     formatter = logging.Formatter(fmt=log_format, datefmt=date_format)
     
     # Console handler
@@ -50,11 +50,14 @@ def setup_logging(
     
     # File handler
     if log_file:
-        log_path = Path(log_file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        try: 
+            log_path = Path(log_file)
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        except Exception as e:
+            logger.error(f"Failed to set up file handler for {log_file}: {e}")
     
     return logger
 
