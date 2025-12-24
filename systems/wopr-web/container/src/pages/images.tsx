@@ -1,22 +1,63 @@
-interface ImageGalleryProps {
-    gameId: string;
-    imageFiles: string[];  // Just the filenames
+import React, { useState, useEffect } from 'react';
+
+interface NginxFileEntry {
+    name: string;
+    type: 'file' | 'directory';
+    mtime: string;
+    size: number;
 }
 
-export function ImageGallery({ gameId, imageFiles }: ImageGalleryProps) {
+interface ImageGalleryProps {
+    gameId: string;
+}
+
+export function ImageGallery({ gameId }: ImageGalleryProps) {
+    const [images, setImages] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    
-    const images = imageFiles.map(filename => {
-        const rawUrl = `/wopr/ml/raw/${gameId}/${filename}`;
-        const thumbnailUrl = `/wopr/ml/thumbnails/${gameId}/${filename}`;
+
+    useEffect(() => {
+        loadImages();
+    }, [gameId]);
+
+    async function loadImages() {
+        setLoading(true);
+        setError(null);
         
-        return {
-            filename,
-            rawUrl,
-            thumbnailUrl,
-            // We'll check thumbnail existence by trying to load it
-        };
-    });
+        try {
+            // Fetch directory listing as JSON from nginx
+            const res = await fetch(`/wopr/ml/raw/${gameId}/`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            
+            const entries: NginxFileEntry[] = await res.json();
+            
+            // Filter for image files only
+            const imageFiles = entries
+                .filter(e => e.type === 'file')
+                .filter(e => /\.(jpe?g|png|gif|webp)$/i.test(e.name))
+                .map(e => e.name)
+                .sort();
+            
+            setImages(imageFiles);
+        } catch (e: any) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (loading) {
+        return <div className="gallery-loading">Loading images...</div>;
+    }
+
+    if (error) {
+        return <div className="gallery-error">Error loading {gameId}: {error}</div>;
+    }
+
+    if (images.length === 0) {
+        return <div className="gallery-empty">No images found in {gameId}</div>;
+    }
 
     return (
         <div className="image-gallery">
@@ -26,25 +67,31 @@ export function ImageGallery({ gameId, imageFiles }: ImageGalleryProps) {
             </div>
             
             <div className="thumbnail-grid">
-                {images.map((img) => (
-                    <div 
-                        key={img.filename}
-                        className="thumbnail-item"
-                        onClick={() => setSelectedImage(img.rawUrl)}
-                    >
-                        <img 
-                            src={img.thumbnailUrl}
-                            alt={img.filename}
-                            loading="lazy"
-                            onError={(e) => {
-                                // Thumbnail doesn't exist, use raw image
-                                e.currentTarget.src = img.rawUrl;
-                                e.currentTarget.classList.add('no-thumb');
-                            }}
-                        />
-                        <div className="thumbnail-label">{img.filename}</div>
-                    </div>
-                ))}
+                {images.map((filename) => {
+                    const rawUrl = `/wopr/ml/raw/${gameId}/${filename}`;
+                    const thumbUrl = `/wopr/ml/thumbnails/${gameId}/${filename}`;
+                    
+                    return (
+                        <div 
+                            key={filename}
+                            className="thumbnail-item"
+                            onClick={() => setSelectedImage(rawUrl)}
+                        >
+                            <img 
+                                src={thumbUrl}
+                                alt={filename}
+                                loading="lazy"
+                                onError={(e) => {
+                                    // Thumbnail doesn't exist, use raw
+                                    const target = e.currentTarget;
+                                    target.src = rawUrl;
+                                    target.classList.add('no-thumb');
+                                }}
+                            />
+                            <div className="thumbnail-label">{filename}</div>
+                        </div>
+                    );
+                })}
             </div>
 
             {selectedImage && (
@@ -52,8 +99,18 @@ export function ImageGallery({ gameId, imageFiles }: ImageGalleryProps) {
                     className="lightbox"
                     onClick={() => setSelectedImage(null)}
                 >
-                    <img src={selectedImage} alt="Full size" />
-                    <button className="close-btn">✕</button>
+                    <div className="lightbox-content">
+                        <img src={selectedImage} alt="Full size" />
+                        <button 
+                            className="close-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedImage(null);
+                            }}
+                        >
+                            ✕
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
