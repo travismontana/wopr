@@ -20,8 +20,8 @@ COPY --chown=1000:1000 app.py .
 EXPOSE 8080
 
 ENV OTEL_SERVICE_NAME=wopr-config-service 
-ENV OTEL_TRACES_EXPORTER=console,otlp 
-ENV OTEL_METRICS_EXPORTER=console,otlp
+ENV OTEL_TRACES_EXPORTER=otlp 
+ENV OTEL_METRICS_EXPORTER=otlp
 ENV OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.monitoring.abode.tailandtraillabs.org
 ENV OTEL_PYTHON_EXCLUDED_URLS="(/health|/metrics)$"

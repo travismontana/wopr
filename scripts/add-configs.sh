@@ -15,5 +15,5 @@ while IFS= read -r i ; do
   # { "value": "${VALUE}", description: "Added by add-configs.sh", updated_by: "add-configs.sh" }
   CMD="curl -X PUT https://wopr-config.studio.abode.tailandtraillabs.org/set/${KEY} -H 'Content-Type: application/json' -d '{ \"value\": \"${VALUE}\", \"description\": \"Added by add-configs.sh\", \"updated_by\": \"add-configs.sh\" }'"
   echo "Executing: $CMD"
-  eval $CMD
+#  eval $CMD
 done < <(echo "$LISTOFTHINGS")
