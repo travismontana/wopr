@@ -237,3 +237,7 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.dialog {
+  text-align: right;
+}

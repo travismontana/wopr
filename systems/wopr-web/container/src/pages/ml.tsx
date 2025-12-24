@@ -210,7 +210,7 @@ export default function MLPage() {
         const randomId = Math.random().toString(36).substring(2, 8);  // e.g., "7k3x9m"
         // ${pieceName}-${objposition}-rot${objrotation}-pct${lightintensity}-temp${colortemperature}-${timestamp}
 
-        const fName = `${pieceName}-${objposition}-rot${objrotation}-pct${lightintensity}-temp${colortemperature}-${timestamp}-${randomId}`;
+        const fName = `${pieceName}-${objposition}-rot${objrotation}-pct${lightintensity}-temp${colortemperature}`;
         const subjectName = fName;
         const sequence = 1; // You might want to manage sequence differently
 
