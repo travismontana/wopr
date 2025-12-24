@@ -70,7 +70,7 @@ app = FastAPI(
     },
 )
 
-if tracer_enabled:
+if tracing_enabled:
     FastAPIInstrumentor.instrument_app(app)
 
 # CORS
