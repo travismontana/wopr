@@ -59,9 +59,9 @@ async def capture_image(request: CaptureRequest):
     """Capture image from camera (stub)"""
 
     if captureType == "ml_capture":
-        camUrl = "http://wopr-cam.hangar.bpfx.org:5000/api/v1/capture_ml";
+        camUrl = "http://wopr-cam.hangar.bpfx.org:5000/capture_ml";
     else:
-        camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
+        camUrl = "http://wopr-cam.hangar.bpfx.org:5000/capture";
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
