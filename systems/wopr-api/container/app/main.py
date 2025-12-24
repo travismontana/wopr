@@ -85,12 +85,12 @@ app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
 async def root():
     """Root endpoint"""
     with tracer.start_as_current_span("root_endpoint") if tracer else nullcontext():
-    return {
-        "service": woprvar.APP_TITLE,
-        "version": woprvar.APP_VERSION,
-        "status": "operational",
-        "docs": "/docs"
-    }
+        return {
+            "service": woprvar.APP_TITLE,
+            "version": woprvar.APP_VERSION,
+            "status": "operational",
+            "docs": "/docs"
+        }
 
 
 if __name__ == "__main__":
