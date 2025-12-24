@@ -328,7 +328,7 @@ export default function MLPage() {
                                 </label>
                                 <br></br>
                                 <label>
-                                    
+                                    Object Position
                                     <select value={objposition} onChange={(e) => setObjPosition(e.target.value as ObjPos)}>
                                         {ObjectPositions.map((pos) => (
                                             <option key={pos.value} value={pos.value}>

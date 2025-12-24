@@ -271,3 +271,135 @@ button:hover {
 .dialog .form-group {
   margin-bottom: 1.25rem;  /* ← Space between label/select groups */
 }
+
+.image-gallery {
+    padding: 1rem;
+}
+
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #2222D6;
+}
+
+.gallery-header h2 {
+    margin: 0;
+}
+
+.image-count {
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.thumbnail-item {
+    cursor: pointer;
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+    background: #000;
+}
+
+.thumbnail-item:hover {
+    border-color: #2222D6;
+    transform: scale(1.03);
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Visual indicator for full-size images (no thumbnail) */
+.thumbnail-item img.no-thumb {
+    opacity: 0.8;
+    filter: brightness(0.7);
+}
+
+.thumbnail-label {
+    padding: 0.5rem;
+    background: #000;
+    color: #2222D6;
+    font-size: 0.75rem;
+    text-align: center;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.thumbnail-label .badge {
+    display: inline-block;
+    background: #ff6b6b;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    margin-left: 0.5rem;
+}
+
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+}
+
+.lightbox img {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+}
+
+.close-btn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: #2222D6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    background: #1b1bb8;
+}
+
+.gallery-loading,
+.gallery-error {
+    padding: 2rem;
+    text-align: center;
+    font-family: monospace;
+    color: #2222D6;
+}
+
+.gallery-error {
+    color: #ff6b6b;
+}
