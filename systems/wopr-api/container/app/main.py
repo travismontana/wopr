@@ -22,11 +22,11 @@ logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 logger.info("WOPR API application: booting up...")
 
-tracing_enabled = woprconfig.get_config_value("tracing.enabled", False)
+tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
 
 if tracing_enabled:
     from opentelemetry import trace
-    traceing_endpoint = woprconfig.get_config_value("tracing.endpoint", "http://localhost:4317")
+    tracing_endpoint = woprconfig.get_str("tracing.endpoint", "http://localhost:4317")
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_enabled=tracing_enabled,
