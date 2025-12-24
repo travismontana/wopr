@@ -16,10 +16,19 @@ import logging
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+import httpx
 
 router = APIRouter()
 
 camera_dict = woprvar.HACK_CAMERA_DICT
+
+class CaptureRequest(BaseModel):
+    captureType: str
+    game_id: str
+    subject: str
+    subject_name: str
+    sequence: int
 
 @router.get("")
 async def listall():
@@ -40,13 +49,12 @@ async def get_camera(camera_id: str):
     return {"camera": camera}
 
 @router.post("/capture")
-async def capture_image(
-    captureType: str,
-    game_id: str,
-    subject: str,
-    subject_name: str,
-    sequence: int
-):
+async def capture_image(request: CaptureRequest):
+    captureType = request.captureType
+    game_id = request.game_id
+    subject = request.subject
+    subject_name = request.subject_name
+    sequence = request.sequence
     logger.debug(f"Capturing image for game {game_id}, subject {subject}, subject_name {subject_name}, sequence {sequence}")
     """Capture image from camera (stub)"""
 

@@ -188,7 +188,7 @@ export default function MLPage() {
         } else {
         // subject, objrotation, objposition, colortemperature, lightintensity
         // Here you would add the logic to capture the image using the camera URL and parameters
-        // For now, we just log the parameters
+        // For now, we just log thce parameters
         console.log("Capturing image with parameters:");
         console.log("Game Name:", gameName);
         console.log("Image Type:", subject);
