@@ -70,6 +70,9 @@ app = FastAPI(
     },
 )
 
+if tracer_enabled:
+    FastAPIInstrumentor.instrument_app(app)
+
 # CORS
 CORS_ORIGINS: List[str] = ["*"]
 app.add_middleware(
