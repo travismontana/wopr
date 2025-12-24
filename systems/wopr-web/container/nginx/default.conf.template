@@ -70,6 +70,11 @@ server {
   location ^~ /wopr/ {
     alias /remote/wopr/;
 
+    if (-d $request_filename) {
+        # This is a directory, force autoindex
+      rewrite ^ $uri/ permanent;
+    }
+
     autoindex on;
     autoindex_format json;     # <-- key: JSON listing
     autoindex_exact_size off;
