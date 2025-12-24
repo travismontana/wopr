@@ -12,6 +12,7 @@ import logging
 from wopr import config as woprconfig
 from wopr import storage as woprstorage
 from wopr import logging as woprlogging
+from wopr import tracing as woprtracing
 from app import globals as woprvar
 
 # Initialize config client at startup
@@ -20,6 +21,24 @@ woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)  # Uses WOPR_CONF
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 logger.info("WOPR API application: booting up...")
+
+tracing_enabled = woprconfig.get_config_value("tracing.enabled", False)
+
+if tracing_enabled:
+    from opentelemetry import trace
+    traceing_endpoint = woprconfig.get_config_value("tracing.endpoint", "http://localhost:4317")
+    tracer = woprtracing.create_tracer(
+        tracer_name=woprvar.APP_NAME,
+        tracer_enabled=tracing_enabled,
+        tracer_endpoint=tracing_endpoint
+    )
+    if tracer:
+        logger.info(f"Tracing enabled. Exporting to {tracing_endpoint}")
+    else:
+        logger.warning("Tracing is enabled but failed to initialize tracer.")
+else:
+    tracer = None
+    logger.info("Tracing is disabled.")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +49,7 @@ async def lifespan(app: FastAPI):
     """Lifespan events"""
     # Startup
     logger.info("WOPR API starting up...")
+    with tracer.start_as_current_span("app_startup") if tracer else nullcontext():
     #setup_tracing()
     yield
     # Shutdown
@@ -64,6 +84,7 @@ app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
 @app.get("/")
 async def root():
     """Root endpoint"""
+    with tracer.start_as_current_span("root_endpoint") if tracer else nullcontext():
     return {
         "service": woprvar.APP_TITLE,
         "version": woprvar.APP_VERSION,
