@@ -16,7 +16,7 @@ def create_tracer(tracer_name: str, tracer_enabled: bool, tracer_endpoint: str):
 
   # Set up OTLP exporter
   otlp_exporter = OTLPSpanExporter(endpoint=tracer_endpoint)
-  span_processor = BatchExportSpanProcessor(otlp_exporter)
+  span_processor = BatchSpanProcessor(otlp_exporter)
   trace.get_tracer_provider().add_span_processor(span_processor)
 
   return tracer
