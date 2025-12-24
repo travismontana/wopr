@@ -31,7 +31,7 @@ logger.info("WOPR API application: booting up...")
 tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
 
 if tracing_enabled:
-    tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4317")
+    tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_enabled=tracing_enabled,
