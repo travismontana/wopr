@@ -27,7 +27,7 @@ export function ImageGallery({ gameId }: ImageGalleryProps) {
         
         try {
             // Fetch directory listing as JSON from nginx
-            const res = await fetch(`/wopr/ml/raw/${gameId}/`);
+            const res = await fetch(`/wopr/ml/${gameId}/`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
             const entries: NginxFileEntry[] = await res.json();
@@ -68,7 +68,7 @@ export function ImageGallery({ gameId }: ImageGalleryProps) {
             
             <div className="thumbnail-grid">
                 {images.map((filename) => {
-                    const rawUrl = `/wopr/ml/raw/${gameId}/${filename}`;
+                    const rawUrl = `/wopr/ml/${gameId}/${filename}`;
                     const thumbUrl = `/wopr/ml/thumbnails/${gameId}/${filename}`;
                     
                     return (

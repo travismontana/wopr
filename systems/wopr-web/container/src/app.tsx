@@ -2,7 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import "./pages/css/theme.css";
 
 import Dashboard from "./pages/dashboard";
-import GameImages from "./pages/game-images";
+import GameImages from "./pages/game_images";
 import Games from "./pages/games";
 import { ImageGallery } from "./pages/images";
 import ML from "./pages/ml"; 
@@ -29,7 +29,7 @@ export default function Main() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/games" element={<Games />} />
-            <Route path="/images" element={<Images />} />
+            <Route path="/images" element={<ImageGallery gameId="dune_imperium" />} />
             <Route path="/ml" element={<ML />} />
             <Route path="/control" element={<Control />} />
           </Routes>
