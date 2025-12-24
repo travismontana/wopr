@@ -49,9 +49,9 @@ async def lifespan(app: FastAPI):
     """Lifespan events"""
     # Startup
     logger.info("WOPR API starting up...")
-    with tracer.start_as_current_span("app_startup")
-    #setup_tracing()
-    yield
+    with tracer.start_as_current_span("app_startup"):
+        #setup_tracing()
+        yield
     # Shutdown
     logger.info("WOPR API shutting down...")
 
