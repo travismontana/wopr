@@ -34,7 +34,7 @@ RUN pip install --user -r requirements.txt
 COPY --chown=wopr:wopr app/ ./app/
 
 
-
+ENV OTEL_SERVICE_NAME=wopr-api
 
 EXPOSE 8000
 
