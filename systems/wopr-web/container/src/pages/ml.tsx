@@ -215,7 +215,7 @@ export default function MLPage() {
         const sequence = 1; // You might want to manage sequence differently
 
         try {
-            const res = await fetch(`${apiUrl}/api/v1/capture`, {
+            const res = await fetch(`${apiUrl}/api/v1/cameras/capture`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
