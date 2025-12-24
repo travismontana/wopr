@@ -38,3 +38,51 @@ async def get_camera(camera_id: str):
             detail=f"Camera with ID {camera_id} not found"
         )
     return {"camera": camera}
+
+@router.post("/capture")
+async def capture_image(
+    captureType: str,
+    game_id: str,
+    subject: str,
+    subject_name: str,
+    sequence: int
+):
+    logger.debug(f"Capturing image for game {game_id}, subject {subject}, subject_name {subject_name}, sequence {sequence}")
+    """Capture image from camera (stub)"""
+
+    if captureType == "ml_capture":
+        const camUrl = "http://wopr-cam.hangar.bpfx.org:5000/api/v1/capture_ml";
+    else:
+        const camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
+
+    try {
+        const res = await fetch(camUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                game_id: gameId.trim(),
+                subject: subject.trim(),
+                subject_name: subjectName.trim(),
+                sequence: Number(sequence),
+                }),
+        });
+
+        const raw = (await res.text()).trim();
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${raw}`);
+
+        const httpPath = raw.startsWith("/remote/wopr/")
+            ? `/wopr/${raw.slice("/remote/wopr/".length)}`
+            : raw;
+
+        setStatus({ type: "ok", message: "Saved", path: httpPath });
+
+        setSequence((s) => s + 1);
+        setShowCaptureDialog(false);
+        } catch (e: any) {
+        setStatus({ type: "error", message: e?.message ?? String(e) });
+        } finally {
+        setBusy(false);
+        }
+    }
+
+    return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}

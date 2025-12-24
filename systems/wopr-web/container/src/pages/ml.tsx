@@ -215,15 +215,16 @@ export default function MLPage() {
         const sequence = 1; // You might want to manage sequence differently
 
         try {
-            const res = await fetch(`${url}:${port}/capture_ml`, {
+            const res = await fetch(`${apiUrl}/api/v1/capture`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                game_id: gameId.trim(),
-                subject,
-                subject_name: subjectName.trim(),
-                sequence: Number(sequence),
-                }),
+                    captureType: "ml_capture",
+                    game_id: gameId.trim(),
+                    subject: subject.trim(),
+                    subject_name: subjectName.trim(),
+                    sequence: Number(sequence),
+                   }),
             });
 
             const raw = (await res.text()).trim();
