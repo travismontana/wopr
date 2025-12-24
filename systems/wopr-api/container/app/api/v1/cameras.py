@@ -55,32 +55,22 @@ async def capture_image(
     else:
         camUrl = "http://wopr-cam.hangar.bpfx.org/api/v1/capture";
 
-    try {
-        const res = await fetch(camUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                game_id: gameId.trim(),
-                subject: subject.trim(),
-                subject_name: subjectName.trim(),
-                sequence: Number(sequence),
-                }),
-        });
-
-        const raw = (await res.text()).trim();
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${raw}`);
-
-        const httpPath = raw.startsWith("/remote/wopr/")
-            ? `/wopr/${raw.slice("/remote/wopr/".length)}`
-            : raw;
-
-        setStatus({ type: "ok", message: "Saved", path: httpPath });
-
-        setSequence((s) => s + 1);
-        setShowCaptureDialog(false);
-        } catch (e: any) {
-        setStatus({ type: "error", message: e?.message ?? String(e) });
-        } finally {
-        setBusy(false);
-        }
-        return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}
+     try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{camUrl}",
+                json={
+                    "game_id": str(game_id) if game_id else None,
+                    "subject": str(subject) if subject else None,
+                    "subject_name": str(subject_name) if subject_name else None,
+                    "sequence": int(sequence) if sequence else None
+                }
+            )
+            response.raise_for_status()
+            cam_response = response.json()
+    except httpx.HTTPError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Failed to capture from camera: {str(e)}"
+        )
+    return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}
