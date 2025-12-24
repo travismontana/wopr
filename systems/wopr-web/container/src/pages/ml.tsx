@@ -316,6 +316,8 @@ export default function MLPage() {
                                 <br></br>
                                 <label>
                                     Object Rotation
+                                    (0 is referenced to North on the game 
+                                    playfield, or just pick one to be zero)
                                     <select value={objrotation} onChange={(e) => setObjRotation(Number(e.target.value))}>
                                         {ObjectRotations.map((angle) => (
                                             <option key={angle} value={angle}>
@@ -326,7 +328,7 @@ export default function MLPage() {
                                 </label>
                                 <br></br>
                                 <label>
-                                    Object Position (0 is referenced to North on the game playfield, or just pick one to be zero)
+                                    
                                     <select value={objposition} onChange={(e) => setObjPosition(e.target.value as ObjPos)}>
                                         {ObjectPositions.map((pos) => (
                                             <option key={pos.value} value={pos.value}>
