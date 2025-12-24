@@ -230,13 +230,8 @@ export default function MLPage() {
             const raw = (await res.text()).trim();
             if (!res.ok) throw new Error(`HTTP ${res.status}: ${raw}`);
 
-            const httpPath = raw.startsWith("/remote/wopr/")
-                ? `/wopr/${raw.slice("/remote/wopr/".length)}`
-                : raw;
+            setStatus({ type: "ok", message: "Saved", path: raw });
 
-            setStatus({ type: "ok", message: "Saved", path: httpPath });
-
-            setSequence((s) => s + 1);
             setShowCaptureDialog(false);
             } catch (e: any) {
             setStatus({ type: "error", message: e?.message ?? String(e) });
@@ -245,7 +240,6 @@ export default function MLPage() {
             }
 
         }
-        console.log("Capture not implemented yet");
     }
 
     // Add missing computed value

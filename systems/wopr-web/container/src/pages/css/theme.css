@@ -238,7 +238,36 @@ button:hover {
   }
 }
 
+/* ======================
+   Dialog styling
+   ====================== */
 .dialog {
   text-align: right;
-  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;  /* ← Space between all child elements */
+}
+
+.dialog select {
+  /* Apple HIG recommends 44px minimum for touch targets */
+  min-height: 44px;
+  padding: 0.75rem;
+  font-size: 16px;  /* ← Prevents iOS zoom on focus */
+  margin-bottom: 0.5rem;  /* ← Additional space between selects */
+  border-radius: 8px;
+  border: 2px solid #2222D6;
+  background: white;
+  color: #212529;
+}
+
+.dialog label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 14px;
+  text-align: left;  /* ← Override parent's text-align: right */
+}
+
+/* If you have label+select pairs, wrap them for better spacing */
+.dialog .form-group {
+  margin-bottom: 1.25rem;  /* ← Space between label/select groups */
 }
