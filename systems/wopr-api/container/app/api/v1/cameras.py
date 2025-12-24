@@ -83,6 +83,4 @@ async def capture_image(
         } finally {
         setBusy(false);
         }
-    }
-
-    return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}
+        return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}
