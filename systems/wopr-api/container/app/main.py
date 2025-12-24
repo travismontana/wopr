@@ -89,7 +89,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
+with tracer.start_as_current_span("include_routers") if tracer else nullcontext():
+    app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
 
 @app.get("/")
 async def root():
