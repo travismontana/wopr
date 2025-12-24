@@ -1,3 +1,4 @@
+# buildplease
 FROM python:3.12-slim
 LABEL maintainer="Bob Bomar"
 LABEL description="WOPR API - Wargaming Oversight & Position Recognition API Service"
