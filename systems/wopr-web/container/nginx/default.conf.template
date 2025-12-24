@@ -66,11 +66,7 @@ server {
   # # Browse WOPR storage
   #}
 
-  location ~* ^/wopr/.*\.(jpg|jpeg|png|gif|webp)$ {
-    alias /remote/wopr/;
-    expires 1h;
-  }
-  
+
   location ^~ /wopr/ {
     alias /remote/wopr/;
 
