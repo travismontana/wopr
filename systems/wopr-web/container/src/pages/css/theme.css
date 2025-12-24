@@ -264,7 +264,7 @@ button:hover {
   display: block;
   margin-bottom: 0.25rem;
   font-size: 14px;
-  text-align: left;  /* ← Override parent's text-align: right */
+  text-align: right;  /* ← Override parent's text-align: right */
 }
 
 /* If you have label+select pairs, wrap them for better spacing */
