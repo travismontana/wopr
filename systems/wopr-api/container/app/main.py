@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI):
     logger.info("WOPR API starting up...")
     with tracer.start_as_current_span("app_startup"):
         #setup_tracing()
+        logger.info("Yielding into application...")
         yield
     # Shutdown
     logger.info("WOPR API shutting down...")
@@ -85,6 +86,7 @@ app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
 async def root():
     """Root endpoint"""
     with tracer.start_as_current_span("root_endpoint") if tracer else nullcontext():
+        logger.info("Root endpoint accessed")
         return {
             "service": woprvar.APP_TITLE,
             "version": woprvar.APP_VERSION,
