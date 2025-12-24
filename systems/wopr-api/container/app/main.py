@@ -15,6 +15,12 @@ from wopr import logging as woprlogging
 from wopr import tracing as woprtracing
 from app import globals as woprvar
 
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
 # Initialize config client at startup
 woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)  # Uses WOPR_CONFIG_SERVICE_URL env var
 
@@ -25,7 +31,6 @@ logger.info("WOPR API application: booting up...")
 tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
 
 if tracing_enabled:
-    from opentelemetry import trace
     tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4317")
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
