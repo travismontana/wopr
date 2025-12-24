@@ -5,3 +5,4 @@ git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core
 fastapi>=0.114.12
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.19
+httpx>=0.26.0
