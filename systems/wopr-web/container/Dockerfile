@@ -15,7 +15,7 @@ RUN npm run build
 
 # runtime stage
 FROM nginxinc/nginx-unprivileged:alpine
-
+WORKDIR /app
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 #RUN touch /run/nginx.pid && chown nginx:nginx /run/nginx.pid
