@@ -307,6 +307,8 @@ export default function MLPage() {
                                         ))}
                                     </select>
                                 </label>
+                                <br>
+                                </br>
                                 <label>
                                     Image Type
                                     <select value={subject} onChange={(e) => setImgType(e.target.value as ImgType)}>
