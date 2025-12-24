@@ -34,6 +34,7 @@ if tracing_enabled:
     tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
+        tracer_version=woprvar.APP_VERSION,
         tracer_enabled=tracing_enabled,
         tracer_endpoint=tracing_endpoint
     )

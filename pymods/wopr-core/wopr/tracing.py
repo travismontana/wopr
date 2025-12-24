@@ -8,7 +8,7 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExport
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 
-def create_tracer(tracer_name: str, tracer_enabled: bool, tracer_endpoint: str):
+def create_tracer(tracer_name: str, tracer_version: str, tracer_enabled: bool, tracer_endpoint: str):
   if not tracer_enabled:
       return None
     # Initialize OpenTelemetry
