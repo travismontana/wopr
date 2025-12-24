@@ -2,6 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import "./pages/css/theme.css";
 
 import Dashboard from "./pages/dashboard";
+import GameImages from "./pages/game-images";
 import Games from "./pages/games";
 import Images from "./pages/images";
 import ML from "./pages/ml"; 
