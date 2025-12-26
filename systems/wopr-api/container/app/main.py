@@ -9,6 +9,8 @@ WOPR API main application.
 
 import logging
 import json
+from contextlib import nullcontext
+from typing import List
 
 from wopr import config as woprconfig
 from wopr import storage as woprstorage
@@ -21,31 +23,29 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from starlette.request import Request
+from starlette.requests import Request
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
-from typing import List
 
 
 # Initialize config client at startup
-woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)  # Uses WOPR_CONFIG_SERVICE_URL env var
+woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)
 
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
-
 logger.info("WOPR API application: booting up...")
 
 tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
 
-
+# Initialize tracer early so it's available in lifespan
+tracer = None
 
 async def lifespan(app: FastAPI):
     """Lifespan events"""
     # Startup
     logger.info("WOPR API starting up...")
-    with tracer.start_as_current_span("app_startup"):
-        #setup_tracing()
+    with tracer.start_as_current_span("app_startup") if tracer else nullcontext():
         logger.info("Yielding into application...")
         yield
     # Shutdown
@@ -67,13 +67,14 @@ app = FastAPI(
 
 if tracing_enabled:
     CAPTURE_REQUEST_HEADERS = [
-    "accept", "accept-language", "accept-encoding",
-    "content-type", "referer", "user-agent"
+        "accept", "accept-language", "accept-encoding",
+        "content-type", "referer", "user-agent"
     ]
 
     CAPTURE_RESPONSE_HEADERS = [
         "content-type", "content-length", "cache-control"
     ]
+    
     tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
@@ -81,11 +82,11 @@ if tracing_enabled:
         tracer_enabled=tracing_enabled,
         tracer_endpoint=tracing_endpoint
     )
+    
     if tracer:
         logger.info(f"Tracing enabled. Exporting to {tracing_endpoint}")
     else:
         logger.warning("Tracing is enabled but failed to initialize tracer.")
-
 
     def request_hook(span, scope):
         if span and span.is_recording():
@@ -130,9 +131,11 @@ if tracing_enabled:
                 if key in response.headers:
                     span.set_attribute(f"http.response.header.{key}", response.headers[key])
         
-    else:
-        tracer = None
-        logger.info("Tracing is disabled.")
+        return response  # <-- CRITICAL: Was missing!
+
+else:
+    tracer = None
+    logger.info("Tracing is disabled.")
 
 # CORS
 CORS_ORIGINS: List[str] = ["*"]
