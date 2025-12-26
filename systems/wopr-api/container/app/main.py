@@ -31,6 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 from app.api.v1 import config
 
+woprconfig.init_config()
 
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 logger.info("WOPR API application: booting up...")

@@ -10,15 +10,18 @@ import os
 import yaml
 import logging
 from contextlib import contextmanager
-from psycopg.rows import dict_row
-
-# Switch to psycopg (psycopg3)
 import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from wopr import config as woprconfig
+from wopr import storage as woprstorage
+from wopr import logging as woprlogging
+from app import globals as woprvar
+
+import logging
+logger = woprlogging.setup_logging(woprvar.APP_NAME)
+woprconfig.init_config()
 
 router = APIRouter()
 
