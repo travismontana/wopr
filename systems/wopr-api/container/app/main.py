@@ -77,14 +77,52 @@ app = FastAPI(
 )
 
 if tracing_enabled:
+    tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
+    tracer = woprtracing.create_tracer(
+        tracer_name=woprvar.APP_NAME,
+        tracer_version=woprvar.APP_VERSION,
+        tracer_enabled=tracing_enabled,
+        tracer_endpoint=tracing_endpoint
+    )
+    if tracer:
+        logger.info(f"Tracing enabled. Exporting to {tracing_endpoint}")
+    else:
+        logger.warning("Tracing is enabled but failed to initialize tracer.")
+
+    def request_hook(span, scope):
+        """Capture request headers"""
+        if span and span.is_recording():
+            headers = dict(scope.get("headers", []))
+            # Decode bytes to strings
+            for key, value in headers.items():
+                try:
+                    key_str = key.decode() if isinstance(key, bytes) else key
+                    val_str = value.decode() if isinstance(value, bytes) else value
+                    span.set_attribute(f"http.request.header.{key_str}", val_str)
+                except:
+                    pass
+    
+    def response_hook(span, message):
+        """Capture response headers"""
+        if span and span.is_recording():
+            headers = dict(message.get("headers", []))
+            for key, value in headers.items():
+                try:
+                    key_str = key.decode() if isinstance(key, bytes) else key
+                    val_str = value.decode() if isinstance(value, bytes) else value
+                    span.set_attribute(f"http.response.header.{key_str}", val_str)
+                except:
+                    pass
+
     logger.info("Instrumenting FastAPI application with OpenTelemetry")
     FastAPIInstrumentor.instrument_app(
         app,
-            server_request_hook=lambda span, request: span.set_attribute(
-                "http.request.body", str(request.body())  # Careful with size
-            )
-        )
-
+        server_request_hook=request_hook,
+        client_response_hook=response_hook
+    )
+else:
+    tracer = None
+    logger.info("Tracing is disabled.")
 
 # CORS
 CORS_ORIGINS: List[str] = ["*"]
