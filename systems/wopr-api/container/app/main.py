@@ -80,7 +80,7 @@ if tracing_enabled:
         "content-type", "content-length", "cache-control"
     ]
     
-    tracing_endpoint = woprvars.APP_OTEL_URL + "/v1/traces"
+    tracing_endpoint = woprvar.APP_OTEL_URL + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_version=woprvar.APP_VERSION,
