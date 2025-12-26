@@ -20,7 +20,7 @@ from psycopg.types.json import Jsonb
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="WOPR Config Service", version="1.0.0")
+router = APIRouter()
 
 # Database connection
 DATABASE_URL = os.getenv(
@@ -525,8 +525,3 @@ def export_yaml(environment: str = None):
     config = get_all(environment)
     yaml_str = yaml.dump(config, default_flow_style=False, sort_keys=False)
     return {"yaml": yaml_str, "environment": environment or ENVIRONMENT}
-
-
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=8080)
