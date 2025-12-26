@@ -31,7 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 from app.api.v1 import config
 
-woprconfig.init_config(service_url=os.getenv("WOPR_API_URL"):=WOPR_API_URL)
+woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
 
 # Set normal logging not using woprlogg.
 logger = logging.getLogger()

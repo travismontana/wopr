@@ -14,7 +14,7 @@ from app import globals as woprvar
 
 import logging
 import os
-woprconfig.init_config(service_url=os.getenv("WOPR_API_URL"):=WOPR_API_URL)
+woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 from fastapi import APIRouter, Depends, HTTPException, status
