@@ -72,6 +72,17 @@ config:
     apiServiceUrl: "http://wopr-api.wopr.svc:8000"
     apiVersion: "v1"
 
+wopr:
+  config:
+    secretName: wopr-api-config
+    secretKey: confi
+
+env:
+  - name: WOPR_API_URL
+    valueFrom:
+      secretKeyRef:
+        name: wopr-api-config
+        key: apiServiceUrl
 # Optional: Environment-specific overrides
 # environments:
 #   dev:
