@@ -118,7 +118,7 @@ def infer_type(value: Any) -> str:
         return 'string'
 
 
-@app.get("/config/health")
+@app.get("/health")
 def health():
     """Health check"""
     try:
@@ -130,7 +130,7 @@ def health():
         return {"status": "unhealthy", "error": str(e)}, 503
 
 
-@app.get("/config/get/{key:path}")
+@app.get("/get/{key:path}")
 def get_value(key: str, environment: str = None):
     """
     Get configuration value by key.
@@ -188,7 +188,7 @@ def get_value(key: str, environment: str = None):
             }
 
 
-@app.post("/config/get")
+@app.post("/get")
 def get_multiple(request: dict):
     """
     Get multiple configuration values.
@@ -231,7 +231,7 @@ def get_multiple(request: dict):
     return result
 
 
-@app.get("/config/section/{section:path}")
+@app.get("/section/{section:path}")
 def get_section(section: str, environment: str = None):
     """
     Get all keys in a section.
@@ -288,7 +288,7 @@ def get_section(section: str, environment: str = None):
     return result
 
 
-@app.get("/config/all")
+@app.get("/all")
 def get_all(environment: str = None):
     """Get entire configuration as nested dict"""
     if environment is None:
@@ -330,7 +330,7 @@ def get_all(environment: str = None):
     return result
 
 
-@app.put("/config/set/{key:path}")
+@app.put("/set/{key:path}")
 def set_value(key: str, update: ConfigUpdate, environment: str = None):
     """
     Set/update configuration value.
@@ -407,7 +407,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
     }
 
 
-@app.delete("/config/delete/{key:path}")
+@app.delete("/delete/{key:path}")
 def delete_value(key: str, environment: str = None):
     """Delete configuration value"""
     if environment is None:
@@ -429,7 +429,7 @@ def delete_value(key: str, environment: str = None):
     return {"deleted": key}
 
 
-@app.get("/config/history/{key:path}")
+@app.get("/history/{key:path}")
 def get_history(key: str, limit: int = 10):
     """Get change history for a key"""
     with get_db() as conn:
@@ -459,7 +459,7 @@ def get_history(key: str, limit: int = 10):
     ]
 
 
-@app.post("/config/import/yaml")
+@app.post("/import/yaml")
 async def import_yaml(request: dict):
     """
     Import configuration from YAML.
@@ -519,7 +519,7 @@ async def import_yaml(request: dict):
     return {"imported": len(flat), "environment": environment}
 
 
-@app.get("/config/export/yaml")
+@app.get("/export/yaml")
 def export_yaml(environment: str = None):
     """Export configuration as YAML"""
     config = get_all(environment)
