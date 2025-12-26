@@ -27,7 +27,7 @@ class ConfigClient:
         """
         if service_url is None:
             service_url = os.getenv(
-                'WOPR_API_URL', 'http://wopr-api.studio.abode.tailandtraillabs.org/api/v1')
+                'WOPR_API_URL', 'http://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
             logging.debug(f"Using config service URL from environment: ({service_url})")
         else:
             logging.debug(f"Using provided config service URL: ({service_url})")

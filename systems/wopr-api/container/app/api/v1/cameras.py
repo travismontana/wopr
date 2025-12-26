@@ -13,8 +13,9 @@ from wopr import logging as woprlogging
 from app import globals as woprvar
 
 import logging
+import os
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
-woprconfig.init_config()
+woprconfig.init_config(service_url=os.getenv('WOPR_API_URL'))
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 import httpx
