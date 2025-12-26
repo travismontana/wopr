@@ -70,6 +70,7 @@ config:
   services:
     configServiceUrl: "http://wopr-config-service.wopr.svc:8080"
     apiServiceUrl: "http://wopr-api.wopr.svc:8000"
+    apiVersion: "v1"
 
 # Optional: Environment-specific overrides
 # environments:
