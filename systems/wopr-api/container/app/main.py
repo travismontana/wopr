@@ -77,6 +77,14 @@ app = FastAPI(
 )
 
 if tracing_enabled:
+    CAPTURE_REQUEST_HEADERS = [
+    "accept", "accept-language", "accept-encoding",
+    "content-type", "referer", "user-agent"
+    ]
+
+    CAPTURE_RESPONSE_HEADERS = [
+        "content-type", "content-length", "cache-control"
+    ]
     tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
@@ -89,37 +97,30 @@ if tracing_enabled:
     else:
         logger.warning("Tracing is enabled but failed to initialize tracer.")
 
+
     def request_hook(span, scope):
-        """Capture request headers"""
         if span and span.is_recording():
             headers = dict(scope.get("headers", []))
-            # Decode bytes to strings
             for key, value in headers.items():
-                try:
-                    key_str = key.decode() if isinstance(key, bytes) else key
+                key_str = key.decode() if isinstance(key, bytes) else key
+                if key_str.lower() in CAPTURE_REQUEST_HEADERS:
                     val_str = value.decode() if isinstance(value, bytes) else value
                     span.set_attribute(f"http.request.header.{key_str}", val_str)
-                except:
-                    pass
     
-    def response_hook(span, message):
-        """Capture response headers"""
+    FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
+    
+    @app.middleware("http")
+    async def capture_response_headers(request, call_next):
+        response = await call_next(request)
+        span = trace.get_current_span()
         if span and span.is_recording():
-            headers = dict(message.get("headers", []))
-            for key, value in headers.items():
-                try:
-                    key_str = key.decode() if isinstance(key, bytes) else key
-                    val_str = value.decode() if isinstance(value, bytes) else value
-                    span.set_attribute(f"http.response.header.{key_str}", val_str)
-                except:
-                    pass
+            for key in CAPTURE_RESPONSE_HEADERS:
+                if key in response.headers:
+                    span.set_attribute(f"http.response.header.{key}", response.headers[key])
+        return response
 
     logger.info("Instrumenting FastAPI application with OpenTelemetry")
-    FastAPIInstrumentor.instrument_app(
-        app,
-        server_request_hook=request_hook,
-        client_response_hook=response_hook
-    )
+    
 else:
     tracer = None
     logger.info("Tracing is disabled.")
