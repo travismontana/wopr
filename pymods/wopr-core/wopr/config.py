@@ -26,7 +26,7 @@ class ConfigClient:
             timeout: Request timeout in seconds
         """
         service_url = os.getenv(
-            'WOPR_API_URL', 'http://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
+            'WOPR_API_URL', 'https://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
         if service_url is None:
             
             logging.debug(f"Using config service URL from environment: ({service_url})")
@@ -222,6 +222,8 @@ def init_config(service_url: Optional[str] = None, timeout: int = 5) -> None:
         timeout: Request timeout in seconds
     """
     global _client
+    if not service_url:
+        service_url = os.getenv('WOPR_API_URL', 'https://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
     _client = ConfigClient(service_url, timeout)
 
 
