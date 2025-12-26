@@ -31,9 +31,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 from app.api.v1 import config
 
-woprconfig.init_config()
+woprconfig.init_config(service_url=os.getenv("WOPR_API_URL"):=WOPR_API_URL)
 
-logger = woprlogging.setup_logging(woprvar.APP_NAME)
+# Set normal logging not using woprlogg.
+logger = logging.getLogger()
 logger.info("WOPR API application: booting up...")
 logger.setup(woprvar.APP_NAME,log_file="/var/log/wopr-api.log", level="DEBUG")
 tracing_enabled = woprconfig.get_bool("tracing.enable", False)
