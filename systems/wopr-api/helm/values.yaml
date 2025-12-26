@@ -82,7 +82,7 @@ env:
     valueFrom:
       configMapKeyRef:
         name: wopr-api-config
-        key: apiServiceUrl
+        key: API_URL
 # Optional: Environment-specific overrides
 # environments:
 #   dev:
