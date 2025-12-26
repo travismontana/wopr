@@ -78,7 +78,13 @@ app = FastAPI(
 
 if tracing_enabled:
     logger.info("Instrumenting FastAPI application with OpenTelemetry")
-    FastAPIInstrumentor.instrument_app(app)
+    FastAPIInstrumentor.instrument_app(
+        app,
+            server_request_hook=lambda span, request: span.set_attribute(
+                "http.request.body", str(request.body())  # Careful with size
+            )
+        )
+
 
 # CORS
 CORS_ORIGINS: List[str] = ["*"]
