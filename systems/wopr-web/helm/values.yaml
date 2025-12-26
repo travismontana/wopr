@@ -58,5 +58,5 @@ affinity: {}
 
 wopr:
   config:
-    SecretName: wopr-api-config
+    secretName: wopr-api-config
     apiUrlKey: WOPR_API_URL
