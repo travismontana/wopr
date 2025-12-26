@@ -293,7 +293,6 @@ def get_all(environment: str = None):
     """Get entire configuration as nested dict"""
     if environment is None:
         environment = ENVIRONMENT
-    w
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
