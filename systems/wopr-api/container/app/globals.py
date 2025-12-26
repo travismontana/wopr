@@ -24,9 +24,6 @@ SERVICE_NAME = os.getenv("SERVICE_NAME", APP_NAME)
 SERVICE_HOST = os.getenv("SERVICE_HOST", APP_HOST)
 SERVICE_PORT = int(os.getenv("SERVICE_PORT", APP_PORT))
 
-# External Services
-CONFIG_SERVICE_URL = os.getenv("CONFIG_SERVICE_URL", APP_CONFIG_URL)
-
 HACK_CAMERA_DICT = {
     "1": {
         "id": "1",
