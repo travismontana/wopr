@@ -80,7 +80,7 @@ wopr:
 env:
   - name: WOPR_API_URL
     valueFrom:
-      secretKeyRef:
+      configMapKeyRef:
         name: wopr-api-config
         key: apiServiceUrl
 # Optional: Environment-specific overrides
