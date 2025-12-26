@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "wopr-config.fullname" . }}-initdb
+  name: {{ include "wopr-api.fullname" . }}-initdb
   labels:
-    {{- include "wopr-config.labels" . | nindent 4 }}
+    {{- include "wopr-api.labels" . | nindent 4 }}
 data:
   schema.sql: |
 {{ .Files.Get "files/schema.sql" | indent 4 }}
