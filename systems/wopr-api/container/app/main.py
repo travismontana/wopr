@@ -28,6 +28,7 @@ from starlette.requests import Request
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
+from app.api.v1 import config
 
 
 # Initialize config client at startup
@@ -98,7 +99,8 @@ if tracing_enabled:
                     span.set_attribute(f"http.request.header.{key_str}", val_str)
     
     FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
-    
+    app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
+    app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
@@ -147,8 +149,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-with tracer.start_as_current_span("include_routers") if tracer else nullcontext():
-    app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
+    
 
 @app.get("/")
 async def root():

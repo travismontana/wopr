@@ -2,7 +2,7 @@
 """
 WOPR Config Service - Database-backed Configuration Service
 """
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Any, Optional, List
 import json
@@ -118,7 +118,7 @@ def infer_type(value: Any) -> str:
         return 'string'
 
 
-@app.get("/health")
+@router.get("/health")
 def health():
     """Health check"""
     try:
@@ -130,7 +130,7 @@ def health():
         return {"status": "unhealthy", "error": str(e)}, 503
 
 
-@app.get("/get/{key:path}")
+@router.get("/get/{key:path}")
 def get_value(key: str, environment: str = None):
     """
     Get configuration value by key.
@@ -188,7 +188,7 @@ def get_value(key: str, environment: str = None):
             }
 
 
-@app.post("/get")
+@router.post("/get")
 def get_multiple(request: dict):
     """
     Get multiple configuration values.
@@ -231,7 +231,7 @@ def get_multiple(request: dict):
     return result
 
 
-@app.get("/section/{section:path}")
+@router.get("/section/{section:path}")
 def get_section(section: str, environment: str = None):
     """
     Get all keys in a section.
@@ -288,12 +288,12 @@ def get_section(section: str, environment: str = None):
     return result
 
 
-@app.get("/all")
+@router.get("/all")
 def get_all(environment: str = None):
     """Get entire configuration as nested dict"""
     if environment is None:
         environment = ENVIRONMENT
-    
+    w
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -330,7 +330,7 @@ def get_all(environment: str = None):
     return result
 
 
-@app.put("/set/{key:path}")
+@router.put("/set/{key:path}")
 def set_value(key: str, update: ConfigUpdate, environment: str = None):
     """
     Set/update configuration value.
@@ -407,7 +407,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
     }
 
 
-@app.delete("/delete/{key:path}")
+@router.delete("/delete/{key:path}")
 def delete_value(key: str, environment: str = None):
     """Delete configuration value"""
     if environment is None:
@@ -429,7 +429,7 @@ def delete_value(key: str, environment: str = None):
     return {"deleted": key}
 
 
-@app.get("/history/{key:path}")
+@router.get("/history/{key:path}")
 def get_history(key: str, limit: int = 10):
     """Get change history for a key"""
     with get_db() as conn:
@@ -459,7 +459,7 @@ def get_history(key: str, limit: int = 10):
     ]
 
 
-@app.post("/import/yaml")
+@router.post("/import/yaml")
 async def import_yaml(request: dict):
     """
     Import configuration from YAML.
@@ -519,7 +519,7 @@ async def import_yaml(request: dict):
     return {"imported": len(flat), "environment": environment}
 
 
-@app.get("/export/yaml")
+@router.get("/export/yaml")
 def export_yaml(environment: str = None):
     """Export configuration as YAML"""
     config = get_all(environment)
