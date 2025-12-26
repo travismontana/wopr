@@ -8,6 +8,7 @@ WOPR API main application.
 """
 
 import logging
+import json
 
 from wopr import config as woprconfig
 from wopr import storage as woprstorage
@@ -20,6 +21,13 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from starlette.request import Request
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1 import cameras
+from typing import List
+
 
 # Initialize config client at startup
 woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)  # Uses WOPR_CONFIG_SERVICE_URL env var
@@ -30,26 +38,7 @@ logger.info("WOPR API application: booting up...")
 
 tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
 
-if tracing_enabled:
-    tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
-    tracer = woprtracing.create_tracer(
-        tracer_name=woprvar.APP_NAME,
-        tracer_version=woprvar.APP_VERSION,
-        tracer_enabled=tracing_enabled,
-        tracer_endpoint=tracing_endpoint
-    )
-    if tracer:
-        logger.info(f"Tracing enabled. Exporting to {tracing_endpoint}")
-    else:
-        logger.warning("Tracing is enabled but failed to initialize tracer.")
-else:
-    tracer = None
-    logger.info("Tracing is disabled.")
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import cameras
-from typing import List
 
 async def lifespan(app: FastAPI):
     """Lifespan events"""
@@ -110,20 +99,40 @@ if tracing_enabled:
     FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
     
     @app.middleware("http")
-    async def capture_response_headers(request, call_next):
-        response = await call_next(request)
+    async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
+        
+        # Read request body
+        body = await request.body()
+        
+        # Capture request body in span
+        if span and span.is_recording() and body:
+            try:
+                body_dict = json.loads(body)
+                span.set_attribute("http.request.body", json.dumps(body_dict))
+            except:
+                # Not JSON or parse failed - store as string (truncate if huge)
+                body_str = body.decode()[:1000]
+                span.set_attribute("http.request.body", body_str)
+        
+        # Reconstruct request so FastAPI can still read the body
+        async def receive():
+            return {"type": "http.request", "body": body}
+        
+        request = Request(request.scope, receive)
+        
+        # Process request
+        response = await call_next(request)
+        
+        # Capture response headers
         if span and span.is_recording():
             for key in CAPTURE_RESPONSE_HEADERS:
                 if key in response.headers:
                     span.set_attribute(f"http.response.header.{key}", response.headers[key])
-        return response
-
-    logger.info("Instrumenting FastAPI application with OpenTelemetry")
-    
-else:
-    tracer = None
-    logger.info("Tracing is disabled.")
+        
+    else:
+        tracer = None
+        logger.info("Tracing is disabled.")
 
 # CORS
 CORS_ORIGINS: List[str] = ["*"]
