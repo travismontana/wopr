@@ -38,6 +38,11 @@ spec:
           containerPort: 8080
           protocol: TCP
         env:
+        - name: WOPR_API_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.wopr.config.SecretName }}
+              key: {{ .Values.wopr.config.apiUrlKey }}
         {{- with .Values.env }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

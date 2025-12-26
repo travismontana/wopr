@@ -34,7 +34,7 @@ from app.api.v1 import config
 
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 logger.info("WOPR API application: booting up...")
-
+logger.setup(woprvar.APP_NAME,log_file="/var/log/wopr-api.log", level="DEBUG")
 tracing_enabled = woprconfig.get_bool("tracing.enable", False)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
     logger.debug(f"Tracing is enabled tracing_enabled: ({tracing_enabled}).")

@@ -63,3 +63,21 @@ affinity: {}
 postgresql:
   uriSecretName: wopr-config-db-cluster-app
   uriKey: uri
+
+# Default values for WOPR services
+
+config:
+  services:
+    configServiceUrl: "http://wopr-config-service.wopr.svc:8080"
+    apiServiceUrl: "http://wopr-api.wopr.svc:8000"
+
+# Optional: Environment-specific overrides
+# environments:
+#   dev:
+#     config:
+#       environment: "development"
+#       logging:
+#         level: "DEBUG"
+#   staging:
+#     config:
+#       environment: "staging"

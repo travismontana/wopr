@@ -27,14 +27,14 @@ class ConfigClient:
         """
         if service_url is None:
             service_url = os.getenv(
-                'WOPR_CONFIG_SERVICE_URL',
+                'WOPR_API_HOST',
                 'http://wopr-config_service.svc:8080'
-            )
+            ) + "/api/" + os.getenv('WOPR_API_VERSION', 'v1')
             logging.debug(f"Using config service URL from environment: ({service_url})")
         else:
             logging.debug(f"Using provided config service URL: ({service_url})")
         
-        self.service_url = service_url.rstrip('/')
+        """self.service_url = service_url.rstrip('/')"""
         self.timeout = timeout
         self._cache = {}
         self._cache_enabled = os.getenv('WOPR_CONFIG_CACHE', 'true').lower() == 'true'

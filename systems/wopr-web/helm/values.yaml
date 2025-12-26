@@ -50,14 +50,13 @@ autoscaling:
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
 
-env:
-  - name: WOPR_API_HOST
-    value: "http://wopr-api.wopr.svc:8000"
-  - name: WOPR_API_VERSION
-    value: "v1"
-
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+wopr:
+  config:
+    SecretName: wopr-api-config
+    apiUrlKey: WOPR_API_URL
