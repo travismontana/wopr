@@ -34,6 +34,7 @@ class ConfigClient:
             logging.debug(f"Using provided config service URL: ({service_url})")
 
         self.timeout = timeout
+        self.service_url = service_url
         self._cache = {}
         self._cache_enabled = os.getenv('WOPR_CONFIG_CACHE', 'true').lower() == 'true'
     
