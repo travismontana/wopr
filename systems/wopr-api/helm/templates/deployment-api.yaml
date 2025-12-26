@@ -37,6 +37,11 @@ spec:
           containerPort: 8080
           protocol: TCP
         env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgresql.uriSecretName }}
+              key: {{ .Values.postgresql.uriKey }}
         {{- with .Values.env }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

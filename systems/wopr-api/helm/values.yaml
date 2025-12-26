@@ -59,3 +59,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+postgresql:
+  uriSecretName: wopr-config-db-cluster-app
+  uriKey: uri
