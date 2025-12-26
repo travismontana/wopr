@@ -1,0 +1,63 @@
+# Default values for wpor-web
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/travismontana/wopr/wopr-web
+  pullPolicy: Always
+  tag: "latest"
+  #tag: "001630b"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "studio-traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: wopr.studio.abode.tailandtraillabs.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: wopr-web-tls
+      hosts:
+        - wopr.studio.abode.tailandtraillabs.org
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+env:
+  - name: WOPR_API_HOST
+    value: "http://wopr-api.wopr.svc:8000"
+  - name: WOPR_API_VERSION
+    value: "v1"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

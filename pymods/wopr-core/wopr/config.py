@@ -30,6 +30,9 @@ class ConfigClient:
                 'WOPR_CONFIG_SERVICE_URL',
                 'http://wopr-config_service.svc:8080'
             )
+            logging.debug(f"Using config service URL from environment: ({service_url})")
+        else:
+            logging.debug(f"Using provided config service URL: ({service_url})")
         
         self.service_url = service_url.rstrip('/')
         self.timeout = timeout

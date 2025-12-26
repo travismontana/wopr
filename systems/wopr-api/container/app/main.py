@@ -9,6 +9,7 @@ WOPR API main application.
 
 import logging
 import json
+import os
 from contextlib import nullcontext
 from typing import List
 
@@ -31,13 +32,14 @@ from app.api.v1 import cameras
 from app.api.v1 import config
 
 
-# Initialize config client at startup
-woprconfig.init_config(service_url=woprvar.CONFIG_SERVICE_URL)
-
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 logger.info("WOPR API application: booting up...")
 
-tracing_enabled = woprconfig.get_bool("tracing.enabled", False)
+tracing_enabled = woprconfig.get_bool("tracing.enable", False)
+if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
+    logger.debug(f"Tracing is enabled tracing_enabled: ({tracing_enabled}).")
+else:
+    logger.debug(f"Tracing is disabled; tracing_enabled: ({tracing_enabled}).")
 
 # Initialize tracer early so it's available in lifespan
 tracer = None
@@ -76,7 +78,7 @@ if tracing_enabled:
         "content-type", "content-length", "cache-control"
     ]
     
-    tracing_endpoint = woprconfig.get_str("tracing.host", "http://localhost:4318") + "/v1/traces"
+    tracing_endpoint = woprconfig.get_str("tracing.host", ) + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_version=woprvar.APP_VERSION,
