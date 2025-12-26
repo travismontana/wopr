@@ -37,7 +37,7 @@ woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logger.info("WOPR API application: booting up...")
-tracing_enabled = woprconfig.get_bool("tracing.enable", False)
+tracing_enabled = woprconfig.get_bool("tracing.enable", True)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
     logger.debug(f"Tracing is enabled tracing_enabled: ({tracing_enabled}).")
 else:
@@ -80,7 +80,7 @@ if tracing_enabled:
         "content-type", "content-length", "cache-control"
     ]
     
-    tracing_endpoint = woprconfig.get_str("tracing.host", ) + "/v1/traces"
+    tracing_endpoint = woprvars.APP_OTEL_URL + "/v1/traces"
     tracer = woprtracing.create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_version=woprvar.APP_VERSION,
@@ -152,8 +152,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-    
 
 @app.get("/")
 async def root():
