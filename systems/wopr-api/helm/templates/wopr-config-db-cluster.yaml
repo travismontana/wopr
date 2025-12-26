@@ -12,3 +12,7 @@ spec:
     initdb:
       database: app
       owner: app
+    postInitApplicationSQL:
+      - configMapRefs:
+        - name: wopr-api-initdb
+          key: schema.sql
