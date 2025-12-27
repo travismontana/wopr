@@ -109,6 +109,7 @@ if tracing_enabled:
     FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
     app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
     app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
+    app.include_router(status.router, prefix="/api/v1/status", tags=["status"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
