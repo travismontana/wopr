@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 import httpx
 
-router = APIRouter()
+router = APIRouter(tags=["cameras"])
 
 camera_dict = woprvar.HACK_CAMERA_DICT
 

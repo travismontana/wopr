@@ -23,7 +23,7 @@ import logging
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 woprconfig.init_config()
 
-router = APIRouter()
+router = APIRouter(tags=["config"])
 
 # Database connection
 DATABASE_URL = os.getenv(

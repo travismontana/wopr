@@ -25,7 +25,7 @@ logger = woprlogging.setup_logging(woprvar.APP_NAME)
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/api/v1/status", tags=["status"])
+router = APIRouter(tags=["status"])
 
 class StatusCheck(BaseModel):
     """Single status check result"""
