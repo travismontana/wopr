@@ -1,6 +1,6 @@
 import logging
 import sys
-import datetime
+from datetime import datetime, timezone
 from app import globals as woprvar
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
