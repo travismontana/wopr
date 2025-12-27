@@ -8,6 +8,7 @@ WOPR API main application.
 """
 
 import logging
+import sys
 import json
 import os
 import asyncpg
