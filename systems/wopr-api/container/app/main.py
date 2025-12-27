@@ -35,6 +35,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 from app.api.v1 import config
 from app.api.v1 import status
+from app.api.v1 import health
 
 woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
 
@@ -112,6 +113,7 @@ if tracing_enabled:
     app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
     app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
     app.include_router(status.router, prefix="/api/v1/status", tags=["status"])
+    app.include_router(health.router, prefix="/api/v1/health", tags=["health"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()

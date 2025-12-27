@@ -295,7 +295,7 @@ async def check_wopr_api_up() -> StatusCheck:
     logger.debug("Checking WOPR API up... starttime=%s", start_time)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{woprvar.WOPR_API_URL}/", timeout=5.0)
+            response = await client.get(f"{woprvar.WOPR_API_URL}/health", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR API up check passed.")
             return StatusCheck(
@@ -323,7 +323,7 @@ async def check_wopr_api_functional() -> StatusCheck:
     logger.debug("Checking WOPR API functional... starttime=%s", start_time)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{woprvar.WOPR_API_URL}/docs", timeout=5.0)
+            response = await client.get(f"{woprvar.WOPR_API_URL}/health", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR API functional check passed.")
             return StatusCheck(
