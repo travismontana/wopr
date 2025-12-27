@@ -402,6 +402,35 @@ async def check_wopr_cam_functional() -> StatusCheck:
             error_message=str(e),
         )
 
+# for check_config_map_present, we will just check if the environment variable WOPR_API_URL is set, as a proxy for checking if the config map is present
+@router.get("/wopr-config-map-present")
+async def check_config_map_present() -> StatusCheck:
+    """
+    Check if WOPR config map is present.
+    """
+    start_time = datetime.now(timezone.utc)
+    logger.debug("Checking WOPR config map present... starttime=%s", start_time)
+    try:
+        if os.getenv("WOPR_API_URL"):
+            logger.debug("WOPR config map present check passed.")
+            return StatusCheck(
+                test_name="wopr_config_map_present",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+        else:
+            raise RuntimeError("WOPR_API_URL environment variable not set")
+    except Exception as e:
+        logger.error("WOPR config map present check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_config_map_present",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
 @router.get("/")
 @router.get("")
 async def get_system_status() -> SystemStatus:
@@ -433,7 +462,7 @@ async def get_system_status() -> SystemStatus:
     logger.debug("WOPR camera up check result: %s", wopr_cam_up)
     wopr_cam_functional = await check_wopr_cam_functional()
     logger.debug("WOPR camera functional check result: %s", wopr_cam_functional)
-    config_map_present = False  # Check k8s API
+    config_map_present = await check_config_map_present()
     logger.debug("WOPR config map present check result: %s", config_map_present)
     
     after = datetime.now(timezone.utc)
@@ -450,6 +479,6 @@ async def get_system_status() -> SystemStatus:
         wopr_api_functional=(wopr_api_functional.test_result == "pass"),
         wopr_cam_up=(wopr_cam_up.test_result == "pass"),
         wopr_cam_functional=(wopr_cam_functional.test_result == "pass"),
-        wopr_config_map_present=config_map_present,
+        wopr_config_map_present=(config_map_present.test_result == "pass"),
         timestamp_right_after_data_pull=after,
     )
