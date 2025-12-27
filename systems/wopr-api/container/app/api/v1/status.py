@@ -295,7 +295,7 @@ async def check_wopr_api_up() -> StatusCheck:
     logger.debug("Checking WOPR API up... starttime=%s", start_time)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{woprvar.WOPR_API_URL}/status", timeout=5.0)
+            response = await client.get(f"{woprvar.WOPR_API_URL}/", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR API up check passed.")
             return StatusCheck(
@@ -352,7 +352,7 @@ async def check_wopr_cam_up() -> StatusCheck:
     logger.debug("Checking WOPR camera up... starttime=%s camUrl=%s", start_time, camUrl)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{camUrl}/status", timeout=5.0)
+            response = await client.get(f"{camUrl}/s", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR camera up check passed.")
             return StatusCheck(
