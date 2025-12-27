@@ -481,4 +481,8 @@ async def get_system_status() -> SystemStatus:
         wopr_cam_functional=(wopr_cam_functional.test_result == "pass"),
         wopr_config_map_present=(config_map_present.test_result == "pass"),
         timestamp_right_after_data_pull=after,
+        diff_timestamp_ms=int((after - before).total_seconds() * 1000,
+        # timestamp in seconds to a significand of 4 digits
+        diff_timestamp_s=float(f"{(after - before).total_seconds():.4f}"),
+
     )
