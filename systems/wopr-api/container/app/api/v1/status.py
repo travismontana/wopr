@@ -59,6 +59,7 @@ async def get_db_uri() -> str:
     """
     uri = os.getenv("DATABASE_URL")
     if not uri:
+        logger.error("DATABASE_URL environment variable not set")
         raise RuntimeError("DATABASE_URL environment variable not set")
     return uri
 
@@ -70,15 +71,18 @@ async def check_db_up() -> StatusCheck:
     Test: Can we connect to the port and execute SELECT 1?
     """
     start_time = datetime.now(timezone.utc)
-    
+    logger.debug("Checking database connectivity... starttime=%s", start_time)
     try:
         db_uri = await get_db_uri()
-        
+        logger.debug("Database URI obtained.")
         # Connect and run simplest possible query
         conn = await asyncpg.connect(db_uri)
+        logger.debug("Database connection established.")
         try:
             result = await conn.fetchval("SELECT 1")
+            logger.debug("Database query executed, result=%s", result)
             if result == 1:
+                logger.debug("Database is up and running.")
                 return StatusCheck(
                     test_name="db_up",
                     test_start_timestamp=start_time,
@@ -87,8 +91,10 @@ async def check_db_up() -> StatusCheck:
                 )
         finally:
             await conn.close()
+            logger.debug("Database connection closed.")
             
     except Exception as e:
+        logger.error("Database connectivity check failed: %s", str(e))
         return StatusCheck(
             test_name="db_up",
             test_start_timestamp=start_time,
@@ -104,18 +110,20 @@ async def check_db_queriable() -> StatusCheck:
     Test: Can we query the config_values table?
     """
     start_time = datetime.now(timezone.utc)
-    
+    logger.debug("Checking database queriability... starttime=%s", start_time)
     try:
         db_uri = await get_db_uri()
-        
+        logger.debug("Database URI obtained.")
         conn = await asyncpg.connect(db_uri)
+        logger.debug("Database connection established.")
         try:
             # Query something we actually care about
             result = await conn.fetchval(
                 "SELECT COUNT(*) FROM settings"
             )
-            
+            logger.debug("Database queriability query executed, result=%s", result)
             if result is not None:  # Even 0 is valid
+                logger.debug("Database is queriable.")
                 return StatusCheck(
                     test_name="db_queriable",
                     test_start_timestamp=start_time,
@@ -124,8 +132,10 @@ async def check_db_queriable() -> StatusCheck:
                 )
         finally:
             await conn.close()
+            logger.debug("Database connection closed.")
             
     except Exception as e:
+        logger.error("Database queriability check failed: %s", str(e))
         return StatusCheck(
             test_name="db_queriable",
             test_start_timestamp=start_time,
@@ -143,14 +153,16 @@ async def check_db_writable() -> StatusCheck:
     Test: Can we INSERT into status_checks table?
     """
     start_time = datetime.now(timezone.utc)
-    
+    logger.debug("Checking database writability... starttime=%s", start_time)
     try:
         db_uri = await get_db_uri()
-        
+        logger.debug("Database URI obtained.")
         conn = await asyncpg.connect(db_uri)
+        logger.debug("Database connection established.")
         try:
             # Write a test record
             test_time = datetime.now(timezone.utc)
+            logger.debug("Inserting test record into status_checks table at %s", test_time)
             await conn.execute(
                 """
                 INSERT INTO status_checks 
@@ -162,7 +174,7 @@ async def check_db_writable() -> StatusCheck:
                 "pass",
                 test_time,
             )
-            
+            logger.debug("Test record inserted successfully.")
             return StatusCheck(
                 test_name="db_writable",
                 test_start_timestamp=start_time,
@@ -171,8 +183,10 @@ async def check_db_writable() -> StatusCheck:
             )
         finally:
             await conn.close()
+            logger.debug("Database connection closed.")
             
     except Exception as e:
+        logger.error("Database writability check failed: %s", str(e))
         return StatusCheck(
             test_name="db_writable",
             test_start_timestamp=start_time,
@@ -220,22 +234,33 @@ async def get_system_status() -> SystemStatus:
     Returns aggregated health check results.
     """
     before = datetime.now(timezone.utc)
-    
+    logger.debug("Gathering system status... starttime=%s", before)
     # Run all checks (placeholder - you'll implement these)
     db_up = await check_db_up()
+    logger.debug("Database up check result: %s", db_up)
     db_queriable = await check_db_queriable()
+    logger.debug("Database queriable check result: %s", db_queriable)
     db_writable = await check_db_writable()
+    logger.debug("Database writable check result: %s", db_writable)
     
     # TODO: Implement other checks
     wopr_web_up = False  # HTTP GET to wopr_web
+    logger.debug("WOPR web up check result: %s", wopr_web_up)
     wopr_web_functional = False  # Check for dynamic content
+    logger.debug("WOPR web functional check result: %s", wopr_web_functional)
     wopr_api_up = True  # Self-check (you're here, aren't you?)
+    logger.debug("WOPR API up check result: %s", wopr_api_up)
     wopr_api_functional = False  # Can create a game?
+    logger.debug("WOPR API functional check result: %s", wopr_api_functional)
     wopr_cam_up = False  # HTTP GET to wopr_cam
+    logger.debug("WOPR camera up check result: %s", wopr_cam_up)
     wopr_cam_functional = False  # Get camera status
+    logger.debug("WOPR camera functional check result: %s", wopr_cam_functional)
     config_map_present = False  # Check k8s API
+    logger.debug("WOPR config map present check result: %s", config_map_present)
     
     after = datetime.now(timezone.utc)
+    logger.debug("System status gathered... endtime=%s", after)
     
     return SystemStatus(
         timestamp_right_before_data_pull=before,
