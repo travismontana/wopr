@@ -7,6 +7,7 @@ import Games from "./pages/games";
 import { ImageGallery } from "./pages/images";
 import ML from "./pages/ml"; 
 import Control from "./pages/control"; 
+import Status from "./pages/status";
 
 export default function Main() {
   return (
