@@ -229,6 +229,7 @@ async def init_status_checks_table() -> str:
         await conn.close()
 
 @router.get("/")
+@router.get("")
 async def get_system_status() -> SystemStatus:
     """
     Get current status of all WOPR components.
