@@ -48,7 +48,7 @@ class SystemStatus(BaseModel):
     wopr_cam_up: bool
     wopr_cam_functional: bool
     wopr_config_map_present: bool
-    timestamp_right_after_data_pull: datetim
+    timestamp_right_after_data_pull: datetime
 
 async def get_db_uri() -> str:
     """
