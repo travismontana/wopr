@@ -1,6 +1,7 @@
 import logging
 import sys
 import datetime
+from app import globals as woprvar
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
