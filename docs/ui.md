@@ -39,7 +39,7 @@
 
 Don't split "see active games" and "control active games" into separate nav items. That's two clicks for one conceptual task. Active games should be a **dashboard view** with inline controls. 
 
-
+```
 graph TD
     WOPR[WOPR]
     
@@ -78,3 +78,4 @@ graph TD
     style SETUP fill:#ffa500
     style CAPTURE fill:#9370db
     style SYSTEM fill:#708090
+```
