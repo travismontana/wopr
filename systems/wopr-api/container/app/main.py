@@ -10,6 +10,8 @@ WOPR API main application.
 import logging
 import json
 import os
+import asyncpg
+import base64
 from contextlib import nullcontext
 from typing import List
 
@@ -25,7 +27,8 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.requests import Request
-
+from datetime import datetime, timezone
+from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
