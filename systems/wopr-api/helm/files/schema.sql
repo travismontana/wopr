@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS settings (
     UNIQUE(key, environment)
 );
 
+-- Grant permissions to app user
+GRANT ALL PRIVILEGES ON TABLE settings TO app;
+GRANT ALL PRIVILEGES ON SEQUENCE settings_id_seq TO app;
+
 -- Indexes for fast lookups
 CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
 CREATE INDEX IF NOT EXISTS idx_settings_environment ON settings(environment);

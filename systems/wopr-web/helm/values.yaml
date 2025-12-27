@@ -56,7 +56,9 @@ tolerations: []
 
 affinity: {}
 
-wopr:
-  config:
-    secretName: wopr-api-config
-    apiUrlKey: WOPR_API_URL
+env:
+  - name: WOPR_API_URL
+    valueFrom:
+      configMapKeyRef:
+        name: wopr-api-config
+        key: API_URL
