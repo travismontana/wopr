@@ -19,7 +19,7 @@ from pydantic import BaseModel
 import base64
 import json
 
-woprconfig.init_config(service_url=os.getenv("wopr_API_URL") or woprvar.wopr_API_URL)
+woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 from fastapi import APIRouter, Depends, HTTPException, status
