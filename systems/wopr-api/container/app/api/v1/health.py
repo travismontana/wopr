@@ -12,7 +12,7 @@ router = APIRouter(tags=["status"])
 @router.get("/", summary="Health Check", description="Check the health of the WOPR API.")
 @router.get("", summary="Health Check", description="Check the health of the WOPR API.")
 async def health_check() -> dict:
-    logger.debug("Performing health check at %s", datetime.now(datetime.timezone.utc).isoformat())
+    logger.debug("Performing health check at %s", datetime.now(timezone.utc).isoformat())
     return {
         "status": "ok",
         "service": "wopr-api",
