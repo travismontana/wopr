@@ -349,10 +349,11 @@ async def check_wopr_cam_up() -> StatusCheck:
     """
     start_time = datetime.now(timezone.utc)
     camUrl = woprvar.HACK_CAMERA_DICT["1"]["url"]
-    logger.debug("Checking WOPR camera up... starttime=%s camUrl=%s", start_time, camUrl)
+    camPort = woprvar.HACK_CAMERA_DICT["1"]["port"]
+    logger.debug("Checking WOPR camera up... starttime=%s camUrl=%s camPort=%s", start_time, camUrl, camPort)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{camUrl}/s", timeout=5.0)
+            response = await client.get(f"{camUrl}:{camPort}/s", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR camera up check passed.")
             return StatusCheck(
@@ -362,7 +363,7 @@ async def check_wopr_cam_up() -> StatusCheck:
                 test_end_timestamp=datetime.now(timezone.utc),
             )
     except Exception as e:
-        logger.error("WOPR camera up check failed: error: %s camUrl=%s", str(e), camUrl)
+        logger.error("WOPR camera up check failed: error: %s camUrl=%s camPort=%s", str(e), camUrl, camPort)
         return StatusCheck(
             test_name="wopr_cam_up",
             test_start_timestamp=start_time,
@@ -378,10 +379,11 @@ async def check_wopr_cam_functional() -> StatusCheck:
     """
     start_time = datetime.now(timezone.utc)
     camUrl = woprvar.HACK_CAMERA_DICT["1"]["url"]
-    logger.debug("Checking WOPR camera functional... starttime=%s", start_time)
+    camPort = woprvar.HACK_CAMERA_DICT["1"]["port"]
+    logger.debug("Checking WOPR camera functional... starttime=%s camUrl=%s camPort=%s", start_time, camUrl, camPort)
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{camUrl}/functional", timeout=5.0)
+            response = await client.get(f"{camUrl}:{camPort}/", timeout=5.0)
             response.raise_for_status()
             logger.debug("WOPR camera functional check passed.")
             return StatusCheck(
