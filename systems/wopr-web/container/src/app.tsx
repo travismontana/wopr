@@ -33,7 +33,7 @@ export default function Main() {
             <Route path="/images" element={<ImageGallery gameId="dune_imperium" />} />
             <Route path="/ml" element={<ML />} />
             <Route path="/control" element={<Control />} />
-            <Route path="/status" element={React.lazy(() => import("./pages/status"))} />
+            <Route path="/status" element={<Status />} />
           </Routes>
         </main>
       </div>
