@@ -228,6 +228,177 @@ async def init_status_checks_table() -> str:
     finally:
         await conn.close()
 
+@router.get("/wopr-web-up")
+async def check_wopr_web_up() -> StatusCheck:
+    """
+    Check if WOPR web is up.
+    """
+    start_time = datetime.now(timezone.utc)
+    logger.debug("Checking WOPR web up... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"https://wopr.{woprvar.APP_DOMAIN}", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR web up check passed.")
+            return StatusCheck(
+                test_name="wopr_web_up",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR web up check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_web_up",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
+@router.get("/wopr-web-functional")
+async def check_wopr_web_functional() -> StatusCheck:
+    """
+    Check if WOPR web is functional.
+    """
+    start_time = datetime.now(timezone.utc)
+    logger.debug("Checking WOPR web functional... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"https://wopr.{woprvar.APP_DOMAIN}/ml", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR web functional check passed.")
+            return StatusCheck(
+                test_name="wopr_web_functional",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR web functional check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_web_functional",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
+#Samething, but now for api, and will check WOPR_API_URL for up, and WOPR_API_URL/docs for functional
+@router.get("/wopr-api-up")
+async def check_wopr_api_up() -> StatusCheck:
+    """
+    Check if WOPR API is up.
+    """
+    start_time = datetime.now(timezone.utc)
+    logger.debug("Checking WOPR API up... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{woprvar.WOPR_API_URL}/status", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR API up check passed.")
+            return StatusCheck(
+                test_name="wopr_api_up",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR API up check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_api_up",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
+@router.get("/wopr-api-functional")
+async def check_wopr_api_functional() -> StatusCheck:
+    """
+    Check if WOPR API is functional.
+    """
+    start_time = datetime.now(timezone.utc)
+    logger.debug("Checking WOPR API functional... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{woprvar.WOPR_API_URL}/docs", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR API functional check passed.")
+            return StatusCheck(
+                test_name="wopr_api_functional",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR API functional check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_api_functional",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
+@router.get("/wopr-cam-up")
+async def check_wopr_cam_up() -> StatusCheck:
+    """
+    Check if WOPR camera is up.
+    """
+    start_time = datetime.now(timezone.utc)
+    camUrl = woprvar.HACK_CAMERA_DICT["1"]["url"]
+    logger.debug("Checking WOPR camera up... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{camUrl}/status", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR camera up check passed.")
+            return StatusCheck(
+                test_name="wopr_cam_up",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR camera up check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_cam_up",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
+@router.get("/wopr-cam-functional")
+async def check_wopr_cam_functional() -> StatusCheck:
+    """
+    Check if WOPR camera is functional.
+    """
+    start_time = datetime.now(timezone.utc)
+    camUrl = woprvar.HACK_CAMERA_DICT["1"]["url"]
+    logger.debug("Checking WOPR camera functional... starttime=%s", start_time)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{camUrl}/functional", timeout=5.0)
+            response.raise_for_status()
+            logger.debug("WOPR camera functional check passed.")
+            return StatusCheck(
+                test_name="wopr_cam_functional",
+                test_start_timestamp=start_time,
+                test_result="pass",
+                test_end_timestamp=datetime.now(timezone.utc),
+            )
+    except Exception as e:
+        logger.error("WOPR camera functional check failed: %s", str(e))
+        return StatusCheck(
+            test_name="wopr_cam_functional",
+            test_start_timestamp=start_time,
+            test_result="fail",
+            test_end_timestamp=datetime.now(timezone.utc),
+            error_message=str(e),
+        )
+
 @router.get("/")
 @router.get("")
 async def get_system_status() -> SystemStatus:
@@ -247,17 +418,17 @@ async def get_system_status() -> SystemStatus:
     logger.debug("Database writable check result: %s", db_writable)
     
     # TODO: Implement other checks
-    wopr_web_up = False  # HTTP GET to wopr_web
+    wopr_web_up = await check_wopr_web_up()
     logger.debug("WOPR web up check result: %s", wopr_web_up)
-    wopr_web_functional = False  # Check for dynamic content
+    wopr_web_functional = await check_wopr_web_functional()
     logger.debug("WOPR web functional check result: %s", wopr_web_functional)
-    wopr_api_up = True  # Self-check (you're here, aren't you?)
+    wopr_api_up = await check_wopr_api_up()
     logger.debug("WOPR API up check result: %s", wopr_api_up)
-    wopr_api_functional = False  # Can create a game?
+    wopr_api_functional = await check_wopr_api_functional()
     logger.debug("WOPR API functional check result: %s", wopr_api_functional)
-    wopr_cam_up = False  # HTTP GET to wopr_cam
+    wopr_cam_up = await check_wopr_cam_up()
     logger.debug("WOPR camera up check result: %s", wopr_cam_up)
-    wopr_cam_functional = False  # Get camera status
+    wopr_cam_functional = await check_wopr_cam_functional()
     logger.debug("WOPR camera functional check result: %s", wopr_cam_functional)
     config_map_present = False  # Check k8s API
     logger.debug("WOPR config map present check result: %s", config_map_present)
@@ -270,12 +441,12 @@ async def get_system_status() -> SystemStatus:
         db_up=(db_up.test_result == "pass"),
         db_queriable=(db_queriable.test_result == "pass"),
         db_writable=(db_writable.test_result == "pass"),
-        wopr_web_up=wopr_web_up,
-        wopr_web_functional=wopr_web_functional,
-        wopr_api_up=wopr_api_up,
-        wopr_api_functional=wopr_api_functional,
-        wopr_cam_up=wopr_cam_up,
-        wopr_cam_functional=wopr_cam_functional,
+        wopr_web_up=(wopr_web_up.test_result == "pass"),
+        wopr_web_functional=(wopr_web_functional.test_result == "pass"),
+        wopr_api_up=(wopr_api_up.test_result == "pass"),
+        wopr_api_functional=(wopr_api_functional.test_result == "pass"),
+        wopr_cam_up=(wopr_cam_up.test_result == "pass"),
+        wopr_cam_functional=(wopr_cam_functional.test_result == "pass"),
         wopr_config_map_present=config_map_present,
         timestamp_right_after_data_pull=after,
     )
