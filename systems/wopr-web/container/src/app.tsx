@@ -23,6 +23,7 @@ export default function Main() {
             <Link to="/images"><button>Images</button></Link>
             <Link to="/ml"><button>ML</button></Link>
             <Link to="/control"><button>Control</button></Link>
+            <Link to="/status"><button>Status</button></Link>
           </nav>
         </section>
         <main className="content">
@@ -32,6 +33,7 @@ export default function Main() {
             <Route path="/images" element={<ImageGallery gameId="dune_imperium" />} />
             <Route path="/ml" element={<ML />} />
             <Route path="/control" element={<Control />} />
+            <Route path="/status" element={React.lazy(() => import("./pages/status"))} />
           </Routes>
         </main>
       </div>
