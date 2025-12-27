@@ -8,10 +8,10 @@
 **Things I'd like now that I've had time to process things**
 - on wopr_config - needs a UI that can edit the thing like yaml.
 - local config cache, cache invalidation, config versioning in the DB, auto config rollback if a problem detected, problem detection. 
-- status page
-- telemetry 
-- add telemetry to config and core module
-- centralize the core module
+- status page *
+- telemetry **
+- add telemetry to config and core module *
+- centralize the core module **
 - installer
 - be able to rollout services via installer
 <!-- >>> NEW >>> -->
@@ -22,6 +22,65 @@
 <!-- >>> END NEW >>> -->
 
 ---
+
+**20251226 - 2025, Dev 26**
+* Prompt for status checks:
+```
+In wopr-api, I want to add a /api/v1/status.py, You do db-up, show me the python/fastapi you would do to check if the db is up.  I'll do the rest, so you do just db-up, and recommend how to do the db thing.
+
+DB to use:
+kubectl -n wopr get secret wopr-config-db-cluster-app -o jsonpath='{.data.uri}' | base64 -d
+
+I guess create a new table? or a new database? not sure how to do that or which.
+
+Tests:
+
+- Timestamps before and after ()
+- "db-up" : bool - Can i connect to the port/see a prompt to login or SELECT 1
+  "db-queriable" : bool - Can I query something I care about?
+  "db-writable": bool - Are the disks alive?
+  "wopr-web-up" : boo - Can I get to the web page and get some html?
+  "wopr-web-functional" : bool - Can I get soem dynamic content on the page?
+  "wopr-api-up" : bool - Can I connect and see things?
+  "wopr-api-functional" : bool - Can I connect and write thing?
+  "wopr-cam-up" : bool - Can I connect to the cam service?
+  "wopr-cam-functional" : bool - Does it tell me the cam status?
+
+Each test will report {"test-start-timestamp" : timestamp, "test-result" : pass|fail|norun, "test-end-timestamp"}, 
+then the test master will write that to the database.
+
+GET /
+- Shows the current status of teh environment in json, the format will be:
+{
+  "timestamp_right_before_data_pull": "standardformat_precision_tdb",
+  "db-up" : bool,
+  "db-queriable" : bool,
+  "db-writable": bool,
+  "wopr-web-up" : bool,
+  "wopr-web-functional" : bool,
+  "wopr-api-up" : bool,
+  "wopr-api-functional" : bool,
+  "wopr-cam-up" : bool,
+  "wopr-cam-functional" : bool,
+  "wopr-config-map-present" : bool,
+  "timestamp_right_after_data_pull": "standardformat_precision_tdb"
+}
+
+GET /{one-of-the-things-from-above}
+
+To run the tests, writes to a database.
+POST /
+{
+  "all": "true",
+  "specific" : [
+    {
+      "test-standard-name" : bool
+    }
+  ]
+}
+
+There will be a prefect that will administer the tests.
+
 
 **20251218 - 2025, Dec 18** <!-- NEW -->
 * Conceptualized WOPR-EDM (Edge Device Management) service

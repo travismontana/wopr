@@ -2,7 +2,6 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: wopr-config-db-database
-  namespace: wopr
 spec:
   name: wopr-config-db-database
   owner: wopr-config-db-database-owner

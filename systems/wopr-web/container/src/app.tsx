@@ -7,6 +7,7 @@ import Games from "./pages/games";
 import { ImageGallery } from "./pages/images";
 import ML from "./pages/ml"; 
 import Control from "./pages/control"; 
+import Status from "./pages/status";
 
 export default function Main() {
   return (
@@ -23,6 +24,7 @@ export default function Main() {
             <Link to="/images"><button>Images</button></Link>
             <Link to="/ml"><button>ML</button></Link>
             <Link to="/control"><button>Control</button></Link>
+            <Link to="/status"><button>Status</button></Link>
           </nav>
         </section>
         <main className="content">
@@ -32,6 +34,7 @@ export default function Main() {
             <Route path="/images" element={<ImageGallery gameId="dune_imperium" />} />
             <Route path="/ml" element={<ML />} />
             <Route path="/control" element={<Control />} />
+            <Route path="/status" element={<Status />} />
           </Routes>
         </main>
       </div>

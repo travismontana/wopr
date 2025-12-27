@@ -55,7 +55,7 @@ template{display:none;}[hidden]
   /*min-height: 100vh;
   padding: 1rem;*/
   align-content: start;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr)); /* 6 equal columns */
   width: min(100%, var(--content-max));
   margin: 1px auto;
   padding-left: var(--content-pad);

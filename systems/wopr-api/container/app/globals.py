@@ -13,7 +13,9 @@ APP_DESCRIPTION = "WOPR API application package"
 APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
 APP_DOMAIN = "studio.abode.tailandtraillabs.org"
-APP_CONFIG_URL = "http://wopr-config." + APP_DOMAIN
+APP_API_URL = "https://wopr-api." + APP_DOMAIN
+APP_OTEL_URL = "https://otel.monitoring.abode.tailandtraillabs.org"
+WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
 
 APP_HOST = "0.0.0.0"
 APP_PORT = 8000
@@ -22,9 +24,6 @@ APP_PORT = 8000
 SERVICE_NAME = os.getenv("SERVICE_NAME", APP_NAME)
 SERVICE_HOST = os.getenv("SERVICE_HOST", APP_HOST)
 SERVICE_PORT = int(os.getenv("SERVICE_PORT", APP_PORT))
-
-# External Services
-CONFIG_SERVICE_URL = os.getenv("CONFIG_SERVICE_URL", APP_CONFIG_URL)
 
 HACK_CAMERA_DICT = {
     "1": {

@@ -13,13 +13,16 @@ from wopr import logging as woprlogging
 from app import globals as woprvar
 
 import logging
-logger = woprlogging.setup_logging(woprvar.APP_NAME)
+import sys
+logger = logging.getLogger(woprvar.APP_NAME)
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 import httpx
 
-router = APIRouter()
+router = APIRouter(tags=["cameras"])
 
 camera_dict = woprvar.HACK_CAMERA_DICT
 

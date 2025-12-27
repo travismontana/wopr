@@ -1,3 +1,4 @@
+# buildplease10
 FROM python:3.12-slim
 LABEL maintainer="Bob Bomar"
 LABEL description="WOPR API - Wargaming Oversight & Position Recognition API Service"
@@ -20,6 +21,9 @@ RUN useradd -m wopr && \
     mkdir -p /app /var/log/wopr && \
     chown -R wopr:wopr /app /var/log/wopr
 
+RUN touch /var/log/wopr-api.log
+RUN chown wopr:wopr /var/log/wopr-api.log
+
 USER wopr
 
 WORKDIR /app
@@ -30,6 +34,7 @@ RUN pip install --user -r requirements.txt
 COPY --chown=wopr:wopr app/ ./app/
 
 
+ENV OTEL_SERVICE_NAME=wopr-api
 
 EXPOSE 8000
 

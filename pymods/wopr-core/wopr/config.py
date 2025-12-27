@@ -25,14 +25,16 @@ class ConfigClient:
             service_url: Config service URL (default from WOPR_CONFIG_SERVICE_URL env)
             timeout: Request timeout in seconds
         """
+        service_url = os.getenv(
+            'WOPR_API_URL', 'https://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
         if service_url is None:
-            service_url = os.getenv(
-                'WOPR_CONFIG_SERVICE_URL',
-                'http://wopr-config_service.svc:8080'
-            )
-        
-        self.service_url = service_url.rstrip('/')
+            
+            logging.debug(f"Using config service URL from environment: ({service_url})")
+        else:
+            logging.debug(f"Using provided config service URL: ({service_url})")
+
         self.timeout = timeout
+        self.service_url = service_url
         self._cache = {}
         self._cache_enabled = os.getenv('WOPR_CONFIG_CACHE', 'true').lower() == 'true'
     
@@ -221,6 +223,8 @@ def init_config(service_url: Optional[str] = None, timeout: int = 5) -> None:
         timeout: Request timeout in seconds
     """
     global _client
+    if not service_url:
+        service_url = os.getenv('WOPR_API_URL', 'https://wopr-api.studio.abode.tailandtraillabs.org/api/v1/config')
     _client = ConfigClient(service_url, timeout)
 
 

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wopr-api.fullname" . }}-config
+  labels:
+    {{- include "wopr-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config
+data:
+  # Service URLs
+  CONFIG_SERVICE_URL: {{ .Values.config.services.configServiceUrl | quote }}
+  API_SERVICE_URL: {{ .Values.config.services.apiServiceUrl | quote }}
+  API_VERSION: {{ .Values.config.services.apiVersion | quote }}
+  API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}

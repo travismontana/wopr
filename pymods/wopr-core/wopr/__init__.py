@@ -23,7 +23,7 @@ from wopr.storage import (
 )
 from wopr.logging import setup_logging, get_logger
 
-__version__ = "0.1.0"
+__version__ = "0.1.3-beta"
 __all__ = [
     # Config
     'init_config',

@@ -3,7 +3,6 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: wopr-config-db-cluster
-  namespace: wopr
 spec:
   instances: 1
   storage:
@@ -13,3 +12,7 @@ spec:
     initdb:
       database: app
       owner: app
+      postInitApplicationSQLRefs:
+        configMapRefs:
+          - name: wopr-api-initdb
+            key: schema.sql
