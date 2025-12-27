@@ -19,7 +19,7 @@ from pydantic import BaseModel
 import base64
 import json
 
-woprconfig.init_config(service_url=os.getenv("wopr-API_URL") or woprvar.wopr-API_URL)
+woprconfig.init_config(service_url=os.getenv("wopr_API_URL") or woprvar.wopr_API_URL)
 logger = woprlogging.setup_logging(woprvar.APP_NAME)
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -38,32 +38,32 @@ class StatusCheck(BaseModel):
 class SystemStatus(BaseModel):
     """Overall system status"""
     timestamp_right_before_data_pull: datetime
-    db-up: bool
-    db-queriable: bool
+    db_up: bool
+    db_queriable: bool
     db_writable: bool
-    wopr-web_up: bool
-    wopr-web_functional: bool
-    wopr-api_up: bool
-    wopr-api_functional: bool
-    wopr-cam_up: bool
-    wopr-cam_functional: bool
-    wopr-config_map_present: bool
+    wopr_web_up: bool
+    wopr_web_functional: bool
+    wopr_api_up: bool
+    wopr_api_functional: bool
+    wopr_cam_up: bool
+    wopr_cam_functional: bool
+    wopr_config_map_present: bool
     timestamp_right_after_data_pull: datetime
 
 async def get_db_uri() -> str:
     """
     Get database URI from environment or k8s secret.
     
-    In k8s, wopr-config-db-cluster-app secret should be mounted as env var:
-    DATABASE_URL from secret/wopr-config-db-cluster-app/uri
+    In k8s, wopr_config-db_cluster-app secret should be mounted as env var:
+    DATABASE_URL from secret/wopr_config-db_cluster-app/uri
     """
     uri = os.getenv("DATABASE_URL")
     if not uri:
         raise RuntimeError("DATABASE_URL environment variable not set")
     return uri
 
-@router.get("/db-up")
-async def check_db-up() -> StatusCheck:
+@router.get("/db_up")
+async def check_db_up() -> StatusCheck:
     """
     Check if database is reachable and accepting connections.
     
@@ -80,7 +80,7 @@ async def check_db-up() -> StatusCheck:
             result = await conn.fetchval("SELECT 1")
             if result == 1:
                 return StatusCheck(
-                    test_name="db-up",
+                    test_name="db_up",
                     test_start_timestamp=start_time,
                     test_result="pass",
                     test_end_timestamp=datetime.now(timezone.utc),
@@ -90,14 +90,14 @@ async def check_db-up() -> StatusCheck:
             
     except Exception as e:
         return StatusCheck(
-            test_name="db-up",
+            test_name="db_up",
             test_start_timestamp=start_time,
             test_result="fail",
             test_end_timestamp=datetime.now(timezone.utc),
             error_message=str(e),
         )
-@router.get("/db-queriable")
-async def check_db-queriable() -> StatusCheck:
+@router.get("/db_queriable")
+async def check_db_queriable() -> StatusCheck:
     """
     Check if database is queriable (can SELECT from real tables).
     
@@ -117,7 +117,7 @@ async def check_db-queriable() -> StatusCheck:
             
             if result is not None:  # Even 0 is valid
                 return StatusCheck(
-                    test_name="db-queriable",
+                    test_name="db_queriable",
                     test_start_timestamp=start_time,
                     test_result="pass",
                     test_end_timestamp=datetime.now(timezone.utc),
@@ -127,7 +127,7 @@ async def check_db-queriable() -> StatusCheck:
             
     except Exception as e:
         return StatusCheck(
-            test_name="db-queriable",
+            test_name="db_queriable",
             test_start_timestamp=start_time,
             test_result="fail",
             test_end_timestamp=datetime.now(timezone.utc),
@@ -135,7 +135,7 @@ async def check_db-queriable() -> StatusCheck:
         )
 
 
-@router.get("/db-writable")
+@router.get("/db_writable")
 async def check_db_writable() -> StatusCheck:
     """
     Check if database is writable (disks alive?).
@@ -157,14 +157,14 @@ async def check_db_writable() -> StatusCheck:
                 (test_name, test_start_timestamp, test_result, test_end_timestamp)
                 VALUES ($1, $2, $3, $4)
                 """,
-                "db-writable-probe",
+                "db_writable-probe",
                 test_time,
                 "pass",
                 test_time,
             )
             
             return StatusCheck(
-                test_name="db-writable",
+                test_name="db_writable",
                 test_start_timestamp=start_time,
                 test_result="pass",
                 test_end_timestamp=datetime.now(timezone.utc),
@@ -174,7 +174,7 @@ async def check_db_writable() -> StatusCheck:
             
     except Exception as e:
         return StatusCheck(
-            test_name="db-writable",
+            test_name="db_writable",
             test_start_timestamp=start_time,
             test_result="fail",
             test_end_timestamp=datetime.now(timezone.utc),
@@ -222,32 +222,32 @@ async def get_system_status() -> SystemStatus:
     before = datetime.now(timezone.utc)
     
     # Run all checks (placeholder - you'll implement these)
-    db-up = await check_db-up()
-    db-queriable = await check_db-queriable()
+    db_up = await check_db_up()
+    db_queriable = await check_db_queriable()
     db_writable = await check_db_writable()
     
     # TODO: Implement other checks
-    wopr-web_up = False  # HTTP GET to wopr-web
-    wopr-web_functional = False  # Check for dynamic content
-    wopr-api_up = True  # Self-check (you're here, aren't you?)
-    wopr-api_functional = False  # Can create a game?
-    wopr-cam_up = False  # HTTP GET to wopr-cam
-    wopr-cam_functional = False  # Get camera status
+    wopr_web_up = False  # HTTP GET to wopr_web
+    wopr_web_functional = False  # Check for dynamic content
+    wopr_api_up = True  # Self-check (you're here, aren't you?)
+    wopr_api_functional = False  # Can create a game?
+    wopr_cam_up = False  # HTTP GET to wopr_cam
+    wopr_cam_functional = False  # Get camera status
     config_map_present = False  # Check k8s API
     
     after = datetime.now(timezone.utc)
     
     return SystemStatus(
         timestamp_right_before_data_pull=before,
-        db-up=(db-up.test_result == "pass"),
-        db-queriable=(db-queriable.test_result == "pass"),
+        db_up=(db_up.test_result == "pass"),
+        db_queriable=(db_queriable.test_result == "pass"),
         db_writable=(db_writable.test_result == "pass"),
-        wopr-web_up=wopr-web_up,
-        wopr-web_functional=wopr-web_functional,
-        wopr-api_up=wopr-api_up,
-        wopr-api_functional=wopr-api_functional,
-        wopr-cam_up=wopr-cam_up,
-        wopr-cam_functional=wopr-cam_functional,
-        wopr-config_map_present=config_map_present,
+        wopr_web_up=wopr_web_up,
+        wopr_web_functional=wopr_web_functional,
+        wopr_api_up=wopr_api_up,
+        wopr_api_functional=wopr_api_functional,
+        wopr_cam_up=wopr_cam_up,
+        wopr_cam_functional=wopr_cam_functional,
+        wopr_config_map_present=config_map_present,
         timestamp_right_after_data_pull=after,
     )
