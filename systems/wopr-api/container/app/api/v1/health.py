@@ -1,6 +1,5 @@
 import logging
 import sys
-from datetime import datetime, timezone
 import datetime
 from app import globals as woprvar
 logger = logging.getLogger(woprvar.APP_NAME)
