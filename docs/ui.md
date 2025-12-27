@@ -37,7 +37,7 @@
 
 ## Anti-pattern Warning
 
-Don't split "see active games" and "control active games" into separate nav items. That's two clicks for one conceptual task. Active games should be a **dashboard view** with inline controls. 
+Don't split "see active games" and "control active games" into separate nav items. That's two clicks for one conceptual task. Active games should be a **dashboard view** with inline controls.
 
 
 graph TD
