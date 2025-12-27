@@ -17,6 +17,7 @@ import asyncpg
 from pydantic import BaseModel
 import base64
 import json
+import httpx
 
 import logging
 import sys
