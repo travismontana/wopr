@@ -112,7 +112,7 @@ async def check_db-queriable() -> StatusCheck:
         try:
             # Query something we actually care about
             result = await conn.fetchval(
-                "SELECT COUNT(*) FROM config_values WHERE is_active = true"
+                "SELECT COUNT(*) FROM settings"
             )
             
             if result is not None:  # Even 0 is valid
@@ -181,6 +181,36 @@ async def check_db_writable() -> StatusCheck:
             error_message=str(e),
         )
 
+@router.get("/inittable")
+async def init_status_checks_table() -> str:
+    """
+    Initialize the status_checks table in the database.
+    
+    This should be run once during setup.
+    """
+    db_uri = await get_db_uri()
+    
+    conn = await asyncpg.connect(db_uri)
+    try:
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS status_checks (
+                id SERIAL PRIMARY KEY,
+                test_name VARCHAR(100) NOT NULL,
+                test_start_timestamp TIMESTAMPTZ NOT NULL,
+                test_result VARCHAR(20) NOT NULL,  -- 'pass', 'fail', 'norun'
+                test_end_timestamp TIMESTAMPTZ NOT NULL,
+                error_message TEXT,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+            
+            CREATE INDEX IF NOT EXISTS idx_status_checks_test_name ON status_checks(test_name);
+            CREATE INDEX IF NOT EXISTS idx_status_checks_created_at ON status_checks(created_at DESC);
+            """
+        )
+        return "status_checks table initialized successfully."
+    finally:
+        await conn.close()
 
 @router.get("/")
 async def get_system_status() -> SystemStatus:
