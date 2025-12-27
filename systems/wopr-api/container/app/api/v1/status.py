@@ -9,7 +9,6 @@ WOPR API - cameras api.
 
 from wopr import config as woprconfig
 from wopr import storage as woprstorage
-from wopr import logging as woprlogging
 from app import globals as woprvar
 from datetime import datetime, timezone
 import logging
@@ -19,8 +18,10 @@ from pydantic import BaseModel
 import base64
 import json
 
-woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
-logger = woprlogging.setup_logging(woprvar.APP_NAME)
+import logging
+logger = logging.getLogger(woprvar.APP_NAME)
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel

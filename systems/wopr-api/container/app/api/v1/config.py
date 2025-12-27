@@ -20,7 +20,10 @@ from wopr import logging as woprlogging
 from app import globals as woprvar
 
 import logging
-logger = woprlogging.setup_logging(woprvar.APP_NAME)
+logger = logging.getLogger(woprvar.APP_NAME)
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
 woprconfig.init_config()
 
 router = APIRouter(tags=["config"])

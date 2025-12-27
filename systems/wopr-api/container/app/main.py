@@ -40,6 +40,7 @@ woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API
 # Set normal logging not using woprlogg.
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API application: booting up...")
 tracing_enabled = woprconfig.get_bool("tracing.enable", True)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
