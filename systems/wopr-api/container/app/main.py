@@ -30,6 +30,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import cameras
 from app.api.v1 import config
+from app.api.v1 import status
 
 woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
 
