@@ -14,6 +14,8 @@ import CapturePage from "./routes/boh/cameras/capture";
 import MLOverview from "./routes/boh/ml/index";
 import ImageGallery from "./routes/boh/images/view";
 import ImagesPage from "./routes/boh/images/index";
+import ConfigPage from "./routes/boh/config/index";
+import ConfigEditPage from "./routes/boh/config/control";
 
 // Theme
 import "./themes/modern.css";
@@ -69,8 +71,10 @@ const router = createBrowserRouter([
           },
           {
             path: "config",
-            element: <WorkInProgress />,
-            children: [],
+            element: <ConfigPage />,
+            children: [
+              { path: "control", element: <ConfigEditPage /> },
+            ],
           }
         ],
       },
