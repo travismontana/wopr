@@ -79,3 +79,63 @@ graph TD
     style CAPTURE fill:#9370db
     style SYSTEM fill:#708090
 ```
+
+Play
+|- Start Game
+|
+|- Active Games Dashboard
+|  |- Stop/edit game
+|  |- Quick controls
+|
+|- Game History
+
+Setup
+|- Add/Remove Game (collection)
+|- Training
+
+Capture
+|- Cameras
+|- Images
+|- 
+
+System
+|- Configuration
+|- Bulk
+
+
+|--------------------------------------|
+|----------------WOPR------------------|
+|       [Home] [Play] [Settings]       |
+|--------------------------------------|
+|                                      |
+|       ( Main Content Here )          |
+|                                      |
+|                                      |
+|--------------------------------------|
+
+
+
+
+Home:
+Dashboard (num games going on, overall system status)
+
+Play:
+|- New Game
+|- Edit Game
+|- Stop Game
+|- Archive
+
+Settings:
+|- Machine Learning
+|   |- Capture
+|   |- Images
+|   |   |- View
+|   |   |- Edit
+|   |- Training
+|
+|- Cameras
+|   |- Control
+|   |- Edit
+|
+|- Configuration
+|
