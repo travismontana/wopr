@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { apiUrl } from "@lib/api";
 interface ConfigSetting {
   key: string;
   value: any;
@@ -31,7 +31,7 @@ export default function ConfigEditor() {
   const [newType, setNewType] = useState<string>('string');
   const [newDescription, setNewDescription] = useState<string>('');
 
-  const API_BASE = '/api/v1/config';
+  const API_BASE = `${apiUrl}/api/v1/config`;
 
   useEffect(() => {
     fetchConfigs();
