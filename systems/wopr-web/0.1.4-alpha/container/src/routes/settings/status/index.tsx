@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import "./css/theme.css";
 
-import { apiUrl } from "@lib/wopr";
+import { apiUrl } from "@lib/api";
 
 /*
 Sample status data:

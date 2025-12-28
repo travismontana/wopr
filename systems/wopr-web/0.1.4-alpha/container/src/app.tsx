@@ -1,6 +1,4 @@
 import { Outlet, NavLink } from "react-router-dom";
-// Theme
-import "./themes/modern.css";
 
 export default function App() {
   return (

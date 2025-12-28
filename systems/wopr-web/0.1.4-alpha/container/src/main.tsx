@@ -15,18 +15,19 @@ import SysConfig from "./routes/settings/config/index";
 
 // Theme
 import "./themes/modern.css";
+import WorkInProgress from "./routes/wip";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <Dashboard /> },
+      { index: true, element: <WorkInProgress /> },
       {
         path: "play",
-        element: <Play />,
+        element: <WorkInProgress />,
         children: [
-          { path: "new", element: <NewGame /> },
+          { path: "new", element: <WorkInProgress /> },
         ],
       },
       {
@@ -35,19 +36,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: "ml",
-            element: <MLOverview />,
+            element: <WorkInProgress />,
             children: [
-              { path: "capture", element: <Capture /> },
+              { path: "capture", element: <WorkInProgress /> },
             ],
           },
           {
             path: "status",
-            element: <SysStatus />,
+            element: <StatusPage />,
             children: [],
           },
           {
             path: "config",
-            element: <SysConfig />,
+            element: <WorkInProgress />,
             children: [],
           }
         ],
