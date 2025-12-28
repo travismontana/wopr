@@ -1,3 +1,4 @@
+```
 /                          → Dashboard
 /play                      → Game list/management
 /play/new                  → New game wizard
@@ -33,3 +34,4 @@
               │       └─ <Training />
               ├─ <Cameras />        (/settings/cameras)
               └─ <Config />         (/settings/config)
+```
