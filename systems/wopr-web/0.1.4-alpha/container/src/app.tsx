@@ -12,7 +12,7 @@ export default function App() {
         <ul>
           <li><NavLink to="/">Home</NavLink></li>
           <li><NavLink to="/play">Play</NavLink></li>
-          <li><NavLink to="/settings">Settings</NavLink></li>
+          <li><NavLink to="/boh">Back of House</NavLink></li>
         </ul>
       </nav>
 

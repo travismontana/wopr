@@ -6,7 +6,7 @@ type StatusState =
   | { type: "ok" | "error" | "info"; message: string; path?: string }
   | null;
 
-export default function MLPage() {
+export default function CapturePage() {
 
     const gameList = [
         { value: "dune_imperium", label: "Dune Imperium" },
@@ -144,8 +144,8 @@ export default function MLPage() {
 
     async function getCameraDict(id: number) {
         try {
-            console.log("Fetching camera dictionary from:", `${apiUrl}/api/v1/cameras/1`);
-            const res = await fetch(`${apiUrl}/api/v1/cameras/1`);  // ← Fixed: fetch(...) not fetch`...`
+            console.log("Fetching camera dictionary from:", `${apiUrl}/cameras/1`);
+            const res = await fetch(`${apiUrl}/cameras/1`);  // ← Fixed: fetch(...) not fetch`...`
             
             if (!res.ok) {
                 throw new Error(`Error fetching camera dictionary: ${res.statusText}`);  // ← Fixed: Error(...) not Error`...`
@@ -213,7 +213,7 @@ export default function MLPage() {
         const sequence = 1; // You might want to manage sequence differently
 
         try {
-            const res = await fetch(`${apiUrl}/api/v1/cameras/capture`, {
+            const res = await fetch(`${apiUrl}/cameras/capture`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
