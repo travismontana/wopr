@@ -68,9 +68,15 @@ postgresql:
 
 config:
   services:
-    configServiceUrl: "http://wopr-config-service.wopr.svc:8080"
-    apiServiceUrl: "http://wopr-api.wopr.svc:8000"
-    apiVersion: "v1"
+    # API_URL is set in configmap.yaml because it's:
+    # API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}
+    # If you can figure out how to make that work here, go for it.
+    - name: API_SERVICE_URL
+      value: "http://wopr-api.wopr.svc:8000"
+    - name: API_VERSION
+      value: "v1"
+    - name: WOPR_VERSION
+      value: "v0.1.4-alpha"
 
 
 env:
