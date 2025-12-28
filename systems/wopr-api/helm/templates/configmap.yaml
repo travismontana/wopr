@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/component: config
 data:
   # Service URLs
-  API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}
   {{- with .Values.config }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
+  API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}
