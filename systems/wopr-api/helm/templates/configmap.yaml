@@ -10,4 +10,3 @@ data:
   {{- with .Values.config }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}
