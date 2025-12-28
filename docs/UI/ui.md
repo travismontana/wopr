@@ -39,7 +39,7 @@
 
 Don't split "see active games" and "control active games" into separate nav items. That's two clicks for one conceptual task. Active games should be a **dashboard view** with inline controls. 
 
-
+```mermaid
 graph TD
     WOPR[WOPR]
     
@@ -78,3 +78,64 @@ graph TD
     style SETUP fill:#ffa500
     style CAPTURE fill:#9370db
     style SYSTEM fill:#708090
+```
+
+Play
+|- Start Game
+|
+|- Active Games Dashboard
+|  |- Stop/edit game
+|  |- Quick controls
+|
+|- Game History
+
+Setup
+|- Add/Remove Game (collection)
+|- Training
+
+Capture
+|- Cameras
+|- Images
+|- 
+
+System
+|- Configuration
+|- Bulk
+
+
+|--------------------------------------|
+|----------------WOPR------------------|
+|       [Home] [Play] [Settings]       |
+|--------------------------------------|
+|                                      |
+|       ( Main Content Here )          |
+|                                      |
+|                                      |
+|--------------------------------------|
+
+
+
+
+Home:
+Dashboard (num games going on, overall system status)
+
+Play:
+|- New Game
+|- Edit Game
+|- Stop Game
+|- Archive
+
+Settings:
+|- Machine Learning
+|   |- Capture
+|   |- Images
+|   |   |- View
+|   |   |- Edit
+|   |- Training
+|
+|- Cameras
+|   |- Control
+|   |- Edit
+|
+|- Configuration
+|
