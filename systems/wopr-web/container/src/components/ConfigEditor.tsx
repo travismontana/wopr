@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { apiUrl } from "@lib/api";
 
 interface ConfigSetting {
   key: string;
@@ -21,6 +20,9 @@ export default function ConfigEditor() {
   const [editValue, setEditValue] = useState<string>('');
   const [saving, setSaving] = useState(false);
   
+  // Track which complex values are expanded
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+  
   // Add new setting state
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [addSection, setAddSection] = useState<string>('');
@@ -29,7 +31,7 @@ export default function ConfigEditor() {
   const [newType, setNewType] = useState<string>('string');
   const [newDescription, setNewDescription] = useState<string>('');
 
-  const API_BASE = `${apiUrl}/api/v1/config`;
+  const API_BASE = '/api/v1/config';
 
   useEffect(() => {
     fetchConfigs();
@@ -265,6 +267,91 @@ export default function ConfigEditor() {
     return String(value);
   };
 
+  const toggleExpand = (key: string) => {
+    setExpandedKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const isComplex = (value: any): boolean => {
+    return typeof value === 'object' && value !== null;
+  };
+
+  const updateComplexValue = async (key: string, newValue: any, valueType: string) => {
+    try {
+      setSaving(true);
+      
+      const response = await fetch(`${API_BASE}/set/${key}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          value: newValue,
+          updated_by: 'web-ui'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save: ${response.statusText}`);
+      }
+
+      await fetchConfigs();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to save config');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleArrayItemEdit = async (key: string, value: any[], index: number, newItemValue: string) => {
+    const updated = [...value];
+    // Try to parse as JSON first, fallback to string
+    try {
+      updated[index] = JSON.parse(newItemValue);
+    } catch {
+      updated[index] = newItemValue;
+    }
+    await updateComplexValue(key, updated, 'list');
+  };
+
+  const handleArrayItemDelete = async (key: string, value: any[], index: number) => {
+    const updated = value.filter((_, i) => i !== index);
+    await updateComplexValue(key, updated, 'list');
+  };
+
+  const handleArrayItemAdd = async (key: string, value: any[]) => {
+    const updated = [...value, ""];
+    await updateComplexValue(key, updated, 'list');
+  };
+
+  const handleObjectKeyEdit = async (key: string, value: object, oldKey: string, newKey: string, newValue: string) => {
+    const updated = { ...value };
+    delete (updated as any)[oldKey];
+    // Try to parse as JSON first, fallback to string
+    try {
+      (updated as any)[newKey] = JSON.parse(newValue);
+    } catch {
+      (updated as any)[newKey] = newValue;
+    }
+    await updateComplexValue(key, updated, 'dict');
+  };
+
+  const handleObjectKeyDelete = async (key: string, value: object, objKey: string) => {
+    const updated = { ...value };
+    delete (updated as any)[objKey];
+    await updateComplexValue(key, updated, 'dict');
+  };
+
+  const handleObjectKeyAdd = async (key: string, value: object) => {
+    const updated = { ...value, "": "" };
+    await updateComplexValue(key, updated, 'dict');
+  };
+
   if (loading) {
     return <div className="config-editor loading">Loading configurations...</div>;
   }
@@ -330,6 +417,106 @@ export default function ConfigEditor() {
                         autoFocus
                         className="value-input"
                       />
+                    ) : isComplex(setting.value) ? (
+                      <div className="complex-value">
+                        <button 
+                          onClick={() => toggleExpand(setting.key)}
+                          className="btn-expand"
+                        >
+                          {expandedKeys.has(setting.key) ? '▼' : '▶'} 
+                          {Array.isArray(setting.value) ? `[${setting.value.length} items]` : `{${Object.keys(setting.value).length} keys}`}
+                        </button>
+                        
+                        {expandedKeys.has(setting.key) && (
+                          <div className="nested-editor">
+                            {Array.isArray(setting.value) ? (
+                              <div className="array-editor">
+                                {setting.value.map((item, idx) => (
+                                  <div key={idx} className="array-item">
+                                    <span className="item-index">[{idx}]</span>
+                                    <input
+                                      type="text"
+                                      value={typeof item === 'object' ? JSON.stringify(item) : String(item)}
+                                      onChange={(e) => {
+                                        const newVal = [...setting.value];
+                                        try {
+                                          newVal[idx] = JSON.parse(e.target.value);
+                                        } catch {
+                                          newVal[idx] = e.target.value;
+                                        }
+                                        // Update in real-time without save button
+                                      }}
+                                      onBlur={(e) => handleArrayItemEdit(setting.key, setting.value, idx, e.target.value)}
+                                      className="nested-input"
+                                    />
+                                    <button
+                                      onClick={() => handleArrayItemDelete(setting.key, setting.value, idx)}
+                                      className="btn-delete-nested"
+                                      disabled={saving}
+                                    >
+                                      ✗
+                                    </button>
+                                  </div>
+                                ))}
+                                <button
+                                  onClick={() => handleArrayItemAdd(setting.key, setting.value)}
+                                  className="btn-add-nested"
+                                  disabled={saving}
+                                >
+                                  + Add Item
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="object-editor">
+                                {Object.entries(setting.value).map(([objKey, objVal]) => (
+                                  <div key={objKey} className="object-item">
+                                    <input
+                                      type="text"
+                                      value={objKey}
+                                      onChange={(e) => {
+                                        // Key edit - will be handled on blur
+                                      }}
+                                      onBlur={(e) => {
+                                        if (e.target.value !== objKey) {
+                                          const valStr = typeof objVal === 'object' ? JSON.stringify(objVal) : String(objVal);
+                                          handleObjectKeyEdit(setting.key, setting.value, objKey, e.target.value, valStr);
+                                        }
+                                      }}
+                                      className="nested-input key-input"
+                                      placeholder="key"
+                                    />
+                                    <span className="key-separator">:</span>
+                                    <input
+                                      type="text"
+                                      value={typeof objVal === 'object' ? JSON.stringify(objVal) : String(objVal)}
+                                      onChange={(e) => {
+                                        // Value edit - will be handled on blur
+                                      }}
+                                      onBlur={(e) => handleObjectKeyEdit(setting.key, setting.value, objKey, objKey, e.target.value)}
+                                      className="nested-input value-input"
+                                      placeholder="value"
+                                    />
+                                    <button
+                                      onClick={() => handleObjectKeyDelete(setting.key, setting.value, objKey)}
+                                      className="btn-delete-nested"
+                                      disabled={saving}
+                                    >
+                                      ✗
+                                    </button>
+                                  </div>
+                                ))}
+                                <button
+                                  onClick={() => handleObjectKeyAdd(setting.key, setting.value)}
+                                  className="btn-add-nested"
+                                  disabled={saving}
+                                >
+                                  + Add Property
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <code>{formatValue(setting.value)}</code>
                     )}
@@ -357,13 +544,20 @@ export default function ConfigEditor() {
                           ✗
                         </button>
                       </>
+                    ) : isComplex(setting.value) ? (
+                      <button 
+                        onClick={() => toggleExpand(setting.key)}
+                        className="btn-edit"
+                      >
+                        {expandedKeys.has(setting.key) ? 'Collapse' : 'Expand'}
+                      </button>
                     ) : (
                       <button 
                         onClick={() => handleEdit(setting.key, setting.value)}
                         className="btn-edit"
                       >
                         Edit
-                        </button>
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -778,6 +972,116 @@ export default function ConfigEditor() {
 
         .modal-actions button {
           padding: 0.5rem 1.5rem;
+        }
+
+        /* Complex value editor styles */
+        .complex-value {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .btn-expand {
+          background: #111;
+          color: #0ff;
+          border: 1px solid #0ff;
+          padding: 0.25rem 0.5rem;
+          cursor: pointer;
+          font-family: monospace;
+          font-size: 0.9rem;
+          text-align: left;
+          width: fit-content;
+        }
+
+        .btn-expand:hover {
+          background: #004;
+        }
+
+        .nested-editor {
+          margin-top: 0.5rem;
+          margin-left: 1rem;
+          padding: 0.5rem;
+          border-left: 2px solid #0ff;
+          background: #0a0a0a;
+        }
+
+        .array-editor,
+        .object-editor {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .array-item,
+        .object-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .item-index {
+          color: #0f0;
+          font-family: monospace;
+          font-weight: bold;
+          min-width: 2rem;
+        }
+
+        .key-separator {
+          color: #0ff;
+          font-family: monospace;
+          font-weight: bold;
+        }
+
+        .nested-input {
+          flex: 1;
+          background: #000;
+          color: #0ff;
+          border: 1px solid #333;
+          padding: 0.25rem 0.5rem;
+          font-family: monospace;
+          font-size: 0.9rem;
+        }
+
+        .nested-input:focus {
+          outline: none;
+          border-color: #0ff;
+          box-shadow: 0 0 3px #0ff;
+        }
+
+        .key-input {
+          flex: 0 0 30%;
+          color: #f0f;
+        }
+
+        .btn-delete-nested {
+          background: #400;
+          color: #f00;
+          border: 1px solid #f00;
+          padding: 0.25rem 0.5rem;
+          cursor: pointer;
+          font-family: monospace;
+          font-size: 0.9rem;
+          min-width: 2rem;
+        }
+
+        .btn-delete-nested:hover:not(:disabled) {
+          background: #600;
+        }
+
+        .btn-add-nested {
+          background: #004;
+          color: #0ff;
+          border: 1px solid #0ff;
+          padding: 0.25rem 0.75rem;
+          cursor: pointer;
+          font-family: monospace;
+          font-size: 0.9rem;
+          margin-top: 0.25rem;
+          align-self: flex-start;
+        }
+
+        .btn-add-nested:hover:not(:disabled) {
+          background: #006;
         }
       `}</style>
     </div>
