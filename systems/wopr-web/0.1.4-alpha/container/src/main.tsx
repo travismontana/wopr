@@ -8,6 +8,7 @@ import Dashboard from "./routes/home/dashboard";
 import Play from "./routes/play/index";
 import NewGame from "./routes/play/new-game";
 import Settings from "./routes/settings/index";
+import StatusPage from "./routes/settings/status/index";
 import MLOverview from "./routes/settings/ml/index";
 import Capture from "./routes/settings/ml/capture";
 import SysStatus from "./routes/settings/status/index";

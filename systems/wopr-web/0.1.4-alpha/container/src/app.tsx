@@ -22,7 +22,7 @@ export default function App() {
 
       <footer className="system-status" role="contentinfo">
         <span className="status-indicator" data-status="operational">SYS:OK</span>
-        <span className="version">v{import.meta.env.WOPR_VERSION || '0.0.0'}</span>
+        <span className="version">v{window.ENV?.WOPR_VERSION || '0.0.0'}</span>
       </footer>
     </div>
   );
