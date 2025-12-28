@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiUrl } from "@lib/api";
+
 interface ConfigSetting {
   key: string;
   value: any;
@@ -31,7 +31,7 @@ export default function ConfigEditor() {
   const [newType, setNewType] = useState<string>('string');
   const [newDescription, setNewDescription] = useState<string>('');
 
-  const API_BASE = `${apiUrl}/api/v1/config`;
+  const API_BASE = '/api/v1/config';
 
   useEffect(() => {
     fetchConfigs();
@@ -436,16 +436,7 @@ export default function ConfigEditor() {
                                     <span className="item-index">[{idx}]</span>
                                     <input
                                       type="text"
-                                      value={typeof item === 'object' ? JSON.stringify(item) : String(item)}
-                                      onChange={(e) => {
-                                        const newVal = [...setting.value];
-                                        try {
-                                          newVal[idx] = JSON.parse(e.target.value);
-                                        } catch {
-                                          newVal[idx] = e.target.value;
-                                        }
-                                        // Update in real-time without save button
-                                      }}
+                                      defaultValue={typeof item === 'object' ? JSON.stringify(item) : String(item)}
                                       onBlur={(e) => handleArrayItemEdit(setting.key, setting.value, idx, e.target.value)}
                                       className="nested-input"
                                     />
@@ -472,10 +463,7 @@ export default function ConfigEditor() {
                                   <div key={objKey} className="object-item">
                                     <input
                                       type="text"
-                                      value={objKey}
-                                      onChange={(e) => {
-                                        // Key edit - will be handled on blur
-                                      }}
+                                      defaultValue={objKey}
                                       onBlur={(e) => {
                                         if (e.target.value !== objKey) {
                                           const valStr = typeof objVal === 'object' ? JSON.stringify(objVal) : String(objVal);
@@ -488,10 +476,7 @@ export default function ConfigEditor() {
                                     <span className="key-separator">:</span>
                                     <input
                                       type="text"
-                                      value={typeof objVal === 'object' ? JSON.stringify(objVal) : String(objVal)}
-                                      onChange={(e) => {
-                                        // Value edit - will be handled on blur
-                                      }}
+                                      defaultValue={typeof objVal === 'object' ? JSON.stringify(objVal) : String(objVal)}
                                       onBlur={(e) => handleObjectKeyEdit(setting.key, setting.value, objKey, objKey, e.target.value)}
                                       className="nested-input value-input"
                                       placeholder="value"
