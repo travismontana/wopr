@@ -101,8 +101,11 @@ async def list_games(
     logger.debug(f"Listing games: limit={limit}, offset={offset}, locale={locale}")
     
     with get_db() as conn:
+        logger.debug("opened DB connection for listing games")
         with conn.cursor(row_factory=dict_row) as cur:
+            logger.debug("created DB cursor for listing games")
             if locale:
+                logger.debug(f"Filtering games by locale: {locale}")
                 cur.execute(
                     """
                     SELECT * FROM games
@@ -113,6 +116,7 @@ async def list_games(
                     (locale, limit, offset)
                 )
             else:
+                logger.debug("No locale filter applied")
                 cur.execute(
                     """
                     SELECT * FROM games
