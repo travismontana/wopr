@@ -195,6 +195,7 @@ export default function MLImagesManager() {
       // Only generate filename for new images, not edits
       if (!editingImage) {
         payload.filename = generateFilename();
+        await takePic();
       }
       const url = editingImage
         ? `${API_URL}/api/v1/mlimages/${editingImage.id}`
