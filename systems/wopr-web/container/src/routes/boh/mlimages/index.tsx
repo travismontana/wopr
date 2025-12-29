@@ -155,7 +155,7 @@ export default function MLImagesManager() {
     }
   }
 
-  async function takePic() {
+  async function takePic(filename?: string) {
     const res = await fetch(`${API_URL}/api/v1/cameras/capture`, {
       method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -195,7 +195,7 @@ export default function MLImagesManager() {
       // Only generate filename for new images, not edits
       if (!editingImage) {
         payload.filename = generateFilename();
-        await takePic();
+        await takePic(payload.filename);
       }
       const url = editingImage
         ? `${API_URL}/api/v1/mlimages/${editingImage.id}`
