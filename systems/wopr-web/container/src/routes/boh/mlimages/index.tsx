@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 
 const API_URL =
@@ -15,7 +14,9 @@ interface MLImage {
   object_rotation?: number;
   object_position?: string;
   color_temp?: string;
-  light_intensity?: string;
+  light_intensity?: number;
+  game_id?: number;
+  piece_id?: number;
   created_at?: string;
   updated_at?: string;
   published_at?: string;
@@ -40,12 +41,37 @@ interface MLImageFormData {
   object_position: string;
   color_temp: string;
   light_intensity: string;
+  game_id: string;
+  piece_id: string;
   locale: string;
 }
 
 type StatusState =
   | { type: "ok" | "error" | "info"; message: string }
   | null;
+
+type SortField = "game" | "piece" | "filename" | "id";
+type SortDirection = "asc" | "desc";
+
+const ROTATION_OPTIONS = [0, 45, 90, 135, 180, 225, 270, 315];
+
+const POSITION_OPTIONS = [
+  { value: "center", label: "Center" },
+  { value: "topLeft", label: "Top Left" },
+  { value: "topRight", label: "Top Right" },
+  { value: "bottomLeft", label: "Bottom Left" },
+  { value: "bottomRight", label: "Bottom Right" },
+  { value: "topEdge", label: "Top Edge" },
+  { value: "bottomEdge", label: "Bottom Edge" },
+  { value: "leftEdge", label: "Left Edge" },
+  { value: "rightEdge", label: "Right Edge" },
+  { value: "nearCenter", label: "Near Center" },
+  { value: "random", label: "Random" },
+];
+
+const COLOR_TEMP_OPTIONS = ["neutral", "hot", "cold"];
+
+const LIGHT_INTENSITY_OPTIONS = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10];
 
 export default function MLImagesManager() {
   const [mlimages, setMLImages] = useState<MLImage[]>([]);
@@ -57,12 +83,16 @@ export default function MLImagesManager() {
   const [editingImage, setEditingImage] = useState<MLImage | null>(null);
   const [selectedGameFilter, setSelectedGameFilter] = useState<string>("");
   const [selectedPieceFilter, setSelectedPieceFilter] = useState<string>("");
+  const [sortField, setSortField] = useState<SortField>("id");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [formData, setFormData] = useState<MLImageFormData>({
     filename: "",
     object_rotation: "",
     object_position: "",
     color_temp: "",
     light_intensity: "",
+    game_id: "",
+    piece_id: "",
     locale: "en",
   });
 
@@ -140,7 +170,11 @@ export default function MLImagesManager() {
           : undefined,
         object_position: formData.object_position.trim() || undefined,
         color_temp: formData.color_temp.trim() || undefined,
-        light_intensity: formData.light_intensity.trim() || undefined,
+        light_intensity: formData.light_intensity
+          ? parseInt(formData.light_intensity)
+          : undefined,
+        game_id: parseInt(formData.game_id),
+        piece_id: parseInt(formData.piece_id),
         locale: formData.locale.trim() || undefined,
       };
 
@@ -172,6 +206,8 @@ export default function MLImagesManager() {
         object_position: "",
         color_temp: "",
         light_intensity: "",
+        game_id: "",
+        piece_id: "",
         locale: "en",
       });
       setEditingImage(null);
@@ -214,60 +250,6 @@ export default function MLImagesManager() {
     }
   }
 
-  async function handleLinkToGame(imageId: number, gameId: number) {
-    setLoading(true);
-    setStatus(null);
-
-    try {
-      const res = await fetch(
-        `${API_URL}/api/v1/mlimages/${imageId}/games/${gameId}`,
-        { method: "POST" }
-      );
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errorText}`);
-      }
-
-      setStatus({ type: "ok", message: "ML image linked to game!" });
-      await loadMLImages();
-    } catch (e: any) {
-      setStatus({
-        type: "error",
-        message: e?.message ?? "Failed to link ML image to game",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleLinkToPiece(imageId: number, pieceId: number) {
-    setLoading(true);
-    setStatus(null);
-
-    try {
-      const res = await fetch(
-        `${API_URL}/api/v1/mlimages/${imageId}/pieces/${pieceId}`,
-        { method: "POST" }
-      );
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errorText}`);
-      }
-
-      setStatus({ type: "ok", message: "ML image linked to piece!" });
-      await loadMLImages();
-    } catch (e: any) {
-      setStatus({
-        type: "error",
-        message: e?.message ?? "Failed to link ML image to piece",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function handleEdit(image: MLImage) {
     setEditingImage(image);
     setFormData({
@@ -275,7 +257,9 @@ export default function MLImagesManager() {
       object_rotation: image.object_rotation?.toString() || "",
       object_position: image.object_position || "",
       color_temp: image.color_temp || "",
-      light_intensity: image.light_intensity || "",
+      light_intensity: image.light_intensity?.toString() || "",
+      game_id: image.game_id?.toString() || "",
+      piece_id: image.piece_id?.toString() || "",
       locale: image.locale || "en",
     });
     setShowForm(true);
@@ -290,23 +274,66 @@ export default function MLImagesManager() {
       object_position: "",
       color_temp: "",
       light_intensity: "",
+      game_id: "",
+      piece_id: "",
       locale: "en",
     });
   }
 
-  function handleLinkToGameClick(imageId: number) {
-    const gameId = prompt("Enter Game ID to link to:");
-    if (gameId && !isNaN(Number(gameId))) {
-      handleLinkToGame(imageId, Number(gameId));
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
     }
   }
 
-  function handleLinkToPieceClick(imageId: number) {
-    const pieceId = prompt("Enter Piece ID to link to:");
-    if (pieceId && !isNaN(Number(pieceId))) {
-      handleLinkToPiece(imageId, Number(pieceId));
-    }
+  function getGameName(gameId?: number): string {
+    if (!gameId) return "—";
+    const game = games.find((g) => g.id === gameId);
+    return game?.name || `Game ${gameId}`;
   }
+
+  function getPieceName(pieceId?: number): string {
+    if (!pieceId) return "—";
+    const piece = pieces.find((p) => p.id === pieceId);
+    return piece?.name || `Piece ${pieceId}`;
+  }
+
+  const sortedImages = [...mlimages].sort((a, b) => {
+    let aVal: string | number;
+    let bVal: string | number;
+
+    switch (sortField) {
+      case "game":
+        aVal = getGameName(a.game_id);
+        bVal = getGameName(b.game_id);
+        break;
+      case "piece":
+        aVal = getPieceName(a.piece_id);
+        bVal = getPieceName(b.piece_id);
+        break;
+      case "filename":
+        aVal = a.filename || "";
+        bVal = b.filename || "";
+        break;
+      case "id":
+      default:
+        aVal = a.id;
+        bVal = b.id;
+        break;
+    }
+
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      const comparison = aVal.localeCompare(bVal);
+      return sortDirection === "asc" ? comparison : -comparison;
+    }
+
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   return (
     <section className="panel">
@@ -349,7 +376,7 @@ export default function MLImagesManager() {
         </button>
 
         <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          Game:
+          Filter by Game:
           <select
             value={selectedGameFilter}
             onChange={(e) => setSelectedGameFilter(e.target.value)}
@@ -370,7 +397,7 @@ export default function MLImagesManager() {
         </label>
 
         <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          Piece:
+          Filter by Piece:
           <select
             value={selectedPieceFilter}
             onChange={(e) => setSelectedPieceFilter(e.target.value)}
@@ -409,6 +436,60 @@ export default function MLImagesManager() {
             {editingImage ? "Edit ML Image" : "New ML Image"}
           </h3>
 
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: "block", marginBottom: "0.25rem" }}>
+                Game *
+              </label>
+              <select
+                value={formData.game_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, game_id: e.target.value })
+                }
+                required
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  borderRadius: "4px",
+                  border: "1px solid #444",
+                }}
+              >
+                <option value="">Select a game...</option>
+                {games.map((game) => (
+                  <option key={game.id} value={game.id}>
+                    {game.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <label style={{ display: "block", marginBottom: "0.25rem" }}>
+                Piece *
+              </label>
+              <select
+                value={formData.piece_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, piece_id: e.target.value })
+                }
+                required
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  borderRadius: "4px",
+                  border: "1px solid #444",
+                }}
+              >
+                <option value="">Select a piece...</option>
+                {pieces.map((piece) => (
+                  <option key={piece.id} value={piece.id}>
+                    {piece.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div>
             <label style={{ display: "block", marginBottom: "0.25rem" }}>
               Filename *
@@ -432,12 +513,9 @@ export default function MLImagesManager() {
           <div style={{ display: "flex", gap: "0.75rem" }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Object Rotation (degrees)
+                Object Rotation
               </label>
-              <input
-                type="number"
-                min="0"
-                max="360"
+              <select
                 value={formData.object_rotation}
                 onChange={(e) =>
                   setFormData({ ...formData, object_rotation: e.target.value })
@@ -448,27 +526,39 @@ export default function MLImagesManager() {
                   borderRadius: "4px",
                   border: "1px solid #444",
                 }}
-              />
+              >
+                <option value="">Select rotation...</option>
+                {ROTATION_OPTIONS.map((deg) => (
+                  <option key={deg} value={deg}>
+                    {deg}°
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div style={{ flex: 1 }}>
               <label style={{ display: "block", marginBottom: "0.25rem" }}>
                 Object Position
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.object_position}
                 onChange={(e) =>
                   setFormData({ ...formData, object_position: e.target.value })
                 }
-                placeholder="center, top-left, etc."
                 style={{
                   width: "100%",
                   padding: "0.5rem",
                   borderRadius: "4px",
                   border: "1px solid #444",
                 }}
-              />
+              >
+                <option value="">Select position...</option>
+                {POSITION_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -477,40 +567,50 @@ export default function MLImagesManager() {
               <label style={{ display: "block", marginBottom: "0.25rem" }}>
                 Color Temperature
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.color_temp}
                 onChange={(e) =>
                   setFormData({ ...formData, color_temp: e.target.value })
                 }
-                placeholder="5500K, warm, cool"
                 style={{
                   width: "100%",
                   padding: "0.5rem",
                   borderRadius: "4px",
                   border: "1px solid #444",
                 }}
-              />
+              >
+                <option value="">Select color temp...</option>
+                {COLOR_TEMP_OPTIONS.map((temp) => (
+                  <option key={temp} value={temp}>
+                    {temp}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div style={{ flex: 1 }}>
               <label style={{ display: "block", marginBottom: "0.25rem" }}>
                 Light Intensity
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.light_intensity}
                 onChange={(e) =>
                   setFormData({ ...formData, light_intensity: e.target.value })
                 }
-                placeholder="bright, dim, medium"
                 style={{
                   width: "100%",
                   padding: "0.5rem",
                   borderRadius: "4px",
                   border: "1px solid #444",
                 }}
-              />
+              >
+                <option value="">Select intensity...</option>
+                {LIGHT_INTENSITY_OPTIONS.map((intensity) => (
+                  <option key={intensity} value={intensity}>
+                    {intensity}%
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -545,90 +645,128 @@ export default function MLImagesManager() {
         </form>
       )}
 
-      {/* ML Images List */}
-      <div style={{ marginTop: "1rem" }}>
+      {/* ML Images Table */}
+      <div style={{ marginTop: "1rem", overflowX: "auto" }}>
         {loading && mlimages.length === 0 ? (
           <p>Loading ML images...</p>
         ) : mlimages.length === 0 ? (
           <p>No ML images found. Add one to get started.</p>
         ) : (
-          <div
+          <table
             style={{
-              display: "grid",
-              gap: "0.75rem",
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              width: "100%",
+              borderCollapse: "collapse",
+              background: "#111",
+              borderRadius: "8px",
             }}
           >
-            {mlimages.map((image) => (
-              <div
-                key={image.id}
-                style={{
-                  padding: "1rem",
-                  background: "#111",
-                  borderRadius: "8px",
-                  border: "1px solid #2222D6",
-                }}
-              >
-                <h3
+            <thead>
+              <tr style={{ borderBottom: "2px solid #2222D6" }}>
+                <th
+                  onClick={() => handleSort("game")}
                   style={{
-                    margin: "0 0 0.5rem 0",
-                    wordBreak: "break-word",
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    userSelect: "none",
                   }}
                 >
-                  {image.filename}
-                </h3>
-
-                <div style={{ fontSize: "0.85em", color: "#aaa" }}>
-                  {image.object_rotation !== undefined && (
-                    <div>Rotation: {image.object_rotation}°</div>
-                  )}
-                  {image.object_position && (
-                    <div>Position: {image.object_position}</div>
-                  )}
-                  {image.color_temp && <div>Color: {image.color_temp}</div>}
-                  {image.light_intensity && (
-                    <div>Light: {image.light_intensity}</div>
-                  )}
-                  {image.locale && <div>Locale: {image.locale}</div>}
-                  <div>ID: {image.id}</div>
-                </div>
-
-                <div
-                  className="actions"
+                  Game{" "}
+                  {sortField === "game" && (sortDirection === "asc" ? "▲" : "▼")}
+                </th>
+                <th
+                  onClick={() => handleSort("piece")}
                   style={{
-                    marginTop: "0.75rem",
-                    justifyContent: "flex-start",
-                    flexWrap: "wrap",
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    userSelect: "none",
                   }}
                 >
-                  <button onClick={() => handleEdit(image)} disabled={loading}>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleLinkToGameClick(image.id)}
-                    disabled={loading}
-                    style={{ background: "#0dcaf0" }}
-                  >
-                    → Game
-                  </button>
-                  <button
-                    onClick={() => handleLinkToPieceClick(image.id)}
-                    disabled={loading}
-                    style={{ background: "#198754" }}
-                  >
-                    → Piece
-                  </button>
-                  <button
-                    onClick={() => handleDelete(image.id, image.filename)}
-                    disabled={loading}
-                    style={{ background: "#dc3545" }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  Piece{" "}
+                  {sortField === "piece" && (sortDirection === "asc" ? "▲" : "▼")}
+                </th>
+                <th
+                  onClick={() => handleSort("filename")}
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  Filename{" "}
+                  {sortField === "filename" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
+                </th>
+                <th
+                  onClick={() => handleSort("id")}
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  ID {sortField === "id" && (sortDirection === "asc" ? "▲" : "▼")}
+                </th>
+                <th
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "right",
+                  }}
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedImages.map((image) => (
+                <tr
+                  key={image.id}
+                  style={{ borderBottom: "1px solid #333" }}
+                >
+                  <td style={{ padding: "0.75rem" }}>
+                    {getGameName(image.game_id)}
+                  </td>
+                  <td style={{ padding: "0.75rem" }}>
+                    {getPieceName(image.piece_id)}
+                  </td>
+                  <td style={{ padding: "0.75rem", wordBreak: "break-word" }}>
+                    {image.filename}
+                  </td>
+                  <td style={{ padding: "0.75rem" }}>{image.id}</td>
+                  <td style={{ padding: "0.75rem", textAlign: "right" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <button
+                        onClick={() => handleEdit(image)}
+                        disabled={loading}
+                        style={{ padding: "0.25rem 0.5rem" }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(image.id, image.filename)}
+                        disabled={loading}
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          background: "#dc3545",
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </section>
