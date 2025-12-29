@@ -77,6 +77,16 @@ env:
       configMapKeyRef:
         name: wopr-api-config
         key: API_URL
+  - name: WOPR_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: wopr-db-user-credentials
+        key: password
+  - name: WOPR_DB_USER
+    valueFrom:
+      secretKeyRef:
+        name: wopr-db-user-credentials
+        key: username
 # Optional: Environment-specific overrides
 # environments:
 #   dev:

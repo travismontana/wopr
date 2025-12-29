@@ -16,10 +16,7 @@ APP_DOMAIN = "studio.abode.tailandtraillabs.org"
 APP_API_URL = "https://wopr-api." + APP_DOMAIN
 APP_OTEL_URL = "https://otel.monitoring.abode.tailandtraillabs.org"
 WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
-DATABASE_URL = os.getenv(
-    'DATABASE_URL',
-    'postgresql://wopr:wopr@wopr-config-db-cluster-rw.wopr.svc:5432/wopr-db'
-)
+DATABASE_URL = 'postgresql://' + os.getenv('WOPR_DB_USER') + ":" + os.getenv('WOPR_DB_PASSWORD') + "@wopr-config-db-cluster-rw.wopr.svc:5432/wopr-db"
 
 APP_HOST = "0.0.0.0"
 APP_PORT = 8000
