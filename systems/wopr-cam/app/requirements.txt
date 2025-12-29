@@ -1,7 +1,7 @@
 # Core web API
 fastapi~=0.115.6
 uvicorn[standard]~=0.34.0
-
+git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core
 # Data validation (FastAPI depends on pydantic, but we pin explicitly)
 pydantic~=2.10.4
 
