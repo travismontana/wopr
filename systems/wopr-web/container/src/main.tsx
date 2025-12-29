@@ -20,9 +20,9 @@ import ConfigEditPage from "./routes/boh/config/control";
 // Theme
 import "./themes/modern.css";
 import WorkInProgress from "./routes/wip";
-import GamesManager from "./pages/GamesManager";
-import MLImagesManager from "./pages/MLImagesManager";
-import PiecesManager from "./pages/PiecesManager";
+import GamesManager from "./routes/boh/games/GamesManager";
+import MLImagesManager from "./routes/boh/ml/MLImagesManager";
+import PiecesManager from "./routes/boh/pieces/PiecesManager";
 
 
 const router = createBrowserRouter([

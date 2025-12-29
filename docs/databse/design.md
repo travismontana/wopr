@@ -24,6 +24,10 @@ STORAGE_DIR: /.....
 ```
 
 
+Add/edit/remove games
+Add/edit/remove pieces
+Add/edit/remove mlimages
+
 
 
 ```
