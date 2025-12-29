@@ -95,38 +95,50 @@ export default function MLImagesManager() {
   });
 
   useEffect(() => {
+    console.log("[MLImagesManager] Component mounted, initializing data load");
     loadGames();
     loadPieces();
     loadMLImages();
   }, []);
 
   useEffect(() => {
+    console.log("[MLImagesManager] Filters changed:", {
+      gameFilter: selectedGameFilter,
+      pieceFilter: selectedPieceFilter,
+    });
     loadMLImages();
   }, [selectedGameFilter, selectedPieceFilter]);
 
   async function loadGames() {
+    console.log("[loadGames] Fetching games from API");
     try {
       const res = await fetch(`${API_URL}/api/v1/games`);
+      console.log("[loadGames] Response status:", res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      console.log("[loadGames] Loaded games:", data.length, "items");
       setGames(data);
     } catch (e: any) {
-      console.error("Failed to load games:", e);
+      console.error("[loadGames] Failed to load games:", e);
     }
   }
 
   async function loadPieces() {
+    console.log("[loadPieces] Fetching pieces from API");
     try {
       const res = await fetch(`${API_URL}/api/v1/pieces`);
+      console.log("[loadPieces] Response status:", res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      console.log("[loadPieces] Loaded pieces:", data.length, "items");
       setPieces(data);
     } catch (e: any) {
-      console.error("Failed to load pieces:", e);
+      console.error("[loadPieces] Failed to load pieces:", e);
     }
   }
 
   async function loadMLImages() {
+    console.log("[loadMLImages] Starting ML images load");
     setLoading(true);
     setStatus(null);
 
@@ -140,12 +152,16 @@ export default function MLImagesManager() {
         ? `${API_URL}/api/v1/mlimages?${queryString}`
         : `${API_URL}/api/v1/mlimages`;
 
+      console.log("[loadMLImages] Fetching from URL:", url);
       const res = await fetch(url);
+      console.log("[loadMLImages] Response status:", res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
+      console.log("[loadMLImages] Loaded ML images:", data.length, "items");
       setMLImages(data);
     } catch (e: any) {
+      console.error("[loadMLImages] Error loading ML images:", e);
       setStatus({
         type: "error",
         message: e?.message ?? "Failed to load ML images",
@@ -156,22 +172,30 @@ export default function MLImagesManager() {
   }
 
   async function takePic(filename?: string) {
+    console.log("[takePic] Capturing image with filename:", filename);
     const res = await fetch(`${API_URL}/api/v1/cameras/capture`, {
       method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            captureType: "ml_capture",
-            filename: filename.trim(),
-            }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        captureType: "ml_capture",
+        filename: filename.trim(),
+      }),
     });
+    console.log("[takePic] Capture response status:", res.status);
     if (!res.ok) {
       throw new Error(`Camera capture failed: HTTP ${res.status}`);
     }
-    return await res.json();
+    const result = await res.json();
+    console.log("[takePic] Capture result:", result);
+    return result;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log("[handleSubmit] Form submitted", {
+      isEdit: !!editingImage,
+      formData,
+    });
     setLoading(true);
     setStatus(null);
 
@@ -191,13 +215,16 @@ export default function MLImagesManager() {
       // Only generate filename for new images, not edits
       if (!editingImage) {
         payload.filename = generateFilename();
+        console.log("[handleSubmit] Generated filename:", payload.filename);
         await takePic(payload.filename);
       }
+
       const url = editingImage
         ? `${API_URL}/api/v1/mlimages/${editingImage.id}`
         : `${API_URL}/api/v1/mlimages`;
 
       const method = editingImage ? "PUT" : "POST";
+      console.log("[handleSubmit] Sending request:", { method, url, payload });
 
       const res = await fetch(url, {
         method,
@@ -205,10 +232,15 @@ export default function MLImagesManager() {
         body: JSON.stringify(payload),
       });
 
+      console.log("[handleSubmit] Response status:", res.status);
       if (!res.ok) {
         const errorText = await res.text();
+        console.error("[handleSubmit] Error response:", errorText);
         throw new Error(`HTTP ${res.status}: ${errorText}`);
       }
+
+      const responseData = await res.json();
+      console.log("[handleSubmit] Success response:", responseData);
 
       setStatus({
         type: "ok",
@@ -216,11 +248,10 @@ export default function MLImagesManager() {
       });
 
       setFormData({
-        filename: "",
-        object_rotation: "",
-        object_position: "",
-        color_temp: "",
-        light_intensity: "",
+        object_rotation: "0",
+        object_position: "random",
+        color_temp: "neutral",
+        light_intensity: "70",
         game_id: "",
         piece_id: "",
         locale: "en",
@@ -229,6 +260,7 @@ export default function MLImagesManager() {
       setShowForm(false);
       await loadMLImages();
     } catch (e: any) {
+      console.error("[handleSubmit] Failed to save ML image:", e);
       setStatus({
         type: "error",
         message: e?.message ?? "Failed to save ML image",
@@ -239,7 +271,9 @@ export default function MLImagesManager() {
   }
 
   async function handleDelete(imageId: number, filename: string) {
+    console.log("[handleDelete] Attempting to delete:", { imageId, filename });
     if (!confirm(`Delete ML image "${filename}"? This cannot be undone.`)) {
+      console.log("[handleDelete] User cancelled deletion");
       return;
     }
 
@@ -247,15 +281,19 @@ export default function MLImagesManager() {
     setStatus(null);
 
     try {
+      console.log("[handleDelete] Sending DELETE request for ID:", imageId);
       const res = await fetch(`${API_URL}/api/v1/mlimages/${imageId}`, {
         method: "DELETE",
       });
 
+      console.log("[handleDelete] Response status:", res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
+      console.log("[handleDelete] Successfully deleted:", filename);
       setStatus({ type: "ok", message: `Deleted "${filename}"` });
       await loadMLImages();
     } catch (e: any) {
+      console.error("[handleDelete] Failed to delete ML image:", e);
       setStatus({
         type: "error",
         message: e?.message ?? "Failed to delete ML image",
@@ -266,40 +304,46 @@ export default function MLImagesManager() {
   }
 
   function generateFilename(): string {
+    console.log("[generateFilename] Generating filename with formData:", formData);
     const piece = pieces.find((p) => p.id === parseInt(formData.piece_id));
     const pieceName = piece?.name || "unknown";
     const game = games.find((g) => g.id === parseInt(formData.game_id));
     const gameName = game?.name || "unknown";
+    console.log("[generateFilename] Resolved names:", { pieceName, gameName });
+
     const sanitize = (str: string): string => {
       return str
         .toLowerCase()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-z0-9_-]/g, '_');
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_-]/g, "_");
     };
-    
+
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
     const timestamp = `${year}${month}${day}-${hours}${minutes}${seconds}`;
-    
+
     const parts = [
       sanitize(pieceName),
       sanitize(gameName),
-      sanitize(formData.object_position || 'nopos'),
-      `rot${formData.object_rotation || '0'}`,
-      `pct${formData.light_intensity || '100'}`,
-      `temp${sanitize(formData.color_temp || 'neutral')}`,
-      timestamp
+      sanitize(formData.object_position || "nopos"),
+      `rot${formData.object_rotation || "0"}`,
+      `pct${formData.light_intensity || "100"}`,
+      `temp${sanitize(formData.color_temp || "neutral")}`,
+      timestamp,
     ];
-    
-    return `${parts.join('-')}.jpg`;
+
+    const filename = `${parts.join("-")}.jpg`;
+    console.log("[generateFilename] Generated filename:", filename);
+    return filename;
   }
 
   function handleEdit(image: MLImage) {
+    console.log("[handleEdit] Editing image:", image);
     setEditingImage(image);
     setFormData({
       object_rotation: image.object_rotation?.toString() || "",
@@ -314,6 +358,7 @@ export default function MLImagesManager() {
   }
 
   function handleCancel() {
+    console.log("[handleCancel] Cancelling form");
     setShowForm(false);
     setEditingImage(null);
     setFormData({
@@ -328,23 +373,31 @@ export default function MLImagesManager() {
   }
 
   function handleSort(field: SortField) {
+    console.log("[handleSort] Sort requested:", { field, currentField: sortField, currentDirection: sortDirection });
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      const newDirection = sortDirection === "asc" ? "desc" : "asc";
+      console.log("[handleSort] Toggling direction to:", newDirection);
+      setSortDirection(newDirection);
     } else {
+      console.log("[handleSort] Changing sort field to:", field);
       setSortField(field);
       setSortDirection("asc");
     }
   }
 
   function getGameName(gameId?: number): string {
+    console.log("[getGameName] Called with gameId:", gameId);
     if (!gameId) return "—";
     const game = games.find((g) => g.id === gameId);
+    console.log("[getGameName] Found game:", game);
     return game?.name || `Game ${gameId}`;
   }
 
   function getPieceName(pieceId?: number): string {
+    console.log("[getPieceName] Called with pieceId:", pieceId);
     if (!pieceId) return "—";
     const piece = pieces.find((p) => p.id === pieceId);
+    console.log("[getPieceName] Found piece:", piece);
     return piece?.name || `Piece ${pieceId}`;
   }
 
@@ -380,6 +433,16 @@ export default function MLImagesManager() {
     if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
     if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
     return 0;
+  });
+
+  console.log("[MLImagesManager] Render:", {
+    mlimagesCount: mlimages.length,
+    sortedImagesCount: sortedImages.length,
+    gamesCount: games.length,
+    piecesCount: pieces.length,
+    loading,
+    showForm,
+    editingImage: !!editingImage,
   });
 
   return (
@@ -749,10 +812,7 @@ export default function MLImagesManager() {
             </thead>
             <tbody>
               {sortedImages.map((image) => (
-                <tr
-                  key={image.id}
-                  style={{ borderBottom: "1px solid #333" }}
-                >
+                <tr key={image.id} style={{ borderBottom: "1px solid #333" }}>
                   <td style={{ padding: "0.75rem" }}>
                     {getGameName(image.game_id)}
                   </td>
