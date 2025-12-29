@@ -85,57 +85,59 @@ class MLImageResponse(BaseModel):
     updated_by_id: Optional[int]
     locale: Optional[str]
 
-    @router.get("", response_model=List[MLImageResponse])
-    async def list_mlimages(
-        limit: int = 100,
-        offset: int = 0,
-        locale: Optional[str] = None,
-        game_id: Optional[int] = None,
-        piece_id: Optional[int] = None
-    ):
-        """
-        List all ML image metadata with optional pagination and filtering.
-        
-        Args:
-            limit: Maximum number of results (default 100)
-            offset: Number of results to skip (default 0)
-            locale: Optional locale filter
-            game_id: Optional filter by game ID
-            piece_id: Optional filter by piece ID
-        """
-        logger.debug(f"Listing ML images: limit={limit}, offset={offset}, locale={locale}, game_id={game_id}, piece_id={piece_id}")
-        
-        with get_db() as conn:
-            with conn.cursor(row_factory=dict_row) as cur:
-                # Build WHERE clause dynamically based on filters
-                where_clauses = []
-                params = []
-                
-                if game_id:
-                    where_clauses.append("game_id = %s")
-                    params.append(game_id)
-                
-                if piece_id:
-                    where_clauses.append("piece_id = %s")
-                    params.append(piece_id)
-                
-                if locale:
-                    where_clauses.append("locale = %s")
-                    params.append(locale)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT * FROM ml_image_metadatas
-                    WHERE {where_sql}
-                    ORDER BY created_at DESC
-                    LIMIT %s OFFSET %s
-                """
-                params.extend([limit, offset])
-                
-                cur.execute(query, params)
-                rows = cur.fetchall()
-                return rows
+
+@router.get("", response_model=List[MLImageResponse])
+async def list_mlimages(
+    limit: int = 100,
+    offset: int = 0,
+    locale: Optional[str] = None,
+    game_id: Optional[int] = None,
+    piece_id: Optional[int] = None
+):
+    """
+    List all ML image metadata with optional pagination and filtering.
+    
+    Args:
+        limit: Maximum number of results (default 100)
+        offset: Number of results to skip (default 0)
+        locale: Optional locale filter
+        game_id: Optional filter by game ID
+        piece_id: Optional filter by piece ID
+    """
+    logger.debug(f"Listing ML images: limit={limit}, offset={offset}, locale={locale}, game_id={game_id}, piece_id={piece_id}")
+    
+    with get_db() as conn:
+        with conn.cursor(row_factory=dict_row) as cur:
+            # Build WHERE clause dynamically based on filters
+            where_clauses = []
+            params = []
+            
+            if game_id:
+                where_clauses.append("game_id = %s")
+                params.append(game_id)
+            
+            if piece_id:
+                where_clauses.append("piece_id = %s")
+                params.append(piece_id)
+            
+            if locale:
+                where_clauses.append("locale = %s")
+                params.append(locale)
+            
+            where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+            
+            query = f"""
+                SELECT * FROM ml_image_metadatas
+                WHERE {where_sql}
+                ORDER BY created_at DESC
+                LIMIT %s OFFSET %s
+            """
+            params.extend([limit, offset])
+            
+            cur.execute(query, params)
+            rows = cur.fetchall()
+            return rows
+
 
 @router.get("/{mlimage_id}", response_model=MLImageResponse)
 async def get_mlimage(mlimage_id: int):
