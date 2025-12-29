@@ -26,16 +26,18 @@ router = APIRouter()
 
 # Database connection - adjust to match your actual connection string
 DATABASE_URL = woprvar.DATABASE_URL  # Assumes you have this in globals
-
+logger.debug(f"Using database URL: {DATABASE_URL}")
 
 @contextmanager
 def get_db():
     """Database connection context manager"""
+    logger.debug("Opening database connection")
     conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
     finally:
         conn.close()
+        logger.debug("Closed database connection")
 
 
 class GameCreate(BaseModel):
@@ -119,6 +121,7 @@ async def list_games(
                 )
             
             games = cur.fetchall()
+            logger.debug(f"Fetched {len(games)} games from DB")
             return games
 
 
@@ -139,13 +142,14 @@ async def get_game(game_id: int):
                 (game_id,)
             )
             game = cur.fetchone()
-            
             if not game:
+                logger.debug(f"Game {game_id} not found in DB")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
+            logger.debug(f"Found game {game_id}: {game.get('name')}")
             return game
 
 
@@ -158,6 +162,7 @@ async def create_game(game: GameCreate):
         game: Game data
     """
     logger.info(f"Creating game: {game.name}")
+    logger.debug(f"Create payload: {game.dict(exclude_none=True)}")
     
     now = datetime.utcnow()
     
@@ -189,7 +194,7 @@ async def create_game(game: GameCreate):
             )
             conn.commit()
             new_game = cur.fetchone()
-            
+            logger.debug(f"Inserted game row: {new_game}")
             logger.info(f"Created game {new_game['id']}: {new_game['name']}")
             return new_game
 
@@ -227,6 +232,7 @@ async def update_game(game_id: int, game: GameUpdate):
     values.extend([now, now])
     values.append(game_id)
     
+    logger.debug(f"Update fields: {update_fields} | values (pre-query): {values}")
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
@@ -235,7 +241,7 @@ async def update_game(game_id: int, game: GameUpdate):
                 WHERE id = %s
                 RETURNING *
             """
-            
+            logger.debug(f"Executing update query: {query}")
             cur.execute(query, values)
             conn.commit()
             updated_game = cur.fetchone()
@@ -245,7 +251,7 @@ async def update_game(game_id: int, game: GameUpdate):
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+            logger.debug(f"Updated game row: {updated_game}")
             logger.info(f"Updated game {game_id}")
             return updated_game
 
@@ -268,11 +274,12 @@ async def delete_game(game_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+            logger.debug(f"Delete result for {game_id}: {deleted}")
             if not deleted:
+                logger.debug(f"Game {game_id} not found when attempting delete")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             logger.info(f"Deleted game {game_id}")

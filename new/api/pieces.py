@@ -30,11 +30,13 @@ DATABASE_URL = woprvar.DATABASE_URL
 @contextmanager
 def get_db():
     """Database connection context manager"""
+    logger.debug("Opening database connection")
     conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
     finally:
         conn.close()
+        logger.debug("Closed database connection")
 
 
 class PieceCreate(BaseModel):
@@ -131,6 +133,7 @@ async def list_pieces(
                 )
             
             pieces = cur.fetchall()
+            logger.debug(f"Fetched {len(pieces)} pieces from DB")
             return pieces
 
 
@@ -151,13 +154,14 @@ async def get_piece(piece_id: int):
                 (piece_id,)
             )
             piece = cur.fetchone()
-            
             if not piece:
+                logger.debug(f"Piece {piece_id} not found in DB")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Piece with ID {piece_id} not found"
                 )
-            
+
+            logger.debug(f"Found piece {piece_id}: {piece.get('name')}")
             return piece
 
 
@@ -170,6 +174,7 @@ async def create_piece(piece: PieceCreate):
         piece: Piece data
     """
     logger.info(f"Creating piece: {piece.name}")
+    logger.debug(f"Create payload: {piece.dict(exclude_none=True)}")
     
     now = datetime.utcnow()
     
@@ -198,7 +203,7 @@ async def create_piece(piece: PieceCreate):
             )
             conn.commit()
             new_piece = cur.fetchone()
-            
+            logger.debug(f"Inserted piece row: {new_piece}")
             logger.info(f"Created piece {new_piece['id']}: {new_piece['name']}")
             return new_piece
 
@@ -233,7 +238,7 @@ async def update_piece(piece_id: int, piece: PieceUpdate):
     now = datetime.utcnow()
     values.extend([now, now])
     values.append(piece_id)
-    
+    logger.debug(f"Update fields: {update_fields} | values (pre-query): {values}")
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
@@ -242,7 +247,7 @@ async def update_piece(piece_id: int, piece: PieceUpdate):
                 WHERE id = %s
                 RETURNING *
             """
-            
+            logger.debug(f"Executing update query: {query}")
             cur.execute(query, values)
             conn.commit()
             updated_piece = cur.fetchone()
@@ -252,7 +257,7 @@ async def update_piece(piece_id: int, piece: PieceUpdate):
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Piece with ID {piece_id} not found"
                 )
-            
+            logger.debug(f"Updated piece row: {updated_piece}")
             logger.info(f"Updated piece {piece_id}")
             return updated_piece
 
@@ -275,13 +280,14 @@ async def delete_piece(piece_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+            logger.debug(f"Delete result for piece {piece_id}: {deleted}")
             if not deleted:
+                logger.debug(f"Piece {piece_id} not found when attempting delete")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Piece with ID {piece_id} not found"
                 )
-            
+
             logger.info(f"Deleted piece {piece_id}")
 
 
@@ -301,19 +307,21 @@ async def link_piece_to_game(piece_id: int, game_id: int):
             # Verify piece exists
             cur.execute("SELECT id FROM pieces WHERE id = %s", (piece_id,))
             if not cur.fetchone():
+                logger.debug(f"Piece {piece_id} not found when linking to game {game_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Piece with ID {piece_id} not found"
                 )
-            
+
             # Verify game exists
             cur.execute("SELECT id FROM games WHERE id = %s", (game_id,))
             if not cur.fetchone():
+                logger.debug(f"Game {game_id} not found when linking piece {piece_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             # Create link (assuming pieces_game_lnk has piece_id, game_id columns)
             try:
                 cur.execute(
@@ -324,9 +332,11 @@ async def link_piece_to_game(piece_id: int, game_id: int):
                     (piece_id, game_id)
                 )
                 conn.commit()
+                logger.debug(f"Inserted pieces_game_lnk row for piece={piece_id}, game={game_id}")
                 logger.info(f"Linked piece {piece_id} to game {game_id}")
                 return {"piece_id": piece_id, "game_id": game_id, "status": "linked"}
             except psycopg.errors.UniqueViolation:
+                logger.debug(f"Piece {piece_id} already linked to game {game_id}")
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail=f"Piece {piece_id} is already linked to game {game_id}"
@@ -356,11 +366,12 @@ async def unlink_piece_from_game(piece_id: int, game_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+            logger.debug(f"Delete link result for piece={piece_id}, game={game_id}: {deleted}")
             if not deleted:
+                logger.debug(f"Link between piece {piece_id} and game {game_id} not found when unlinking")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Link between piece {piece_id} and game {game_id} not found"
                 )
-            
+
             logger.info(f"Unlinked piece {piece_id} from game {game_id}")

@@ -25,7 +25,7 @@ logger = woprlogging.setup_logging(woprvar.APP_NAME)
 router = APIRouter()
 
 DATABASE_URL = woprvar.DATABASE_URL
-
+logger.debug(f"Using DATABASE_URL: {DATABASE_URL}")
 
 @contextmanager
 def get_db():

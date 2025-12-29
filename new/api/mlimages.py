@@ -30,11 +30,13 @@ DATABASE_URL = woprvar.DATABASE_URL
 @contextmanager
 def get_db():
     """Database connection context manager"""
+    logger.debug("Opening database connection")
     conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
     finally:
         conn.close()
+        logger.debug("Closed database connection")
 
 
 class MLImageCreate(BaseModel):
@@ -177,6 +179,7 @@ async def list_mlimages(
                 )
             
             images = cur.fetchall()
+            logger.debug(f"Fetched {len(images)} ML images from DB")
             return images
 
 
@@ -197,13 +200,14 @@ async def get_mlimage(mlimage_id: int):
                 (mlimage_id,)
             )
             image = cur.fetchone()
-            
             if not image:
+                logger.debug(f"ML image {mlimage_id} not found in DB")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"ML image metadata with ID {mlimage_id} not found"
                 )
-            
+
+            logger.debug(f"Found ML image {mlimage_id}: {image.get('filename')}")
             return image
 
 
@@ -216,6 +220,7 @@ async def create_mlimage(image: MLImageCreate):
         image: ML image metadata
     """
     logger.info(f"Creating ML image metadata: {image.filename}")
+    logger.debug(f"Create payload: {image.dict(exclude_none=True)}")
     
     now = datetime.utcnow()
     
@@ -249,7 +254,7 @@ async def create_mlimage(image: MLImageCreate):
             )
             conn.commit()
             new_image = cur.fetchone()
-            
+            logger.debug(f"Inserted ML image row: {new_image}")
             logger.info(f"Created ML image metadata {new_image['id']}: {new_image['filename']}")
             return new_image
 
@@ -284,7 +289,7 @@ async def update_mlimage(mlimage_id: int, image: MLImageUpdate):
     now = datetime.utcnow()
     values.extend([now, now])
     values.append(mlimage_id)
-    
+    logger.debug(f"Update fields: {update_fields} | values (pre-query): {values}")
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
@@ -293,7 +298,7 @@ async def update_mlimage(mlimage_id: int, image: MLImageUpdate):
                 WHERE id = %s
                 RETURNING *
             """
-            
+            logger.debug(f"Executing update query: {query}")
             cur.execute(query, values)
             conn.commit()
             updated_image = cur.fetchone()
@@ -303,7 +308,7 @@ async def update_mlimage(mlimage_id: int, image: MLImageUpdate):
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"ML image metadata with ID {mlimage_id} not found"
                 )
-            
+            logger.debug(f"Updated ML image row: {updated_image}")
             logger.info(f"Updated ML image metadata {mlimage_id}")
             return updated_image
 
@@ -326,13 +331,14 @@ async def delete_mlimage(mlimage_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+            logger.debug(f"Delete result for ML image {mlimage_id}: {deleted}")
             if not deleted:
+                logger.debug(f"ML image {mlimage_id} not found when attempting delete")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"ML image metadata with ID {mlimage_id} not found"
                 )
-            
+
             logger.info(f"Deleted ML image metadata {mlimage_id}")
 
 
@@ -352,19 +358,21 @@ async def link_mlimage_to_game(mlimage_id: int, game_id: int):
             # Verify ML image exists
             cur.execute("SELECT id FROM ml_image_metadatas WHERE id = %s", (mlimage_id,))
             if not cur.fetchone():
+                logger.debug(f"ML image {mlimage_id} not found when linking to game {game_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"ML image metadata with ID {mlimage_id} not found"
                 )
-            
+
             # Verify game exists
             cur.execute("SELECT id FROM games WHERE id = %s", (game_id,))
             if not cur.fetchone():
+                logger.debug(f"Game {game_id} not found when linking ML image {mlimage_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             # Create link
             try:
                 cur.execute(
@@ -375,9 +383,11 @@ async def link_mlimage_to_game(mlimage_id: int, game_id: int):
                     (mlimage_id, game_id)
                 )
                 conn.commit()
+                logger.debug(f"Inserted ml_image_metadatas_game_lnk row for mlimage={mlimage_id}, game={game_id}")
                 logger.info(f"Linked ML image {mlimage_id} to game {game_id}")
                 return {"mlimage_id": mlimage_id, "game_id": game_id, "status": "linked"}
             except psycopg.errors.UniqueViolation:
+                logger.debug(f"ML image {mlimage_id} already linked to game {game_id}")
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail=f"ML image {mlimage_id} is already linked to game {game_id}"
@@ -407,13 +417,15 @@ async def unlink_mlimage_from_game(mlimage_id: int, game_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+
+            logger.debug(f"Delete link result for mlimage={mlimage_id}, game={game_id}: {deleted}")
             if not deleted:
+                logger.debug(f"Link between ML image {mlimage_id} and game {game_id} not found when unlinking")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Link between ML image {mlimage_id} and game {game_id} not found"
                 )
-            
+
             logger.info(f"Unlinked ML image {mlimage_id} from game {game_id}")
 
 
@@ -433,19 +445,21 @@ async def link_mlimage_to_piece(mlimage_id: int, piece_id: int):
             # Verify ML image exists
             cur.execute("SELECT id FROM ml_image_metadatas WHERE id = %s", (mlimage_id,))
             if not cur.fetchone():
+                logger.debug(f"ML image {mlimage_id} not found when linking to piece {piece_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"ML image metadata with ID {mlimage_id} not found"
                 )
-            
+
             # Verify piece exists
             cur.execute("SELECT id FROM pieces WHERE id = %s", (piece_id,))
             if not cur.fetchone():
+                logger.debug(f"Piece {piece_id} not found when linking ML image {mlimage_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Piece with ID {piece_id} not found"
                 )
-            
+
             # Create link
             try:
                 cur.execute(
@@ -456,9 +470,11 @@ async def link_mlimage_to_piece(mlimage_id: int, piece_id: int):
                     (mlimage_id, piece_id)
                 )
                 conn.commit()
+                logger.debug(f"Inserted ml_image_metadatas_piece_lnk row for mlimage={mlimage_id}, piece={piece_id}")
                 logger.info(f"Linked ML image {mlimage_id} to piece {piece_id}")
                 return {"mlimage_id": mlimage_id, "piece_id": piece_id, "status": "linked"}
             except psycopg.errors.UniqueViolation:
+                logger.debug(f"ML image {mlimage_id} already linked to piece {piece_id}")
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail=f"ML image {mlimage_id} is already linked to piece {piece_id}"
@@ -488,11 +504,12 @@ async def unlink_mlimage_from_piece(mlimage_id: int, piece_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+            logger.debug(f"Delete link result for mlimage={mlimage_id}, piece={piece_id}: {deleted}")
             if not deleted:
+                logger.debug(f"Link between ML image {mlimage_id} and piece {piece_id} not found when unlinking")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Link between ML image {mlimage_id} and piece {piece_id} not found"
                 )
-            
+
             logger.info(f"Unlinked ML image {mlimage_id} from piece {piece_id}")
