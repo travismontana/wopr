@@ -3,14 +3,14 @@ directus:
   
   ingress:
     enabled: true
-    className: ""
+    className: "studio-traefik"
     hosts:
       - host: directus.studio.abode.tailandtraillabs.org  # needs 'host:' key
         paths:
           - path: /
             pathType: Prefix
     annotations:
-      kubernetes.io/ingress.class: studio-nginx
+      kubernetes.io/ingress.class: studio-traefik
       cert-manager.io/cluster-issuer: letsencrypt-prod  # moved here
     tls:
       - hosts:
