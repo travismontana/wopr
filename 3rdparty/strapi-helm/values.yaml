@@ -12,7 +12,7 @@ service:
 ingress:
   enabled: true
   className: "studio-traefik"
-  annotations: {}
+  annotations: 
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
   hosts:
