@@ -251,6 +251,7 @@ button.danger:hover:not(:disabled) {
   border-collapse: collapse;
   background: #111;
   border: 1px solid #00ff00;
+  color: #00ff00;
 }
 
 .data-table thead tr {
