@@ -47,10 +47,6 @@ class Subject(str, Enum):
 
 
 class CaptureRequest(BaseModel):
-    game_id: str = Field(..., min_length=1, description="Game identifier, e.g. dune_imperium")
-    subject: Subject = Field(..., description="Capture subject")
-    subject_name: str = Field(..., min_length=1, description="Subject name")
-    sequence: int = Field(..., ge=1, description="Sequence number >= 1")
     filename: Optional[str] = Field(None, description="Optional filename override")
 
 
@@ -120,13 +116,11 @@ def capture(req: CaptureRequest):
 @app.post("/capture_ml", response_class=PlainTextResponse)
 def capture_ml(req: CaptureRequest):
     # Generate filepath from config (may raise ValueError; handled above)
-    filepath1 = imagefilename(req.game_id, req.subject.value)
+    filename = req.filename if req.filename else "noname.jpg"
     base_path = get_str('storage.base_path')
-    subject_name = req.subject_name
     ml_subdir = "ml" # get_str('storage.ml_subdir')
-    ml_dir = Path(base_path) / ml_subdir / req.game_id
-    filename = filepath1.split('/')[-1]
-    filepath = ml_dir / f"{subject_name}-{filename}"
+    ml_dir = Path(base_path) / ml_subdir / 'incoming'
+    filepath = ml_dir / f"{filename}"
     ml_dir.mkdir(parents=True, exist_ok=True)
 
     resolution = get_str("camera.default_resolution")
