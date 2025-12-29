@@ -84,6 +84,8 @@ class MLImageResponse(BaseModel):
     created_by_id: Optional[int]
     updated_by_id: Optional[int]
     locale: Optional[str]
+    game_id: Optional[int]
+    piece_id: Optional[int]
 
 
 @router.get("", response_model=List[MLImageResponse])
