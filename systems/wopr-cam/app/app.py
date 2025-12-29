@@ -152,7 +152,7 @@ def capture_ml(req: CaptureRequest):
 
     # Return newline so curl doesn't stick your prompt ("%") on the end
     logger.info(f"Captured image to {filepath}")
-    return JSONResponse({"filename": filepath})
+    return JSONResponse({"filename": str(filepath)})
 
 
 @app.get("/status")
