@@ -75,4 +75,4 @@ async def capture_image(request: CaptureRequest):
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Failed to capture from camera: {str(e)}"
         )
-    return {"filepath": cam_response}
+    return {"filepath": "cam_response"}
