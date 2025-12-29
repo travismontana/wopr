@@ -68,8 +68,8 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
             
             <div className="thumbnail-grid">
                 {images.map((filename) => {
-                    const rawUrl = `/wopr/ml/${gameId}/${filename}`;
-                    const thumbUrl = `/wopr/ml/thumbnails/${gameId}/${filename}`;
+                    const rawUrl = `/remote/wopr/ml/${gameId}/${filename}`;
+                    const thumbUrl = `/remote/wopr/ml/thumbnails/${gameId}/${filename}`;
                     
                     return (
                         <div 
