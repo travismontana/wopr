@@ -251,7 +251,6 @@ button.danger:hover:not(:disabled) {
   border-collapse: collapse;
   background: #111;
   border: 1px solid #00ff00;
-  color: #00ff00;
 }
 
 .data-table thead tr {
@@ -279,4 +278,35 @@ button.danger:hover:not(:disabled) {
 }
 
 .data-table td {
-  padd
+  padding: 0.75rem;
+  color: #00ff00;
+}
+
+.data-table td.actions {
+  text-align: right;
+}
+
+.data-table .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.data-table .action-buttons button {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Select dropdowns */
+select {
+  padding: 0.5rem;
+  border: 1px solid #00ff00;
+  background: #000;
+  color: #00ff00;
+  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
+}
+
+select:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
