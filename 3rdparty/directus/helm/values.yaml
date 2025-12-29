@@ -1,0 +1,31 @@
+directus:
+  adminEmail: "bob@bomar.us"
+  
+  ingress:
+    enabled: true
+    className: ""
+    hosts:
+      - host: directus.studio.abode.tailandtraillabs.org  # needs 'host:' key
+        paths:
+          - path: /
+            pathType: Prefix
+    annotations:
+      kubernetes.io/ingress.class: studio-nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod  # moved here
+    tls:
+      - hosts:
+          - directus.studio.abode.tailandtraillabs.org
+        secretName: directus-tls
+
+  databaseEngine: "postgresql"
+  
+  createPostgresqlSecret: false  # important - you're managing the secret
+  
+  postgresql:
+    enableInstallation: false  # CHANGED - don't install postgres
+    auth:
+      existingSecret: "directus-db-user"
+      database: "directus"
+      username: "directus"
+    postgresqlURL: "wopr-db-rw.wopr.svc.cluster.local"  # ADDED - your CNPG service
+    postgresqlPort: "5432"  # ADDED
