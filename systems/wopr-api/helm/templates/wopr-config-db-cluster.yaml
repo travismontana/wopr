@@ -19,6 +19,7 @@ spec:
   managed:
     roles:
       - name: wopr-db-user
+        comment: "wopr database user"
         ensure: present
         login: true
         passwordSecret:

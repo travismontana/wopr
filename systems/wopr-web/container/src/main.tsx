@@ -20,6 +20,9 @@ import ConfigEditPage from "./routes/boh/config/control";
 // Theme
 import "./themes/modern.css";
 import WorkInProgress from "./routes/wip";
+import GamesManager from "./pages/GamesManager";
+import MLImagesManager from "./pages/MLImagesManager";
+import PiecesManager from "./pages/PiecesManager";
 
 
 const router = createBrowserRouter([
@@ -40,10 +43,20 @@ const router = createBrowserRouter([
         element: <BackOfHouse />,
         children: [
           {
+            path: "games",
+            element: <GamesManager />,
+            children: [],
+          },
+          {
+            path: "pieces",
+            element: <PiecesManager />,
+            children: [],
+          },
+          {
             path: "ml",
             element: <WorkInProgress />,
             children: [
-              { path: "capture", element: <WorkInProgress /> },
+              { path: "images", element: <MLImagesManager /> },
             ],
           },
           {
