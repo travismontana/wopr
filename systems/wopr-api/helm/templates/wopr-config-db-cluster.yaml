@@ -22,5 +22,4 @@ spec:
         ensure: present
         passwordSecretRef:
           name: wopr-db-user-credentials
-          key: password
         createdb: true
