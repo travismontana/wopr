@@ -29,6 +29,7 @@ interface PieceFormData {
   name: string;
   description: string;
   locale: string;
+  gameId: string; // Added for linking on create/edit
 }
 
 type StatusState =
@@ -43,10 +44,12 @@ export default function PiecesManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingPiece, setEditingPiece] = useState<Piece | null>(null);
   const [selectedGameFilter, setSelectedGameFilter] = useState<string>("");
+  const [linkingPieceId, setLinkingPieceId] = useState<number | null>(null); // Track which piece is being linked
   const [formData, setFormData] = useState<PieceFormData>({
     name: "",
     description: "",
     locale: "en",
+    gameId: "", // Added
   });
 
   useEffect(() => {
@@ -119,12 +122,22 @@ export default function PiecesManager() {
         throw new Error(`HTTP ${res.status}: ${errorText}`);
       }
 
+      const savedPiece = await res.json();
+
+      // If a game was selected, link it after creating/updating the piece
+      if (formData.gameId) {
+        await handleLinkToGame(
+          editingPiece?.id ?? savedPiece.id,
+          Number(formData.gameId)
+        );
+      }
+
       setStatus({
         type: "ok",
         message: editingPiece ? "Piece updated!" : "Piece created!",
       });
 
-      setFormData({ name: "", description: "", locale: "en" });
+      setFormData({ name: "", description: "", locale: "en", gameId: "" });
       setEditingPiece(null);
       setShowForm(false);
       await loadPieces();
@@ -175,6 +188,7 @@ export default function PiecesManager() {
       }
 
       setStatus({ type: "ok", message: "Piece linked to game!" });
+      setLinkingPieceId(null); // Close the selector
       await loadPieces();
     } catch (e: any) {
       setStatus({
@@ -192,6 +206,7 @@ export default function PiecesManager() {
       name: piece.name || "",
       description: piece.description || "",
       locale: piece.locale || "en",
+      gameId: "", // Reset game selection
     });
     setShowForm(true);
   }
@@ -199,14 +214,7 @@ export default function PiecesManager() {
   function handleCancel() {
     setShowForm(false);
     setEditingPiece(null);
-    setFormData({ name: "", description: "", locale: "en" });
-  }
-
-  function handleLinkClick(pieceId: number) {
-    const gameId = prompt("Enter Game ID to link to:");
-    if (gameId && !isNaN(Number(gameId))) {
-      handleLinkToGame(pieceId, Number(gameId));
-    }
+    setFormData({ name: "", description: "", locale: "en", gameId: "" });
   }
 
   return (
@@ -341,6 +349,39 @@ export default function PiecesManager() {
             />
           </div>
 
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Link to Game (optional)
+            </label>
+            <select
+              value={formData.gameId}
+              onChange={(e) =>
+                setFormData({ ...formData, gameId: e.target.value })
+              }
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
+            >
+              <option value="">-- Select a game --</option>
+              {games.map((game) => (
+                <option key={game.id} value={game.id}>
+                  {game.name}
+                </option>
+              ))}
+            </select>
+            {games.length === 0 && (
+              <p style={{ fontSize: "0.85em", color: "#aaa", marginTop: "0.25rem" }}>
+                No games available.{" "}
+                <a href="/games" style={{ color: "#0dcaf0" }}>
+                  Add a game first
+                </a>
+              </p>
+            )}
+          </div>
+
           <div className="actions" style={{ marginTop: "0.5rem" }}>
             <button type="submit" disabled={loading}>
               {editingPiece ? "Update" : "Create"}
@@ -390,28 +431,88 @@ export default function PiecesManager() {
                   {piece.locale && <div>Locale: {piece.locale}</div>}
                   <div>ID: {piece.id}</div>
                 </div>
-                <div
-                  className="actions"
-                  style={{ marginTop: "0.75rem", justifyContent: "flex-start" }}
-                >
-                  <button onClick={() => handleEdit(piece)} disabled={loading}>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleLinkClick(piece.id)}
-                    disabled={loading}
-                    style={{ background: "#0dcaf0" }}
+
+                {/* Inline game linking section */}
+                {linkingPieceId === piece.id ? (
+                  <div
+                    style={{
+                      marginTop: "0.75rem",
+                      padding: "0.75rem",
+                      background: "#0a0a0a",
+                      borderRadius: "4px",
+                    }}
                   >
-                    Link to Game
-                  </button>
-                  <button
-                    onClick={() => handleDelete(piece.id, piece.name)}
-                    disabled={loading}
-                    style={{ background: "#dc3545" }}
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.9em",
+                      }}
+                    >
+                      Select game to link:
+                    </label>
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleLinkToGame(piece.id, Number(e.target.value));
+                        }
+                      }}
+                      disabled={loading}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
+                        border: "1px solid #444",
+                        marginBottom: "0.5rem",
+                      }}
+                    >
+                      <option value="">-- Choose a game --</option>
+                      {games.map((game) => (
+                        <option key={game.id} value={game.id}>
+                          {game.name}
+                        </option>
+                      ))}
+                    </select>
+                    {games.length === 0 && (
+                      <p style={{ fontSize: "0.85em", color: "#aaa", margin: "0 0 0.5rem 0" }}>
+                        No games available.{" "}
+                        <a href="/games" style={{ color: "#0dcaf0" }}>
+                          Add one here
+                        </a>
+                      </p>
+                    )}
+                    <button
+                      onClick={() => setLinkingPieceId(null)}
+                      disabled={loading}
+                      style={{ fontSize: "0.85em" }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="actions"
+                    style={{ marginTop: "0.75rem", justifyContent: "flex-start" }}
                   >
-                    Delete
-                  </button>
-                </div>
+                    <button onClick={() => handleEdit(piece)} disabled={loading}>
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setLinkingPieceId(piece.id)}
+                      disabled={loading}
+                      style={{ background: "#0dcaf0" }}
+                    >
+                      Link to Game
+                    </button>
+                    <button
+                      onClick={() => handleDelete(piece.id, piece.name)}
+                      disabled={loading}
+                      style={{ background: "#dc3545" }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
