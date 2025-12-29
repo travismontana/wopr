@@ -36,7 +36,6 @@ interface Piece {
 }
 
 interface MLImageFormData {
-  filename: string;
   object_rotation: string;
   object_position: string;
   color_temp: string;
@@ -86,7 +85,6 @@ export default function MLImagesManager() {
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [formData, setFormData] = useState<MLImageFormData>({
-    filename: "",
     object_rotation: "",
     object_position: "",
     color_temp: "",
@@ -163,8 +161,7 @@ export default function MLImagesManager() {
     setStatus(null);
 
     try {
-      const payload = {
-        filename: formData.filename.trim(),
+      const payload: any = {
         object_rotation: formData.object_rotation
           ? parseInt(formData.object_rotation)
           : undefined,
@@ -178,6 +175,10 @@ export default function MLImagesManager() {
         locale: formData.locale.trim() || undefined,
       };
 
+      // Only generate filename for new images, not edits
+      if (!editingImage) {
+        payload.filename = generateFilename();
+      }
       const url = editingImage
         ? `${API_URL}/api/v1/mlimages/${editingImage.id}`
         : `${API_URL}/api/v1/mlimages`;
@@ -250,10 +251,41 @@ export default function MLImagesManager() {
     }
   }
 
+  function generateFilename(): string {
+    const piece = pieces.find((p) => p.id === parseInt(formData.piece_id));
+    const pieceName = piece?.name || "unknown";
+    
+    const sanitize = (str: string): string => {
+      return str
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_-]/g, '_');
+    };
+    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}${month}${day}-${hours}${minutes}${seconds}`;
+    
+    const parts = [
+      sanitize(pieceName),
+      sanitize(formData.object_position || 'nopos'),
+      `rot${formData.object_rotation || '0'}`,
+      `pct${formData.light_intensity || '100'}`,
+      `temp${sanitize(formData.color_temp || 'neutral')}`,
+      timestamp
+    ];
+    
+    return `${parts.join('-')}.jpg`;
+  }
+
   function handleEdit(image: MLImage) {
     setEditingImage(image);
     setFormData({
-      filename: image.filename || "",
       object_rotation: image.object_rotation?.toString() || "",
       object_position: image.object_position || "",
       color_temp: image.color_temp || "",
@@ -269,7 +301,6 @@ export default function MLImagesManager() {
     setShowForm(false);
     setEditingImage(null);
     setFormData({
-      filename: "",
       object_rotation: "",
       object_position: "",
       color_temp: "",
@@ -488,26 +519,6 @@ export default function MLImagesManager() {
                 ))}
               </select>
             </div>
-          </div>
-
-          <div>
-            <label style={{ display: "block", marginBottom: "0.25rem" }}>
-              Filename *
-            </label>
-            <input
-              type="text"
-              value={formData.filename}
-              onChange={(e) =>
-                setFormData({ ...formData, filename: e.target.value })
-              }
-              required
-              style={{
-                width: "100%",
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #444",
-              }}
-            />
           </div>
 
           <div style={{ display: "flex", gap: "0.75rem" }}>
