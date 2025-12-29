@@ -16,3 +16,12 @@ spec:
         configMapRefs:
           - name: wopr-api-initdb
             key: schema.sql
+  managed:
+    roles:
+      - name: wopr-db-user
+        ensure: present
+        passwordSecretRef:
+          name: wopr-db-credentials
+          key: password
+        options:
+          - CREATEDB
