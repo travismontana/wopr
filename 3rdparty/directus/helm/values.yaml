@@ -27,5 +27,5 @@ directus:
       existingSecret: "directus-db-user"
       database: "directus"
       username: "directus"
-    postgresqlURL: "wopr-db-rw.wopr.svc.cluster.local"  # ADDED - your CNPG service
+    postgresqlURL: "wopr-config-db-cluster-rw.wopr.svc.cluster.local"  # ADDED - your CNPG service
     postgresqlPort: "5432"  # ADDED
