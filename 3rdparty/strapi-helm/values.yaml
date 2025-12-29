@@ -23,7 +23,7 @@ ingress:
   tls:
     - secretName: strapi-tls
       hosts:
-        - cms.yourdomain.com
+        - cms.studio.abode.tailandtraillabs.org
 # Strapi configuration
 strapi:
   # Environment
