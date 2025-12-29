@@ -268,7 +268,8 @@ export default function MLImagesManager() {
   function generateFilename(): string {
     const piece = pieces.find((p) => p.id === parseInt(formData.piece_id));
     const pieceName = piece?.name || "unknown";
-    
+    const game = games.find((g) => g.id === parseInt(formData.game_id));
+    const gameName = game?.name || "unknown";
     const sanitize = (str: string): string => {
       return str
         .toLowerCase()
@@ -287,6 +288,7 @@ export default function MLImagesManager() {
     
     const parts = [
       sanitize(pieceName),
+      sanitize(gameName),
       sanitize(formData.object_position || 'nopos'),
       `rot${formData.object_rotation || '0'}`,
       `pct${formData.light_intensity || '100'}`,
