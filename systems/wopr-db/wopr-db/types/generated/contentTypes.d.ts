@@ -511,7 +511,6 @@ export interface ApiMlImageMetadataMlImageMetadata
     filename: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    game: Schema.Attribute.Relation<'oneToOne', 'api::game.game'>;
     lightIntensity: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -523,7 +522,6 @@ export interface ApiMlImageMetadataMlImageMetadata
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'random'>;
     objectRotation: Schema.Attribute.Integer;
-    piece: Schema.Attribute.Relation<'oneToOne', 'api::piece.piece'>;
     publishedAt: Schema.Attribute.DateTime;
     uid: Schema.Attribute.UID & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;

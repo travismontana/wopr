@@ -27,16 +27,6 @@
     "updateTime": {
       "type": "datetime"
     },
-    "game": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::game.game"
-    },
-    "piece": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::piece.piece"
-    },
     "objectRotation": {
       "type": "integer"
     },
