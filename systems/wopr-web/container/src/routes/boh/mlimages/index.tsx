@@ -451,33 +451,13 @@ export default function MLImagesManager() {
 
       {/* Status Message */}
       {status && (
-        <div
-          style={{
-            padding: "0.75rem",
-            borderRadius: "8px",
-            background:
-              status.type === "ok"
-                ? "#198754"
-                : status.type === "error"
-                ? "#dc3545"
-                : "#0dcaf0",
-            color: "white",
-            marginBottom: "1rem",
-          }}
-        >
+        <div className={`status-message ${status.type}`}>
           {status.message}
         </div>
       )}
 
       {/* Actions and Filters */}
-      <div
-        style={{
-          display: "flex",
-          gap: "0.75rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
+      <div className="toolbar">
         <button onClick={() => setShowForm(!showForm)} disabled={loading}>
           {showForm ? "Cancel" : "Add ML Image"}
         </button>
@@ -485,17 +465,12 @@ export default function MLImagesManager() {
           {loading ? "Loading..." : "Refresh"}
         </button>
 
-        <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <label>
           Filter by Game:
           <select
             value={selectedGameFilter}
             onChange={(e) => setSelectedGameFilter(e.target.value)}
             disabled={loading}
-            style={{
-              padding: "0.5rem",
-              borderRadius: "4px",
-              border: "1px solid #2222D6",
-            }}
           >
             <option value="">All</option>
             {games.map((game) => (
@@ -506,17 +481,12 @@ export default function MLImagesManager() {
           </select>
         </label>
 
-        <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <label>
           Filter by Piece:
           <select
             value={selectedPieceFilter}
             onChange={(e) => setSelectedPieceFilter(e.target.value)}
             disabled={loading}
-            style={{
-              padding: "0.5rem",
-              borderRadius: "4px",
-              border: "1px solid #2222D6",
-            }}
           >
             <option value="">All</option>
             {pieces.map((piece) => (
@@ -530,39 +500,18 @@ export default function MLImagesManager() {
 
       {/* Form */}
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-            padding: "1rem",
-            background: "#111",
-            borderRadius: "8px",
-            marginTop: "1rem",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>
-            {editingImage ? "Edit ML Image" : "New ML Image"}
-          </h3>
+        <form onSubmit={handleSubmit} className="form-container">
+          <h3>{editingImage ? "Edit ML Image" : "New ML Image"}</h3>
 
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Game *
-              </label>
+          <div className="form-row">
+            <div className="form-field">
+              <label>Game *</label>
               <select
                 value={formData.game_id}
                 onChange={(e) =>
                   setFormData({ ...formData, game_id: e.target.value })
                 }
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select a game...</option>
                 {games.map((game) => (
@@ -573,22 +522,14 @@ export default function MLImagesManager() {
               </select>
             </div>
 
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Piece *
-              </label>
+            <div className="form-field">
+              <label>Piece *</label>
               <select
                 value={formData.piece_id}
                 onChange={(e) =>
                   setFormData({ ...formData, piece_id: e.target.value })
                 }
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select a piece...</option>
                 {pieces.map((piece) => (
@@ -600,22 +541,14 @@ export default function MLImagesManager() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Object Rotation
-              </label>
+          <div className="form-row">
+            <div className="form-field">
+              <label>Object Rotation</label>
               <select
                 value={formData.object_rotation}
                 onChange={(e) =>
                   setFormData({ ...formData, object_rotation: e.target.value })
                 }
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select rotation...</option>
                 {ROTATION_OPTIONS.map((deg) => (
@@ -626,21 +559,13 @@ export default function MLImagesManager() {
               </select>
             </div>
 
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Object Position
-              </label>
+            <div className="form-field">
+              <label>Object Position</label>
               <select
                 value={formData.object_position}
                 onChange={(e) =>
                   setFormData({ ...formData, object_position: e.target.value })
                 }
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select position...</option>
                 {POSITION_OPTIONS.map((opt) => (
@@ -652,22 +577,14 @@ export default function MLImagesManager() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Color Temperature
-              </label>
+          <div className="form-row">
+            <div className="form-field">
+              <label>Color Temperature</label>
               <select
                 value={formData.color_temp}
                 onChange={(e) =>
                   setFormData({ ...formData, color_temp: e.target.value })
                 }
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select color temp...</option>
                 {COLOR_TEMP_OPTIONS.map((temp) => (
@@ -678,21 +595,13 @@ export default function MLImagesManager() {
               </select>
             </div>
 
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", marginBottom: "0.25rem" }}>
-                Light Intensity
-              </label>
+            <div className="form-field">
+              <label>Light Intensity</label>
               <select
                 value={formData.light_intensity}
                 onChange={(e) =>
                   setFormData({ ...formData, light_intensity: e.target.value })
                 }
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  border: "1px solid #444",
-                }}
               >
                 <option value="">Select intensity...</option>
                 {LIGHT_INTENSITY_OPTIONS.map((intensity) => (
@@ -704,10 +613,8 @@ export default function MLImagesManager() {
             </div>
           </div>
 
-          <div>
-            <label style={{ display: "block", marginBottom: "0.25rem" }}>
-              Locale
-            </label>
+          <div className="form-field">
+            <label>Locale</label>
             <input
               type="text"
               value={formData.locale}
@@ -715,16 +622,10 @@ export default function MLImagesManager() {
                 setFormData({ ...formData, locale: e.target.value })
               }
               placeholder="en"
-              style={{
-                width: "100%",
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #444",
-              }}
             />
           </div>
 
-          <div className="actions" style={{ marginTop: "0.5rem" }}>
+          <div className="actions">
             <button type="submit" disabled={loading}>
               {editingImage ? "Update" : "Create"}
             </button>
@@ -736,126 +637,55 @@ export default function MLImagesManager() {
       )}
 
       {/* ML Images Table */}
-      <div style={{ marginTop: "1rem", overflowX: "auto" }}>
-        {loading && mlimages.length === 0 ? (
-          <p>Loading ML images...</p>
-        ) : mlimages.length === 0 ? (
-          <p>No ML images found. Add one to get started.</p>
-        ) : (
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              background: "#111",
-              borderRadius: "8px",
-            }}
-          >
-            <thead>
-              <tr style={{ borderBottom: "2px solid #2222D6" }}>
-                <th
-                  onClick={() => handleSort("game")}
-                  style={{
-                    padding: "0.75rem",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                >
-                  Game{" "}
-                  {sortField === "game" && (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("piece")}
-                  style={{
-                    padding: "0.75rem",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                >
-                  Piece{" "}
-                  {sortField === "piece" && (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("filename")}
-                  style={{
-                    padding: "0.75rem",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                >
-                  Filename{" "}
-                  {sortField === "filename" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("id")}
-                  style={{
-                    padding: "0.75rem",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                >
-                  ID {sortField === "id" && (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  style={{
-                    padding: "0.75rem",
-                    textAlign: "right",
-                  }}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedImages.map((image) => (
-                <tr key={image.id} style={{ borderBottom: "1px solid #333" }}>
-                  <td style={{ padding: "0.75rem" }}>
-                    {getGameName(image.game_id)}
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    {getPieceName(image.piece_id)}
-                  </td>
-                  <td style={{ padding: "0.75rem", wordBreak: "break-word" }}>
-                    {image.filename}
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>{image.id}</td>
-                  <td style={{ padding: "0.75rem", textAlign: "right" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        justifyContent: "flex-end",
-                      }}
+      {loading && mlimages.length === 0 ? (
+        <p>Loading ML images...</p>
+      ) : mlimages.length === 0 ? (
+        <p>No ML images found. Add one to get started.</p>
+      ) : (
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("game")}>
+                Game {sortField === "game" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => handleSort("piece")}>
+                Piece {sortField === "piece" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => handleSort("filename")}>
+                Filename {sortField === "filename" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th onClick={() => handleSort("id")}>
+                ID {sortField === "id" && (sortDirection === "asc" ? "▲" : "▼")}
+              </th>
+              <th className="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedImages.map((image) => (
+              <tr key={image.id}>
+                <td>{getGameName(image.game_id)}</td>
+                <td>{getPieceName(image.piece_id)}</td>
+                <td>{image.filename}</td>
+                <td>{image.id}</td>
+                <td className="actions">
+                  <div className="action-buttons">
+                    <button onClick={() => handleEdit(image)} disabled={loading}>
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(image.id, image.filename)}
+                      disabled={loading}
+                      className="danger"
                     >
-                      <button
-                        onClick={() => handleEdit(image)}
-                        disabled={loading}
-                        style={{ padding: "0.25rem 0.5rem" }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(image.id, image.filename)}
-                        disabled={loading}
-                        style={{
-                          padding: "0.25rem 0.5rem",
-                          background: "#dc3545",
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </section>
   );
 }
