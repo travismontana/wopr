@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: directus-db-user
+  name: strapi-db-user
   namespace: wopr
 type: kubernetes.io/basic-auth
 stringData:
-  username: directus
+  username: strapi
   password: <generate-something-secure>
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: directus
+  name: strapi
   namespace: wopr
 spec:
   cluster:
     name: wopr-config-db-cluster
-  name: directus
-  owner: directus
+  name: strapi
+  owner: strapi
