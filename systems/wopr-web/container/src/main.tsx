@@ -22,7 +22,7 @@ import "./themes/modern.css";
 import WorkInProgress from "./routes/wip";
 import GamesManager from "./routes/boh/games";
 import MLImagesManager from "./routes/boh/ml/MLImagesManager";
-import PiecesManager from "./routes/boh/pieces/PiecesManager";
+import PiecesManager from "./routes/boh/pieces";
 
 
 const router = createBrowserRouter([
