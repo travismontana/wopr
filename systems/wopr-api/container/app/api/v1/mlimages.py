@@ -228,10 +228,10 @@ async def create_mlimage(image: MLImageCreate):
                 INSERT INTO ml_image_metadatas (
                     document_id, filename, uid,
                     object_rotation, object_position,
-                    color_temp, light_intensity, locale,
+                    color_temp, light_intensity, locale, game, piece,
                     create_time, update_time, created_at, updated_at
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
                 """,
                 (
@@ -243,6 +243,8 @@ async def create_mlimage(image: MLImageCreate):
                     image.color_temp,
                     image.light_intensity,
                     image.locale,
+                    image.game_id,
+                    image.piece_id,
                     now,
                     now,
                     now,
