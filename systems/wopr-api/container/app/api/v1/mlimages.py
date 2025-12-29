@@ -49,6 +49,8 @@ class MLImageCreate(BaseModel):
     color_temp: Optional[str] = Field(None, max_length=255)
     light_intensity: Optional[str] = Field(None, max_length=255)
     locale: Optional[str] = Field(None, max_length=255)
+    game_id: Optional[int] = None
+    piece_id: Optional[int] = None
 
 
 class MLImageUpdate(BaseModel):
