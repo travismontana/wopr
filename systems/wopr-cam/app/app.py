@@ -151,7 +151,7 @@ def capture_ml(req: CaptureRequest):
     cv2.imwrite(filepath, frame)
 
     # Return newline so curl doesn't stick your prompt ("%") on the end
-    return f'{"filename":"{filepath}"}\n'
+    return f'{"filename": {filepath}}\n'
 
 
 @app.get("/status")
