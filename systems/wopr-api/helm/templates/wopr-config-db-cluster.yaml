@@ -23,5 +23,4 @@ spec:
         passwordSecretRef:
           name: wopr-db-credentials
           key: password
-        options:
-          - CREATEDB
+        createdb: true
