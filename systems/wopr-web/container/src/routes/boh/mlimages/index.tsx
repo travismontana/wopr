@@ -85,10 +85,10 @@ export default function MLImagesManager() {
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [formData, setFormData] = useState<MLImageFormData>({
-    object_rotation: "",
-    object_position: "",
-    color_temp: "",
-    light_intensity: "",
+    object_rotation: "0",
+    object_position: "random",
+    color_temp: "neutral",
+    light_intensity: "70",
     game_id: "",
     piece_id: "",
     locale: "en",
@@ -167,9 +167,7 @@ export default function MLImagesManager() {
           : undefined,
         object_position: formData.object_position.trim() || undefined,
         color_temp: formData.color_temp.trim() || undefined,
-        light_intensity: formData.light_intensity
-          ? parseInt(formData.light_intensity)
-          : undefined,
+        light_intensity: formData.light_intensity.trim() || undefined,
         game_id: parseInt(formData.game_id),
         piece_id: parseInt(formData.piece_id),
         locale: formData.locale.trim() || undefined,
@@ -301,10 +299,10 @@ export default function MLImagesManager() {
     setShowForm(false);
     setEditingImage(null);
     setFormData({
-      object_rotation: "",
-      object_position: "",
-      color_temp: "",
-      light_intensity: "",
+      object_rotation: "0",
+      object_position: "random",
+      color_temp: "neutral",
+      light_intensity: "70",
       game_id: "",
       piece_id: "",
       locale: "en",
