@@ -53,11 +53,9 @@ const router = createBrowserRouter([
             children: [],
           },
           {
-            path: "ml",
-            element: <WorkInProgress />,
-            children: [
-              { path: "images", element: <MLImagesManager /> },
-            ],
+            path: "mlimages",
+            element: <MLImagesManager />,
+            children: [],
           },
           {
             path: "cameras",
