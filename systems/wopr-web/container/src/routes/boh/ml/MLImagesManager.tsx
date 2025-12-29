@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./css/theme.css";
 
 const API_URL =
   (window as any).ENV?.WOPR_API_URL ||
