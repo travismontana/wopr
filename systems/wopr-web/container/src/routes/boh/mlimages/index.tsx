@@ -161,10 +161,6 @@ export default function MLImagesManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             captureType: "ml_capture",
-            game_id: gameId.trim(),
-            subject: subject.trim(),
-            subject_name: subjectName.trim(),
-            sequence: Number(sequence),
             filename: filename.trim(),
             }),
     });
