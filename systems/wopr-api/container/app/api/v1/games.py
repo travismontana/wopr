@@ -20,8 +20,9 @@ from pydantic import BaseModel, Field
 import psycopg
 from psycopg.rows import dict_row
 
-logger = woprlogging.setup_logging(woprvar.APP_NAME)
-
+logger = logging.getLogger(woprvar.APP_NAME)
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 router = APIRouter()
 
 # Database connection - adjust to match your actual connection string
