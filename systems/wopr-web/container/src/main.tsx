@@ -21,7 +21,7 @@ import ConfigEditPage from "./routes/boh/config/control";
 import "./themes/modern.css";
 import WorkInProgress from "./routes/wip";
 import GamesManager from "./routes/boh/games/index";
-import MLImagesManager from "./routes/boh/ml/index";
+import MLImagesManager from "./routes/boh/mlimages/index";
 import PiecesManager from "./routes/boh/pieces/index";
 
 
