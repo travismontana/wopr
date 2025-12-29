@@ -20,6 +20,6 @@ spec:
     roles:
       - name: wopr-db-user
         ensure: present
-        passwordSecretRef:
+        passwordSecret:
           name: wopr-db-user-credentials
         createdb: true

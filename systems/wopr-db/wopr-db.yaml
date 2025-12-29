@@ -16,5 +16,5 @@ metadata:
 spec:
   cluster:
     name: wopr-config-db-cluster
-  name: wopr-db-user
+  name: wopr-db
   owner: wopr-db-user
