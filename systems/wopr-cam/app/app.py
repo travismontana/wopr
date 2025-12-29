@@ -51,6 +51,7 @@ class CaptureRequest(BaseModel):
     subject: Subject = Field(..., description="Capture subject")
     subject_name: str = Field(..., min_length=1, description="Subject name")
     sequence: int = Field(..., ge=1, description="Sequence number >= 1")
+    filename: Optional[str] = Field(None, description="Optional filename override")
 
 
 @app.exception_handler(ValueError)
@@ -81,7 +82,10 @@ async def unhandled_exception_handler(request, exc: Exception):
 @app.post("/capture", response_class=PlainTextResponse)
 def capture(req: CaptureRequest):
     # Generate filepath from config (may raise ValueError; handled above)
-    filepath = imagefilename(req.game_id, req.subject.value)
+    if req.filename:
+        filepath = "/remote/wopr/ml/incoming/" + Path(req.filename).name
+    else:
+        filepath = imagefilename(req.game_id, req.subject.value)
 
     resolution = get_str("camera.default_resolution")
     logger.info(f"Res: {resolution}")

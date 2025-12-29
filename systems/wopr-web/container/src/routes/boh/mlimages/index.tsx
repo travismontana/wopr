@@ -155,6 +155,25 @@ export default function MLImagesManager() {
     }
   }
 
+  async function takePic() {
+    const res = await fetch(`${API_URL}/api/v1/cameras/capture`, {
+      method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            captureType: "ml_capture",
+            game_id: gameId.trim(),
+            subject: subject.trim(),
+            subject_name: subjectName.trim(),
+            sequence: Number(sequence),
+            filename: filename.trim(),
+            }),
+    });
+    if (!res.ok) {
+      throw new Error(`Camera capture failed: HTTP ${res.status}`);
+    }
+    return await res.json();
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);

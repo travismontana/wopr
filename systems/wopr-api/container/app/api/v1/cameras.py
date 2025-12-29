@@ -32,6 +32,7 @@ class CaptureRequest(BaseModel):
     subject: str
     subject_name: str
     sequence: int
+    filename: str
 
 @router.get("")
 async def listall():
@@ -58,7 +59,8 @@ async def capture_image(request: CaptureRequest):
     subject = request.subject
     subject_name = request.subject_name
     sequence = request.sequence
-    logger.debug(f"Capturing image for game {game_id}, subject {subject}, subject_name {subject_name}, sequence {sequence}")
+    filename = request.filename
+    logger.debug(f"Capturing image for game {game_id}, subject {subject}, subject_name {subject_name}, sequence {sequence}, filename {filename}")
     """Capture image from camera (stub)"""
 
     if captureType == "ml_capture":
@@ -74,7 +76,8 @@ async def capture_image(request: CaptureRequest):
                     "game_id": str(game_id) if game_id else None,
                     "subject": str(subject) if subject else None,
                     "subject_name": str(subject_name) if subject_name else None,
-                    "sequence": int(sequence) if sequence else None
+                    "sequence": int(sequence) if sequence else None,
+                    "filename": str(filename) if filename else None,
                 }
             )
             response.raise_for_status()
