@@ -44,7 +44,7 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 3
         {{- end}}
-        {{- if ne .Values.readinessProbe.enabled }}
+        {{- if ne .Values.readinessProbe.enabled false }}
         readinessProbe:
           tcpSocket:
             port: {{ .Values.service.port }}
