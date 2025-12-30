@@ -72,7 +72,7 @@ const router = createBrowserRouter([
             element: <ImagesPage />,
             children: [
               { path: "view", element: <ImageGallery gameId="dune_imperium_uprising" /> },
-              { path: "gallery", element: <ImageGalleryProps gameId="dune_imperium_uprising" /> },
+              { path: "gallery", element: <ImageGalleryProps gameId="1" /> },
               { path: "edit", element: <WorkInProgress /> },
               { path: "other", element: <WorkInProgress /> },
             ],
