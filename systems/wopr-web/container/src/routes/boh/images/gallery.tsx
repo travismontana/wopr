@@ -35,9 +35,6 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
     async function loadImages() {
         setLoading(true);
         setError(null);
-        const url = pieceId 
-          ? `/api/v1/mlimages?game_id=${gameId}&piece_id=${pieceId}&limit=1000`
-          : `/api/v1/mlimages?game_id=${gameId}&limit=1000`;
         
         try {
             // Fetch from wopr-api mlimages endpoint filtered by game_id
