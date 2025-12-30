@@ -1,5 +1,6 @@
 apiVersion: v2
 name: wopr-directus
+namespace: wopr
 version: 1.0.0
 description: WOPR Directus UI
 dependencies:
