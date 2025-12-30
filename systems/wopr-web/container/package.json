@@ -19,6 +19,6 @@
     "@types/react": "^19.2.7",
     "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.0",
-    "@types/react-image-gallery": "^1.2.4"   // <-- ADD THIS LINE
+    "@types/react-image-gallery": "^1.2.4" 
   }
 }
