@@ -68,7 +68,10 @@ wopr-baseapp:
           name: wopr-config-db-cluster-app
           key: port
     - name: DB_DATABASE
-      value: wopr-db
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_METADATA_DB
     - name: DB_USER
       valueFrom:
         secretKeyRef:
