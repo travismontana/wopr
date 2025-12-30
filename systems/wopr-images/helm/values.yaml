@@ -42,7 +42,7 @@ service:
 
 ingress:
   enabled: true
-  className: traefik
+  className: studio-traefik
   host: thumbor.studio.abode.tailandtraillabs.org
   tls:
     enabled: true
