@@ -16,7 +16,11 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
+    const [isFullSize, setIsFullSize] = useState(false);
+    const handleThumbnailClick = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+        setIsFullSize(false); // Start at fit-to-window
+    };
     useEffect(() => {
         loadImages();
     }, [gameId]);
@@ -95,17 +99,28 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
             </div>
 
             {selectedImage && (
-                <div 
-                    className="lightbox"
-                    onClick={() => setSelectedImage(null)}
+                <div className="lightbox"
+                    onClick={() => {
+                        setSelectedImage(null);
+                        setIsFullSize(false);
+                    }}
                 >
-                    <div className="lightbox-content">
-                        <img src={selectedImage} alt="Full size" />
+                    <div 
+                        className={`lightbox-content ${isFullSize ? 'full-size' : 'fit-window'}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <img 
+                            src={selectedImage} 
+                            alt="Full size"
+                            onClick={() => setIsFullSize(!isFullSize)}
+                            style={{ cursor: isFullSize ? 'zoom-out' : 'zoom-in' }}
+                        />
                         <button 
                             className="close-btn"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedImage(null);
+                                setIsFullSize(false);
                             }}
                         >
                             ✕
