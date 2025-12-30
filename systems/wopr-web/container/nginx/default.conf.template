@@ -89,7 +89,7 @@ server {
 
   location ^~ /wopr/ {
     alias /remote/wopr/;
-
+    absolute_redirect off;
     location ~ /$ {
       autoindex on;
       autoindex_format json;     # <-- key: JSON listing
