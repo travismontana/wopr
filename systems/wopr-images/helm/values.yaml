@@ -1,15 +1,77 @@
-thumbor:
-  ingress:
-    enabled: true
-    className: "studio-traefik"
-    annotations:
-      cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    hosts:
-      - host: wopr-images.studio.abode.tailandtraillabs.org
-        paths:
-          - path: /
-            pathType: Prefix
-    tls:
-      - secretName: wopr-images-tls
-        hosts:
-          - wopr-images.studio.abode.tailandtraillabs.org
+replicaCount: 1
+
+image:
+  repository: minimalcompact/thumbor
+  pullPolicy: IfNotPresent
+  tag: "7.7.5"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8888
+
+ingress:
+  enabled: true
+  className: "studio-traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: thumbor.studio.abode.tailandtraillabs.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: thumbor-tls
+      hosts:
+        - thumbor.studio.abode.tailandtraillabs.org
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+# Thumbor configuration
+env:
+  - name: THUMBOR_PORT
+    value: "8888"
+  - name: THUMBOR_NUM_PROCESSES
+    value: "4"
+  - name: SECURITY_KEY
+    value: "changeme-in-production"
+  - name: ALLOW_UNSAFE_URL
+    value: "True"
+  - name: FILE_LOADER_ROOT_PATH
+    value: "/data/images"
+  - name: RESULT_STORAGE_FILE_STORAGE_ROOT_PATH
+    value: "/data/result_storage"
+  - name: STORAGE_FILE_STORAGE_ROOT_PATH
+    value: "/data/storage"
+
+# NFS volume configuration
+nfs:
+  enabled: true
+  server: danas.hangar.bpfx.org
+  path: /volume2/wopr
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
