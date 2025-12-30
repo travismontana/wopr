@@ -22,30 +22,32 @@ spec:
       - name: thumbor
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # CHANGE: Override broken entrypoint, call thumbor directly
+        command: ["/usr/local/bin/thumbor"]
+        args:
+          - "--port={{ .Values.thumbor.port }}"
+          - "--conf=/etc/thumbor/thumbor.conf"
+          - "--processes={{ .Values.thumbor.numProcesses }}"
         ports:
         - name: http
           containerPort: {{ .Values.thumbor.port }}
           protocol: TCP
         env:
-        - name: HEALTHCHECK_ROUTE
-          value: "/"
         - name: THUMBOR_PORT
           value: {{ .Values.thumbor.port | quote }}
         - name: THUMBOR_NUM_PROCESSES
           value: {{ .Values.thumbor.numProcesses | quote }}
-        - name: MAX_AGE
-          value: {{ .Values.thumbor.maxAge | quote }}
-        - name: MAX_AGE_TEMP_IMAGE
-          value: {{ .Values.thumbor.maxAgeTempImage | quote }}
-        - name: RESULT_STORAGE_EXPIRATION_SECONDS
-          value: {{ .Values.thumbor.resultStorageExpiration | quote }}
-        - name: ALLOW_UNSAFE_URL
-          value: {{ .Values.thumbor.allowUnsafeUrl | quote }}
-        - name: AUTO_WEBP
-          value: {{ .Values.thumbor.autoWebp | quote }}
         volumeMounts:
+        # CHANGE: NFS for source images
         - name: nfs-images
           mountPath: {{ .Values.nfs.mountPath }}
+        # ADD: ConfigMap with thumbor.conf
+        - name: config
+          mountPath: /etc/thumbor
+          readOnly: true
+        # ADD: Writable scratch space for cache/storage
+        - name: tmp
+          mountPath: /tmp
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -53,4 +55,11 @@ spec:
         nfs:
           server: {{ .Values.nfs.server }}
           path: {{ .Values.nfs.path }}
+      # ADD: Config volume
+      - name: config
+        configMap:
+          name: {{ include "thumbor.fullname" . }}-config
+      # ADD: emptyDir for writable space (old school /tmp)
+      - name: tmp
+        emptyDir: {}
       restartPolicy: Always
