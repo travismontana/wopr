@@ -15,7 +15,7 @@ ingress:
   className: "studio-traefik"
   annotations: {}
   hosts:
-    - host: wopr-images.studio.abode.tailandtraillabs.org
+    - host: images.studio.abode.tailandtraillabs.org
       paths:
         - path: /
           pathType: Prefix
@@ -23,7 +23,7 @@ ingress:
     enabled: true
     secretName: wopr-images-tls
     hosts:
-      - wopr-images.studio.abode.tailandtraillabs.org
+      - images.studio.abode.tailandtraillabs.org
 
 # NFS mount configuration
 nfs:
