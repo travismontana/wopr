@@ -4,5 +4,5 @@ version: 1.0.0
 description: WOPR Directus UI
 dependencies:
   - name: wopr-baseapp
-    version: 1.0.3
+    version: 1.0.4
     repository: "oci://ghcr.io/travismontana/wopr/charts"
