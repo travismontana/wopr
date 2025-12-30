@@ -9,6 +9,7 @@ export default function ImagesPage() {
       <nav className="secondary-nav" aria-label="Imagess">
         <ul>
           <li><NavLink to="view">View</NavLink></li>
+          <li><NavLink to="gallery">Gallery</NavLink></li>
           <li><NavLink to="edit">Edit</NavLink></li>
           <li><NavLink to="other">Other</NavLink></li>
         </ul>

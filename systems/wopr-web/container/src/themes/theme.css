@@ -367,3 +367,48 @@ select:focus {
 .close-btn:hover {
     background: rgba(0, 0, 0, 0.8);
 }
+
+/* In your theme.css or component CSS */
+.image-gallery-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.gallery-header h2 {
+    margin: 0;
+    font-family: var(--font-mono, monospace);
+}
+
+.image-count {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Match WOPR aesthetic */
+.image-gallery {
+    background-color: var(--bg-primary, #000);
+}
+
+.image-gallery-slide {
+    background-color: #000;
+}
+
+.image-gallery-thumbnail {
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.image-gallery-thumbnail.active,
+.image-gallery-thumbnail:hover {
+    border-color: var(--accent-color, #0f0);
+}

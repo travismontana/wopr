@@ -16,6 +16,7 @@ import ImageGallery from "./routes/boh/images/view";
 import ImagesPage from "./routes/boh/images/index";
 import ConfigPage from "./routes/boh/config/index";
 import ConfigEditPage from "./routes/boh/config/control";
+import ImageGalleryProps from "./routes/boh/images/gallery";
 
 // Theme
 import "./themes/modern.css";
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
             element: <ImagesPage />,
             children: [
               { path: "view", element: <ImageGallery gameId="dune_imperium_uprising" /> },
+              { path: "gallery", element: <ImageGalleryProps gameId="dune_imperium_uprising" /> },
               { path: "edit", element: <WorkInProgress /> },
               { path: "other", element: <WorkInProgress /> },
             ],
