@@ -14,6 +14,7 @@ ingress:
   enabled: true
   className: "studio-traefik"
   annotations: {}
+  host: images.studio.abode.tailandtraillabs.org
   hosts:
     - host: images.studio.abode.tailandtraillabs.org
       paths:
@@ -24,6 +25,11 @@ ingress:
     secretName: wopr-images-tls
     hosts:
       - images.studio.abode.tailandtraillabs.org
+    tls:
+    enabled: true
+    secretName: thumbor-tls
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 
 # NFS mount configuration
 nfs:
