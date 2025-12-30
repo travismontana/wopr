@@ -1,14 +1,6 @@
 apiVersion: v2
-name: thumbor
-description: Thumbor image processing service for WOPR
+name: wopr-images
+description: Thumbor image processing service
 type: application
 version: 0.1.0
-appVersion: "7.7.5"
-keywords:
-  - wopr
-  - thumbor
-  - image
-  - processing
-maintainers:
-  - name: Bob Bomar
-    email: bob@bomar.us
+appVersion: "latest"

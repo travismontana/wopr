@@ -2,77 +2,40 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/minimalcompact/thumbor
+  tag: latest
   pullPolicy: IfNotPresent
-  tag: "latest"
-  #tag: "7.7.5"
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+securityContext:
+  runAsUser: 2222
+  runAsGroup: 2222
+  fsGroup: 2222
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
+nfs:
+  server: danas.hangar.bpfx.org
+  path: /volume2/wopr
+  mountPath: /data
+
+thumbor:
+  port: 80
+  numProcesses: 2
+  maxAge: 3600
+  maxAgeTempImage: 300
+  resultStorageExpiration: 31536000
+  allowUnsafeUrl: true
+  autoWebp: true
 
 service:
   type: ClusterIP
-  port: 8888
+  port: 80
 
 ingress:
   enabled: true
-  className: "studio-traefik"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: thumbor.studio.abode.tailandtraillabs.org
-      paths:
-        - path: /
-          pathType: Prefix
+  className: studio-traefik
+  host: thumbor.studio.abode.tailandtraillabs.org
   tls:
-    - secretName: thumbor-tls
-      hosts:
-        - thumbor.studio.abode.tailandtraillabs.org
+    enabled: true
+    secretName: thumbor-tls
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 250m
-    memory: 256Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
-
-# Thumbor configuration
-env:
-  - name: THUMBOR_PORT
-    value: "8888"
-  - name: THUMBOR_NUM_PROCESSES
-    value: "4"
-  - name: SECURITY_KEY
-    value: "changeme-in-production"
-  - name: ALLOW_UNSAFE_URL
-    value: "True"
-  - name: FILE_LOADER_ROOT_PATH
-    value: "/data/images"
-  - name: RESULT_STORAGE_FILE_STORAGE_ROOT_PATH
-    value: "/data/result_storage"
-  - name: STORAGE_FILE_STORAGE_ROOT_PATH
-    value: "/data/storage"
-
-# NFS volume configuration
-nfs:
-  enabled: true
-  server: danas.hangar.bpfx.org
-  path: /volume2/wopr
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+resources: {}

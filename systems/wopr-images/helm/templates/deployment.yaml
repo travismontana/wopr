@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "thumbor.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "thumbor.selectorLabels" . | nindent 6 }}
@@ -16,75 +14,43 @@ spec:
       labels:
         {{- include "thumbor.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "thumbor.serviceAccountName" . }}
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 2222
-        runAsGroup: 2222
-        fsGroup: 2222
-      initContainers:
-      - name: fix-permissions
-        image: busybox
-        command: ['sh', '-c', 'chmod -R g+w /app && chown -R 2222:2222 /app']
-        volumeMounts:
-        - name: app-data
-          mountPath: /app        
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
       containers:
-      - name: {{ include "thumbor.fullname" . }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      - name: thumbor
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: 8888
+          containerPort: {{ .Values.thumbor.port }}
           protocol: TCP
         env:
-        {{- with .Values.env }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
+        - name: HEALTHCHECK_ROUTE
+          value: "/"
+        - name: THUMBOR_PORT
+          value: {{ .Values.thumbor.port | quote }}
+        - name: THUMBOR_NUM_PROCESSES
+          value: {{ .Values.thumbor.numProcesses | quote }}
+        - name: MAX_AGE
+          value: {{ .Values.thumbor.maxAge | quote }}
+        - name: MAX_AGE_TEMP_IMAGE
+          value: {{ .Values.thumbor.maxAgeTempImage | quote }}
+        - name: RESULT_STORAGE_EXPIRATION_SECONDS
+          value: {{ .Values.thumbor.resultStorageExpiration | quote }}
+        - name: ALLOW_UNSAFE_URL
+          value: {{ .Values.thumbor.allowUnsafeUrl | quote }}
+        - name: AUTO_WEBP
+          value: {{ .Values.thumbor.autoWebp | quote }}
         volumeMounts:
-        - name: wopr-data
-          mountPath: /data
+        - name: nfs-images
+          mountPath: {{ .Values.nfs.mountPath }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-      {{- if .Values.nfs.enabled }}
-      - name: wopr-data
+      - name: nfs-images
         nfs:
           server: {{ .Values.nfs.server }}
           path: {{ .Values.nfs.path }}
-      {{- else }}
-      - name: wopr-data
-        emptyDir: {}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      restartPolicy: Always
