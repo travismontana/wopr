@@ -75,3 +75,10 @@ wopr-baseapp:
         secretKeyRef:
           name: wopr-db-user-credentials
           key: password
+    - name: SECRET
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: password
+    - name: PUBLIC_URL
+      value: https://directus.studio.abode.tailandtraillabs.org
