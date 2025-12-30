@@ -1,0 +1,60 @@
+# Minimal - just structure, ApplicationSet provides real values
+# Required
+app:
+  name: "wopr-baseapp"
+
+#Required
+image:
+  registry: ghcr.io
+  repository: "travismontana/wopr/wopr-api"
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Optional
+# service:
+#   type: ClusterIP
+#   port: 8989
+
+#pvc:
+#  storageClass: ""
+#  size: 1Gi
+#  accessMode: ReadWriteOnce
+
+#volumes:
+#  nfs:
+#    server: "a"
+#    path: "/a"
+#  mountPath: /media
+
+#env:
+#  TZ: "America/Chicago"
+#  PUID: "1000"
+#  PGID: "1000"
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+ingress:
+  enabled: false
+  className: "studio-traefik"
+  annotations: {}
+  hosts: 
+    - host: chart-example.local
+      paths: 
+        - path: /
+          pathType: Prefix 
+  tls:
+    - secretName: chart-example-tls
+      hosts:
+        - chart-example.local
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+

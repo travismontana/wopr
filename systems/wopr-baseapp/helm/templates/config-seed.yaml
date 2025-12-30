@@ -1,0 +1,48 @@
+{{- if .Values.ConfigMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "arr-app.fullname" . }}-config-seed
+  labels:
+    {{- include "arr-app.labels" . | nindent 4 }}
+data:
+  seed-config.sh: |
+    #!/bin/sh
+    set -e
+    
+    CONFIG_FILE="/config/config.xml"
+    
+    # Only seed if config.xml doesn't exist (first run)
+    if [ ! -f "$CONFIG_FILE" ]; then
+      echo "Seeding initial config.xml with authentication..."
+      
+      # Generate password hash (SHA256)
+      PASSWORD_HASH=$(echo -n "{{ .Values.appAuth.password }}" | sha256sum | awk '{print $1}')
+      
+      # Create base config.xml with auth
+      cat > "$CONFIG_FILE" << 'EOF'
+    <Config>
+      <LogLevel>info</LogLevel>
+      <Port>{{ .Values.service.port }}</Port>
+      <BindAddress>*</BindAddress>
+      <UrlBase></UrlBase>
+      <AuthenticationMethod>{{ .Values.appAuth.method }}</AuthenticationMethod>
+      <AuthenticationRequired>Enabled</AuthenticationRequired>
+      <Username>{{ .Values.appAuth.username }}</Username>
+      <Password>${PASSWORD_HASH}</Password>
+      {{- if .Values.appAuth.apiKey }}
+      <ApiKey>{{ .Values.appAuth.apiKey }}</ApiKey>
+      {{- end }}
+      <Branch>main</Branch>
+      <UpdateMechanism>Docker</UpdateMechanism>
+    </Config>
+    EOF
+      
+      # Replace the password hash placeholder
+      sed -i "s/\${PASSWORD_HASH}/$PASSWORD_HASH/g" "$CONFIG_FILE"
+      
+      echo "Config seeded successfully"
+    else
+      echo "Config already exists, skipping seed"
+    fi
+{{- end }}

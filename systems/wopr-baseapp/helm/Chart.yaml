@@ -1,0 +1,6 @@
+apiVersion: v2
+name: arr-app
+description: A Helm chart for *arr applications (sonarr, radarr, bazarr, lidarr)
+type: application
+version: 1.0.0
+appVersion: "latest"

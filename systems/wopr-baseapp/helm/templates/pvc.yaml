@@ -1,0 +1,20 @@
+{{- if .Values.pvc }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pvc.name }}
+  labels:
+    {{- include "wopr-baseapp.labels" . | nindent 4 }}
+    {{- if .Values.pvc.extraLabels }}
+    {{- toYaml .Values.pvc.extraLabels | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+  - {{ .Values.pvc.accessMode }}
+  {{- if .Values.pvc.storageClass }}
+  storageClassName: {{ .Values.pvc.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.pvc.size }}
+{{- end }}
