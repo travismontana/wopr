@@ -16,14 +16,13 @@ interface MLImageMetadata {
 }
 
 interface ImageGalleryProps {
-    gameId: string;  // Can be game name or ID
-    pieceId?: number; // Optional piece filter
+    gameId: string;
 }
 
 // Base URL for image server
-const IMAGE_BASE_URL = 'https://wopr-images.studio.abode.tailandtraillabs.org/ml';
+const IMAGE_BASE_URL = 'https://wopr-images.studio.abode.tailandtraillabs.org/wopr/ml';
 
-export default function ImageGallery({ gameId }: ImageGalleryProps) {
+export function ImageGallery({ gameId }: ImageGalleryProps) {
     const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,7 +37,7 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
         
         try {
             // Fetch from wopr-api mlimages endpoint filtered by game_id
-            const res = await fetch(url);
+            const res = await fetch(`/api/v1/mlimages?game_id=${gameId}&limit=1000`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
             const data: MLImageMetadata[] = await res.json();
@@ -47,21 +46,27 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
             const galleryImages = data
                 .filter(img => img.filename) // Skip any without filename
                 .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Newest first
-                .map(img => ({
-                    original: `${IMAGE_BASE_URL}/${gameId}/${img.filename}`,
-                    thumbnail: `${IMAGE_BASE_URL}/thumbnails/${gameId}/thumbnail-${img.filename}`,
-                    description: img.filename,
-                    originalTitle: `${img.filename} (${img.object_rotation || 0}° rotation)`,
-                    // Store metadata for potential use
-                    metadata: {
-                        id: img.id,
-                        piece_id: img.piece_id,
-                        rotation: img.object_rotation,
-                        position: img.object_position,
-                        color_temp: img.color_temp,
-                        light_intensity: img.light_intensity
-                    }
-                }));
+                .map(img => {
+                    const original = `${IMAGE_BASE_URL}/${gameId}/${img.filename}`;
+                    const thumbnail = `${IMAGE_BASE_URL}/thumbnails/${gameId}/thumbnail-${img.filename}`;
+                    
+                    return {
+                        original: original,
+                        thumbnail: thumbnail,
+                        description: img.filename,
+                        originalTitle: `${img.filename} (${img.object_rotation || 0}° rotation)`,
+                        // Custom thumbnail with fallback
+                        renderThumbInner: () => (
+                            <img
+                                src={thumbnail}
+                                alt={img.filename}
+                                onError={(e) => {
+                                    e.currentTarget.src = original;
+                                }}
+                            />
+                        )
+                    };
+                });
             
             setImages(galleryImages);
         } catch (e: any) {
@@ -100,7 +105,6 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
                 showIndex={true}
                 showBullets={false}
                 infinite={true}
-                onErrorImageURL="/placeholder-image.jpg" // Optional fallback
             />
         </div>
     );
