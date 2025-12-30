@@ -1,0 +1,27 @@
+wopr-baseapp:
+  app:
+    name: wopr-directus
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: directus/directus
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8055
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: directus.studio.abode.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: directus-tls
+        hosts:
+          - directus.studio.abode.tailandtraillabs.org
+  

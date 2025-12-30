@@ -1,6 +1,6 @@
 apiVersion: v2
-name: arr-app
-description: A Helm chart for *arr applications (sonarr, radarr, bazarr, lidarr)
+name: wopr-baseapp
+description: A base helm chart for wopr
 type: application
-version: 1.0.0
+version: 1.0.1
 appVersion: "latest"
