@@ -1,9 +1,8 @@
 apiVersion: v2
 name: wopr-directus
-namespace: wopr
 version: 1.0.0
 description: WOPR Directus UI
 dependencies:
   - name: wopr-baseapp
-    version: 1.0.6
+    version: 1.0.8
     repository: "oci://ghcr.io/travismontana/wopr/charts"

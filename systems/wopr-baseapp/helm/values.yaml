@@ -70,4 +70,42 @@ readinessProbe:
   periodSeconds: 5
   timeoutSeconds: 3
   failureThreshold: 3
-
+# secrets:
+#   # Basic auth (stringData)
+# - name: wopr-db-credentials
+#    enabled: true
+#    type: kubernetes.io/basic-auth
+#    username: dbuser
+#      password: supersecret
+#
+#   # TLS cert (data - base64 encoded)
+#   - name: wopr-tls
+#     enabled: true
+#     type: kubernetes.io/tls
+#     data:
+#       tls.crt: LS0tLS1CRUdJTi...  # base64 cert
+#       tls.key: LS0tLS1CRUdJTi...  # base64 key
+#
+#   # Docker registry (data)
+#   - name: registry-creds
+#     enabled: true
+#     type: kubernetes.io/dockerconfigjson
+#     data:
+#       .dockerconfigjson: eyJhdXRocyI6e...  # base64 config
+#
+#   # SSH key (data)
+#   - name: git-ssh-key
+#     enabled: true
+#     type: kubernetes.io/ssh-auth
+#     data:
+#       ssh-privatekey: LS0tLS1CRUdJTi...  # base64 key
+#
+#   # Generic opaque (mix both if you want)
+#   - name: app-config
+#     enabled: true
+#     type: Opaque
+#     stringData:
+#       config.yaml: |
+#         some: config
+#     data:
+#       binary-blob: U29tZSBiaW5hcnk=

@@ -1,4 +1,6 @@
-# Default values for wpor-web
+wopr-config:
+  WOPR_VERSION: "v0.1.4-alpha"
+  WOPR_METADATA_DB: "wopr-db"
 
 replicaCount: 1
 

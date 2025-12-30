@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wopr-config
+  labels:
+    {{- include "wopr-api.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config
+data:
+  {{- with .Values.wopr-config }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

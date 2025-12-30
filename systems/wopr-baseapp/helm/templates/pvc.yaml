@@ -1,20 +1,25 @@
-{{- if .Values.pvc }}
+{{- /* CHANGED: Loop over array instead of single object */ -}}
+{{- range .Values.pvc }}
+{{- /* CHANGED: Check if this specific PVC is enabled */ -}}
+{{- if .enabled }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.pvc.name }}
+  name: {{ .name }}  {{- /* CHANGED: .name is now on the item, not .Values.pvc.name */ -}}
   labels:
-    {{- include "wopr-baseapp.labels" . | nindent 4 }}
-    {{- if .Values.pvc.extraLabels }}
-    {{- toYaml .Values.pvc.extraLabels | nindent 4 }}
+    {{- include "wopr-baseapp.labels" $ | nindent 4 }}  {{- /* CHANGED: Use $ for root context in range */ -}}
+    {{- if .extraLabels }}  {{- /* CHANGED: .extraLabels now on item */ -}}
+    {{- toYaml .extraLabels | nindent 4 }}
     {{- end }}
 spec:
-  accessModes:
-  - {{ .Values.pvc.accessMode }}
-  {{- if .Values.pvc.storageClass }}
-  storageClassName: {{ .Values.pvc.storageClass }}
+  accessModes:  {{- /* CHANGED: Now plural and expects array */ -}}
+  {{- toYaml .accessModes | nindent 2 }}
+  {{- if .storageClass }}  {{- /* CHANGED: .storageClass now on item */ -}}
+  storageClassName: {{ .storageClass }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.pvc.size }}
+      storage: {{ .size }}  {{- /* CHANGED: .size now on item */ -}}
+{{- end }}
 {{- end }}
