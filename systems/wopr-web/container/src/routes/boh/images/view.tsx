@@ -79,7 +79,7 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
                         <div 
                             key={filename}
                             className="thumbnail-item"
-                            onClick={() => setSelectedImage(rawUrl)}
+                            onClick={() => handleThumbnailClick(rawUrl)}
                         >
                             <img 
                                 src={thumbUrl}
