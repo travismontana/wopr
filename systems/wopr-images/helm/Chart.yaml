@@ -1,6 +1,7 @@
+# Chart.yaml
 apiVersion: v2
-name: wopr-images
-description: Thumbor image processing service
+name: wopr-nginx
+description: Nginx server for WOPR static content
 type: application
 version: 0.1.0
-appVersion: "latest"
+appVersion: "1.25"

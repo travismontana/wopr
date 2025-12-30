@@ -1,65 +1,60 @@
+# templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "thumbor.fullname" . }}
+  name: {{ include "wopr-nginx.fullname" . }}
   labels:
-    {{- include "thumbor.labels" . | nindent 4 }}
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "thumbor.selectorLabels" . | nindent 6 }}
+      {{- include "wopr-nginx.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
-        {{- include "thumbor.selectorLabels" . | nindent 8 }}
+        {{- include "wopr-nginx.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsUser: {{ .Values.securityContext.runAsUser }}
         runAsGroup: {{ .Values.securityContext.runAsGroup }}
         fsGroup: {{ .Values.securityContext.fsGroup }}
+        runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
       containers:
-      - name: thumbor
+      - name: nginx
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # CHANGE: Override broken entrypoint, call thumbor directly
-        command: ["/usr/local/bin/thumbor"]
-        args:
-          - "--port={{ .Values.thumbor.port }}"
-          - "--conf=/etc/thumbor/thumbor.conf"
-          - "--processes={{ .Values.thumbor.numProcesses }}"
         ports:
         - name: http
-          containerPort: {{ .Values.thumbor.port }}
+          containerPort: 8080
           protocol: TCP
-        env:
-        - name: THUMBOR_PORT
-          value: {{ .Values.thumbor.port | quote }}
-        - name: THUMBOR_NUM_PROCESSES
-          value: {{ .Values.thumbor.numProcesses | quote }}
         volumeMounts:
-        # CHANGE: NFS for source images
-        - name: nfs-images
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: nfs-volume
           mountPath: {{ .Values.nfs.mountPath }}
-        # ADD: ConfigMap with thumbor.conf
-        - name: config
-          mountPath: /etc/thumbor
           readOnly: true
-        # ADD: Writable scratch space for cache/storage
         - name: tmp
           mountPath: /tmp
+        - name: cache
+          mountPath: /var/cache/nginx
+        - name: run
+          mountPath: /var/run
         resources:
-          {{- toYaml .Values.resources | nindent 12 }}
+          {{- toYaml .Values.resources | nindent 10 }}
       volumes:
-      - name: nfs-images
-        nfs:
-          server: {{ .Values.nfs.server }}
-          path: {{ .Values.nfs.path }}
-      # ADD: Config volume
-      - name: config
+      - name: nginx-config
         configMap:
-          name: {{ include "thumbor.fullname" . }}-config
-      # ADD: emptyDir for writable space (old school /tmp)
+          name: {{ include "wopr-nginx.fullname" . }}-config
+      - name: nfs-volume
+        persistentVolumeClaim:
+          claimName: {{ include "wopr-nginx.fullname" . }}-nfs
       - name: tmp
         emptyDir: {}
-      restartPolicy: Always
+      - name: cache
+        emptyDir: {}
+      - name: run
+        emptyDir: {}

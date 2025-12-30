@@ -1,15 +1,16 @@
+# templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "thumbor.fullname" . }}
+  name: {{ include "wopr-nginx.fullname" . }}
   labels:
-    {{- include "thumbor.labels" . | nindent 4 }}
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+      targetPort: 8080
       protocol: TCP
       name: http
   selector:
-    {{- include "thumbor.selectorLabels" . | nindent 4 }}
+    {{- include "wopr-nginx.selectorLabels" . | nindent 4 }}

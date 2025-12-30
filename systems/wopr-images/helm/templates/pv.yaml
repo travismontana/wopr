@@ -1,0 +1,17 @@
+# templates/persistentvolume.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "wopr-nginx.fullname" . }}-nfs
+  labels:
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    server: {{ .Values.nfs.server }}
+    path: {{ .Values.nfs.path }}

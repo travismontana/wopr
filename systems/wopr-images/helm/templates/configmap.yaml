@@ -1,9 +1,10 @@
+# templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "thumbor.fullname" . }}-config
+  name: {{ include "wopr-nginx.fullname" . }}-config
   labels:
-    {{- include "thumbor.labels" . | nindent 4 }}
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
 data:
-  thumbor.conf: |
-    {{- .Values.thumbor.config | nindent 4 }}
+  nginx.conf: |
+{{ .Values.nginxConfig | indent 4 }}
