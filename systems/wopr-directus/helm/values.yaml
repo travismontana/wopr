@@ -23,7 +23,7 @@ wopr-baseapp:
     tls: 
       - secretName: directus-tls
         hosts:
-          - directus.studio.abode.tailandtraillabs.org
+          - directus.studio.abode.tailandtraillabs.orgs
   pvc:
     - name: directus-uploads
       enabled: true
@@ -47,13 +47,6 @@ wopr-baseapp:
       mountPath: /directus/uploads
     - name: directus-extensions
       mountPath: /directus/extensions
-  secret:
-    - name: wopr-db-user-credentials
-      enabled: true
-      type: kubernetes.io/basic-auth
-      stringData:
-        username: {{ .username }}
-        password: {{ .password }}
   env:
     - name: DB_CLIENT
       value: pg
