@@ -22,7 +22,7 @@ interface ImageGalleryProps {
 // Base URL for image server
 const IMAGE_BASE_URL = 'https://wopr-images.studio.abode.tailandtraillabs.org/wopr/ml';
 
-export function ImageGallery({ gameId }: ImageGalleryProps) {
+export default function ImageGallery({ gameId }: ImageGalleryProps) {
     const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
