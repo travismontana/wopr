@@ -6,6 +6,6 @@ metadata:
     {{- include "wopr-api.labels" . | nindent 4 }}
     app.kubernetes.io/component: config
 data:
-  {{- with .Values.wopr-config }}
+  {{- with .Values.woprConfig }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
