@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: minimalcompact/thumbor
+  repository: ghcr.io/minimalcompact/thumbor
   pullPolicy: IfNotPresent
   tag: "7.7.5"
 
