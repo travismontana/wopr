@@ -31,7 +31,7 @@ wopr-baseapp:
         - ReadWriteOnce
       size: 10Gi
     - name: directus-extensions
-      enabled: false
+      enabled: true
       accessModes:
         - ReadWriteOnce
       size: 5Gi
