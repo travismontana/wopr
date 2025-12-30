@@ -1,0 +1,15 @@
+thumbor:
+  ingress:
+    enabled: true
+    className: "studio-traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: wopr-images.studio.abode.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: wopr-images-tls
+        hosts:
+          - wopr-images.studio.abode.tailandtraillabs.org

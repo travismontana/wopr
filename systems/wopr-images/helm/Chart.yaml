@@ -1,0 +1,20 @@
+apiVersion: v2
+name: wopr-images
+description: WOPR Images
+type: application
+version: 0.1.0
+appVersion: "0.1.3-beta"
+keywords:
+  - wopr
+  - web
+  - react
+  - ui
+  - frontend
+maintainers:
+  - name: Bob Bomar
+    email: bob@bomar.us
+
+dependencies:
+  - name: thumbor
+    version: 0.1.0
+    repository: https://thumbor.github.io/helm
