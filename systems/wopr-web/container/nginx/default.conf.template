@@ -92,13 +92,11 @@ server {
     expires 1h;
   }
 
+
+
   location ^~ /wopr/ {
     alias /remote/wopr/;
 
-    if (-d $request_filename) {
-        # This is a directory, force autoindex
-        rewrite ^ $uri/ permanent;
-    }
     location ~ /$ {
       autoindex on;
       autoindex_format json;     # <-- key: JSON listing
