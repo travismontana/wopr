@@ -19,7 +19,11 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls: 
+    enabled: true
+    secretName: wopr-images-tls
+    hosts:
+      - wopr-images.studio.abode.tailandtraillabs.org
 
 # NFS mount configuration
 nfs:
