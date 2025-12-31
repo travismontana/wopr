@@ -10,6 +10,7 @@ export default function BackOfHouse() {
           <li><NavLink to="/boh/mlimages">Machine Learning Images Manager</NavLink></li> 
           <li><NavLink to="/boh/cameras">Cameras</NavLink></li> 
           <li><NavLink to="/boh/images">Images</NavLink></li> 
+          <li><NavLink to="/boh/homeauto">Home Automation</NavLink></li> 
           <li><NavLink to="/boh/config">Configuration</NavLink></li> 
           <li><NavLink to="/boh/status">Status</NavLink></li> 
         </ul> 
