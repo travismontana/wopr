@@ -82,3 +82,19 @@ podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "4318"
   prometheus.io/path: "/v1/metrics"
+
+sidecarContainers: 
+  - name: nginx-exporter
+    image: nginx/nginx-prometheus-exporter:latest
+    args:
+      - -nginx.scrape-uri=http://localhost:8080/stub_status
+    ports:
+      - name: nginx-metrics
+        containerPort: 9113
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
