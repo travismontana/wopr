@@ -1,5 +1,42 @@
-import time
+"""
+WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025-present Bob <bob@bomar.us>
+# See git log for detailed authorship
+
+Brief description of what this file does.
+"""
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+import httpx
+import asyncio
+from typing import Optional
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ← CREATE ROUTER BEFORE USING IT
+router = APIRouter(prefix="/api/v1/ml", tags=["ml"])
+
+
+class CaptureRequest(BaseModel):
+    game_id: int
+    piece_id: int
+    position_id: int
+    lighting_level: int = Field(ge=10, le=100, description="Brightness 10-100")
+    lighting_temp: str = Field(description="neutral/warm/cool")
+    notes: Optional[str] = None
+
+
+class CaptureResponse(BaseModel):
+    success: bool
+    image_metadata_id: Optional[int] = None
+    message: str
+    lighting_set: bool
+    image_captured: bool
+
+
 
 @router.post("/captureandsetlights", response_model=CaptureResponse)
 async def capture_and_set_lights(request: CaptureRequest):
