@@ -21,5 +21,5 @@ pip3 install --no-cache-dir --user --break-system-packages -r ${WCAM_DIR}/app/re
 #chmod 644 ${WCAM_SERVICE}
 systemctl --user daemon-reload
 systemctl --user enable ${SERVICE_NAME}
-
+systemctl --user restart ${SERVICE_NAME}
 exit 0

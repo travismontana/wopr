@@ -47,9 +47,9 @@ logger = setup_logging("wopr-camera")
 tracer = create_tracer(
     tracer_name=g.APP_NAME,
     tracer_version=g.APP_VERSION,
-    tracer_enabled=get_bool("otel.tracing.enabled", True),
-    tracer_endpoint=get_str("otel.tracing.endpoint", f"{g.APP_OTEL_URL}/v1/traces"),
-    service_namespace=get_str("otel.service_namespace", "wopr"),
+    tracer_enabled=True,
+    tracer_endpoint=g.APP_OTEL_URL+"/v1/traces",
+    service_namespace="wopr",
     deployment_env=get_str("environment", "production"),
 )
 
