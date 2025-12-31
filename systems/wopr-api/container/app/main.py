@@ -47,6 +47,7 @@ from app.api.v1 import health
 from app.api.v1 import games
 from app.api.v1 import pieces
 from app.api.v1 import mlimages
+from app.api.v1 import homeauto
 
 woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 
