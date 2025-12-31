@@ -62,6 +62,14 @@ env:
       configMapKeyRef:
         name: wopr-api-config
         key: API_URL
+  - name: OTEL_TRACES_EXPORTER
+    value: otlp
+  - name: OTEL_METRICS_EXPORTER
+    value: otlp
+  - name: OTEL_EXPORTER_OTLP_PROTOCOL
+    value: http/protobuf
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: https://otel.monitoring.abode.tailandtraillabs.org/v1/traces
 
 labels: 
   app.wopr.io/hasNginx: "true"
