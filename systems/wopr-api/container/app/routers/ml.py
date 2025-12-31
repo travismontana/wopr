@@ -190,7 +190,8 @@ async def generate_ml_filename(
     
     # Sanitize names
     def sanitize(s: str) -> str:
-        return s.lower().replace(" ", "_").replace("-", "_")
+        return ''.join(c if c.isalnum() or c == '_' else '_' for c in s.lower())
+
     
     # Generate timestamp
     now = datetime.now()
