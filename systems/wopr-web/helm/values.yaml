@@ -62,3 +62,8 @@ env:
       configMapKeyRef:
         name: wopr-api-config
         key: API_URL
+
+labels: 
+  app.wopr.io/hasNginx: "true"
+selectorLabels: 
+  app.wopr.io/hasNginx: "true"

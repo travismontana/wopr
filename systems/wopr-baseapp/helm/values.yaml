@@ -40,6 +40,9 @@ env:
     - name: OTEL_EXPORTER_OTLP_ENDPOINT
       value: https://otel.monitoring.abode.tailandtraillabs.org
 
+# labels: 
+#   app.wopr.io/hasNginx: "true"
+
 resources:
   requests:
     memory: "256Mi"

@@ -16,6 +16,7 @@ spec:
   template:
     metadata:
       labels:
+      
         {{- include "wpor-web.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: api
     spec:
