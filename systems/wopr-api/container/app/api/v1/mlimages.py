@@ -4,7 +4,7 @@ WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob <bob@example.com>
 # See git log for detailed authorship
 
-WOPR API - ml_image_metadatas CRUD endpoints.
+WOPR API - ml_image_metadata CRUD endpoints.
 """
 
 from wopr import logging as woprlogging
@@ -129,7 +129,7 @@ async def list_mlimages(
             where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
             
             query = f"""
-                SELECT * FROM ml_image_metadatas
+                SELECT * FROM ml_image_metadata
                 WHERE {where_sql}
                 ORDER BY created_at DESC
                 LIMIT %s OFFSET %s
@@ -154,7 +154,7 @@ async def get_mlimage(mlimage_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
-                "SELECT * FROM ml_image_metadatas WHERE id = %s",
+                "SELECT * FROM ml_image_metadata WHERE id = %s",
                 (mlimage_id,)
             )
             image = cur.fetchone()
@@ -184,7 +184,7 @@ async def create_mlimage(image: MLImageCreate):
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
-                INSERT INTO ml_image_metadatas (
+                INSERT INTO ml_image_metadata (
                     document_id, filename, uid,
                     object_rotation, object_position,
                     color_temp, light_intensity, locale, game_id, piece_id,
@@ -251,7 +251,7 @@ async def update_mlimage(mlimage_id: int, image: MLImageUpdate):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
-                UPDATE ml_image_metadatas
+                UPDATE ml_image_metadata
                 SET {', '.join(update_fields)}
                 WHERE id = %s
                 RETURNING *
@@ -284,7 +284,7 @@ async def delete_mlimage(mlimage_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
-                "DELETE FROM ml_image_metadatas WHERE id = %s RETURNING id",
+                "DELETE FROM ml_image_metadata WHERE id = %s RETURNING id",
                 (mlimage_id,)
             )
             conn.commit()
@@ -313,7 +313,7 @@ async def link_mlimage_to_game(mlimage_id: int, game_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             # Verify ML image exists
-            cur.execute("SELECT id FROM ml_image_metadatas WHERE id = %s", (mlimage_id,))
+            cur.execute("SELECT id FROM ml_image_metadata WHERE id = %s", (mlimage_id,))
             if not cur.fetchone():
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -332,7 +332,7 @@ async def link_mlimage_to_game(mlimage_id: int, game_id: int):
             try:
                 cur.execute(
                     """
-                    INSERT INTO ml_image_metadatas_game_lnk (ml_image_metadata_id, game_id)
+                    INSERT INTO ml_image_metadata_game_lnk (ml_image_metadata_id, game_id)
                     VALUES (%s, %s)
                     """,
                     (mlimage_id, game_id)
@@ -362,7 +362,7 @@ async def unlink_mlimage_from_game(mlimage_id: int, game_id: int):
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
-                DELETE FROM ml_image_metadatas_game_lnk
+                DELETE FROM ml_image_metadata_game_lnk
                 WHERE ml_image_metadata_id = %s AND game_id = %s
                 RETURNING ml_image_metadata_id
                 """,
@@ -394,7 +394,7 @@ async def link_mlimage_to_piece(mlimage_id: int, piece_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             # Verify ML image exists
-            cur.execute("SELECT id FROM ml_image_metadatas WHERE id = %s", (mlimage_id,))
+            cur.execute("SELECT id FROM ml_image_metadata WHERE id = %s", (mlimage_id,))
             if not cur.fetchone():
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -413,7 +413,7 @@ async def link_mlimage_to_piece(mlimage_id: int, piece_id: int):
             try:
                 cur.execute(
                     """
-                    INSERT INTO ml_image_metadatas_piece_lnk (ml_image_metadata_id, piece_id)
+                    INSERT INTO ml_image_metadata_piece_lnk (ml_image_metadata_id, piece_id)
                     VALUES (%s, %s)
                     """,
                     (mlimage_id, piece_id)
@@ -443,7 +443,7 @@ async def unlink_mlimage_from_piece(mlimage_id: int, piece_id: int):
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
-                DELETE FROM ml_image_metadatas_piece_lnk
+                DELETE FROM ml_image_metadata_piece_lnk
                 WHERE ml_image_metadata_id = %s AND piece_id = %s
                 RETURNING ml_image_metadata_id
                 """,
