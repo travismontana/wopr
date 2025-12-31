@@ -111,10 +111,20 @@ async def set_light_preset(request: LightPresetRequest):
             f"Light preset set successfully: brightness={request.brightness}%, "
             f"kelvin={request.kelvin}K"
         )
-        
+
+        if isinstance(ha_response, dict):
+            changed_states = ha_response.get("changed_states", [])
+            service_response = ha_response.get("service_response")
+        elif isinstance(ha_response, list):
+            changed_states = ha_response
+            service_response = None
+        else:
+            changed_states = []
+            service_response = ha_response
+
         return HomeAssistantResponse(
-            changed_states=ha_response.get("changed_states", []),
-            service_response=ha_response.get("service_response")
+            changed_states=changed_states,
+            service_response=service_response
         )
         
     except httpx.HTTPStatusError as e:
