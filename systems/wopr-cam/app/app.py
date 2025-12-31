@@ -13,6 +13,7 @@ via USB webcam and saves to a path.
 import cv2
 import time
 import logging
+import sys
 from enum import Enum
 from typing import Optional
 from pathlib import Path
