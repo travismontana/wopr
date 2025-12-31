@@ -241,17 +241,19 @@ export default function MLImagesManager() {
         message: editingImage ? "ML image updated!" : "ML image created!",
       });
 
-      setFormData({
-        object_rotation: "0",
-        object_position: "random",
-        color_temp: "neutral",
-        light_intensity: "70",
-        game_id: "",
-        piece_id: "",
-        locale: "en",
-      });
-      setEditingImage(null);
-      setShowForm(false);
+      if (editingImage) {
+        setFormData({
+          object_rotation: "0",
+          object_position: "random",
+          color_temp: "neutral",
+          light_intensity: "70",
+          game_id: "",
+          piece_id: "",
+          locale: "en",
+        });
+        setEditingImage(null);
+        setShowForm(false);
+      }
       await loadMLImages();
     } catch (e: any) {
       console.error("[handleSubmit] Failed to save ML image:", e);
@@ -295,6 +297,20 @@ export default function MLImagesManager() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleClearForm() {
+    console.log("[handleClearForm] Clearing form to defaults");
+    setFormData({
+      object_rotation: "0",
+      object_position: "random",
+      color_temp: "neutral",
+      light_intensity: "70",
+      game_id: "",
+      piece_id: "",
+      locale: "en",
+    });
+    setStatus({ type: "info", message: "Form cleared" });
   }
 
   function generateFilename(): string {
@@ -622,6 +638,9 @@ export default function MLImagesManager() {
           <div className="actions">
             <button type="submit" disabled={loading}>
               {editingImage ? "Update" : "Create"}
+            </button>
+            <button type="button" onClick={handleClearForm} disabled={loading}>
+              Clear
             </button>
             <button type="button" onClick={handleCancel} disabled={loading}>
               Cancel
