@@ -41,7 +41,8 @@ import globals as g
 # Initialize config first
 init_config()
 
-logger = setup_logging("wopr-camera")
+logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # Initialize tracer using centralized setup with globals
 tracer = create_tracer(
