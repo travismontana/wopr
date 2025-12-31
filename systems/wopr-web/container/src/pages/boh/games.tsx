@@ -12,14 +12,12 @@ interface Game {
   description?: string;
   min_players?: number;
   max_players?: number;
-  create_time?: string;
-  update_time?: string;
-  created_at?: string;
-  updated_at?: string;
-  published_at?: string;
-  created_by_id?: number;
-  updated_by_id?: number;
-  locale?: string;
+  url?: string;  // NEW (BGG link)
+  status: string;  // NEW ('draft' | 'published')
+  user_created?: string;  // NEW (UUID)
+  date_created: string;  // was created_at
+  user_updated?: string;  // NEW (UUID)
+  date_updated?: string;  // was updated_at
 }
 
 interface GameFormData {
@@ -80,7 +78,8 @@ export default function GamesManager() {
         description: formData.description.trim() || undefined,
         min_players: formData.min_players ? parseInt(formData.min_players) : undefined,
         max_players: formData.max_players ? parseInt(formData.max_players) : undefined,
-        locale: formData.locale.trim() || undefined,
+        url: formData.url || undefined,  // NEW
+        status: "published"  // NEW (or "published")
       };
 
       const url = editingGame

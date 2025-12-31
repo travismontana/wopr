@@ -5,19 +5,14 @@ const API_URL =
   "https://wopr-api.studio.abode.tailandtraillabs.org";
 
 interface Piece {
-  id: number;
-  document_id?: string;
+  uuid: string;  // NEW
   name: string;
-  uid?: string;
-  create_time?: string;
-  update_time?: string;
-  description?: string;
-  created_at?: string;
-  updated_at?: string;
-  published_at?: string;
-  created_by_id?: number;
-  updated_by_id?: number;
-  locale?: string;
+  game_uuid: number;  // NEW (direct FK, was via junction table)
+  status: string;  // NEW
+  user_created?: string;  // NEW
+  date_created: string;  // was created_at
+  user_updated?: string;  // NEW
+  date_updated?: string;  // was updated_at
 }
 
 interface Game {
@@ -101,8 +96,8 @@ export default function PiecesManager() {
     try {
       const payload = {
         name: formData.name.trim(),
-        description: formData.description.trim() || undefined,
-        locale: formData.locale.trim() || undefined,
+        game_uuid: Number(formData.gameId),  // CHANGED: was separate link call
+        status: "published"  // NEW
       };
 
       const url = editingPiece
@@ -123,14 +118,6 @@ export default function PiecesManager() {
       }
 
       const savedPiece = await res.json();
-
-      // If a game was selected, link it after creating/updating the piece
-      if (formData.gameId) {
-        await handleLinkToGame(
-          editingPiece?.id ?? savedPiece.id,
-          Number(formData.gameId)
-        );
-      }
 
       setStatus({
         type: "ok",
@@ -167,34 +154,6 @@ export default function PiecesManager() {
       await loadPieces();
     } catch (e: any) {
       setStatus({ type: "error", message: e?.message ?? "Failed to delete piece" });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleLinkToGame(pieceId: number, gameId: number) {
-    setLoading(true);
-    setStatus(null);
-
-    try {
-      const res = await fetch(
-        `${API_URL}/api/v1/pieces/${pieceId}/games/${gameId}`,
-        { method: "POST" }
-      );
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errorText}`);
-      }
-
-      setStatus({ type: "ok", message: "Piece linked to game!" });
-      setLinkingPieceId(null); // Close the selector
-      await loadPieces();
-    } catch (e: any) {
-      setStatus({
-        type: "error",
-        message: e?.message ?? "Failed to link piece to game",
-      });
     } finally {
       setLoading(false);
     }

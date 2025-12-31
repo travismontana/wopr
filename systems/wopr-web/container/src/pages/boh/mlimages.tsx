@@ -6,23 +6,19 @@ const API_URL =
 
 interface MLImage {
   id: number;
-  document_id?: string;
+  uuid: string;  // NEW
   filename: string;
-  uid?: string;
-  create_time?: string;
-  update_time?: string;
   object_rotation?: number;
   object_position?: string;
   color_temp?: string;
-  light_intensity?: number;
-  game_id?: number;
-  piece_id?: number;
-  created_at?: string;
-  updated_at?: string;
-  published_at?: string;
-  created_by_id?: number;
-  updated_by_id?: number;
-  locale?: string;
+  light_intensity?: number;  // CHANGED: was string, now number
+  game_uuid?: number;  // NEW (direct FK)
+  piece_id?: number;  // NEW (direct FK)
+  status: string;  // NEW
+  user_created?: string;  // NEW
+  date_created: string;  // was created_at
+  user_updated?: string;  // NEW
+  date_updated?: string;  // was updated_at
 }
 
 interface Game {
@@ -201,15 +197,13 @@ export default function MLImagesManager() {
 
     try {
       const payload: any = {
-        object_rotation: formData.object_rotation
-          ? parseInt(formData.object_rotation)
-          : undefined,
-        object_position: formData.object_position.trim() || undefined,
-        color_temp: formData.color_temp.trim() || undefined,
-        light_intensity: formData.light_intensity.trim() || undefined,
-        game_id: parseInt(formData.game_id),
-        piece_id: parseInt(formData.piece_id),
-        locale: formData.locale.trim() || undefined,
+        object_rotation: Number(formData.object_rotation),
+        object_position: formData.object_position,
+        color_temp: formData.color_temp,
+        light_intensity: Number(formData.light_intensity),  // CHANGED: now number
+        game_uuid: formData.game_id ? Number(formData.game_id) : undefined,  // CHANGED: direct FK
+        piece_id: formData.piece_id ? Number(formData.piece_id) : undefined,  // CHANGED: direct FK
+        status: "draft"  // NEW
       };
 
       // Only generate filename for new images, not edits

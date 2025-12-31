@@ -4,7 +4,7 @@ WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob <bob@example.com>
 # See git log for detailed authorship
 
-WOPR API - games CRUD endpoints.
+WOPR API - games_catalog CRUD endpoints.
 """
 
 from wopr import logging as woprlogging
@@ -85,30 +85,30 @@ class GameResponse(BaseModel):
 
 
 @router.get("", response_model=List[GameResponse])
-async def list_games(
+async def list_games_catalog(
     limit: int = 100,
     offset: int = 0,
     locale: Optional[str] = None
 ):
     """
-    List all games with optional pagination and locale filtering.
+    List all games_catalog with optional pagination and locale filtering.
     
     Args:
         limit: Maximum number of results (default 100)
         offset: Number of results to skip (default 0)
         locale: Optional locale filter
     """
-    logger.debug(f"Listing games: limit={limit}, offset={offset}, locale={locale}")
+    logger.debug(f"Listing games_catalog: limit={limit}, offset={offset}, locale={locale}")
     
     with get_db() as conn:
-        logger.debug("opened DB connection for listing games")
+        logger.debug("opened DB connection for listing games_catalog")
         with conn.cursor(row_factory=dict_row) as cur:
-            logger.debug("created DB cursor for listing games")
+            logger.debug("created DB cursor for listing games_catalog")
             if locale:
-                logger.debug(f"Filtering games by locale: {locale}")
+                logger.debug(f"Filtering games_catalog by locale: {locale}")
                 cur.execute(
                     """
-                    SELECT * FROM games
+                    SELECT * FROM games_catalog
                     WHERE locale = %s
                     ORDER BY created_at DESC
                     LIMIT %s OFFSET %s
@@ -119,16 +119,16 @@ async def list_games(
                 logger.debug("No locale filter applied")
                 cur.execute(
                     """
-                    SELECT * FROM games
+                    SELECT * FROM games_catalog_catalog
                     ORDER BY created_at DESC
                     LIMIT %s OFFSET %s
                     """,
                     (limit, offset)
                 )
             
-            games = cur.fetchall()
-            logger.debug(f"Fetched {len(games)} games from DB")
-            return games
+            games_catalog = cur.fetchall()
+            logger.debug(f"Fetched {len(games_catalog)} games_catalog from DB")
+            return games_catalog
 
 
 @router.get("/{game_id}", response_model=GameResponse)
@@ -144,7 +144,7 @@ async def get_game(game_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
-                "SELECT * FROM games WHERE id = %s",
+                "SELECT * FROM games_catalog WHERE id = %s",
                 (game_id,)
             )
             game = cur.fetchone()
@@ -176,7 +176,7 @@ async def create_game(game: GameCreate):
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 """
-                INSERT INTO games (
+                INSERT INTO games_catalog (
                     document_id, uid, name, description,
                     min_players, max_players, locale,
                     create_time, update_time, created_at, updated_at
@@ -242,7 +242,7 @@ async def update_game(game_id: int, game: GameUpdate):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
-                UPDATE games
+                UPDATE games_catalog
                 SET {', '.join(update_fields)}
                 WHERE id = %s
                 RETURNING *
@@ -275,7 +275,7 @@ async def delete_game(game_id: int):
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
-                "DELETE FROM games WHERE id = %s RETURNING id",
+                "DELETE FROM games_catalog WHERE id = %s RETURNING id",
                 (game_id,)
             )
             conn.commit()
