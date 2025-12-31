@@ -48,6 +48,7 @@ from app.api.v1 import games
 from app.api.v1 import pieces
 from app.api.v1 import mlimages
 from app.api.v1 import homeauto
+from app.routers import ml
 
 woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 
@@ -145,7 +146,8 @@ if tracing_enabled:
     app.include_router(games.router, prefix="/api/v1/games", tags=["games"])
     app.include_router(pieces.router, prefix="/api/v1/pieces", tags=["pieces"])
     app.include_router(mlimages.router, prefix="/api/v1/mlimages", tags=["mlimages"])
-    app.include_router(homeauto.router, prefix="/api/v1/homeauto", tags=["homeauto"]) 
+    app.include_router(homeauto.router, prefix="/api/v1/homeauto", tags=["homeauto"])
+    app.include_router(ml.router) 
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
