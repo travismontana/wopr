@@ -32,7 +32,7 @@ from wopr.config import init_config, get_str, get_int, get_bool
 from wopr.logging import setup_logging
 from wopr.tracing import create_tracer
 from wopr.storage import imagefilename
-from app import globals as woprvar
+from globals import globals as woprvar
 from pathlib import Path
 
 # Initialize config first
