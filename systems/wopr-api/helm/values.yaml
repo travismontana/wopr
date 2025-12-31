@@ -89,6 +89,16 @@ env:
       secretKeyRef:
         name: wopr-db-user-credentials
         key: username
+  - name: HOMEASSISTANT_URL
+    valueFrom:
+      configMapKeyRef:
+        name: wopr-homeassistant-config
+        key: HOMEASSISTANT_URL
+  - name: HOMEASSISTANT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: wopr-homeassistant-token
+        key: HOMEASSISTANT_TOKEN
 # Optional: Environment-specific overrides
 # environments:
 #   dev:

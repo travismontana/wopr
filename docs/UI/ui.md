@@ -1,3 +1,12 @@
+
+going to model the home page of wopr on an old computer interface.  
+
+I want it to look something like a PDP 11/70 front panel with the lights and switches.  I want to be able to assign each switch to a route in react.  configurable by a json?  where I can assign each switch and light panel.  
+
+I want to be able to give it any kind of front panel that has switches and lights.  Where I can assign status values to the colors of the lights, and the switches to different routes in react.
+
+
+
 # WOPR UI Layout Proposal
 
 ## Primary Navigation Structure

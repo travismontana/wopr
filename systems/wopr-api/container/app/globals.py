@@ -35,3 +35,12 @@ HACK_CAMERA_DICT = {
         "capabilities": [ "games", "ml"]
     }
 }
+
+HOMEASSISTANT_URL = os.getenv(
+    "HOMEASSISTANT_URL",
+    "http://homeassistant.local:8123"
+)
+HOMEASSISTANT_TOKEN = os.getenv(
+    "HOMEASSISTANT_TOKEN",
+    ""  # Must be set via environment variable or secret
+)
