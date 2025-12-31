@@ -54,32 +54,30 @@ nginxConfig: |
   events {
     worker_connections 1024;
   }
-  log_format json_combined escape=json
-  '{'
-    '"time":"$time_iso8601",'
-    '"remote_addr":"$remote_addr",'
-    '"request":"$request",'
-    '"status":$status,'
-    '"body_bytes_sent":$body_bytes_sent,'
-    '"request_time":$request_time,'
-    '"upstream_response_time":"$upstream_response_time",'
-    '"http_referer":"$http_referer",'
-    '"http_user_agent":"$http_user_agent",'
-    '"request_id":"$request_id"'
-  '}';
-
-  map $request_uri $loggable {
-      ~^/favicon.ico 0;
-      ~^/assets/     0;
-      default        1;
-  }
 
   http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
     access_log /var/log/nginx/access.log json_combined;
-
+    log_format json_combined escape=json
+    '{'
+      '"time":"$time_iso8601",'
+      '"remote_addr":"$remote_addr",'
+      '"request":"$request",'
+      '"status":$status,'
+      '"body_bytes_sent":$body_bytes_sent,'
+      '"request_time":$request_time,'
+      '"upstream_response_time":"$upstream_response_time",'
+      '"http_referer":"$http_referer",'
+      '"http_user_agent":"$http_user_agent",'
+      '"request_id":"$request_id"'
+    '}';
+      map $request_uri $loggable {
+        ~^/favicon.ico 0;
+        ~^/assets/     0;
+        default        1;
+    }
     sendfile on;
     tcp_nopush on;
     keepalive_timeout 65;
