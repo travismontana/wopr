@@ -24,6 +24,7 @@ const IMAGE_BASE_URL = 'https://wopr-images.studio.abode.tailandtraillabs.org/wo
 const API_BASE_URL = 'https://wopr-api.studio.abode.tailandtraillabs.org';
 
 export default function ImageGallery({ gameId }: ImageGalleryProps) {
+    gameId = gameId || '1'; // Default to '1' if undefined
     const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
