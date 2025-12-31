@@ -119,6 +119,7 @@ sidecarContainers:
       requests:
         cpu: 10m
         memory: 32Mi
+        
 podAnnotations: 
   prometheus.io/scrape: "true"
   prometheus.io/port: "4318"
