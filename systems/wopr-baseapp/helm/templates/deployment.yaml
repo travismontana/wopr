@@ -13,6 +13,10 @@ spec:
       {{- include "wopr-baseapp.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
         {{- include "wopr-baseapp.selectorLabels" . | nindent 8 }}
     spec:

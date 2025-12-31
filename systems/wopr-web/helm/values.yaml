@@ -67,3 +67,8 @@ labels:
   app.wopr.io/hasNginx: "true"
 selectorLabels: 
   app.wopr.io/hasNginx: "true"
+
+podAnnotations: 
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "4318"
+  prometheus.io/path: "/v1/metrics"

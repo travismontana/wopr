@@ -43,6 +43,11 @@ env:
 # labels: 
 #   app.wopr.io/hasNginx: "true"
 
+#podAnnotations: 
+#  prometheus.io/scrape: "true"
+#  prometheus.io/port: "4318"
+#  prometheus.io/path: "/v1/metrics"
+
 resources:
   requests:
     memory: "256Mi"
