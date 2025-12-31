@@ -85,7 +85,7 @@ podAnnotations:
 
 sidecarContainers: 
   - name: nginx-exporter
-    image: nginx/nginx-prometheus-exporter:latest
+    image: nginx/nginx-prometheus-exporter:latest    
     args:
       - -nginx.scrape-uri=http://localhost:8080/stub_status
     ports:

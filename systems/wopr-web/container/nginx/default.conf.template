@@ -37,7 +37,7 @@ server {
     try_files $request_filename =404;
     expires 1y;
     add_header Cache-Control "public, immutable";
-}
+  }
 
   location = /favicon.ico {
     try_files $uri =404;
@@ -101,5 +101,12 @@ server {
     # optional: caching
     expires 10s;
     add_header Cache-Control "no-store";
+  }
+
+  location /stub_status {
+    stub_status;
+    allow 127.0.0.1;
+    allow 10.42.0.0/16;  # Your pod CIDR
+    deny all;
   }
 }
