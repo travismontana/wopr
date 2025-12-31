@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app.wopr.io/hasNginx: yes
+        app.wopr.io/hasNginx: "true"
         {{- include "wpor-web.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: api
     spec:
