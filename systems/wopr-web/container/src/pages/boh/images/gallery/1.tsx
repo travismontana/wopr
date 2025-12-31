@@ -82,7 +82,7 @@ export default function ImageGallery({ gameId }: ImageGalleryProps) {
         } finally {
             setLoading(false);
         }
-    }, [gameId]); // Only recreate if gameId changes
+    }); // Only recreate if gameId changes
 
     // Only run when loadImages changes (which only happens when gameId changes)
     useEffect(() => {
