@@ -62,6 +62,8 @@ env:
       configMapKeyRef:
         name: wopr-api-config
         key: API_URL
+  - name: OTEL_SERVICE_NAME
+    value: wopr-web
   - name: OTEL_TRACES_EXPORTER
     value: otlp
   - name: OTEL_METRICS_EXPORTER
