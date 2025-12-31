@@ -119,7 +119,7 @@ async def list_games_catalog(
                 logger.debug("No locale filter applied")
                 cur.execute(
                     """
-                    SELECT * FROM games_catalog_catalog
+                    SELECT * FROM games_catalog
                     ORDER BY created_at DESC
                     LIMIT %s OFFSET %s
                     """,
