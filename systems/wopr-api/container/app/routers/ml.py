@@ -1,39 +1,16 @@
-# wopr-api/app/routers/ml.py (or create if it doesn't exist)
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
-import httpx
-import asyncio
-from typing import Optional
-import logging
+import time
+from datetime import datetime
 
-logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/v1/ml", tags=["ml"])
-
-
-class CaptureRequest(BaseModel):
-    game_id: int
-    piece_id: int
-    position_id: int
-    lighting_level: int = Field(ge=0, le=100, description="0-100")
-    lighting_temp: str = Field(description="e.g., 'neutral', 'warm', 'cool'")
-    notes: Optional[str] = None
-
-
-class CaptureResponse(BaseModel):
-    success: bool
-    image_metadata_id: Optional[int] = None
-    message: str
-    lighting_set: bool
-    image_captured: bool
-    
 @router.post("/captureandsetlights", response_model=CaptureResponse)
 async def capture_and_set_lights(request: CaptureRequest):
     """
     Orchestrates ML training image capture:
-    1. Sets lighting via homeauto API
-    2. Waits 10 seconds for stabilization
-    3. Captures image via mlimages endpoint
-    4. Returns metadata record
+    1. Generates filename
+    2. Sets lighting via homeauto API
+    3. Waits 10 seconds for stabilization
+    4. Captures image via camera
+    5. Creates metadata record
+    6. Returns metadata
     """
     # Map lighting_temp string to kelvin values
     temp_to_kelvin = {
@@ -52,50 +29,77 @@ async def capture_and_set_lights(request: CaptureRequest):
     lighting_set = False
     image_captured = False
     image_metadata_id = None
+    filename = None
 
     try:
-        # Step 1: Set lights
+        # Step 1: Generate filename
+        filename = await generate_ml_filename(
+            request.game_id,
+            request.piece_id,
+            request.position_id,
+            request.lighting_temp,
+            request.lighting_level
+        )
+        logger.info(f"Generated filename: {filename}")
+
+        # Step 2: Set lights
         logger.info(f"Setting lights: level={request.lighting_level}, temp={request.lighting_temp} ({kelvin}K)")
         async with httpx.AsyncClient(timeout=30.0) as client:
             homeauto_response = await client.post(
-                "http://wopr-api:8000/api/v1/homeauto/lights/preset",  # ← Fixed URL
+                "http://wopr-api:8000/api/v1/homeauto/lights/preset",
                 json={
-                    "brightness": request.lighting_level,  # ← Fixed field name
-                    "kelvin": kelvin  # ← Mapped integer value
+                    "brightness": request.lighting_level,
+                    "kelvin": kelvin
                 }
             )
             homeauto_response.raise_for_status()
             lighting_set = True
             logger.info(f"Lights set successfully to {kelvin}K @ {request.lighting_level}%")
 
-        # Step 2: Wait for stabilization
+        # Step 3: Wait for stabilization
         logger.info("Waiting 10 seconds for lighting stabilization...")
         await asyncio.sleep(10)
 
-        # Step 3: Capture image
-        logger.info(f"Capturing image: game={request.game_id}, piece={request.piece_id}, pos={request.position_id}")
+        # Step 4: Capture image via camera
+        logger.info(f"Calling camera capture with filename: {filename}")
         async with httpx.AsyncClient(timeout=60.0) as client:
-            capture_response = await client.post(
+            camera_response = await client.post(
+                "http://wopr-api:8000/api/v1/cameras/capture",
+                json={
+                    "captureType": "ml_capture",
+                    "filename": filename
+                }
+            )
+            camera_response.raise_for_status()
+            logger.info(f"Camera capture complete: {filename}")
+
+        # Step 5: Create metadata record
+        logger.info(f"Creating metadata: game={request.game_id}, piece={request.piece_id}, pos={request.position_id}")
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            metadata_response = await client.post(
                 "http://wopr-api:8000/api/v1/mlimages",
                 json={
-                    "game_id": request.game_id,
+                    "filename": filename,
+                    "object_rotation": 0,  # Could add to CaptureRequest if needed
+                    "object_position": str(request.position_id),
+                    "color_temp": request.lighting_temp,
+                    "light_intensity": request.lighting_level,
+                    "game_uuid": request.game_id,
                     "piece_id": request.piece_id,
-                    "position_id": request.position_id,
-                    "lighting_condition": request.lighting_temp,  # Store original string
-                    "lighting_level": request.lighting_level,
+                    "status": "draft",
                     "notes": request.notes
                 }
             )
-            capture_response.raise_for_status()
-            capture_data = capture_response.json()
+            metadata_response.raise_for_status()
+            metadata_data = metadata_response.json()
             image_captured = True
-            image_metadata_id = capture_data.get("id")
-            logger.info(f"Image captured: metadata_id={image_metadata_id}")
+            image_metadata_id = metadata_data.get("id")
+            logger.info(f"Metadata created: id={image_metadata_id}")
 
         return CaptureResponse(
             success=True,
             image_metadata_id=image_metadata_id,
-            message=f"Image captured successfully for piece {request.piece_id} at position {request.position_id}",
+            message=f"Image captured successfully: {filename}",
             lighting_set=lighting_set,
             image_captured=image_captured
         )
@@ -118,3 +122,52 @@ async def capture_and_set_lights(request: CaptureRequest):
             status_code=500,
             detail=f"Capture failed: {str(e)}"
         )
+
+
+async def generate_ml_filename(
+    game_id: int,
+    piece_id: int,
+    position_id: int,
+    color_temp: str,
+    light_intensity: int
+) -> str:
+    """
+    Generate ML training image filename matching frontend pattern:
+    {piece}-{game}-{position}-rot{rotation}-pct{intensity}-temp{colortemp}-{timestamp}.jpg
+    """
+    # Fetch game and piece names
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            game_res = await client.get(f"http://wopr-api:8000/api/v1/games/{game_id}")
+            game_res.raise_for_status()
+            game_name = game_res.json().get("name", "unknown")
+        except:
+            game_name = "unknown"
+        
+        try:
+            piece_res = await client.get(f"http://wopr-api:8000/api/v1/pieces/{piece_id}")
+            piece_res.raise_for_status()
+            piece_name = piece_res.json().get("name", "unknown")
+        except:
+            piece_name = "unknown"
+    
+    # Sanitize names
+    def sanitize(s: str) -> str:
+        return s.lower().replace(" ", "_").replace("-", "_")
+    
+    # Generate timestamp
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d-%H%M%S")
+    
+    # Build filename
+    parts = [
+        sanitize(piece_name),
+        sanitize(game_name),
+        f"pos{position_id}",
+        "rot0",  # Could make this configurable
+        f"pct{light_intensity}",
+        f"temp{sanitize(color_temp)}",
+        timestamp
+    ]
+    
+    return f"{'-'.join(parts)}.jpg"
