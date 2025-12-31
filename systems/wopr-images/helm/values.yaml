@@ -59,7 +59,6 @@ nginxConfig: |
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
-    access_log /var/log/nginx/access.log json_combined;
     log_format json_combined escape=json
     '{'
       '"time":"$time_iso8601",'
@@ -73,10 +72,11 @@ nginxConfig: |
       '"http_user_agent":"$http_user_agent",'
       '"request_id":"$request_id"'
     '}';
-      map $request_uri $loggable {
-        ~^/favicon.ico 0;
-        ~^/assets/     0;
-        default        1;
+    access_log /var/log/nginx/access.log json_combined if=$loggable;
+    map $request_uri $loggable {
+      ~^/favicon.ico 0;
+      ~^/assets/     0;
+      default        1;
     }
     sendfile on;
     tcp_nopush on;
