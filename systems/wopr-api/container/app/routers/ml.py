@@ -25,8 +25,7 @@ class CaptureResponse(BaseModel):
     message: str
     lighting_set: bool
     image_captured: bool
-
-
+    
 @router.post("/captureandsetlights", response_model=CaptureResponse)
 async def capture_and_set_lights(request: CaptureRequest):
     """
@@ -36,24 +35,38 @@ async def capture_and_set_lights(request: CaptureRequest):
     3. Captures image via mlimages endpoint
     4. Returns metadata record
     """
+    # Map lighting_temp string to kelvin values
+    temp_to_kelvin = {
+        "neutral": 4000,
+        "warm": 3000,
+        "cool": 5500
+    }
+    
+    kelvin = temp_to_kelvin.get(request.lighting_temp.lower())
+    if kelvin is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid lighting_temp: {request.lighting_temp}. Must be 'neutral', 'warm', or 'cool'"
+        )
+    
     lighting_set = False
     image_captured = False
     image_metadata_id = None
 
     try:
         # Step 1: Set lights
-        logger.info(f"Setting lights: level={request.lighting_level}, temp={request.lighting_temp}")
+        logger.info(f"Setting lights: level={request.lighting_level}, temp={request.lighting_temp} ({kelvin}K)")
         async with httpx.AsyncClient(timeout=30.0) as client:
             homeauto_response = await client.post(
-                "http://wopr-api:8000/api/v1/homeauto/lights",  # adjust URL as needed
+                "http://wopr-api:8000/api/v1/homeauto/lights/preset",  # ← Fixed URL
                 json={
-                    "level": request.lighting_level,
-                    "temperature": request.lighting_temp
+                    "brightness": request.lighting_level,  # ← Fixed field name
+                    "kelvin": kelvin  # ← Mapped integer value
                 }
             )
             homeauto_response.raise_for_status()
             lighting_set = True
-            logger.info("Lights set successfully")
+            logger.info(f"Lights set successfully to {kelvin}K @ {request.lighting_level}%")
 
         # Step 2: Wait for stabilization
         logger.info("Waiting 10 seconds for lighting stabilization...")
@@ -63,12 +76,12 @@ async def capture_and_set_lights(request: CaptureRequest):
         logger.info(f"Capturing image: game={request.game_id}, piece={request.piece_id}, pos={request.position_id}")
         async with httpx.AsyncClient(timeout=60.0) as client:
             capture_response = await client.post(
-                "http://wopr-api:8000/api/v1/mlimages",  # adjust URL as needed
+                "http://wopr-api:8000/api/v1/mlimages",
                 json={
                     "game_id": request.game_id,
                     "piece_id": request.piece_id,
                     "position_id": request.position_id,
-                    "lighting_condition": request.lighting_temp,
+                    "lighting_condition": request.lighting_temp,  # Store original string
                     "lighting_level": request.lighting_level,
                     "notes": request.notes
                 }
