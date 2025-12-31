@@ -30,6 +30,15 @@ image:
 #  TZ: "America/Chicago"
 #  PUID: "1000"
 #  PGID: "1000"
+env:
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: http/protobuf
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: https://otel.monitoring.abode.tailandtraillabs.org
 
 resources:
   requests:

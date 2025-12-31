@@ -26,8 +26,10 @@ spec:
           containerPort: {{ .Values.service.port }}
           protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
         {{- end }}
-        {{- if .Values.env }}
         env:
+          - name: OTEL_SERVICE_NAME
+            value: {{ include "wopr-baseapp.fullname" . }}
+        {{- if .Values.env }}
           {{- toYaml .Values.env | nindent 10 }}
         {{- end }}
         {{- if .Values.volumeMounts}}
