@@ -11,10 +11,12 @@ via USB webcam and saves to a path.
 """
 
 import cv2
+import time
 from enum import Enum
 from typing import Optional
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -32,33 +34,34 @@ from wopr.config import init_config, get_str, get_int, get_bool
 from wopr.logging import setup_logging
 from wopr.tracing import create_tracer
 from wopr.storage import imagefilename
-from globals import globals as woprvar
-from pathlib import Path
+
+# Import globals module for constants
+import globals as g
 
 # Initialize config first
 init_config()
 
 logger = setup_logging("wopr-camera")
 
-# Initialize tracer using centralized setup
+# Initialize tracer using centralized setup with globals
 tracer = create_tracer(
-    tracer_name="wopr-cam",
-    tracer_version="0.1.0",
+    tracer_name=g.APP_NAME,
+    tracer_version=g.APP_VERSION,
     tracer_enabled=get_bool("otel.tracing.enabled", True),
-    tracer_endpoint=get_str("otel.tracing.endpoint", "http://tempo:4318/v1/traces"),
+    tracer_endpoint=get_str("otel.tracing.endpoint", f"{g.APP_OTEL_URL}/v1/traces"),
     service_namespace=get_str("otel.service_namespace", "wopr"),
     deployment_env=get_str("environment", "production"),
 )
 
-# Metrics provider setup (keeping this separate as your tracing.py only handles traces)
+# Metrics provider setup
 resource = Resource(attributes={
-    SERVICE_NAME: "wopr-cam",
-    SERVICE_VERSION: "0.1.0",
+    SERVICE_NAME: g.APP_NAME,
+    SERVICE_VERSION: g.APP_VERSION,
 })
 
 metric_reader = PeriodicExportingMetricReader(
     OTLPMetricExporter(
-        endpoint=get_str("otel.metrics.endpoint", "http://tempo:4318/v1/metrics"),
+        endpoint=get_str("otel.metrics.endpoint", f"{g.APP_OTEL_URL}/v1/metrics"),
     )
 )
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
@@ -82,7 +85,7 @@ capture_errors = meter.create_counter(
     unit="1",
 )
 
-app = FastAPI(title="wopr-cam", version="0.1.0")
+app = FastAPI(title=g.APP_TITLE, version=g.APP_VERSION)
 
 # Instrument FastAPI automatically (only if tracer is enabled)
 if tracer:
@@ -132,14 +135,18 @@ async def unhandled_exception_handler(request, exc: Exception):
     )
 
 
+def _trace_if_enabled(span_name: str):
+    """Context manager that creates a span if tracing is enabled, otherwise does nothing."""
+    if tracer:
+        return tracer.start_as_current_span(span_name)
+    else:
+        from contextlib import nullcontext
+        return nullcontext()
+
+
 @app.post("/capture", response_class=PlainTextResponse)
 def capture(req: CaptureRequest):
-    if not tracer:
-        # Tracing disabled, run without spans
-        return _do_capture(req)
-    
-    with tracer.start_as_current_span("camera.capture") as span:
-        import time
+    with _trace_if_enabled("camera.capture") as span:
         start_time = time.time()
         
         try:
@@ -149,21 +156,23 @@ def capture(req: CaptureRequest):
             else:
                 filepath = imagefilename(req.game_id, req.subject.value)
 
-            span.set_attribute("camera.filepath", str(filepath))
-            span.set_attribute("camera.filename_override", bool(req.filename))
+            if span:
+                span.set_attribute("camera.filepath", str(filepath))
+                span.set_attribute("camera.filename_override", bool(req.filename))
 
             resolution = get_str("camera.default_resolution")
             width = get_int(f"camera.resolutions.{resolution}.width")
             height = get_int(f"camera.resolutions.{resolution}.height")
             
-            span.set_attribute("camera.resolution", resolution)
-            span.set_attribute("camera.width", width)
-            span.set_attribute("camera.height", height)
+            if span:
+                span.set_attribute("camera.resolution", resolution)
+                span.set_attribute("camera.width", width)
+                span.set_attribute("camera.height", height)
             
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
             # Camera initialization and capture
-            with tracer.start_as_current_span("camera.device_init"):
+            with _trace_if_enabled("camera.device_init"):
                 cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
                 if not cap.isOpened():
                     raise RuntimeError("Camera device could not be opened")
@@ -172,39 +181,36 @@ def capture(req: CaptureRequest):
                 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
                 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-            with tracer.start_as_current_span("camera.frame_capture"):
+            with _trace_if_enabled("camera.frame_capture"):
                 ret, frame = cap.read()
                 cap.release()
 
                 if not ret:
                     raise RuntimeError("Camera capture failed (no frame read)")
 
-            with tracer.start_as_current_span("camera.image_write"):
+            with _trace_if_enabled("camera.image_write"):
                 cv2.imwrite(filepath, frame)
 
             duration_ms = (time.time() - start_time) * 1000
             capture_duration.record(duration_ms, {"endpoint": "capture"})
             capture_counter.add(1, {"endpoint": "capture", "status": "success"})
             
-            span.set_status(Status(StatusCode.OK))
+            if span:
+                span.set_status(Status(StatusCode.OK))
             return f"{filepath}\n"
             
         except Exception as e:
             capture_errors.add(1, {"error_type": type(e).__name__, "endpoint": "capture"})
             capture_counter.add(1, {"endpoint": "capture", "status": "error"})
-            span.set_status(Status(StatusCode.ERROR, str(e)))
-            span.record_exception(e)
+            if span:
+                span.set_status(Status(StatusCode.ERROR, str(e)))
+                span.record_exception(e)
             raise
 
 
 @app.post("/capture_ml", response_class=PlainTextResponse)
 def capture_ml(req: CaptureRequest):
-    if not tracer:
-        # Tracing disabled, run without spans
-        return _do_capture_ml(req)
-    
-    with tracer.start_as_current_span("camera.capture_ml") as span:
-        import time
+    with _trace_if_enabled("camera.capture_ml") as span:
         start_time = time.time()
         
         try:
@@ -216,21 +222,23 @@ def capture_ml(req: CaptureRequest):
             filepath = ml_dir / f"{filename}"
             ml_dir.mkdir(parents=True, exist_ok=True)
 
-            span.set_attribute("camera.filepath", str(filepath))
-            span.set_attribute("camera.ml_mode", True)
+            if span:
+                span.set_attribute("camera.filepath", str(filepath))
+                span.set_attribute("camera.ml_mode", True)
 
             resolution = get_str("camera.default_resolution")
             width = get_int(f"camera.resolutions.{resolution}.width")
             height = get_int(f"camera.resolutions.{resolution}.height")
             
-            span.set_attribute("camera.resolution", resolution)
-            span.set_attribute("camera.width", width)
-            span.set_attribute("camera.height", height)
+            if span:
+                span.set_attribute("camera.resolution", resolution)
+                span.set_attribute("camera.width", width)
+                span.set_attribute("camera.height", height)
             
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
             # Camera initialization and capture
-            with tracer.start_as_current_span("camera.device_init"):
+            with _trace_if_enabled("camera.device_init"):
                 cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
                 if not cap.isOpened():
                     raise RuntimeError("Camera device could not be opened")
@@ -239,14 +247,14 @@ def capture_ml(req: CaptureRequest):
                 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
                 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-            with tracer.start_as_current_span("camera.frame_capture"):
+            with _trace_if_enabled("camera.frame_capture"):
                 ret, frame = cap.read()
                 cap.release()
 
                 if not ret:
                     raise RuntimeError("Camera capture failed (no frame read)")
 
-            with tracer.start_as_current_span("camera.image_write"):
+            with _trace_if_enabled("camera.image_write"):
                 cv2.imwrite(str(filepath), frame)
 
             duration_ms = (time.time() - start_time) * 1000
@@ -254,37 +262,38 @@ def capture_ml(req: CaptureRequest):
             capture_counter.add(1, {"endpoint": "capture_ml", "status": "success"})
             
             logger.info(f"Captured image to {filepath}")
-            span.set_status(Status(StatusCode.OK))
+            if span:
+                span.set_status(Status(StatusCode.OK))
             return JSONResponse({"filename": str(filepath)})
             
         except Exception as e:
             capture_errors.add(1, {"error_type": type(e).__name__, "endpoint": "capture_ml"})
             capture_counter.add(1, {"endpoint": "capture_ml", "status": "error"})
-            span.set_status(Status(StatusCode.ERROR, str(e)))
-            span.record_exception(e)
+            if span:
+                span.set_status(Status(StatusCode.ERROR, str(e)))
+                span.record_exception(e)
             raise
 
 
 @app.get("/status")
 def status():
-    if tracer:
-        with tracer.start_as_current_span("camera.status"):
-            return {"status": "ready"}
-    return {"status": "ready"}
+    with _trace_if_enabled("camera.status"):
+        return {"status": "ready"}
 
 
 @app.get("/images/{game_id}")
 def list_images(game_id: str):
-    if not tracer:
-        return _do_list_images(game_id)
-    
-    with tracer.start_as_current_span("camera.list_images") as span:
-        span.set_attribute("game.id", game_id)
+    with _trace_if_enabled("camera.list_images") as span:
+        if span:
+            span.set_attribute("game.id", game_id)
         
-        game_dir = WOPR_ROOT / "games" / game_id
+        # Use storage.base_path from config
+        wopr_root = Path(get_str('storage.base_path'))
+        game_dir = wopr_root / "games" / game_id
 
         if not game_dir.exists():
-            span.set_status(Status(StatusCode.ERROR, "Game not found"))
+            if span:
+                span.set_status(Status(StatusCode.ERROR, "Game not found"))
             raise HTTPException(status_code=404, detail="Game not found")
 
         images = sorted(
@@ -293,12 +302,13 @@ def list_images(game_id: str):
         )
 
         result = [
-            f"/wopr/{p.relative_to(WOPR_ROOT)}"
+            f"/wopr/{p.relative_to(wopr_root)}"
             for p in images
         ]
 
-        span.set_attribute("images.count", len(result))
-        span.set_status(Status(StatusCode.OK))
+        if span:
+            span.set_attribute("images.count", len(result))
+            span.set_status(Status(StatusCode.OK))
         
         return {
             "game_id": game_id,
