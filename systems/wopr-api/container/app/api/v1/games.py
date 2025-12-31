@@ -4,7 +4,7 @@ WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob <bob@example.com>
 # See git log for detailed authorship
 
-WOPR API - game_catalog CRUD endpoints.
+WOPR API - games CRUD endpoints (Directus schema).
 """
 
 from wopr import logging as woprlogging
@@ -15,6 +15,7 @@ import sys
 from typing import Optional, List
 from datetime import datetime
 from contextlib import contextmanager
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
@@ -26,8 +27,7 @@ logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 router = APIRouter()
 
-# Database connection - adjust to match your actual connection string
-DATABASE_URL = woprvar.DATABASE_URL  # Assumes you have this in globals
+DATABASE_URL = woprvar.DATABASE_URL
 logger.debug(f"Using database URL: {DATABASE_URL}")
 
 @contextmanager
@@ -44,91 +44,77 @@ def get_db():
 
 class GameCreate(BaseModel):
     """Model for creating a game"""
-    document_id: Optional[str] = None
-    uid: Optional[str] = None
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
     min_players: Optional[int] = Field(None, ge=1)
     max_players: Optional[int] = Field(None, ge=1)
-    locale: Optional[str] = Field(None, max_length=255)
+    url: Optional[str] = None
+    status: str = Field(default="draft", pattern="^(draft|published)$")
+    user_created: Optional[UUID] = None
 
 
 class GameUpdate(BaseModel):
     """Model for updating a game"""
-    document_id: Optional[str] = None
-    uid: Optional[str] = None
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
     min_players: Optional[int] = Field(None, ge=1)
     max_players: Optional[int] = Field(None, ge=1)
-    locale: Optional[str] = Field(None, max_length=255)
-    published_at: Optional[datetime] = None
+    url: Optional[str] = None
+    status: Optional[str] = Field(None, pattern="^(draft|published)$")
+    user_updated: Optional[UUID] = None
 
 
 class GameResponse(BaseModel):
     """Model for game response"""
     id: int
-    document_id: Optional[str]
-    uid: Optional[str]
-    name: Optional[str]
+    uuid: UUID
+    name: str
     description: Optional[str]
     min_players: Optional[int]
     max_players: Optional[int]
-    create_time: Optional[datetime]
-    update_time: Optional[datetime]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    published_at: Optional[datetime]
-    created_by_id: Optional[int]
-    updated_by_id: Optional[int]
-    locale: Optional[str]
+    url: Optional[str]
+    status: str
+    user_created: Optional[UUID]
+    date_created: datetime
+    user_updated: Optional[UUID]
+    date_updated: Optional[datetime]
 
 
 @router.get("", response_model=List[GameResponse])
-async def list_game_catalog(
+async def list_games(
     limit: int = 100,
     offset: int = 0,
-    locale: Optional[str] = None
+    status: Optional[str] = None
 ):
     """
-    List all game_catalog with optional pagination and locale filtering.
+    List all games with optional pagination and status filtering.
     
     Args:
         limit: Maximum number of results (default 100)
         offset: Number of results to skip (default 0)
-        locale: Optional locale filter
+        status: Optional status filter (draft|published)
     """
-    logger.debug(f"Listing game_catalog: limit={limit}, offset={offset}, locale={locale}")
+    logger.debug(f"Listing games: limit={limit}, offset={offset}, status={status}")
     
     with get_db() as conn:
-        logger.debug("opened DB connection for listing game_catalog")
+        logger.debug("opened DB connection for listing games")
         with conn.cursor(row_factory=dict_row) as cur:
-            logger.debug("created DB cursor for listing game_catalog")
-            if locale:
-                logger.debug(f"Filtering game_catalog by locale: {locale}")
-                cur.execute(
-                    """
-                    SELECT * FROM game_catalog
-                    WHERE locale = %s
-                    ORDER BY created_at DESC
-                    LIMIT %s OFFSET %s
-                    """,
-                    (locale, limit, offset)
-                )
-            else:
-                logger.debug("No locale filter applied")
-                cur.execute(
-                    """
-                    SELECT * FROM game_catalog
-                    ORDER BY created_at DESC
-                    LIMIT %s OFFSET %s
-                    """,
-                    (limit, offset)
-                )
+            logger.debug("created DB cursor for listing games")
             
-            game_catalog = cur.fetchall()
-            logger.debug(f"Fetched {len(game_catalog)} game_catalog from DB")
-            return game_catalog
+            query = "SELECT * FROM game_catalog WHERE 1=1"
+            params = []
+            
+            if status:
+                query += " AND status = %s"
+                params.append(status)
+            
+            query += " ORDER BY date_created DESC LIMIT %s OFFSET %s"
+            params.extend([limit, offset])
+            
+            cur.execute(query, params)
+            games = cur.fetchall()
+            logger.debug(f"Fetched {len(games)} games from DB")
+            return games
 
 
 @router.get("/{game_id}", response_model=GameResponse)
@@ -168,8 +154,9 @@ async def create_game(game: GameCreate):
         game: Game data
     """
     logger.info(f"Creating game: {game.name}")
-    logger.debug(f"Create payload: {game.dict(exclude_none=True)}")
     
+    # Generate UUID for Directus document tracking
+    game_uuid = uuid4()
     now = datetime.utcnow()
     
     with get_db() as conn:
@@ -177,30 +164,27 @@ async def create_game(game: GameCreate):
             cur.execute(
                 """
                 INSERT INTO game_catalog (
-                    document_id, uid, name, description,
-                    min_players, max_players, locale,
-                    create_time, update_time, created_at, updated_at
+                    uuid, name, description, min_players, max_players,
+                    url, status, user_created, date_created
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
                 """,
                 (
-                    game.document_id,
-                    game.uid,
+                    game_uuid,
                     game.name,
                     game.description,
                     game.min_players,
                     game.max_players,
-                    game.locale,
-                    now,
-                    now,
-                    now,
+                    game.url,
+                    game.status,
+                    game.user_created,
                     now
                 )
             )
             conn.commit()
             new_game = cur.fetchone()
-            logger.debug(f"Inserted game row: {new_game}")
+            
             logger.info(f"Created game {new_game['id']}: {new_game['name']}")
             return new_game
 
@@ -216,7 +200,6 @@ async def update_game(game_id: int, game: GameUpdate):
     """
     logger.info(f"Updating game {game_id}")
     
-    # Build dynamic update query based on provided fields
     update_fields = []
     values = []
     
@@ -231,14 +214,11 @@ async def update_game(game_id: int, game: GameUpdate):
             detail="No fields to update"
         )
     
-    # Always update update_time and updated_at
-    update_fields.append("update_time = %s")
-    update_fields.append("updated_at = %s")
-    now = datetime.utcnow()
-    values.extend([now, now])
+    # Always update date_updated
+    update_fields.append("date_updated = %s")
+    values.append(datetime.utcnow())
     values.append(game_id)
     
-    logger.debug(f"Update fields: {update_fields} | values (pre-query): {values}")
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
@@ -247,7 +227,7 @@ async def update_game(game_id: int, game: GameUpdate):
                 WHERE id = %s
                 RETURNING *
             """
-            logger.debug(f"Executing update query: {query}")
+            
             cur.execute(query, values)
             conn.commit()
             updated_game = cur.fetchone()
@@ -257,7 +237,7 @@ async def update_game(game_id: int, game: GameUpdate):
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            logger.debug(f"Updated game row: {updated_game}")
+            
             logger.info(f"Updated game {game_id}")
             return updated_game
 
@@ -280,12 +260,79 @@ async def delete_game(game_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            logger.debug(f"Delete result for {game_id}: {deleted}")
+            
             if not deleted:
-                logger.debug(f"Game {game_id} not found when attempting delete")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-
+            
             logger.info(f"Deleted game {game_id}")
+
+
+@router.patch("/{game_id}/publish", response_model=GameResponse)
+async def publish_game(game_id: int):
+    """
+    Publish a game (set status to 'published').
+    
+    Args:
+        game_id: The game ID
+    """
+    logger.info(f"Publishing game {game_id}")
+    
+    with get_db() as conn:
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                """
+                UPDATE game_catalog
+                SET status = 'published', date_updated = %s
+                WHERE id = %s
+                RETURNING *
+                """,
+                (datetime.utcnow(), game_id)
+            )
+            conn.commit()
+            updated_game = cur.fetchone()
+            
+            if not updated_game:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Game with ID {game_id} not found"
+                )
+            
+            logger.info(f"Published game {game_id}")
+            return updated_game
+
+
+@router.patch("/{game_id}/unpublish", response_model=GameResponse)
+async def unpublish_game(game_id: int):
+    """
+    Unpublish a game (set status to 'draft').
+    
+    Args:
+        game_id: The game ID
+    """
+    logger.info(f"Unpublishing game {game_id}")
+    
+    with get_db() as conn:
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                """
+                UPDATE game_catalog
+                SET status = 'draft', date_updated = %s
+                WHERE id = %s
+                RETURNING *
+                """,
+                (datetime.utcnow(), game_id)
+            )
+            conn.commit()
+            updated_game = cur.fetchone()
+            
+            if not updated_game:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Game with ID {game_id} not found"
+                )
+            
+            logger.info(f"Unpublished game {game_id}")
+            return updated_game
