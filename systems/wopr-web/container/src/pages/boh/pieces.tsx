@@ -27,6 +27,7 @@ interface PieceFormData {
   gameId: string;
 }
 
+// NEW: Bulk add state
 interface BulkAddData {
   pieceNames: string;
   gameId: string;
@@ -42,7 +43,7 @@ export default function PiecesManager() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<StatusState>(null);
   const [showForm, setShowForm] = useState(false);
-  const [showBulkForm, setShowBulkForm] = useState(false);
+  const [showBulkForm, setShowBulkForm] = useState(false); // NEW
   const [editingPiece, setEditingPiece] = useState<Piece | null>(null);
   const [selectedGameFilter, setSelectedGameFilter] = useState<string>("");
   const [linkingPieceId, setLinkingPieceId] = useState<number | null>(null);
@@ -53,6 +54,7 @@ export default function PiecesManager() {
     gameId: "",
   });
   
+  // NEW: Bulk add state
   const [bulkData, setBulkData] = useState<BulkAddData>({
     pieceNames: "",
     gameId: "",
@@ -99,6 +101,7 @@ export default function PiecesManager() {
     }
   }
 
+  // NEW: Bulk add handler
   async function handleBulkSubmit(e: React.FormEvent) {
     e.preventDefault();
     
@@ -158,6 +161,7 @@ export default function PiecesManager() {
       }
     }
     
+    // Build status message
     let message = `Bulk add complete: ${results.success} added`;
     if (results.failed > 0) {
       message += `, ${results.failed} failed`;
@@ -268,6 +272,7 @@ export default function PiecesManager() {
     setFormData({ name: "", description: "", locale: "en", gameId: "" });
   }
   
+  // NEW: Bulk cancel
   function handleBulkCancel() {
     setShowBulkForm(false);
     setBulkData({ pieceNames: "", gameId: "" });
@@ -277,20 +282,37 @@ export default function PiecesManager() {
     <section className="panel">
       <h1>Pieces Management</h1>
 
+      {/* Status Message */}
       {status && (
-        <div className={`status status-${status.type}`}>
+        <div
+          style={{
+            padding: "0.75rem",
+            borderRadius: "8px",
+            background:
+              status.type === "ok"
+                ? "#198754"
+                : status.type === "error"
+                ? "#dc3545"
+                : "#0dcaf0",
+            color: "white",
+            marginBottom: "1rem",
+            whiteSpace: "pre-line", // NEW: Allow line breaks in status
+          }}
+        >
           {status.message}
         </div>
       )}
 
-      <div className="actions">
+      {/* Actions */}
+      <div className="actions" style={{ alignItems: "center" }}>
         <button onClick={() => setShowForm(!showForm)} disabled={loading}>
           {showForm ? "Cancel" : "Add Piece"}
         </button>
+        {/* NEW: Bulk add button */}
         <button 
-          className={showBulkForm ? "danger" : "info"}
           onClick={() => setShowBulkForm(!showBulkForm)} 
           disabled={loading}
+          style={{ background: showBulkForm ? "#dc3545" : "#0dcaf0" }}
         >
           {showBulkForm ? "Cancel Bulk" : "Bulk Add"}
         </button>
@@ -298,12 +320,17 @@ export default function PiecesManager() {
           {loading ? "Loading..." : "Refresh"}
         </button>
 
-        <label className="filter-label">
+        <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           Filter by Game:
           <select
             value={selectedGameFilter}
             onChange={(e) => setSelectedGameFilter(e.target.value)}
             disabled={loading}
+            style={{
+              padding: "0.5rem",
+              borderRadius: "4px",
+              border: "1px solid #2222D6",
+            }}
           >
             <option value="">All Pieces</option>
             {games.map((game) => (
@@ -315,18 +342,37 @@ export default function PiecesManager() {
         </label>
       </div>
 
+      {/* NEW: Bulk Add Form */}
       {showBulkForm && (
-        <form onSubmit={handleBulkSubmit} className="form-panel bulk-form">
-          <h3>Bulk Add Pieces</h3>
+        <form
+          onSubmit={handleBulkSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.75rem",
+            padding: "1rem",
+            background: "#111",
+            borderRadius: "8px",
+            marginTop: "1rem",
+            border: "1px solid #0dcaf0",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Bulk Add Pieces</h3>
           
-          <div className="form-group">
-            <label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
               Game * (all pieces will be assigned to this game)
             </label>
             <select
               value={bulkData.gameId}
               onChange={(e) => setBulkData({ ...bulkData, gameId: e.target.value })}
               required
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
             >
               <option value="">-- Select a game --</option>
               {games.map((game) => (
@@ -337,24 +383,30 @@ export default function PiecesManager() {
             </select>
           </div>
 
-          <div className="form-group">
-            <label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
               Piece Names * (one per line)
             </label>
             <textarea
-              className="bulk-textarea"
               value={bulkData.pieceNames}
               onChange={(e) => setBulkData({ ...bulkData, pieceNames: e.target.value })}
               required
               rows={10}
               placeholder="House Atreides&#10;House Harkonnen&#10;Fremen&#10;..."
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+                fontFamily: "monospace",
+              }}
             />
-            <p className="hint">
+            <p style={{ fontSize: "0.85em", color: "#aaa", marginTop: "0.25rem" }}>
               {bulkData.pieceNames.split('\n').filter(n => n.trim()).length} pieces to add
             </p>
           </div>
 
-          <div className="actions">
+          <div className="actions" style={{ marginTop: "0.5rem" }}>
             <button type="submit" disabled={loading}>
               Add All
             </button>
@@ -365,14 +417,28 @@ export default function PiecesManager() {
         </form>
       )}
 
+      {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="form-panel">
-          <h3>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.75rem",
+            padding: "1rem",
+            background: "#111",
+            borderRadius: "8px",
+            marginTop: "1rem",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>
             {editingPiece ? "Edit Piece" : "New Piece"}
           </h3>
 
-          <div className="form-group">
-            <label>Name *</label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Name *
+            </label>
             <input
               type="text"
               value={formData.name}
@@ -380,22 +446,38 @@ export default function PiecesManager() {
                 setFormData({ ...formData, name: e.target.value })
               }
               required
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
             />
           </div>
 
-          <div className="form-group">
-            <label>Description</label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Description
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={3}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
             />
           </div>
 
-          <div className="form-group">
-            <label>Locale</label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Locale
+            </label>
             <input
               type="text"
               value={formData.locale}
@@ -403,16 +485,30 @@ export default function PiecesManager() {
                 setFormData({ ...formData, locale: e.target.value })
               }
               placeholder="en"
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
             />
           </div>
 
-          <div className="form-group">
-            <label>Link to Game (optional)</label>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Link to Game (optional)
+            </label>
             <select
               value={formData.gameId}
               onChange={(e) =>
                 setFormData({ ...formData, gameId: e.target.value })
               }
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
             >
               <option value="">-- Select a game --</option>
               {games.map((game) => (
@@ -422,14 +518,16 @@ export default function PiecesManager() {
               ))}
             </select>
             {games.length === 0 && (
-              <p className="hint">
+              <p style={{ fontSize: "0.85em", color: "#aaa", marginTop: "0.25rem" }}>
                 No games available.{" "}
-                <a href="/games">Add a game first</a>
+                <a href="/games" style={{ color: "#0dcaf0" }}>
+                  Add a game first
+                </a>
               </p>
             )}
           </div>
 
-          <div className="actions">
+          <div className="actions" style={{ marginTop: "0.5rem" }}>
             <button type="submit" disabled={loading}>
               {editingPiece ? "Update" : "Create"}
             </button>
@@ -440,7 +538,8 @@ export default function PiecesManager() {
         </form>
       )}
 
-      <div className="pieces-list">
+      {/* Pieces List */}
+      <div style={{ marginTop: "1rem" }}>
         {loading && pieces.length === 0 ? (
           <p>Loading pieces...</p>
         ) : pieces.length === 0 ? (
@@ -450,21 +549,53 @@ export default function PiecesManager() {
               : "No pieces found. Add one to get started."}
           </p>
         ) : (
-          <div className="pieces-grid">
+          <div
+            style={{
+              display: "grid",
+              gap: "0.75rem",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            }}
+          >
             {pieces.map((piece) => (
-              <div key={piece.id} className="piece-card">
-                <h3>{piece.name}</h3>
+              <div
+                key={piece.id}
+                style={{
+                  padding: "1rem",
+                  background: "#111",
+                  borderRadius: "8px",
+                  border: "1px solid #2222D6",
+                }}
+              >
+                <h3 style={{ margin: "0 0 0.5rem 0" }}>{piece.name}</h3>
                 {piece.description && (
-                  <p className="description">{piece.description}</p>
+                  <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.9em" }}>
+                    {piece.description}
+                  </p>
                 )}
-                <div className="metadata">
+                <div style={{ fontSize: "0.85em", color: "#aaa" }}>
                   {piece.locale && <div>Locale: {piece.locale}</div>}
                   <div>ID: {piece.id}</div>
                 </div>
 
+                {/* Inline game linking section */}
                 {linkingPieceId === piece.id ? (
-                  <div className="link-section">
-                    <label>Select game to link:</label>
+                  <div
+                    style={{
+                      marginTop: "0.75rem",
+                      padding: "0.75rem",
+                      background: "#0a0a0a",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.9em",
+                      }}
+                    >
+                      Select game to link:
+                    </label>
                     <select
                       onChange={(e) => {
                         if (e.target.value) {
@@ -472,6 +603,13 @@ export default function PiecesManager() {
                         }
                       }}
                       disabled={loading}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
+                        border: "1px solid #444",
+                        marginBottom: "0.5rem",
+                      }}
                     >
                       <option value="">-- Choose a game --</option>
                       {games.map((game) => (
@@ -481,31 +619,40 @@ export default function PiecesManager() {
                       ))}
                     </select>
                     {games.length === 0 && (
-                      <p className="hint">
+                      <p style={{ fontSize: "0.85em", color: "#aaa", margin: "0 0 0.5rem 0" }}>
                         No games available.{" "}
-                        <a href="/games">Add one here</a>
+                        <a href="/games" style={{ color: "#0dcaf0" }}>
+                          Add one here
+                        </a>
                       </p>
                     )}
-                    <button onClick={() => setLinkingPieceId(null)} disabled={loading}>
+                    <button
+                      onClick={() => setLinkingPieceId(null)}
+                      disabled={loading}
+                      style={{ fontSize: "0.85em" }}
+                    >
                       Cancel
                     </button>
                   </div>
                 ) : (
-                  <div className="actions">
+                  <div
+                    className="actions"
+                    style={{ marginTop: "0.75rem", justifyContent: "flex-start" }}
+                  >
                     <button onClick={() => handleEdit(piece)} disabled={loading}>
                       Edit
                     </button>
                     <button
-                      className="info"
                       onClick={() => setLinkingPieceId(piece.id)}
                       disabled={loading}
+                      style={{ background: "#0dcaf0" }}
                     >
                       Link to Game
                     </button>
                     <button
-                      className="danger"
                       onClick={() => handleDelete(piece.id, piece.name)}
                       disabled={loading}
+                      style={{ background: "#dc3545" }}
                     >
                       Delete
                     </button>

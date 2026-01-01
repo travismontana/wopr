@@ -3,7 +3,7 @@
   max-width: 80ch;
   margin: 0 auto;
   padding: 1rem;
-  font-family: 'VT323', 'Perfect DOS VGA 437', 'Courier New', monospace;
+  font-family: 'VT323';
   background: #000;
   color: #00ff00;
   line-height: 1.2;
@@ -96,7 +96,6 @@
 }
 
 .wip-message {
-  font-family: monospace;
   opacity: 0.8;
   line-height: 1.6;
 }
@@ -221,7 +220,6 @@
   border: 1px solid #00ff00;
   background: #000;
   color: #00ff00;
-  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
 }
 
 .form-field input:focus,
@@ -238,7 +236,6 @@ button {
   border: 1px solid #00ff00;
   color: #00ff00;
   cursor: pointer;
-  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
 }
 
 button:hover:not(:disabled) {
@@ -337,7 +334,6 @@ select {
   border: 1px solid #00ff00;
   background: #000;
   color: #00ff00;
-  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
 }
 
 select:focus {
@@ -420,7 +416,6 @@ select:focus {
 
 .gallery-header h2 {
     margin: 0;
-    font-family: var(--font-mono, monospace);
 }
 
 .image-count {
@@ -483,7 +478,6 @@ select:focus {
   border: 1px solid #00ff00;
   background: #000;
   color: #00ff00;
-  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
   resize: vertical;
 }
 
@@ -531,7 +525,6 @@ select:focus {
   border: 1px solid #444;
   background: #000;
   color: #00ff00;
-  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
 }
 
 .form-group input:focus,
@@ -542,9 +535,9 @@ select:focus {
   box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
-.bulk-textarea {
+/*.bulk-textarea {
   font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
-}
+}*/
 
 .filter-label {
   display: flex;
