@@ -1,6 +1,8 @@
 apiVersion: v2
-name: wopr-images
-description: Thumbor image processing service
-type: application
-version: 0.1.0
-appVersion: "latest"
+name: wopr-directus
+version: 1.0.0
+description: WOPR Directus UI
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"
