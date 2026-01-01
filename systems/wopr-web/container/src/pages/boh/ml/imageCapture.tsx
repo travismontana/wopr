@@ -54,9 +54,9 @@ export default function MLImagesPage() {
   const [formData, setFormData] = useState<CaptureFormData>({
     game_id: null,
     piece_id: null,
-    position_id: 0,
+    position_id: 10,
     rotation: 0,
-    lighting_level: 50,
+    lighting_level: 70,
     lighting_temp: 'neutral',
     notes: ''
   });
@@ -258,8 +258,8 @@ export default function MLImagesPage() {
                 disabled={!config}
                 required
               >
-                {config?.object.rotations.map((rotation) => (
-                  <option key={rotation} value={rotation}>
+                {config?.object.rotations.map((rotation, index) => (
+                  <option key={rotation} value={index}>
                     {rotation}°
                   </option>
                 ))}
