@@ -236,7 +236,7 @@ async def get_preset_options():
     brightness_options = parse_intensity_list(light_settings["intensity"])
     temps = light_settings["tempNums"]
     kelvin_descriptions = light_settings["tempNames"]
-    kelvin_options = sorted(temps.values())
+    kelvin_options = temps
     
     # Build reverse lookup for descriptions
     #kelvin_descriptions = {v: k for k, v in temps.items()}
