@@ -17,7 +17,7 @@ interface ConfigData {
   object: {
     positions: string[];
     positionNames: string[];
-    rotations: (string | number)[];
+    rotations: (string)[];
   };
   lightSettings: {
     intensity: string[];
@@ -55,7 +55,7 @@ export default function MLImagesPage() {
     game_id: null,
     piece_id: null,
     position_id: 10,
-    rotation: 0,
+    rotation: 1,
     lighting_level: 70,
     lighting_temp: 'neutral',
     notes: ''
