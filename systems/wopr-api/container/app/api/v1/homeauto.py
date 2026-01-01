@@ -61,26 +61,50 @@ async def fetch_light_settings() -> Dict:
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{CONFIG_SERVICE_URL}/section/lightSettings"
+                f"{CONFIG_SERVICE_URL}/get/lightSettings.intensity"
             )
             response.raise_for_status()
-            settings = response.json()
+            settings["intensity"] = response.json()
             
             logger.debug(f"Fetched light settings from config: {settings}")
-            return settings
             
     except httpx.HTTPError as e:
         logger.error(f"Failed to fetch light settings from config service: {str(e)}")
         # Fallback to defaults if config service unavailable
         logger.warning("Using fallback default light settings")
-        return {
-            "intensity": ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"],
-            "temps": {
-                "cool": "5500",
-                "warm": "3000",
-                "neutral": "4000"
-            }
-        }
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"{CONFIG_SERVICE_URL}/get/lightSettings.tempNames"
+            )
+            response.raise_for_status()
+            settings["tempNames"] = response.json()
+            
+            logger.debug(f"Fetched light settings from config: {settings}")
+            
+    except httpx.HTTPError as e:
+        logger.error(f"Failed to fetch light settings from config service: {str(e)}")
+        # Fallback to defaults if config service unavailable
+        logger.warning("Using fallback default light settings")
+    
+        try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"{CONFIG_SERVICE_URL}/get/lightSettings.tempNums"
+            )
+            response.raise_for_status()
+            settings["tempNums"] = response.json()
+            
+            logger.debug(f"Fetched light settings from config: {settings}")
+            
+    except httpx.HTTPError as e:
+        logger.error(f"Failed to fetch light settings from config service: {str(e)}")
+        # Fallback to defaults if config service unavailable
+        logger.warning("Using fallback default light settings")
+    
+
+
 
 
 def parse_intensity_list(intensity_list: List[str]) -> List[int]:
@@ -211,7 +235,7 @@ async def get_preset_options():
     
     # Parse config values
     brightness_options = parse_intensity_list(light_settings["intensity"])
-    temps = parse_temps_dict(light_settings["temps"])
+    temps = dict(zip(light_settings["tempNames"], light_settings["tempNums"]))
     kelvin_options = sorted(temps.values())
     
     # Build reverse lookup for descriptions
