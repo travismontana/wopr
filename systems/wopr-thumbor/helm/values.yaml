@@ -20,9 +20,11 @@ thumbor:
   numProcesses: 2
   maxAge: 3600
   maxAgeTempImage: 300
-  resultStorageExpiration: 31536000
+  resultStorageExpiration: 60
   allowUnsafeUrl: true
   autoWebp: true
+  logLevel: DEBUG
+  resultStorageFileStorageRootPath: /data/thumbor/results
   # ADD: Config content
   config: |
     PORT = 80
