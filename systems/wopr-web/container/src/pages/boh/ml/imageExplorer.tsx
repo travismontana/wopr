@@ -102,7 +102,7 @@ export default function MLExplorerPage() {
 
     try {
       const deletePromises = Array.from(selected).map(id =>
-        fetch(`${API_BASE}/api/v1/ml/images/${id}`, { method: 'DELETE' })
+        fetch(`${API_BASE}/api/v1/mlimages/${id}`, { method: 'DELETE' })
       );
 
       const results = await Promise.all(deletePromises);
