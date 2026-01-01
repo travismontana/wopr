@@ -113,7 +113,7 @@ def parse_intensity_list(intensity_list: List[str]) -> List[int]:
 
 def parse_temps_dict(temps: Dict[str, str]) -> Dict[str, int]:
     """Convert string kelvin values to integers"""
-    return {k: int(v) for k, v in temps.items()}
+    return temps
 
 
 @router.post("/lights/preset", response_model=HomeAssistantResponse)
@@ -141,7 +141,7 @@ async def set_light_preset(request: LightPresetRequest):
     light_settings = await fetch_light_settings()
     
     # Parse and validate kelvin against config
-    temps = light_settings["tempNums"].values()
+    temps = light_settings["tempNums"]
     valid_kelvin = temps
     
     if request.kelvin not in valid_kelvin:
