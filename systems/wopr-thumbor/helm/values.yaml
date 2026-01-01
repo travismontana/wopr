@@ -56,9 +56,9 @@ wopr-baseapp:
     - name: RESULT_STORAGE_EXPIRATION_SECONDS
       value: "60"
     - name: ALLOW_UNSAFE_URL
-      value: "true"
+      value: "True"
     - name: AUTO_WEBP
-      value: "true"
+      value: "True"
     - name: LOG_LEVEL
       value: "DEBUG"
     - name: FILE_LOADER_ROOT_PATH
