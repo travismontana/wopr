@@ -80,7 +80,7 @@ async def fetch_light_settings() -> Dict:
                 f"{CONFIG_SERVICE_URL}/get/lightSettings.tempNames"
             )
             response.raise_for_status()
-            settings["tempNames"] = response.json()
+            settings["tempNames"] = response.json()["value"]
             
             logger.debug(f"Fetched light settings from config: {settings}")
             
@@ -95,7 +95,7 @@ async def fetch_light_settings() -> Dict:
                 f"{CONFIG_SERVICE_URL}/get/lightSettings.tempNums"
             )
             response.raise_for_status()
-            settings["tempNums"] = response.json()
+            settings["tempNums"] = response.json()["value"]
             
             logger.debug(f"Fetched light settings from config: {settings}")
             
