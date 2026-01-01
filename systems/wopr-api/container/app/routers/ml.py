@@ -29,6 +29,7 @@ class CaptureRequest(BaseModel):
     game_id: int
     piece_id: int
     position_id: int
+    rotation: int = Field(ge=0, le=360, description="Rotation in degrees 0-360, in 45 degree increments")
     lighting_level: int = Field(ge=10, le=100, description="Brightness 10-100")
     lighting_temp: str = Field(description="neutral/warm/cool")
     notes: Optional[str] = None
