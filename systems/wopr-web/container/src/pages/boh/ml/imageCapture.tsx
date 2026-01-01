@@ -39,8 +39,10 @@ interface CaptureFormData {
   lighting_temp: string;
   notes: string;
 }
-
-const API_BASE = 'https://api.wopr.studio.abode.tailandtraillabs.org';
+const API_URL =
+  (window as any).ENV?.WOPR_API_URL ||
+  "https://wopr-api.studio.abode.tailandtraillabs.org";
+const API_BASE = API_URL;
 
 export default function MLImagesPage() {
   const [games, setGames] = useState<Game[]>([]);
