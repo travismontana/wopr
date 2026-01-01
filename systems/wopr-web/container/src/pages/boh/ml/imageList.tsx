@@ -39,8 +39,8 @@ export function MLGallery() {
             const data: MLImageMetadata[] = await res.json();
 
             const galleryImages = data.map(img => {
-                const imageUrl = `https://images.studio.abode.tailandtraillabs.org/ml/incoming/dune__imperium___uprising/${img.filename}`;
-                const thumbnailUrl = `https://thumbor.studio.abode.tailandtraillabs.org/unsafe/300x0/ml/incoming/dune__imperium___uprising/${img.filename}`;
+                const imageUrl = `https://images.studio.abode.tailandtraillabs.org/ml/incoming/${img.filename}`;
+                const thumbnailUrl = `https://thumbor.studio.abode.tailandtraillabs.org/unsafe/300x0/ml/incoming/${img.filename}`;
 
                 return {
                     original: imageUrl,
