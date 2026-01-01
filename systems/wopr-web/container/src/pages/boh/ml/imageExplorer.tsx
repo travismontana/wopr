@@ -2,20 +2,22 @@ import { useState, useEffect } from 'react';
 
 interface MLImageMetadata {
   id: number;
-  game_id: number;
+  uuid: string;
+  game_uuid: number;
   piece_id: number;
-  position_id: number;
-  rotation: number;
-  lighting_level: number;
-  lighting_temp: string;
+  object_position: string;
+  object_rotation: number;
+  light_intensity: number;
+  color_temp: string;
   filename: string;
-  notes?: string;
-  created_at: string;
-  game_name?: string;
-  piece_name?: string;
+  status: string;
+  date_created: string;
+  date_updated: string | null;
+  user_created: string | null;
+  user_updated: string | null;
 }
 
-type SortField = 'id' | 'game_name' | 'piece_name' | 'position_id' | 'rotation' | 'lighting_level' | 'created_at';
+type SortField = 'id' | 'game_uuid' | 'piece_id' | 'object_position' | 'object_rotation' | 'light_intensity' | 'date_created';
 type SortDirection = 'asc' | 'desc';
 
 const API_URL =
@@ -27,7 +29,7 @@ export default function MLExplorerPage() {
   const [images, setImages] = useState<MLImageMetadata[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortField, setSortField] = useState<SortField>('date_created');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -60,8 +62,14 @@ export default function MLExplorerPage() {
   };
 
   const sortedImages = [...images].sort((a, b) => {
-    const aVal = a[sortField];
-    const bVal = b[sortField];
+    let aVal: any = a[sortField];
+    let bVal: any = b[sortField];
+    
+    // Handle string positions as numbers for sorting
+    if (sortField === 'object_position') {
+      aVal = parseInt(aVal) || 0;
+      bVal = parseInt(bVal) || 0;
+    }
     
     let comparison = 0;
     if (aVal < bVal) comparison = -1;
@@ -170,25 +178,25 @@ export default function MLExplorerPage() {
               <th onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
                 ID <SortIcon field="id" />
               </th>
-              <th onClick={() => handleSort('game_name')} style={{ cursor: 'pointer' }}>
-                Game <SortIcon field="game_name" />
+              <th onClick={() => handleSort('game_uuid')} style={{ cursor: 'pointer' }}>
+                Game <SortIcon field="game_uuid" />
               </th>
-              <th onClick={() => handleSort('piece_name')} style={{ cursor: 'pointer' }}>
-                Piece <SortIcon field="piece_name" />
+              <th onClick={() => handleSort('piece_id')} style={{ cursor: 'pointer' }}>
+                Piece <SortIcon field="piece_id" />
               </th>
-              <th onClick={() => handleSort('position_id')} style={{ cursor: 'pointer' }}>
-                Position <SortIcon field="position_id" />
+              <th onClick={() => handleSort('object_position')} style={{ cursor: 'pointer' }}>
+                Position <SortIcon field="object_position" />
               </th>
-              <th onClick={() => handleSort('rotation')} style={{ cursor: 'pointer' }}>
-                Rotation <SortIcon field="rotation" />
+              <th onClick={() => handleSort('object_rotation')} style={{ cursor: 'pointer' }}>
+                Rotation <SortIcon field="object_rotation" />
               </th>
-              <th onClick={() => handleSort('lighting_level')} style={{ cursor: 'pointer' }}>
-                Light % <SortIcon field="lighting_level" />
+              <th onClick={() => handleSort('light_intensity')} style={{ cursor: 'pointer' }}>
+                Light % <SortIcon field="light_intensity" />
               </th>
               <th>Temp</th>
               <th>Filename</th>
-              <th onClick={() => handleSort('created_at')} style={{ cursor: 'pointer' }}>
-                Created <SortIcon field="created_at" />
+              <th onClick={() => handleSort('date_created')} style={{ cursor: 'pointer' }}>
+                Created <SortIcon field="date_created" />
               </th>
             </tr>
           </thead>
@@ -203,14 +211,14 @@ export default function MLExplorerPage() {
                   />
                 </td>
                 <td>{img.id}</td>
-                <td>{img.game_name || img.game_id}</td>
-                <td>{img.piece_name || img.piece_id}</td>
-                <td>{img.position_id}</td>
-                <td>{img.rotation}°</td>
-                <td>{img.lighting_level}%</td>
-                <td>{img.lighting_temp}</td>
+                <td>{img.game_uuid}</td>
+                <td>{img.piece_id}</td>
+                <td>{img.object_position}</td>
+                <td>{img.object_rotation}°</td>
+                <td>{img.light_intensity}%</td>
+                <td>{img.color_temp}</td>
                 <td className="filename">{img.filename}</td>
-                <td>{new Date(img.created_at).toLocaleString()}</td>
+                <td>{new Date(img.date_created).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
