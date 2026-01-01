@@ -141,7 +141,7 @@ async def set_light_preset(request: LightPresetRequest):
     light_settings = await fetch_light_settings()
     
     # Parse and validate kelvin against config
-    temps = light_settings["tempNames"]
+    temps = light_settings["tempNums"]
     valid_kelvin = temps
     
     if request.kelvin not in valid_kelvin:
