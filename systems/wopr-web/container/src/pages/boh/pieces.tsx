@@ -5,14 +5,14 @@ const API_URL =
   "https://wopr-api.studio.abode.tailandtraillabs.org";
 
 interface Piece {
-  uuid: string;  // NEW
+  uuid: string;
   name: string;
-  game_uuid: number;  // NEW (direct FK, was via junction table)
-  status: string;  // NEW
-  user_created?: string;  // NEW
-  date_created: string;  // was created_at
-  user_updated?: string;  // NEW
-  date_updated?: string;  // was updated_at
+  game_uuid: number;
+  status: string;
+  user_created?: string;
+  date_created: string;
+  user_updated?: string;
+  date_updated?: string;
 }
 
 interface Game {
@@ -24,7 +24,13 @@ interface PieceFormData {
   name: string;
   description: string;
   locale: string;
-  gameId: string; // Added for linking on create/edit
+  gameId: string;
+}
+
+// NEW: Bulk add state
+interface BulkAddData {
+  pieceNames: string;
+  gameId: string;
 }
 
 type StatusState =
@@ -37,14 +43,21 @@ export default function PiecesManager() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<StatusState>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showBulkForm, setShowBulkForm] = useState(false); // NEW
   const [editingPiece, setEditingPiece] = useState<Piece | null>(null);
   const [selectedGameFilter, setSelectedGameFilter] = useState<string>("");
-  const [linkingPieceId, setLinkingPieceId] = useState<number | null>(null); // Track which piece is being linked
+  const [linkingPieceId, setLinkingPieceId] = useState<number | null>(null);
   const [formData, setFormData] = useState<PieceFormData>({
     name: "",
     description: "",
     locale: "en",
-    gameId: "", // Added
+    gameId: "",
+  });
+  
+  // NEW: Bulk add state
+  const [bulkData, setBulkData] = useState<BulkAddData>({
+    pieceNames: "",
+    gameId: "",
   });
 
   useEffect(() => {
@@ -88,6 +101,89 @@ export default function PiecesManager() {
     }
   }
 
+  // NEW: Bulk add handler
+  async function handleBulkSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    
+    const pieceList = bulkData.pieceNames
+      .split('\n')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+    
+    if (pieceList.length === 0) {
+      setStatus({ type: "error", message: "No piece names provided" });
+      return;
+    }
+    
+    if (!bulkData.gameId) {
+      setStatus({ type: "error", message: "Game selection required for bulk add" });
+      return;
+    }
+    
+    const gameName = games.find(g => g.id === Number(bulkData.gameId))?.name || "Unknown";
+    
+    if (!confirm(`Add ${pieceList.length} pieces to "${gameName}"?\n\n${pieceList.slice(0, 5).join('\n')}${pieceList.length > 5 ? '\n...' : ''}`)) {
+      return;
+    }
+    
+    setLoading(true);
+    setStatus({ type: "info", message: `Adding ${pieceList.length} pieces...` });
+    
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [] as string[]
+    };
+    
+    for (const name of pieceList) {
+      try {
+        const payload = {
+          name,
+          game_uuid: Number(bulkData.gameId),
+          status: "published"
+        };
+        
+        const res = await fetch(`${API_URL}/api/v1/pieces`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`${name}: HTTP ${res.status}`);
+        }
+        
+        results.success++;
+      } catch (e: any) {
+        results.failed++;
+        results.errors.push(e?.message ?? `Failed: ${name}`);
+      }
+    }
+    
+    // Build status message
+    let message = `Bulk add complete: ${results.success} added`;
+    if (results.failed > 0) {
+      message += `, ${results.failed} failed`;
+      if (results.errors.length > 0) {
+        message += `\n${results.errors.slice(0, 3).join('\n')}`;
+        if (results.errors.length > 3) {
+          message += `\n... and ${results.errors.length - 3} more`;
+        }
+      }
+    }
+    
+    setStatus({
+      type: results.failed > 0 ? "error" : "ok",
+      message
+    });
+    
+    setBulkData({ pieceNames: "", gameId: "" });
+    setShowBulkForm(false);
+    await loadPieces();
+    setLoading(false);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -96,8 +192,8 @@ export default function PiecesManager() {
     try {
       const payload = {
         name: formData.name.trim(),
-        game_uuid: Number(formData.gameId),  // CHANGED: was separate link call
-        status: "published"  // NEW
+        game_uuid: Number(formData.gameId),
+        status: "published"
       };
 
       const url = editingPiece
@@ -165,7 +261,7 @@ export default function PiecesManager() {
       name: piece.name || "",
       description: piece.description || "",
       locale: piece.locale || "en",
-      gameId: "", // Reset game selection
+      gameId: "",
     });
     setShowForm(true);
   }
@@ -174,6 +270,12 @@ export default function PiecesManager() {
     setShowForm(false);
     setEditingPiece(null);
     setFormData({ name: "", description: "", locale: "en", gameId: "" });
+  }
+  
+  // NEW: Bulk cancel
+  function handleBulkCancel() {
+    setShowBulkForm(false);
+    setBulkData({ pieceNames: "", gameId: "" });
   }
 
   return (
@@ -194,6 +296,7 @@ export default function PiecesManager() {
                 : "#0dcaf0",
             color: "white",
             marginBottom: "1rem",
+            whiteSpace: "pre-line", // NEW: Allow line breaks in status
           }}
         >
           {status.message}
@@ -204,6 +307,14 @@ export default function PiecesManager() {
       <div className="actions" style={{ alignItems: "center" }}>
         <button onClick={() => setShowForm(!showForm)} disabled={loading}>
           {showForm ? "Cancel" : "Add Piece"}
+        </button>
+        {/* NEW: Bulk add button */}
+        <button 
+          onClick={() => setShowBulkForm(!showBulkForm)} 
+          disabled={loading}
+          style={{ background: showBulkForm ? "#dc3545" : "#0dcaf0" }}
+        >
+          {showBulkForm ? "Cancel Bulk" : "Bulk Add"}
         </button>
         <button onClick={loadPieces} disabled={loading}>
           {loading ? "Loading..." : "Refresh"}
@@ -230,6 +341,81 @@ export default function PiecesManager() {
           </select>
         </label>
       </div>
+
+      {/* NEW: Bulk Add Form */}
+      {showBulkForm && (
+        <form
+          onSubmit={handleBulkSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.75rem",
+            padding: "1rem",
+            background: "#111",
+            borderRadius: "8px",
+            marginTop: "1rem",
+            border: "1px solid #0dcaf0",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Bulk Add Pieces</h3>
+          
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Game * (all pieces will be assigned to this game)
+            </label>
+            <select
+              value={bulkData.gameId}
+              onChange={(e) => setBulkData({ ...bulkData, gameId: e.target.value })}
+              required
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+              }}
+            >
+              <option value="">-- Select a game --</option>
+              {games.map((game) => (
+                <option key={game.id} value={game.id}>
+                  {game.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem" }}>
+              Piece Names * (one per line)
+            </label>
+            <textarea
+              value={bulkData.pieceNames}
+              onChange={(e) => setBulkData({ ...bulkData, pieceNames: e.target.value })}
+              required
+              rows={10}
+              placeholder="House Atreides&#10;House Harkonnen&#10;Fremen&#10;..."
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                borderRadius: "4px",
+                border: "1px solid #444",
+                fontFamily: "monospace",
+              }}
+            />
+            <p style={{ fontSize: "0.85em", color: "#aaa", marginTop: "0.25rem" }}>
+              {bulkData.pieceNames.split('\n').filter(n => n.trim()).length} pieces to add
+            </p>
+          </div>
+
+          <div className="actions" style={{ marginTop: "0.5rem" }}>
+            <button type="submit" disabled={loading}>
+              Add All
+            </button>
+            <button type="button" onClick={handleBulkCancel} disabled={loading}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Form */}
       {showForm && (
