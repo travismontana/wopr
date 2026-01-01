@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MLGallery } from './imageList';
+import { MLExplorerPage } from './imageExplorer';
 
 interface Game {
   id: number;
@@ -339,6 +340,8 @@ export default function MLImagesPage() {
         </div>
       )}
       <MLGallery key={galleryKey} />
+      <br></br>
+      <MLExplorerPage />
     </div>
   );
 }

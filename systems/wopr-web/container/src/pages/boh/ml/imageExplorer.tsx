@@ -25,7 +25,7 @@ const API_URL =
   "https://wopr-api.studio.abode.tailandtraillabs.org";
 const API_BASE = API_URL;
 
-export default function MLExplorerPage() {
+export function MLExplorerPage() {
   const [images, setImages] = useState<MLImageMetadata[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<number>>(new Set());
