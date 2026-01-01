@@ -71,9 +71,5 @@ wopr-baseapp:
       value: /data/thumbor/results 
     - name: RESULT_STORAGE
       value: thumbor.result_storages.file_storage
-    - name: MIXED_STORAGE_FILE_STORAGE
-      value: thumbor.storages.file_storage
-    - name: MIXED_STORAGE_CRYPTO_STORAGE
-      value: thumbor.storages.file_storage
-    - name: MIXED_STORAGE_DETECTOR_STORAGE
-      value: thumbor.storages.file_storage
+    - name: RESULT_STORAGE_STORES_UNSAFE
+      value: "True"
