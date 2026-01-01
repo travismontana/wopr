@@ -38,7 +38,7 @@ export default function MLExplorerPage() {
   const fetchImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/api/v1/ml/images`);
+      const response = await fetch(`${API_BASE}/api/v1/mlimages`);
       if (!response.ok) throw new Error('Failed to fetch images');
       const data = await response.json();
       setImages(data);
