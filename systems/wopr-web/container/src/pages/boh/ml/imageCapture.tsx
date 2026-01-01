@@ -51,6 +51,8 @@ export default function MLImagesPage() {
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [galleryKey, setGalleryKey] = useState(0);
+
 
   const [formData, setFormData] = useState<CaptureFormData>({
     game_id: null,
@@ -159,6 +161,7 @@ export default function MLImagesPage() {
           type: 'success', 
           text: `Image captured successfully! Metadata ID: ${result.image_metadata_id}` 
         });
+        setGalleryKey(prev => prev + 1);
       } else {
         setMessage({ 
           type: 'error', 
@@ -335,7 +338,7 @@ export default function MLImagesPage() {
           <p>Setting lights and waiting for stabilization (10s)...</p>
         </div>
       )}
-      <MLGallery />
+      <MLGallery key={galleryKey} />
     </div>
   );
 }
