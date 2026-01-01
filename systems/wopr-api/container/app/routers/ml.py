@@ -72,12 +72,14 @@ async def capture_and_set_lights(request: CaptureRequest):
     image_captured = False
     image_metadata_id = None
     filename = None
-
+    logger.info(f"Starting ML capture process for game_id={request.game_id}, 
+    piece_id={request.piece_id}, position_id={request.position_id}", rotat)
     try:
         # Step 1: Generate filename
         filename = await generate_ml_filename(
             request.game_id,
             request.piece_id,
+            request.rotation,
             request.position_id,
             request.lighting_temp,
             request.lighting_level
@@ -85,7 +87,7 @@ async def capture_and_set_lights(request: CaptureRequest):
         logger.info(f"Generated filename: {filename}")
 
         # Step 2: Set lights
-        logger.info(f"Setting lights: level={request.lighting_level}, temp={request.lighting_temp} ({kelvin}K)")
+        logger.info(f"Request: {request}")
         async with httpx.AsyncClient(timeout=30.0) as client:
             homeauto_response = await client.post(
                 "http://wopr-api:8000/api/v1/homeauto/lights/preset",
@@ -122,7 +124,7 @@ async def capture_and_set_lights(request: CaptureRequest):
                 "http://wopr-api:8000/api/v1/mlimages",
                 json={
                     "filename": filename,
-                    "object_rotation": 0,  # Could add to CaptureRequest if needed
+                    "object_rotation": request.rotation,
                     "object_position": str(request.position_id),
                     "color_temp": request.lighting_temp,
                     "light_intensity": request.lighting_level,
@@ -170,6 +172,7 @@ async def generate_ml_filename(
     game_id: int,
     piece_id: int,
     position_id: int,
+    rotation: int,
     color_temp: str,
     light_intensity: int
 ) -> str:
@@ -207,7 +210,7 @@ async def generate_ml_filename(
         sanitize(piece_name),
         sanitize(game_name),
         f"pos{position_id}",
-        "rot0",  # Could make this configurable
+        f"rot{rotation}",
         f"pct{light_intensity}",
         f"temp{sanitize(color_temp)}",
         timestamp
