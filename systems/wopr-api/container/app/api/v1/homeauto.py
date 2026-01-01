@@ -88,7 +88,7 @@ async def fetch_light_settings() -> Dict:
         # Fallback to defaults if config service unavailable
         logger.warning("Using fallback default light settings")
     
-        try:
+    try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
                 f"{CONFIG_SERVICE_URL}/get/lightSettings.tempNums"
@@ -102,6 +102,8 @@ async def fetch_light_settings() -> Dict:
         logger.error(f"Failed to fetch light settings from config service: {str(e)}")
         # Fallback to defaults if config service unavailable
         logger.warning("Using fallback default light settings")
+
+    return settings
     
 
 
