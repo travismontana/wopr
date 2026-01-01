@@ -129,6 +129,7 @@ export default function MLImagesPage() {
     setMessage(null);
 
     try {
+      console.log('Submitting capture with data:', formData);
       const response = await fetch(`${API_BASE}/api/v1/ml/captureandsetlights`, {
         method: 'POST',
         headers: {
