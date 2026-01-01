@@ -9,7 +9,7 @@ export default function MLIndex() {
       <nav className="secondary-nav">
         <ul>
           <li><Link to="/boh/ml/imageCapture">Image Capture</Link> - Capture training images with controlled lighting</li>
-          <li><Link to="/boh/ml/imageList">Image List</Link> - Browse and manage ML training images</li>
+          <li><Link to="/boh/ml/imageExplorer">Image Explorer</Link> - Explore and analyze captured images</li>
         </ul>
       </nav>
     </div>
