@@ -141,13 +141,13 @@ async def set_light_preset(request: LightPresetRequest):
     light_settings = await fetch_light_settings()
     
     # Parse and validate kelvin against config
-    temps = light_settings["tempNums"]
+    temps = light_settings["tempNames"]
     valid_kelvin = temps
     
     if request.kelvin not in valid_kelvin:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid kelvin value. Must be one of: {valid_kelvin}"
+            detail=f"Invalid kelvin value. Must be one of: {valid_kelvin} Got: {request.kelvin}"
         )
     
     # Parse and validate brightness against config
@@ -156,7 +156,7 @@ async def set_light_preset(request: LightPresetRequest):
     if request.brightness not in valid_brightness:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid brightness value. Must be one of: {valid_brightness}"
+            detail=f"Invalid brightness value. Must be one of: {valid_brightness} Got: {request.brightness}"
         )
     
     # Build Home Assistant API URL
