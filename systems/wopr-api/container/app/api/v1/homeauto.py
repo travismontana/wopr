@@ -65,7 +65,7 @@ async def fetch_light_settings() -> Dict:
                 f"{CONFIG_SERVICE_URL}/get/lightSettings.intensity"
             )
             response.raise_for_status()
-            settings["intensity"] = response.json()
+            settings["intensity"] = response.json()["value"]
             
             logger.debug(f"Fetched light settings from config: {settings}")
             
@@ -106,10 +106,6 @@ async def fetch_light_settings() -> Dict:
 
     return settings
     
-
-
-
-
 def parse_intensity_list(intensity_list: List[str]) -> List[int]:
     """Convert string intensity values to integers"""
     return [int(i) for i in intensity_list]
