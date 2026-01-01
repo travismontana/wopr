@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob <bob@example.com>
@@ -18,9 +19,13 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 import httpx
-from typing import Optional
+from typing import Optional, Dict, List
+from functools import lru_cache
 
 router = APIRouter(tags=["homeauto"])
+
+# Config service URL - adjust as needed
+CONFIG_SERVICE_URL = "http://wopr-api:8000/api/v1/config"  # ← CHANGE THIS TO YOUR CONFIG SERVICE URL
 
 
 class LightPresetRequest(BaseModel):
@@ -41,6 +46,51 @@ class HomeAssistantResponse(BaseModel):
     """Response from Home Assistant service call"""
     changed_states: list = Field(default_factory=list)
     service_response: Optional[dict] = None
+
+
+async def fetch_light_settings() -> Dict:
+    """
+    Fetch light settings from config service.
+    
+    Returns dict with structure:
+    {
+        "intensity": ["10", "20", ...],
+        "temps": {"cool": "5500", "warm": "3000", "neutral": "4000"}
+    }
+    """
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"{CONFIG_SERVICE_URL}/section/lightSettings"
+            )
+            response.raise_for_status()
+            settings = response.json()
+            
+            logger.debug(f"Fetched light settings from config: {settings}")
+            return settings
+            
+    except httpx.HTTPError as e:
+        logger.error(f"Failed to fetch light settings from config service: {str(e)}")
+        # Fallback to defaults if config service unavailable
+        logger.warning("Using fallback default light settings")
+        return {
+            "intensity": ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"],
+            "temps": {
+                "cool": "5500",
+                "warm": "3000",
+                "neutral": "4000"
+            }
+        }
+
+
+def parse_intensity_list(intensity_list: List[str]) -> List[int]:
+    """Convert string intensity values to integers"""
+    return [int(i) for i in intensity_list]
+
+
+def parse_temps_dict(temps: Dict[str, str]) -> Dict[str, int]:
+    """Convert string kelvin values to integers"""
+    return {k: int(v) for k, v in temps.items()}
 
 
 @router.post("/lights/preset", response_model=HomeAssistantResponse)
@@ -64,19 +114,26 @@ async def set_light_preset(request: LightPresetRequest):
         f"Setting light preset: brightness={request.brightness}%, kelvin={request.kelvin}K"
     )
     
-    # Validate kelvin is one of the supported values
-    valid_kelvin = [3000, 4000, 5500]
+    # Fetch current light settings from config
+    light_settings = await fetch_light_settings()
+    
+    # Parse and validate kelvin against config
+    temps = parse_temps_dict(light_settings["temps"])
+    valid_kelvin = list(temps.values())
+    
     if request.kelvin not in valid_kelvin:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid kelvin value. Must be one of: {valid_kelvin}"
         )
     
-    # Validate brightness is in 10% increments
-    if request.brightness % 10 != 0:
+    # Parse and validate brightness against config
+    valid_brightness = parse_intensity_list(light_settings["intensity"])
+    
+    if request.brightness not in valid_brightness:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Brightness must be in 10% increments (10, 20, 30, ...100)"
+            detail=f"Invalid brightness value. Must be one of: {valid_brightness}"
         )
     
     # Build Home Assistant API URL
@@ -145,16 +202,23 @@ async def set_light_preset(request: LightPresetRequest):
 async def get_preset_options():
     """
     Get available brightness and kelvin options for light presets.
+    Fetches values from config service.
     
     Returns:
         Dictionary with valid brightness percentages and kelvin temperatures
     """
+    light_settings = await fetch_light_settings()
+    
+    # Parse config values
+    brightness_options = parse_intensity_list(light_settings["intensity"])
+    temps = parse_temps_dict(light_settings["temps"])
+    kelvin_options = sorted(temps.values())
+    
+    # Build reverse lookup for descriptions
+    kelvin_descriptions = {v: k for k, v in temps.items()}
+    
     return {
-        "brightness_options": list(range(10, 101, 10)),
-        "kelvin_options": [3000, 4000, 5500],
-        "kelvin_descriptions": {
-            3000: "warm",
-            4000: "neutral", 
-            5500: "cool"
-        }
+        "brightness_options": brightness_options,
+        "kelvin_options": kelvin_options,
+        "kelvin_descriptions": kelvin_descriptions
     }
