@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { MLGallery } from './imageList';
 
 interface Game {
   id: number;
@@ -55,7 +56,7 @@ export default function MLImagesPage() {
     game_id: null,
     piece_id: null,
     position_id: 10,
-    rotation: 1,
+    rotation:0,
     lighting_level: 70,
     lighting_temp: 'neutral',
     notes: ''
@@ -334,6 +335,7 @@ export default function MLImagesPage() {
           <p>Setting lights and waiting for stabilization (10s)...</p>
         </div>
       )}
+      <MLGallery />
     </div>
   );
 }

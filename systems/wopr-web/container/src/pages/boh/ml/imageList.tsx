@@ -19,7 +19,7 @@ interface MLImageMetadata {
     date_updated: string | null;
 }
 
-export default function Gallery() {
+export default function MLGallery() {
     const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
