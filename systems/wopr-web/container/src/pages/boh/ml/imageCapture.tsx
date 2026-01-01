@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
 
-const API_URL =
-  (window as any).ENV?.WOPR_API_URL ||
-  "https://wopr-api.studio.abode.tailandtraillabs.org";
-
 interface Game {
   id: number;
   name: string;
@@ -44,7 +40,7 @@ interface CaptureFormData {
   notes: string;
 }
 
-const API_BASE = API_URL;
+const API_BASE = 'https://api.wopr.studio.abode.tailandtraillabs.org';
 
 export default function MLImagesPage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -177,193 +173,162 @@ export default function MLImagesPage() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6 text-green-500">ML Training Image Capture</h1>
+    <div className="panel">
+      <h1>ML Training Image Capture</h1>
 
       {message && (
-        <div className={`mb-4 p-4 rounded ${
-          message.type === 'success' 
-            ? 'bg-green-900 text-green-200' 
-            : 'bg-red-900 text-red-200'
-        }`}>
+        <div className={`status-message ${message.type === 'success' ? 'ok' : 'error'}`}>
           {message.text}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
-        {/* Game Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Game
-          </label>
-          <select
-            value={formData.game_id || ''}
-            onChange={(e) => {
-              const value = e.target.value ? parseInt(e.target.value) : null;
-              setFormData({ ...formData, game_id: value, piece_id: null });
-            }}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            required
-          >
-            <option value="">Select a game</option>
-            {games.map((game) => (
-              <option key={game.id} value={game.id}>
-                {game.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-container">
+          <div className="form-row">
+            <div className="form-field">
+              <label>Game</label>
+              <select
+                value={formData.game_id || ''}
+                onChange={(e) => {
+                  const value = e.target.value ? parseInt(e.target.value) : null;
+                  setFormData({ ...formData, game_id: value, piece_id: null });
+                }}
+                required
+              >
+                <option value="">Select a game</option>
+                {games.map((game) => (
+                  <option key={game.id} value={game.id}>
+                    {game.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Piece Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Piece
-          </label>
-          <select
-            value={formData.piece_id || ''}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              piece_id: e.target.value ? parseInt(e.target.value) : null 
-            })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            disabled={!formData.game_id || pieces.length === 0}
-            required
-          >
-            <option value="">Select a piece</option>
-            {pieces.map((piece) => (
-              <option key={piece.id} value={piece.id}>
-                {piece.name}
-              </option>
-            ))}
-          </select>
-          {formData.game_id && pieces.length === 0 && (
-            <p className="text-sm text-gray-400 mt-1">No pieces found for selected game</p>
-          )}
-        </div>
+            <div className="form-field">
+              <label>Piece</label>
+              <select
+                value={formData.piece_id || ''}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  piece_id: e.target.value ? parseInt(e.target.value) : null 
+                })}
+                disabled={!formData.game_id || pieces.length === 0}
+                required
+              >
+                <option value="">Select a piece</option>
+                {pieces.map((piece) => (
+                  <option key={piece.id} value={piece.id}>
+                    {piece.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        {/* Position */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Position
-          </label>
-          <select
-            value={formData.position_id}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              position_id: parseInt(e.target.value) 
-            })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            disabled={!config}
-            required
-          >
-            {config?.object.positionNames.map((name, index) => (
-              <option key={index} value={index}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="form-row">
+            <div className="form-field">
+              <label>Position</label>
+              <select
+                value={formData.position_id}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  position_id: parseInt(e.target.value) 
+                })}
+                disabled={!config}
+                required
+              >
+                {config?.object.positionNames.map((name, index) => (
+                  <option key={index} value={index}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Rotation */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Rotation
-          </label>
-          <select
-            value={formData.rotation}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              rotation: parseInt(e.target.value) 
-            })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            disabled={!config}
-            required
-          >
-            {config?.object.rotations.map((rotation) => (
-              <option key={rotation} value={rotation}>
-                {rotation}°
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="form-field">
+              <label>Rotation</label>
+              <select
+                value={formData.rotation}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  rotation: parseInt(e.target.value) 
+                })}
+                disabled={!config}
+                required
+              >
+                {config?.object.rotations.map((rotation) => (
+                  <option key={rotation} value={rotation}>
+                    {rotation}°
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        {/* Light Intensity */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Light Intensity: {formData.lighting_level}%
-          </label>
-          <select
-            value={formData.lighting_level}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              lighting_level: parseInt(e.target.value) 
-            })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            disabled={!config}
-            required
-          >
-            {config?.lightSettings.intensity.map((level) => (
-              <option key={level} value={level}>
-                {level}%
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="form-row">
+            <div className="form-field">
+              <label>Light Intensity: {formData.lighting_level}%</label>
+              <select
+                value={formData.lighting_level}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  lighting_level: parseInt(e.target.value) 
+                })}
+                disabled={!config}
+                required
+              >
+                {config?.lightSettings.intensity.map((level) => (
+                  <option key={level} value={level}>
+                    {level}%
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Light Temperature */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Light Temperature
-          </label>
-          <select
-            value={formData.lighting_temp}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              lighting_temp: e.target.value 
-            })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            disabled={!config}
-            required
-          >
-            {config?.lightSettings.tempNames.map((tempName) => (
-              <option key={tempName} value={tempName}>
-                {tempName.charAt(0).toUpperCase() + tempName.slice(1)} ({config.lightSettings.temps[tempName as keyof typeof config.lightSettings.temps]}K)
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="form-field">
+              <label>Light Temperature</label>
+              <select
+                value={formData.lighting_temp}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  lighting_temp: e.target.value 
+                })}
+                disabled={!config}
+                required
+              >
+                {config?.lightSettings.tempNames.map((tempName) => (
+                  <option key={tempName} value={tempName}>
+                    {tempName.charAt(0).toUpperCase() + tempName.slice(1)} ({config.lightSettings.temps[tempName as keyof typeof config.lightSettings.temps]}K)
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        {/* Notes */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Notes (Optional)
-          </label>
-          <textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
-            rows={3}
-            placeholder="Any additional notes about this capture..."
-          />
-        </div>
+          <div className="form-field">
+            <label>Notes (Optional)</label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              rows={3}
+              placeholder="Any additional notes about this capture..."
+            />
+          </div>
 
-        {/* Submit Button */}
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={loading || !formData.game_id || !formData.piece_id}
-            className="w-full px-6 py-3 bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded transition-colors"
-          >
-            {loading ? 'Capturing...' : 'Capture Image'}
-          </button>
+          <div className="actions">
+            <button
+              type="submit"
+              disabled={loading || !formData.game_id || !formData.piece_id}
+            >
+              {loading ? 'Capturing...' : 'Capture Image'}
+            </button>
+          </div>
         </div>
       </form>
 
       {loading && (
-        <div className="mt-4 p-4 bg-gray-800 rounded text-center">
-          <p className="text-gray-400">
-            Setting lights and waiting for stabilization (10s)...
-          </p>
+        <div className="status-message info">
+          <p>Setting lights and waiting for stabilization (10s)...</p>
         </div>
       )}
     </div>

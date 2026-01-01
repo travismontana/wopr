@@ -412,3 +412,49 @@ select:focus {
 .image-gallery-thumbnail:hover {
     border-color: var(--accent-color, #0f0);
 }
+
+/* Add to theme.css - Secondary navigation (same style as primary-nav) */
+
+.secondary-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  counter-reset: nav-counter;
+}
+
+.secondary-nav li {
+  counter-increment: nav-counter;
+}
+
+.secondary-nav li::before {
+  content: "[" counter(nav-counter) "] ";
+  color: #00ff00;
+}
+
+.secondary-nav a {
+  color: #00ff00;
+  text-decoration: none;
+}
+
+.secondary-nav a:hover,
+.secondary-nav a.active {
+  background: #00ff00;
+  color: #000;
+}
+
+/* Add textarea to match existing form-field input/select styles */
+.form-field textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #00ff00;
+  background: #000;
+  color: #00ff00;
+  font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
+  resize: vertical;
+}
+
+.form-field textarea:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
