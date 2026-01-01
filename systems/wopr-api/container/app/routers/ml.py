@@ -72,8 +72,7 @@ async def capture_and_set_lights(request: CaptureRequest):
     image_captured = False
     image_metadata_id = None
     filename = None
-    logger.info(f"Starting ML capture process for game_id={request.game_id}, 
-    piece_id={request.piece_id}, position_id={request.position_id}", rotat)
+    logger.info(f"Starting ML capture process for request: {request}")
     try:
         # Step 1: Generate filename
         filename = await generate_ml_filename(
@@ -87,7 +86,6 @@ async def capture_and_set_lights(request: CaptureRequest):
         logger.info(f"Generated filename: {filename}")
 
         # Step 2: Set lights
-        logger.info(f"Request: {request}")
         async with httpx.AsyncClient(timeout=30.0) as client:
             homeauto_response = await client.post(
                 "http://wopr-api:8000/api/v1/homeauto/lights/preset",
