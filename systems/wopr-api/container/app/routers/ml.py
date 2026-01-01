@@ -12,9 +12,14 @@ import httpx
 import asyncio
 from typing import Optional
 from datetime import datetime
-import logging
 
-logger = logging.getLogger(__name__)
+from app import globals as woprvar
+import logging
+import sys
+
+logger = logging.getLogger(woprvar.APP_NAME)
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ← CREATE ROUTER BEFORE USING IT
 router = APIRouter(prefix="/api/v1/ml", tags=["ml"])
