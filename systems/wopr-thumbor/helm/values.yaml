@@ -24,8 +24,11 @@ wopr-baseapp:
       - secretName: thumbor-tls
         hosts:
           - thumbor.studio.abode.tailandtraillabs.org
-  
+  volumeMounts:
+  - name: nfs-images
+    mountPath: /data
   volumes:
+  - name: nfs-images
     nfs:
       server: danas.hangar.bpfx.org
       path: /volume2/wopr
