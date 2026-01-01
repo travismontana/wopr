@@ -32,7 +32,7 @@ thumbor:
     STORAGE = 'thumbor.storages.file_storage'
     FILE_STORAGE_ROOT_PATH = '/tmp/thumbor/storage'
     RESULT_STORAGE = 'thumbor.result_storages.file_storage'
-    RESULT_STORAGE_FILE_STORAGE_ROOT_PATH = '/tmp/thumbor/result_storage'
+    RESULT_STORAGE_FILE_STORAGE_ROOT_PATH = '/data/thumbor/results'
     AUTO_WEBP = True
     ALLOW_UNSAFE_URL = True
 
