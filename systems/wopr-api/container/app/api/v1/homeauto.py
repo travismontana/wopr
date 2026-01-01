@@ -58,6 +58,7 @@ async def fetch_light_settings() -> Dict:
         "temps": {"cool": "5500", "warm": "3000", "neutral": "4000"}
     }
     """
+    settings = dict()
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
