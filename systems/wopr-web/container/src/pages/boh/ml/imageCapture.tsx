@@ -259,7 +259,7 @@ export default function MLImagesPage() {
                 required
               >
                 {config?.object.rotations.map((rotation, index) => (
-                  <option key={rotation} value={index}>
+                  <option key={index} value={index}>
                     {rotation}°
                   </option>
                 ))}
