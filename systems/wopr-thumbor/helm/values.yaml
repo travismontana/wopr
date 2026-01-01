@@ -34,6 +34,7 @@ thumbor:
     FILE_STORAGE_ROOT_PATH = '/tmp/thumbor/storage'
     RESULT_STORAGE = 'thumbor.result_storages.file_storage'
     RESULT_STORAGE_FILE_STORAGE_ROOT_PATH = '/data/thumbor/results'
+    RESULT_STORAGE_EXPIRATION_SECOND = 60  # 1 minute
     AUTO_WEBP = True
     ALLOW_UNSAFE_URL = True
 
