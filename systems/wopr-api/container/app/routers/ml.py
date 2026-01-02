@@ -46,6 +46,7 @@ class CaptureResponse(BaseModel):
 
 @router.post("/captureandsetlights", response_model=CaptureResponse)
 async def capture_and_set_lights(request: CaptureRequest):
+    logger.info(f"Received ML capture and set lights request 2222: {request}")
     """
     Orchestrates ML training image capture:
     1. Generates filename
