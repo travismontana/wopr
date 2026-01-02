@@ -1,5 +1,4 @@
 cvat:
-  cvat:
   postgresql:
     enabled: false
     external:
