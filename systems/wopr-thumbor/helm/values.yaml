@@ -24,6 +24,7 @@ wopr-baseapp:
       - secretName: thumbor-tls
         hosts:
           - thumbor.studio.abode.tailandtraillabs.org
+
   volumeMounts:
   - name: nfs-images
     mountPath: /data
@@ -32,7 +33,6 @@ wopr-baseapp:
     nfs:
       server: danas.hangar.bpfx.org
       path: /volume2/wopr
-      mountPath: /data
   
   env:
     - name: OTEL_TRACES_EXPORTER
@@ -43,12 +43,6 @@ wopr-baseapp:
       value: http/protobuf
     - name: OTEL_EXPORTER_OTLP_ENDPOINT
       value: https://otel.monitoring.abode.tailandtraillabs.org 
-    - name: OTEL_SERVICE_NAME
-      value: wopr-thumbor
-    - name: PORT
-      value: "80"
-    - name: NUM_PROCESSES
-      value: "2"
     - name: MAX_AGE
       value: "3600"
     - name: MAX_AGE_TEMP_IMAGE
