@@ -44,7 +44,7 @@ class MLImageCreate(BaseModel):
     """Model for creating ML image metadata"""
     filename: str = Field(..., min_length=1, max_length=255)
     object_rotation: int = Field(default=0)
-    object_position: int = Field(None, max_length=255)
+    object_position: int = Field(default=10)
     color_temp: Optional[str] = Field(None, max_length=255)
     light_intensity: Optional[int] = None
     game_uuid: Optional[int] = None
