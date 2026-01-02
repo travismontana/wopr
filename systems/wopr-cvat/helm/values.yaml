@@ -4,25 +4,9 @@ cvat:
   frontend:
     replicas: 1
   postgresql:
-    enabled: false
-    external:
-      host: "wopr-config-db-cluster-rw.wopr.svc.cluster.local"
-      port: "5432"
-    auth:
-      existingSecret: wopr-cvat-db-user-credentials
-      username: wopr-cvat-db-user
-      password: <generate-something-secure>
+    enabled: true
   redis:
     enabled: true
-    auth:
-      existingSecret: wopr-cvat-redis-user-credentials  
-      existingSecretPasswordKey: password
-    secret:
-      create: true
-      name: wopr-cvat-redis-user-credentials
-      password: <generate-something-secure>
-  clickhouse: 
-    enabled: false
   ingress:
     enabled: true
     hostsname: cvat.studio.abode.tailandtraillabs.org
