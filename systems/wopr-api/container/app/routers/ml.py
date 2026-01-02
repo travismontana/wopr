@@ -124,7 +124,7 @@ async def capture_and_set_lights(request: CaptureRequest):
                 json={
                     "filename": filename,
                     "object_rotation": request.rotation,
-                    "object_position": str(request.position_id),
+                    "object_position": request.position_id,
                     "color_temp": request.lighting_temp,
                     "light_intensity": request.lighting_level,
                     "game_uuid": request.game_id,
