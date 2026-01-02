@@ -100,8 +100,8 @@ async def capture_and_set_lights(request: CaptureRequest):
             logger.info(f"Lights set successfully to {kelvin}K @ {request.lighting_level}%")
 
         # Step 3: Wait for stabilization
-        logger.info("Waiting 10 seconds for lighting stabilization...")
-        await asyncio.sleep(10)
+        logger.info("Waiting 3 seconds for lighting stabilization...")
+        await asyncio.sleep(3)
 
         # Step 4: Capture image via camera
         logger.info(f"Calling camera capture with filename: {filename}")

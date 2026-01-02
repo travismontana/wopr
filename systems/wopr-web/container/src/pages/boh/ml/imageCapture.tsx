@@ -336,7 +336,7 @@ export default function MLImagesPage() {
 
       {loading && (
         <div className="status-message info">
-          <p>Setting lights and waiting for stabilization (10s)...</p>
+          <p>Setting lights and waiting for stabilization (3s)...</p>
         </div>
       )}
       <MLGallery key={galleryKey} />
