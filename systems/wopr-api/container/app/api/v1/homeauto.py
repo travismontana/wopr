@@ -144,7 +144,7 @@ async def set_light_preset(request: LightPresetRequest):
     temps = light_settings["tempNums"]
     valid_kelvin = temps
     
-    if str(request.kelvin) not in valid_kelvin:
+    if request.kelvin not in valid_kelvin:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid kelvin value. Must be one of: {valid_kelvin} Got: {request.kelvin}"
