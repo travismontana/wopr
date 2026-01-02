@@ -76,6 +76,7 @@ async def capture_and_set_lights(request: CaptureRequest):
     filename = None
     logger.info(f"Starting ML capture process for request: {request}")
     try:
+        logger.info(f"inside try block, request: {request}")
         # Step 1: Generate filename
         filename = await generate_ml_filename(
             request.game_id,
