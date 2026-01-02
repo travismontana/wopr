@@ -10,8 +10,7 @@ cvat:
       port: "5432"
     auth:
       existingSecret: wopr-cvat-db-user-credentials
-      existingSecretUserKey: username
-      existingSecretPasswordKey: password
+      username: wopr-cvat-db-user
   redis:
     enabled: true
     auth:
