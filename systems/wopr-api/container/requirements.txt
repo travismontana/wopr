@@ -19,3 +19,6 @@ opentelemetry-exporter-otlp-proto-http>=1.39.1
 opentelemetry-instrumentation-requests~=0.60b1    # if you use requests
 opentelemetry-instrumentation-httpx~=0.60b1       # if you use httpx
 opentelemetry-instrumentation-logging~=0.60b1     # correlate logs with traces
+opentelemetry-instrumentation-asyncpg>=0.43b0
+opentelemetry-instrumentation-httpx>=0.43b0
+opentelemetry-instrumentation-logging>=0.43b0  # Correlate logs with traces

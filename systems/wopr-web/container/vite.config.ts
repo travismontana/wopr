@@ -1,8 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import generouted from '@generouted/react-router/plugin';  // ADD THIS
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    generouted()  // ADD THIS
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+      '@components': path.resolve(__dirname, './src/components'),  // UPDATE THIS
+      '@routes': path.resolve(__dirname, './src/routes'),  // Can remove after migration
+    },
+  },
   server: {
     port: 5173
   },

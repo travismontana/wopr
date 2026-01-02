@@ -1,0 +1,57 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/minimalcompact/thumbor
+  tag: latest
+  pullPolicy: IfNotPresent
+
+securityContext:
+  runAsUser: 2222
+  runAsGroup: 2222
+  fsGroup: 2222
+
+nfs:
+  server: danas.hangar.bpfx.org
+  path: /volume2/wopr
+  mountPath: /data
+
+thumbor:
+  port: 80
+  numProcesses: 2
+  maxAge: 3600
+  maxAgeTempImage: 300
+  resultStorageExpiration: 60
+  allowUnsafeUrl: true
+  autoWebp: true
+  logLevel: DEBUG
+  resultStorageFileStorageRootPath: /data/thumbor/results
+  # ADD: Config content
+  config: |
+    PORT = 80
+    ALLOWED_SOURCES = []
+    LOG_LEVEL = 'DEBUG'  # <- Add this
+    LOADER = 'thumbor.loaders.file_loader'
+    FILE_LOADER_ROOT_PATH = '/data'
+    STORAGE = 'thumbor.storages.file_storage'
+    FILE_STORAGE_ROOT_PATH = '/tmp/thumbor/storage'
+    RESULT_STORAGE = 'thumbor.result_storages.file_storage'
+    RESULT_STORAGE_FILE_STORAGE_ROOT_PATH = '/data/thumbor/results'
+    RESULT_STORAGE_EXPIRATION_SECOND = 60  # 1 minute
+    AUTO_WEBP = True
+    ALLOW_UNSAFE_URL = True
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: studio-traefik
+  host: thumbor.studio.abode.tailandtraillabs.org
+  tls:
+    enabled: true
+    secretName: thumbor-tls
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+resources: {}

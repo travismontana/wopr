@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# main.py
 """
 WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2023-present Bob <bob@bomar.us>
@@ -28,6 +29,13 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.requests import Request
+from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.trace import Status, StatusCode
+from opentelemetry.baggage import set_baggage, get_baggage
+from opentelemetry.trace import Link
+from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 from pydantic import BaseModel
 from fastapi import FastAPI
@@ -36,14 +44,21 @@ from app.api.v1 import cameras
 from app.api.v1 import config
 from app.api.v1 import status
 from app.api.v1 import health
+from app.api.v1 import games
+from app.api.v1 import pieces
+from app.api.v1 import mlimages
+from app.api.v1 import homeauto
+from app.routers import ml
 
-woprconfig.init_config(service_url=os.getenv("WOPR_API_URL") or woprvar.WOPR_API_URL)
+woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 
 # Set normal logging not using woprlogg.
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API application: booting up...")
+
+# Determine if tracing is enabled
 tracing_enabled = woprconfig.get_bool("tracing.enable", True)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
     logger.debug(f"Tracing is enabled tracing_enabled: ({tracing_enabled}).")
@@ -92,11 +107,25 @@ if tracing_enabled:
         tracer_name=woprvar.APP_NAME,
         tracer_version=woprvar.APP_VERSION,
         tracer_enabled=tracing_enabled,
-        tracer_endpoint=tracing_endpoint
+        tracer_endpoint=tracing_endpoint,
+        service_namespace="wopr",
+        deployment_env=os.getenv("DEPLOYMENT_ENV", "production")
     )
     
     if tracer:
         logger.info(f"Tracing enabled. Exporting to {tracing_endpoint}")
+        # Instrument asyncpg (database calls)
+        AsyncPGInstrumentor().instrument()
+        logger.info("AsyncPG instrumentation enabled")
+        
+        # Instrument httpx (HTTP client calls)
+        HTTPXClientInstrumentor().instrument()
+        logger.info("HTTPX instrumentation enabled")
+        
+        # Instrument logging (adds trace_id/span_id to logs)
+        LoggingInstrumentor().instrument(set_logging_format=True)
+        logger.info("Logging instrumentation enabled")
+        
     else:
         logger.warning("Tracing is enabled but failed to initialize tracer.")
 
@@ -114,6 +143,11 @@ if tracing_enabled:
     app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
     app.include_router(status.router, prefix="/api/v1/status", tags=["status"])
     app.include_router(health.router, prefix="/api/v1/health", tags=["health"])
+    app.include_router(games.router, prefix="/api/v1/games", tags=["games"])
+    app.include_router(pieces.router, prefix="/api/v1/pieces", tags=["pieces"])
+    app.include_router(mlimages.router, prefix="/api/v1/mlimages", tags=["mlimages"])
+    app.include_router(homeauto.router, prefix="/api/v1/homeauto", tags=["homeauto"])
+    app.include_router(ml.router) 
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()

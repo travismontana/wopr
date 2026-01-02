@@ -1,0 +1,10 @@
+# templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wopr-nginx.fullname" . }}-config
+  labels:
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+{{ .Values.nginxConfig | indent 4 }}

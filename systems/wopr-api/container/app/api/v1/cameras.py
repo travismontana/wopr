@@ -28,10 +28,7 @@ camera_dict = woprvar.HACK_CAMERA_DICT
 
 class CaptureRequest(BaseModel):
     captureType: str
-    game_id: str
-    subject: str
-    subject_name: str
-    sequence: int
+    filename: str
 
 @router.get("")
 async def listall():
@@ -54,11 +51,8 @@ async def get_camera(camera_id: str):
 @router.post("/capture")
 async def capture_image(request: CaptureRequest):
     captureType = request.captureType
-    game_id = request.game_id
-    subject = request.subject
-    subject_name = request.subject_name
-    sequence = request.sequence
-    logger.debug(f"Capturing image for game {game_id}, subject {subject}, subject_name {subject_name}, sequence {sequence}")
+    filename = request.filename
+    logger.debug(f"Capturing image for filename {filename}")
     """Capture image from camera (stub)"""
 
     if captureType == "ml_capture":
@@ -71,10 +65,7 @@ async def capture_image(request: CaptureRequest):
             response = await client.post(
                 f"{camUrl}",
                 json={
-                    "game_id": str(game_id) if game_id else None,
-                    "subject": str(subject) if subject else None,
-                    "subject_name": str(subject_name) if subject_name else None,
-                    "sequence": int(sequence) if sequence else None
+                    "filename": str(filename) if filename else None,
                 }
             )
             response.raise_for_status()
@@ -84,4 +75,4 @@ async def capture_image(request: CaptureRequest):
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Failed to capture from camera: {str(e)}"
         )
-    return {"game_id": game_id, "subject": subject, "subject_name": subject_name, "sequence": sequence}
+    return {"filepath": "cam_response"}

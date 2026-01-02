@@ -1,0 +1,20 @@
+{{- if .Values.service }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wopr-baseapp.fullname" . }}
+  labels:
+    {{- include "wopr-baseapp.labels" . | nindent 4 }}
+    {{- if .Values.service.extraLabels }}
+    {{- toYaml .Values.service.extraLabels | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.port }}
+    protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
+    name: {{ include "wopr-baseapp.serviceName" . }}
+  selector:
+    {{- include "wopr-baseapp.selectorLabels" . | nindent 4 }}
+{{- end }}

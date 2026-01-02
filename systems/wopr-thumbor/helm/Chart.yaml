@@ -1,0 +1,8 @@
+apiVersion: v2
+name: wopr-thumbor
+version: 1.0.0
+description: WOPR Directus UI
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"

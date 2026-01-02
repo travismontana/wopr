@@ -1,0 +1,114 @@
+image:
+  repository: ghcr.io/travismontana/wopr-strapi
+  tag: "latest"
+  pullPolicy: always
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 1337
+
+ingress:
+  enabled: true
+  className: "studio-traefik"
+  annotations: 
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
+  hosts:
+    - host: cms.studio.abode.tailandtraillabs.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: strapi-tls
+      hosts:
+        - cms.studio.abode.tailandtraillabs.org
+# Strapi configuration
+strapi:
+  # Environment
+  nodeEnv: production  # development or production
+  
+  # Admin JWT secret - CHANGE THIS
+  adminJwtSecret: "CHANGE-ME-admin-jwt-secret"
+  
+  # API token salt - CHANGE THIS
+  apiTokenSalt: "CHANGE-ME-api-token-salt"
+  
+  # App keys (comma-separated, min 4 keys) - CHANGE THIS
+  appKeys: "CHANGE-ME-key1,CHANGE-ME-key2,CHANGE-ME-key3,CHANGE-ME-key4"
+  
+  # JWT secret - CHANGE THIS
+  jwtSecret: "CHANGE-ME-jwt-secret"
+  
+  # Transfer token salt - CHANGE THIS
+  transferTokenSalt: "CHANGE-ME-transfer-token-salt"
+
+# PostgreSQL configuration (external CNPG cluster)
+postgresql:
+  enabled: false  # We're using external CNPG
+  external:
+    host: "wopr-config-db-cluster-rw.database.svc.cluster.local"
+    port: 5432
+    database: "strapi"
+    username: "strapi"
+    password: "CHANGE-ME-db-password"  # Or use existingSecret
+  
+  # Use existing secret for database password
+  existingSecret: "strapi-db-user"
+  existingSecretKey: "password"
+  initJob:
+    enabled: true
+    superuser:
+      existingSecret: "wopr-config-db-cluster-superuser"
+
+# Persistent storage for uploads
+persistence:
+  enabled: true
+  storageClass: ""  # Use default storage class
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /srv/app/public/uploads
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Security context
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+
+# Probes
+livenessProbe:
+  httpGet:
+    path: /_health
+    port: 1337
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /_health
+    port: 1337
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3

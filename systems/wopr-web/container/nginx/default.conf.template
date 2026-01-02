@@ -37,7 +37,7 @@ server {
     try_files $request_filename =404;
     expires 1y;
     add_header Cache-Control "public, immutable";
-}
+  }
 
   location = /favicon.ico {
     try_files $uri =404;
@@ -87,18 +87,9 @@ server {
   # # Browse WOPR storage
   #}
 
-  location ~* ^/wopr/.*\.(jpg|jpeg|png|gif|webp)$ {
-    alias /remote/wopr/;
-    expires 1h;
-  }
-
   location ^~ /wopr/ {
     alias /remote/wopr/;
-
-    if (-d $request_filename) {
-        # This is a directory, force autoindex
-        rewrite ^ $uri/ permanent;
-    }
+    absolute_redirect off;
     location ~ /$ {
       autoindex on;
       autoindex_format json;     # <-- key: JSON listing
@@ -110,5 +101,12 @@ server {
     # optional: caching
     expires 10s;
     add_header Cache-Control "no-store";
+  }
+
+  location /stub_status {
+    stub_status;
+    allow 127.0.0.1;
+    allow 10.42.0.0/16;  # Your pod CIDR
+    deny all;
   }
 }

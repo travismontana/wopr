@@ -1,4 +1,6 @@
-# Default values for wpor-web
+woprConfig:
+  WOPR_VERSION: "v0.1.4-alpha"
+  WOPR_METADATA_DB: "wopr-db"
 
 replicaCount: 1
 
@@ -67,17 +69,9 @@ postgresql:
 # Default values for WOPR services
 
 config:
-  services:
-    # API_URL is set in configmap.yaml because it's:
-    # API_URL: {{ printf "%s/api/%s" .Values.config.services.apiServiceUrl .Values.config.services.apiVersion | quote }}
-    # If you can figure out how to make that work here, go for it.
-    - name: API_SERVICE_URL
-      value: "http://wopr-api.wopr.svc:8000"
-    - name: API_VERSION
-      value: "v1"
-    - name: WOPR_VERSION
-      value: "v0.1.4-alpha"
-
+  API_URL: "http://wopr-api.wopr.svc:8000"
+  API_VERSION: "v1"
+  WOPR_VERSION: "v0.1.4-alpha"
 
 env:
   - name: WOPR_API_URL
@@ -85,6 +79,26 @@ env:
       configMapKeyRef:
         name: wopr-api-config
         key: API_URL
+  - name: WOPR_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: wopr-db-user-credentials
+        key: password
+  - name: WOPR_DB_USER
+    valueFrom:
+      secretKeyRef:
+        name: wopr-db-user-credentials
+        key: username
+  - name: HOMEASSISTANT_URL
+    valueFrom:
+      configMapKeyRef:
+        name: wopr-homeassistant-config
+        key: HOMEASSISTANT_URL
+  - name: HOMEASSISTANT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: wopr-homeassistant-token
+        key: HOMEASSISTANT_TOKEN
 # Optional: Environment-specific overrides
 # environments:
 #   dev:

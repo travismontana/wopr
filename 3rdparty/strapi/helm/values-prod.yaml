@@ -1,0 +1,115 @@
+# Example production values for Strapi 5
+# Copy this to values-prod.yaml and customize
+
+image:
+  repository: naskio/strapi
+  tag: "5.30.1"
+  pullPolicy: IfNotPresent
+
+replicaCount: 2  # HA setup
+
+service:
+  type: ClusterIP
+  port: 1337
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
+  hosts:
+    - host: cms.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: strapi-tls
+      hosts:
+        - cms.yourdomain.com
+
+strapi:
+  nodeEnv: production
+  
+  # CRITICAL: Generate these with: openssl rand -base64 32
+  adminJwtSecret: "REPLACE-WITH-SECURE-RANDOM-STRING"
+  apiTokenSalt: "REPLACE-WITH-SECURE-RANDOM-STRING"
+  appKeys: "REPLACE-KEY1,REPLACE-KEY2,REPLACE-KEY3,REPLACE-KEY4"
+  jwtSecret: "REPLACE-WITH-SECURE-RANDOM-STRING"
+  transferTokenSalt: "REPLACE-WITH-SECURE-RANDOM-STRING"
+
+postgresql:
+  enabled: false
+  external:
+    # For CNPG cluster named "postgresql-cluster" in "database" namespace
+    host: "postgresql-cluster-rw.database.svc.cluster.local"
+    port: 5432
+    database: "strapi"
+    username: "strapi"
+    password: "REPLACE-WITH-DB-PASSWORD"
+  
+  # Alternative: use existing secret
+  # existingSecret: "strapi-db-secret"
+  # existingSecretKey: "password"
+
+persistence:
+  enabled: true
+  storageClass: ""  # Use cluster default
+  accessMode: ReadWriteOnce
+  size: 20Gi  # Adjust based on upload needs
+  mountPath: /srv/app/public/uploads
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "2000m"
+
+# Distribute pods across nodes for HA
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - strapi
+          topologyKey: kubernetes.io/hostname
+
+# Security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  runAsUser: 1000
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# Health probes
+livenessProbe:
+  httpGet:
+    path: /_health
+    port: 1337
+  initialDelaySeconds: 90
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 5
+
+readinessProbe:
+  httpGet:
+    path: /_health
+    port: 1337
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3

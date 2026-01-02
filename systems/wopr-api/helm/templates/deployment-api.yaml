@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: {{ include "wopr-api.fullname" . }}-port
-          containerPort: 8080
+          containerPort: 8000
           protocol: TCP
         env:
         - name: DATABASE_URL

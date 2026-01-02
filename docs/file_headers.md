@@ -8,7 +8,7 @@ Use these at the top of every source file.
 #!/usr/bin/env python3
 """
 WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
+# Copyright (c) 2025-present Bob <bob@bomar.us>
 # See git log for detailed authorship
 
 Brief description of what this file does.
@@ -18,7 +18,7 @@ Brief description of what this file does.
 
 ```yaml
 # WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
+# Copyright (c) 2025-present Bob <bob@bomar.us>
 # See git log for detailed authorship
 ```
 
@@ -26,7 +26,7 @@ Brief description of what this file does.
 
 ```dockerfile
 # WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
+# Copyright (c) 2025-present Bob <bob@bomar.us>
 # See git log for detailed authorship
 
 FROM python:3.11-slim
@@ -37,7 +37,7 @@ FROM python:3.11-slim
 ```bash
 #!/bin/bash
 # WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
+# Copyright (c) 2025-present Bob <bob@bomar.us>
 # See git log for detailed authorship
 #
 # Description: Brief description of what this script does
@@ -50,7 +50,7 @@ set -e
 ```markdown
 # File Title
 
-Copyright (c) 2023-present Bob <bob@bomar.us>  
+Copyright (c) 2025-present Bob <bob@bomar.us>  
 Licensed under the MIT License - see [LICENSE](../LICENSE) file.
 
 ---
@@ -61,7 +61,7 @@ Licensed under the MIT License - see [LICENSE](../LICENSE) file.
 ```javascript
 /**
  * WOPR - Wargaming Oversight & Position Recognition
- * Copyright (c) 2023-present Bob <bob@bomar.us>
+ * Copyright (c) 2025-present Bob <bob@bomar.us>
  * See git log for detailed authorship
  * 
  * Brief description of what this file does.
@@ -80,7 +80,7 @@ For files that don't support comments (JSON), add copyright to parent directory'
 #!/usr/bin/env python3
 """
 WOPR - Wargaming Oversight & Position Recognition
-Copyright (c) 2023-present Bob <bob@bomar.us>
+Copyright (c) 2025-present Bob <bob@bomar.us>
 See git log for detailed authorship
 
 Camera service for WOPR. Runs on Raspberry Pi, captures images
@@ -95,7 +95,7 @@ from flask import Flask, jsonify, request
 
 ```yaml
 # WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
+# Copyright (c) 2025-present Bob <bob@bomar.us>
 # See git log for detailed authorship
 
 apiVersion: apps/v1

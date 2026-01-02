@@ -1,0 +1,69 @@
+wopr-baseapp:
+  app:
+    name: wopr-thumbor
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: minimalcompact/thumbor
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: thumbor.studio.abode.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: thumbor-tls
+        hosts:
+          - thumbor.studio.abode.tailandtraillabs.org
+
+  volumeMounts:
+  - name: nfs-images
+    mountPath: /data
+  volumes:
+  - name: nfs-images
+    nfs:
+      server: danas.hangar.bpfx.org
+      path: /volume2/wopr
+  
+  env:
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: http/protobuf
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: https://otel.monitoring.abode.tailandtraillabs.org 
+    - name: MAX_AGE
+      value: "3600"
+    - name: MAX_AGE_TEMP_IMAGE
+      value: "300"
+    - name: RESULT_STORAGE_EXPIRATION_SECONDS
+      value: "60"
+    - name: ALLOW_UNSAFE_URL
+      value: "True"
+    - name: AUTO_WEBP
+      value: "True"
+    - name: LOG_LEVEL
+      value: "DEBUG"
+    - name: FILE_LOADER_ROOT_PATH
+      value: /data
+    - name: LOADER
+      value: thumbor.loaders.file_loader
+    - name: STORAGE
+      value: thumbor.storages.file_storage
+    - name: RESULT_STORAGE_FILE_STORAGE_ROOT_PATH
+      value: /data/thumbor/results 
+    - name: RESULT_STORAGE
+      value: thumbor.result_storages.file_storage
+    - name: RESULT_STORAGE_STORES_UNSAFE
+      value: "True"

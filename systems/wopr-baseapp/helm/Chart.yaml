@@ -1,0 +1,6 @@
+apiVersion: v2
+name: wopr-baseapp
+description: A base helm chart for wopr
+type: application
+version: 1.0.11
+appVersion: "latest"

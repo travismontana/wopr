@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "thumbor.fullname" . }}
+  labels:
+    {{- include "thumbor.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "thumbor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "thumbor.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      containers:
+      - name: thumbor
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # CHANGE: Override broken entrypoint, call thumbor directly
+        command: ["/usr/local/bin/thumbor"]
+        args:
+          - "--port={{ .Values.thumbor.port }}"
+          - "--conf=/etc/thumbor/thumbor.conf"
+          - "--processes={{ .Values.thumbor.numProcesses }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.thumbor.port }}
+          protocol: TCP
+        env:
+        - name: THUMBOR_PORT
+          value: {{ .Values.thumbor.port | quote }}
+        - name: THUMBOR_NUM_PROCESSES
+          value: {{ .Values.thumbor.numProcesses | quote }}
+        volumeMounts:
+        # CHANGE: NFS for source images
+        - name: nfs-images
+          mountPath: {{ .Values.nfs.mountPath }}
+        # ADD: ConfigMap with thumbor.conf
+        - name: config
+          mountPath: /etc/thumbor
+          readOnly: true
+        # ADD: Writable scratch space for cache/storage
+        - name: tmp
+          mountPath: /tmp
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: nfs-images
+        nfs:
+          server: {{ .Values.nfs.server }}
+          path: {{ .Values.nfs.path }}
+      # ADD: Config volume
+      - name: config
+        configMap:
+          name: {{ include "thumbor.fullname" . }}-config
+      # ADD: emptyDir for writable space (old school /tmp)
+      - name: tmp
+        emptyDir: {}
+      restartPolicy: Always

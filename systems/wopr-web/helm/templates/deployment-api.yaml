@@ -15,7 +15,12 @@ spec:
       app.kubernetes.io/component: api
   template:
     metadata:
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+        app.wopr.io/hasNginx: "true"
         {{- include "wpor-web.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: api
     spec:
@@ -48,6 +53,9 @@ spec:
             mountPath: /remote/wopr
           - name: nginx-conf
             mountPath: /etc/nginx/conf.d
+      {{- with .Values.sidecarContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       volumes:
         - name: wopr-data
           persistentVolumeClaim:

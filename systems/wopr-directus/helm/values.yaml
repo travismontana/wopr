@@ -1,0 +1,84 @@
+wopr-baseapp:
+  app:
+    name: wopr-directus
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: directus/directus
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8055
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: directus.studio.abode.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: directus-tls
+        hosts:
+          - directus.studio.abode.tailandtraillabs.orgs
+  pvc:
+    - name: directus-uploads
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+    - name: directus-extensions
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 5Gi
+  volumes:
+    - name: directus-uploads
+      persistentVolumeClaim:
+        claimName: directus-uploads
+    - name: directus-extensions
+      persistentVolumeClaim:
+        claimName: directus-extensions
+  volumeMounts:
+    - name: directus-uploads
+      mountPath: /directus/uploads
+    - name: directus-extensions
+      mountPath: /directus/extensions
+  env:
+    - name: DB_CLIENT
+      value: pg
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-cluster-app
+          key: host
+    - name: DB_PORT
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-cluster-app
+          key: port
+    - name: DB_DATABASE
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_METADATA_DB
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: password
+    - name: SECRET
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: password
+    - name: PUBLIC_URL
+      value: https://directus.studio.abode.tailandtraillabs.org

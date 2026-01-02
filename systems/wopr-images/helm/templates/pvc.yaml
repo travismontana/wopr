@@ -1,0 +1,14 @@
+# templates/persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "wopr-nginx.fullname" . }}-nfs
+  labels:
+    {{- include "wopr-nginx.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 100Gi

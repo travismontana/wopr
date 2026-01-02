@@ -5,11 +5,11 @@ FROM node:20-alpine AS build
 ENV HOME=/app
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json* tsconfig.json ./
 RUN npm install -g npm@latest
 RUN npm install
 COPY src ./src
-COPY public ./public
+#COPY public ./public
 COPY web/index.html ./index.html
 COPY vite.config.ts ./vite.config.ts
 RUN npm run build
