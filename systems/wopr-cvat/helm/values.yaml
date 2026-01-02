@@ -1,4 +1,8 @@
 cvat:
+  backend:
+    replicas: 1
+  frontend:
+    replicas: 1
   postgresql:
     enabled: false
     external:
