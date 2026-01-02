@@ -11,6 +11,7 @@ cvat:
     auth:
       existingSecret: wopr-cvat-db-user-credentials
       username: wopr-cvat-db-user
+      password: <generate-something-secure>
   redis:
     enabled: true
     auth:
