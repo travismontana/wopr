@@ -214,5 +214,5 @@ async def generate_ml_filename(
         f"temp{sanitize(color_temp)}",
         timestamp
     ]
-    
+    logger.info(f"*****Generated filename parts: {parts}")
     return f"{'-'.join(parts)}.jpg"
