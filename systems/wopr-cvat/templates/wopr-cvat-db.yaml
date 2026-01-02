@@ -1,0 +1,20 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: wopr-cvat-db-database
+spec:
+  name: wopr-cvat-db-database
+  owner: wopr-cvat-db-database-owner
+  cluster:
+    name: wopr-cvat-db-cluster
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wopr-cvat-db-user-credentials
+  namespace: wopr
+type: kubernetes.io/basic-auth
+stringData:
+  username: wopr-cvat-db-user
+  password: <generate-something-secure>
