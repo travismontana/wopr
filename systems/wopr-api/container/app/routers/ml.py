@@ -81,8 +81,8 @@ async def capture_and_set_lights(request: CaptureRequest):
         filename = await generate_ml_filename(
             request.game_id,
             request.piece_id,
-            request.rotation,
             request.position_id,
+            request.rotation,
             request.lighting_temp,
             request.lighting_level
         )
