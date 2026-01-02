@@ -181,6 +181,7 @@ async def generate_ml_filename(
     Generate ML training image filename matching frontend pattern:
     {piece}-{game}-{position}-rot{rotation}-pct{intensity}-temp{colortemp}-{timestamp}.jpg
     """
+    logger.info(f"Generating M2222L filename for game_id={game_id}, piece_id={piece_id}, position_id={position_id}, rotation={rotation}, color_temp={color_temp}, light_intensity={light_intensity}")
     # Fetch game and piece names
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
