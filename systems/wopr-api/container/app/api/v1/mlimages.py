@@ -44,7 +44,7 @@ class MLImageCreate(BaseModel):
     """Model for creating ML image metadata"""
     filename: str = Field(..., min_length=1, max_length=255)
     object_rotation: int = Field(default=0)
-    object_position: Optional[str] = Field(None, max_length=255)
+    object_position: int = Field(None, max_length=255)
     color_temp: Optional[str] = Field(None, max_length=255)
     light_intensity: Optional[int] = None
     game_uuid: Optional[int] = None
@@ -57,7 +57,7 @@ class MLImageUpdate(BaseModel):
     """Model for updating ML image metadata"""
     filename: Optional[str] = Field(None, min_length=1, max_length=255)
     object_rotation: Optional[int] = None
-    object_position: Optional[str] = Field(None, max_length=255)
+    object_position: Optional[int] = None
     color_temp: Optional[str] = Field(None, max_length=255)
     light_intensity: Optional[int] = None
     game_uuid: Optional[int] = None
@@ -72,7 +72,7 @@ class MLImageResponse(BaseModel):
     uuid: UUID
     filename: Optional[str]
     object_rotation: Optional[int]
-    object_position: Optional[str]
+    object_position: Optional[int]
     color_temp: Optional[str]
     light_intensity: Optional[int]
     game_uuid: Optional[int]
