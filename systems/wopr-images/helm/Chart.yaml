@@ -1,7 +1,8 @@
-# Chart.yaml
 apiVersion: v2
-name: wopr-nginx
-description: Nginx server for WOPR static content
-type: application
-version: 0.1.0
-appVersion: "1.25"
+name: wopr-images
+version: 0.1.5-alpha
+description: WOPR Images
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"

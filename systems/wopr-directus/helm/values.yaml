@@ -16,14 +16,14 @@ wopr-baseapp:
   ingress:
     enabled: true
     hosts:
-      - host: directus.studio.abode.tailandtraillabs.org
+      - host: directus.wopr.tailandtraillabs.org
         paths:
           - path: /
             pathType: Prefix
     tls: 
       - secretName: directus-tls
         hosts:
-          - directus.studio.abode.tailandtraillabs.orgs
+          - directus.wopr.tailandtraillabs.orgs
   pvc:
     - name: directus-uploads
       enabled: true
@@ -53,12 +53,12 @@ wopr-baseapp:
     - name: DB_HOST
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: host
     - name: DB_PORT
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: port
     - name: DB_DATABASE
       valueFrom:
@@ -81,4 +81,4 @@ wopr-baseapp:
           name: wopr-db-user-credentials
           key: password
     - name: PUBLIC_URL
-      value: https://directus.studio.abode.tailandtraillabs.org
+      value: https://directus.wopr.tailandtraillabs.org

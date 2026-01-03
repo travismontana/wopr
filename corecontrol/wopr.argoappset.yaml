@@ -27,18 +27,18 @@ spec:
             path: systems/wopr-web/helm
             namespace: wopr
             wave: "2"
-#          - name: wopr-images
-#            path: systems/wopr-images/helm
-#            namespace: wopr
-#            wave: "2"
-#          - name: wopr-thumbor
-#            path: systems/wopr-thumbor/helm
-#            namespace: wopr
-#            wave: "2"
-#          - name: wopr-directus
-#            path: systems/wopr-directus/helm
-#            namespace: wopr
-#            wave: "2"
+          - name: wopr-images
+            path: systems/wopr-images/helm
+            namespace: wopr
+            wave: "2"
+          - name: wopr-thumbor
+            path: systems/wopr-thumbor/helm
+            namespace: wopr
+            wave: "2"
+          - name: wopr-directus
+            path: systems/wopr-directus/helm
+            namespace: wopr
+            wave: "2"
 
   template:
     metadata:

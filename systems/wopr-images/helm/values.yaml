@@ -1,139 +1,73 @@
-# values.yaml
-replicaCount: 1
+wopr-baseapp:
+  app:
+    name: wopr-images
+  replicaCount: 1
 
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  tag: "1.25-alpine"
+  image:
+    registry: docker.io
+    repository: nginx/nginx
+    tag: latest
+    pullPolicy: Always
 
-service:
-  type: ClusterIP
-  port: 80
+  service:
+    type: ClusterIP
+    port: 80
 
-ingress:
-  enabled: true
-  className: "studio-traefik"
-  annotations: {}
-  host: images.studio.abode.tailandtraillabs.org
-  hosts:
-    - host: images.studio.abode.tailandtraillabs.org
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: 
+  ingress:
     enabled: true
-    secretName: wopr-images-tls
+    className: wopr-traefik
     hosts:
-      - images.studio.abode.tailandtraillabs.org
-    tls:
-    enabled: true
-    secretName: thumbor-tls
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+      - host: images.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-images-tls
+        hosts:
+          - images.wopr.tailandtraillabs.org
 
-# NFS mount configuration
-nfs:
-  server: danas.hangar.bpfx.org
-  path: /volume2/wopr
-  mountPath: /remote/wopr
+  env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
+  
+  labels: 
+    app.wopr.io/hasNginx: "true"
+  selectorLabels: 
+    app.wopr.io/hasNginx: "true"
 
-# Security context - run as UID 2222
-securityContext:
-  runAsUser: 2222
-  runAsGroup: 2222
-  fsGroup: 2222
-  runAsNonRoot: true
+  podAnnotations: 
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "4318"
+    prometheus.io/path: "/v1/metrics"
 
-# Nginx configuration
-nginxConfig: |
-  user nginx;
-  worker_processes auto;
-  error_log /var/log/nginx/error.log warn;
-  pid /tmp/nginx.pid;
+  sidecarContainers: 
+    - name: nginx-exporter
+      image: nginx/nginx-prometheus-exporter:latest    
+      args:
+        - -nginx.scrape-uri=http://localhost:8080/stub_status
+      ports:
+        - name: nginx-metrics
+          containerPort: 9113
+      resources:
+        limits:
+          cpu: 50m
+          memory: 64Mi
+        requests:
+          cpu: 10m
+          memory: 32Mi
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /remote/wopr
+    - name: nginx-conf
+      mountPath: /etc/nginx/conf.d
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-nfs-pvc
+    - name: nginx-conf
+      emptyDir: {}
 
-  events {
-    worker_connections 1024;
-  }
-
-  http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-
-    log_format json_combined escape=json
-    '{'
-      '"time":"$time_iso8601",'
-      '"remote_addr":"$remote_addr",'
-      '"request":"$request",'
-      '"status":$status,'
-      '"body_bytes_sent":$body_bytes_sent,'
-      '"request_time":$request_time,'
-      '"upstream_response_time":"$upstream_response_time",'
-      '"http_referer":"$http_referer",'
-      '"http_user_agent":"$http_user_agent",'
-      '"request_id":"$request_id"'
-    '}';
-    access_log /var/log/nginx/access.log json_combined if=$loggable;
-    map $request_uri $loggable {
-      ~^/favicon.ico 0;
-      ~^/assets/     0;
-      default        1;
-    }
-    sendfile on;
-    tcp_nopush on;
-    keepalive_timeout 65;
-    gzip on;
-
-    # Temporary paths that nginx user can write to
-    client_body_temp_path /tmp/client_temp;
-    proxy_temp_path /tmp/proxy_temp;
-    fastcgi_temp_path /tmp/fastcgi_temp;
-    uwsgi_temp_path /tmp/uwsgi_temp;
-    scgi_temp_path /tmp/scgi_temp;
-
-    server {
-      listen 8080;
-      server_name _;
-
-      location / {
-        root /remote/wopr;
-        autoindex on;
-        autoindex_exact_size off;
-        autoindex_localtime on;
-      }
-      location /stub_status {
-        stub_status;
-        allow 127.0.0.1;
-        allow 10.42.0.0/16;  # Your pod CIDR
-        deny all;
-      }
-    }
-  }
-
-resources: {}
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-sidecarContainers: 
-  - name: nginx-exporter
-    image: nginx/nginx-prometheus-exporter:latest    
-    args:
-      - -nginx.scrape-uri=http://localhost:8080/stub_status
-    ports:
-      - name: nginx-metrics
-        containerPort: 9113
-    resources:
-      limits:
-        cpu: 50m
-        memory: 64Mi
-      requests:
-        cpu: 10m
-        memory: 32Mi
-
-podAnnotations: 
-  prometheus.io/scrape: "true"
-  prometheus.io/port: "4318"
-  prometheus.io/path: "/v1/metrics"
+      

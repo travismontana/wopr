@@ -16,14 +16,14 @@ wopr-baseapp:
   ingress:
     enabled: true
     hosts:
-      - host: thumbor.studio.abode.tailandtraillabs.org
+      - host: thumbor.tailandtraillabs.org
         paths:
           - path: /
             pathType: Prefix
     tls: 
       - secretName: thumbor-tls
         hosts:
-          - thumbor.studio.abode.tailandtraillabs.org
+          - thumbor.tailandtraillabs.org
 
   volumeMounts:
   - name: nfs-images
