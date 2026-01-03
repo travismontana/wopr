@@ -1,6 +1,6 @@
 apiVersion: v2
 name: wopr-heimdall
-\version: 0.1.5-alpha
+version: 0.1.5-alpha
 description: WOPR Core Systems - heimdall
 
 dependencies:
