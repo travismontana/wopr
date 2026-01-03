@@ -32,7 +32,7 @@ spec:
         login: true
         passwordSecret:
           name: wopr-db-user-credentials
-        createdb: false
+        createdb: true
         createrole: false
       - name: wopr-cvat-db-user
         comment: wopr cvat database user
