@@ -50,7 +50,7 @@ wopr-baseapp:
     - name: DBNAME
       value: "wopr-db-database"
     - name: CONFDBNAME
-      value: "wopr-config-db"
+      value: "wopr-config-db-database"
     - name: CONFDBUSER
       valueFrom:
         secretKeyRef:
