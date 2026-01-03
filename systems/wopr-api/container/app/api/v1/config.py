@@ -30,10 +30,7 @@ woprconfig.init_config()
 router = APIRouter(tags=["config"])
 
 # Database connection
-DATABASE_URL = os.getenv(
-    'DATABASE_URL',
-    'postgresql://wopr:wopr@config-db:5432/config_db'
-)
+DATABASE_URL = woprvar.CONFDB_URL
 ENVIRONMENT = os.getenv('WOPR_ENVIRONMENT', 'default')
 
 
