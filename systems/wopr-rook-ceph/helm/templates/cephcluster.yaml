@@ -36,7 +36,7 @@ spec:
   storage:
     useAllNodes: true
     useAllDevices: true
-    deviceFilter:sdb
+    deviceFilter: sdb
   monitoring:
     enabled: false
   healthCheck:
