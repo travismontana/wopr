@@ -264,3 +264,7 @@ tempo:
       enabled: true
       #storageClassName: local-path
       size: 10Gi
+
+alloy-operator:
+  crds:
+    deployPodLogsCRD: true

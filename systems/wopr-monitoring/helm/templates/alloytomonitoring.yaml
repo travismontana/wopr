@@ -1,0 +1,271 @@
+apiVersion: collectors.grafana.com/v1alpha1
+kind: Alloy
+metadata:
+  name: alloy-to-monitoring
+  namespace: alloy
+spec:
+  alloy:
+    extraArgs:
+      - --disable-reporting=true
+    configMap:
+      content: |-
+        otelcol.receiver.otlp "cluster" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+          }
+
+          http {
+            endpoint = "0.0.0.0:4318"
+          }
+
+          output {
+            metrics = [otelcol.processor.batch.cluster.input]
+            logs    = [otelcol.processor.batch.cluster.input]
+            traces  = [otelcol.processor.batch.cluster.input]
+          }
+        }
+
+        otelcol.processor.batch "cluster" {
+          output {
+            metrics = [otelcol.exporter.otlphttp.default.input]
+            logs    = [otelcol.exporter.otlphttp.default.input]
+            traces  = [otelcol.exporter.otlphttp.default.input]
+          }
+        }
+
+        otelcol.exporter.otlphttp "default" {
+          client { 
+            endpoint = "otel.wopr.tailandtraillabs.org:80"
+          }
+        }
+        
+        // Kubernetes discovery
+        discovery.kubernetes "nodes" {
+          role = "node"
+        }
+        
+        discovery.kubernetes "pods" {
+          role = "pod"
+        }
+        
+        discovery.kubernetes "services" {
+          role = "service"
+        }
+        
+        // Scrape kubelet cAdvisor metrics (container metrics)
+        discovery.relabel "kubelet_cadvisor" {
+          targets = discovery.kubernetes.nodes.targets
+          
+          rule {
+            source_labels = ["__meta_kubernetes_node_name"]
+            target_label  = "node"
+          }
+          
+          rule {
+            source_labels = ["__address__"]
+            regex         = "([^:]+)(:[0-9]+)?" 
+            replacement   = "$1:10250"
+            target_label  = "__address__"
+          }
+          
+          rule {
+            replacement  = "/metrics/cadvisor"
+            target_label = "__metrics_path__"
+          }
+        }
+        
+        prometheus.scrape "kubelet_cadvisor" {
+          targets    = discovery.relabel.kubelet_cadvisor.output
+          forward_to = [prometheus.relabel.add_cluster.receiver]
+          
+          scheme = "https"
+          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          tls_config {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
+        }
+        
+        // Scrape kubelet metrics
+        discovery.relabel "kubelet" {
+          targets = discovery.kubernetes.nodes.targets
+          
+          rule {
+            source_labels = ["__meta_kubernetes_node_name"]
+            target_label  = "node"
+          }
+          
+          rule {
+            source_labels = ["__address__"]
+            replacement   = "$1:10250"
+            target_label  = "__address__"
+          }
+          
+          rule {
+            replacement  = "/metrics"
+            target_label = "__metrics_path__"
+          }
+        }
+        
+        prometheus.scrape "kubelet" {
+          targets    = discovery.relabel.kubelet.output
+          forward_to = [prometheus.relabel.add_cluster.receiver]
+          
+          scheme = "https"
+          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          tls_config {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
+        }
+        
+        // Scrape pods with prometheus.io annotations
+        discovery.relabel "pods" {
+          targets = discovery.kubernetes.pods.targets
+          
+          // Only scrape pods with prometheus.io/scrape=true annotation
+          rule {
+            source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+            action        = "keep"
+            regex         = "true"
+          }
+          
+          rule {
+            source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+            action        = "replace"
+            target_label  = "__metrics_path__"
+            regex         = "(.+)"
+          }
+          
+          rule {
+            source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+            action        = "replace"
+            regex         = "([^:]+)(?:\\d+)?;(\\d+)"
+            replacement   = "$1:$2"
+            target_label  = "__address__"
+          }
+          
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            target_label  = "namespace"
+          }
+          
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            target_label  = "pod"
+          }
+        }
+        
+        prometheus.scrape "pods" {
+          targets    = discovery.relabel.pods.output
+          forward_to = [prometheus.relabel.add_cluster.receiver]
+        }
+        
+        // Scrape nginx exporters on pods with hasNginx label
+        discovery.relabel "nginx_pods" {
+          targets = discovery.kubernetes.pods.targets
+          
+          // Keep only pods with app.wopr.io/hasNginx=true label
+          rule {
+            source_labels = ["__meta_kubernetes_pod_label_app_wopr_io_hasNginx"]
+            regex         = "true"
+            action        = "keep"
+          }
+          
+          // Set scrape address to pod IP + nginx exporter port
+          rule {
+            source_labels = ["__address__"]
+            regex         = "([^:]+):.*"
+            replacement   = "${1}:9113"
+            target_label  = "__address__"
+          }
+          
+          // Override metrics path to default
+          rule {
+            replacement  = "/metrics"
+            target_label = "__metrics_path__"
+          }
+          
+          // Add namespace label
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            target_label  = "namespace"
+          }
+          
+          // Add pod name
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            target_label  = "pod"
+          }
+          
+          // Add app label
+          rule {
+            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+            target_label  = "app"
+          }
+        }
+        
+        prometheus.scrape "nginx" {
+          targets    = discovery.relabel.nginx_pods.output
+          forward_to = [prometheus.relabel.add_cluster.receiver]
+          scrape_interval = "30s"
+        }
+        
+        // Add cluster label to all metrics
+        prometheus.relabel "add_cluster" {
+          forward_to = [prometheus.remote_write.local_prom.receiver]
+          
+          rule {
+            target_label = "cluster"
+            replacement  = "studio"
+          }
+        }
+        
+        // Self-monitoring
+        prometheus.exporter.self "default" {}
+        
+        prometheus.scrape "self" {
+          targets    = prometheus.exporter.self.default.targets
+          forward_to = [prometheus.relabel.add_cluster.receiver]
+        }
+        
+        // Remote write to monitoring cluster
+        prometheus.remote_write "local_prom" {
+          endpoint {
+            url = "https://prometheus.wopr.tailandtraillabs.org/api/v1/write"
+            
+            queue_config {
+              capacity = 10000
+              max_shards = 10
+            }
+          }
+        }
+        
+        // Discover all pods for log collection
+        discovery.kubernetes "pods_logs" {
+          role = "pod"
+        }
+        
+        // Collect pod logs from container filesystems
+        loki.source.kubernetes "pods" {
+          targets    = discovery.kubernetes.pods_logs.targets
+          forward_to = [loki.process.add_cluster.receiver]
+        }
+        
+        // Add cluster label to logs
+        loki.process "add_cluster" {
+          forward_to = [loki.write.monitoring_loki.receiver]
+          
+          stage.static_labels {
+            values = {
+              cluster = "wopr",
+            }
+          }
+        }
+        
+        // Push logs to central Loki
+        loki.write "monitoring_loki" {
+          endpoint {
+            url = "https://loki.wopr.tailandtraillabs.org/loki/api/v1/push"
+          }
+        }

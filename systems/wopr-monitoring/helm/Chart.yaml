@@ -17,3 +17,7 @@ dependencies:
   - name: tempo
     version: 1.24.1
     repository: "https://grafana.github.io/helm-charts"
+
+  - name: alloy-operator
+    version: 0.3.14
+    repository: "https://grafana.github.io/helm-charts"
