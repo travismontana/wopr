@@ -16,14 +16,14 @@ wopr-baseapp:
   ingress:
     enabled: true
     hosts:
-      - host: thumbor.tailandtraillabs.org
+      - host: thumbor.wopr.tailandtraillabs.org
         paths:
           - path: /
             pathType: Prefix
     tls: 
       - secretName: thumbor-tls
         hosts:
-          - thumbor.tailandtraillabs.org
+          - thumbor.wopr.tailandtraillabs.org
 
   volumeMounts:
   - name: nfs-images
@@ -35,14 +35,6 @@ wopr-baseapp:
       path: /volume2/wopr
   
   env:
-    - name: OTEL_TRACES_EXPORTER
-      value: otlp
-    - name: OTEL_METRICS_EXPORTER
-      value: otlp
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: http/protobuf
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: https://otel.monitoring.abode.tailandtraillabs.org 
     - name: MAX_AGE
       value: "3600"
     - name: MAX_AGE_TEMP_IMAGE
