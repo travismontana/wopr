@@ -1,0 +1,11 @@
+apiVersion: v2
+name: wopr-ednm
+namespace: rook-ceph
+version: 0.1.5-alpha
+description: WOPR Core Systems
+
+dependencies:
+  - name: rook-ceph
+    repository: https://charts.rook.io/release
+    version: 1.18.8
+

@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: wopr-applicationset
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+           - name: wopr-edm
+             path: systems/wopr-edm/helm
+             namespace: wopr
+             wave: "0"
+#          - name: wopr-api
+#            path: systems/wopr-api/helm
+#            namespace: wopr
+#            wave: "1"
+#          - name: wopr-web
+#            path: systems/wopr-web/helm
+#            namespace: wopr
+#            wave: "1"
+#          - name: wopr-images
+#            path: systems/wopr-images/helm
+#            namespace: wopr
+#            wave: "2"
+#          - name: wopr-thumbor
+#            path: systems/wopr-thumbor/helm
+#            namespace: wopr
+#            wave: "2"
+#          - name: wopr-directus
+#            path: systems/wopr-directus/helm
+#            namespace: wopr
+#            wave: "2"
+
+  template:
+    metadata:
+      name: "{{name}}"
+      annotations:
+        # Optional: gives you a stable order *if you ever sync both at once*
+        argocd.argoproj.io/sync-wave: "{{wave}}"
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/travismontana/wopr.git"
+        targetRevision: main
+        path: "{{path}}"
+        helm:
+          # Optional: if you add per-app values later, uncomment and commit the file(s)
+          # valueFiles:
+          #   - values.yaml
+          #
+          # Optional: pass common Helm params here if you want
+          # parameters:
+          #   - name: image.tag
+          #     value: "..."
+      destination:
+        server: "https://kubernetes.default.svc"
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
