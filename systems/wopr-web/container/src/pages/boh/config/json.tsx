@@ -337,7 +337,6 @@ export default function JsonConfigPage() {
 
         .json-viewer .collapsed-icon,
         .json-viewer .expanded-icon {
-          color: #0f0 !important;
         }
 
         /* Fix input fields when editing */
