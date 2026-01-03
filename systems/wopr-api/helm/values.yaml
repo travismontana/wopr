@@ -15,6 +15,7 @@ wopr-baseapp:
 
   ingress:
     enabled: true
+    className: wopr-traefik
     hosts:
       - host: api.wopr.tailandtraillabs.org
         paths:
