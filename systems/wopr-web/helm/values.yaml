@@ -27,4 +27,47 @@ wopr-baseapp:
           - wopr.tailandtraillabs.org
   
   env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
+  
+  labels: 
+    app.wopr.io/hasNginx: "true"
+  selectorLabels: 
+    app.wopr.io/hasNginx: "true"
 
+  podAnnotations: 
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "4318"
+    prometheus.io/path: "/v1/metrics"
+
+  sidecarContainers: 
+    - name: nginx-exporter
+      image: nginx/nginx-prometheus-exporter:latest    
+      args:
+        - -nginx.scrape-uri=http://localhost:8080/stub_status
+      ports:
+        - name: nginx-metrics
+          containerPort: 9113
+      resources:
+        limits:
+          cpu: 50m
+          memory: 64Mi
+        requests:
+          cpu: 10m
+          memory: 32Mi
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /remote/wopr
+    - name: nginx-conf
+      mountPath: /etc/nginx/conf.d
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-nfs-pvc
+    - name: nginx-conf
+      emptyDir: {}
+
+      

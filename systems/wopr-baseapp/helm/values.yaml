@@ -126,3 +126,8 @@ readinessProbe:
 #         some: config
 #     data:
 #       binary-blob: U29tZSBiaW5hcnk=
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 2222
+  runAsGroup: 2222
+  fsGroup: 2222
