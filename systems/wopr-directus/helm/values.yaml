@@ -82,3 +82,8 @@ wopr-baseapp:
           key: password
     - name: PUBLIC_URL
       value: https://directus.wopr.tailandtraillabs.org
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
