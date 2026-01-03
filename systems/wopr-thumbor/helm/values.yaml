@@ -59,3 +59,5 @@ wopr-baseapp:
       value: thumbor.result_storages.file_storage
     - name: RESULT_STORAGE_STORES_UNSAFE
       value: "True"
+  securityContext:
+    runAsNonRoot: false
