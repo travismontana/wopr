@@ -332,7 +332,6 @@ export default function JsonConfigPage() {
         }
 
         .json-viewer .object-key {
-          color: #0f0 !important;
         }
 
         .json-viewer .collapsed-icon,
