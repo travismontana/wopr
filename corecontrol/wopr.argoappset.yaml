@@ -43,6 +43,10 @@ spec:
             path: systems/wopr-monitoring/helm
             namespace: wopr
             wave: "3"
+          - name: wopr-openwebui
+            path: systems/wopr-openwebui/helm
+            namespace: wopr
+            wave: "3"
 
   template:
     metadata:

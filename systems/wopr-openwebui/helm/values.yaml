@@ -1,0 +1,15 @@
+open-webui:
+  ollama:
+    enabled: false
+    fullnameOverride: "groth-ollama"
+  ollamaUrls:
+    - "http://groth.abode.tailandtraillabs.org:11434"
+  ollamaUrlsFromExtraEnv: true
+  tika:
+    enabled: true
+  ingress:
+    enabled: true
+    class: "wopr-trafeik"
+    host: "openwebui.wopr.tailandtraillabs.org"
+    tls: true
+    existingSecret: "wildcard-tls"
