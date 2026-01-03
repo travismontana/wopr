@@ -361,7 +361,6 @@ export default function JsonConfigPage() {
         /* Fix add/edit dialog inputs */
         .json-viewer .rjv-modal input {
           background: #111 !important;
-          color: #0ff !important;
           border: 1px solid #0f0 !important;
         }
 
