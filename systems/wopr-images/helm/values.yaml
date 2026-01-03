@@ -61,8 +61,9 @@ wopr-baseapp:
   volumeMounts:
     - name: wopr-data
       mountPath: /remote/wopr
+      readOnly: true
     - name: nginx-conf
-      mountPath: /etc/nginx/conf.d
+      mountPath: /etc/nginx/nginx.conf
       subPath: nginx.conf
     - name: tmp
       mountPath: /tmp
