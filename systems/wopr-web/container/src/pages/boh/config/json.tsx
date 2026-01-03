@@ -168,8 +168,9 @@ export default function JsonConfigPage() {
         {config && (
           <JsonView 
             src={config}
-            theme="vscode"
+            theme="atom"
             enableClipboard={true}
+            dark={true}
             editable={true}
             onEdit={handleEdit}
             onAdd={handleAdd}
