@@ -168,7 +168,7 @@ export default function JsonConfigPage() {
         {config && (
           <JsonView 
             src={config}
-            theme="winter-is-coming"
+            theme="monokai"
             enableClipboard={true}
             editable={true}
             onEdit={handleEdit}
