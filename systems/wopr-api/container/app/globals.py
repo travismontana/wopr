@@ -24,6 +24,16 @@ DATABASE_URL = (
     os.getenv('DBPORT') + "/" + 
     os.getenv('DBNAME')
 )
+
+CONFDB_URL = (
+    'postgresql://' + 
+    os.getenv('CONFDBUSER', 'config_user') + ":" + 
+    os.getenv('CONFDBPASSWORD', 'config_password') + "@" + 
+    os.getenv('DBHOST', 'config_db_host') + ":" + 
+    os.getenv('DBPORT', '5432') + "/" + 
+    os.getenv('CONFDBNAME', 'config_db_name')
+)
+
 APP_HOST = "0.0.0.0"
 APP_PORT = 8000
 

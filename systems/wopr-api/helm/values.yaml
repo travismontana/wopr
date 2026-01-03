@@ -49,6 +49,18 @@ wopr-baseapp:
           key: port
     - name: DBNAME
       value: "wopr-db-database"
+    - name: CONFDBNAME
+      value: "wopr-db-config"
+    - name: CONFDBUSER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: username
+    - name: CONFDBPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: password
       
   woprConfig:
     WOPR_VERSION: "v0.1.4-alpha"
