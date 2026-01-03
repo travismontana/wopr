@@ -8,9 +8,9 @@ kube-prometheus-stack:
     enabled: true
     ingress:
       enabled: true
-      ingressClassName: monitoring-traefik
+      ingressClassName: wopr-traefik
       annotations:
-        kubernetes.io/ingress.class: monitoring-traefik
+        kubernetes.io/ingress.class: wopr-traefik
       hosts:
         - alertmanager.wopr.tailandtraillabs.org
       tls:
@@ -49,9 +49,9 @@ kube-prometheus-stack:
     enabled: true
     ingress:
       enabled: true
-      ingressClassName: monitoring-traefik
+      ingressClassName: wopr-traefik
       annotations:
-        kubernetes.io/ingress.class: monitoring-traefik
+        kubernetes.io/ingress.class: wopr-traefik
       hosts:
         - grafana.wopr.tailandtraillabs.org
       tls:
@@ -102,9 +102,9 @@ kube-prometheus-stack:
     enabled: true
     ingress:
       enabled: true
-      ingressClassName: monitoring-traefik
+      ingressClassName: wopr-traefik
       annotations:
-        kubernetes.io/ingress.class: monitoring-traefik
+        kubernetes.io/ingress.class: wopr-traefik
       hosts:
         - prometheus.wopr.tailandtraillabs.org
       paths:
@@ -197,7 +197,7 @@ loki:
     replicas: 1
     ingress:
       enabled: true
-      ingressClassName: monitoring-traefik
+      ingressClassName: wopr-traefik
       hosts:
         - host: loki.wopr.tailandtraillabs.org
           paths:
@@ -252,7 +252,7 @@ tempo:
       enabled: true
       ingress:
         enabled: true
-        ingressClassName: monitoring-traefik
+        ingressClassName: wopr-traefik
         hosts:
           - tempo.wopr.tailandtraillabs.org
         tls:
