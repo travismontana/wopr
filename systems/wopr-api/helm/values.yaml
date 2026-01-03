@@ -30,12 +30,12 @@ wopr-baseapp:
     - name: DBUSER
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-user-credentials
+          name: wopr-db-user-credentials
           key: username
     - name: DBPASSWORD
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-user-credentials
+          name: wopr-db-user-credentials
           key: password
     - name: DBHOST
       valueFrom:
