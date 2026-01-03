@@ -7,10 +7,14 @@ spec:
   generators:
     - list:
         elements:
-           - name: wopr-rook-ceph
-             path: systems/wopr-rook-ceph/helm
-             namespace: rook-ceph
-             wave: "0"
+          - name: wopr-rook-ceph
+            path: systems/wopr-rook-ceph/helm
+            namespace: rook-ceph
+            wave: "0"
+          - name: wopr-heimdall
+            path: systems/wopr-heimdall/helm
+            namespace: wopr
+            wave: "1"
 #          - name: wopr-api
 #            path: systems/wopr-api/helm
 #            namespace: wopr
