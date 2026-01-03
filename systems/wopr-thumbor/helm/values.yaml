@@ -63,3 +63,4 @@ wopr-baseapp:
     - "--port=80"
     - "--conf=/etc/thumbor/thumbor.conf"
     - "--processes=2"
+  command: ["/usr/local/bin/thumbor"]
