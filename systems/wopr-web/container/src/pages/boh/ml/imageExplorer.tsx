@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from "@lib/api";
 
 interface MLImageMetadata {
   id: number;
@@ -20,10 +21,7 @@ interface MLImageMetadata {
 type SortField = 'id' | 'game_uuid' | 'piece_id' | 'object_position' | 'object_rotation' | 'light_intensity' | 'date_created';
 type SortDirection = 'asc' | 'desc';
 
-const API_URL =
-  (window as any).ENV?.WOPR_API_URL ||
-  "https://wopr-api.studio.abode.tailandtraillabs.org";
-const API_BASE = API_URL;
+const API_BASE = apiUrl;
 
 export function MLExplorerPage() {
   const [images, setImages] = useState<MLImageMetadata[]>([]);

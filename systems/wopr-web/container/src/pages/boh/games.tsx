@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
-
-const API_URL =
-  (window as any).ENV?.WOPR_API_URL ||
-  "https://wopr-api.studio.abode.tailandtraillabs.org";
-
+import { apiUrl } from "@lib/api";
+const API_URL = apiUrl;
 interface Game {
   id: number;
   document_id?: string;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MLGallery } from './imageList';
 import { MLExplorerPage } from './imageExplorer';
-
+import { apiUrl } from "@lib/api";
 interface Game {
   id: number;
   name: string;
@@ -41,10 +41,8 @@ interface CaptureFormData {
   lighting_temp: string;
   notes: string;
 }
-const API_URL =
-  (window as any).ENV?.WOPR_API_URL ||
-  "https://wopr-api.studio.abode.tailandtraillabs.org";
-const API_BASE = API_URL;
+
+const API_BASE = apiUrl;
 
 export default function MLImagesPage() {
   const [games, setGames] = useState<Game[]>([]);
