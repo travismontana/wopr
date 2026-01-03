@@ -63,7 +63,7 @@ kube-prometheus-stack:
     additionalDataSources:
       - name: Loki
         type: loki
-        url: http://monitoring-kube-prometheus-stack-loki-gateway:80
+        url: http://wopr-monitoring-loki-gateway:80
         access: proxy
         isDefault: false
     
@@ -231,7 +231,7 @@ tempo:
   tempo:
     metricsGenerator:
       enabled: true
-      remoteWriteUrl: "http://prometheus-operated.kube-prometheus-stack:9090/api/v1/write"
+      remoteWriteUrl: "http://wopr-monitoring-kube-prome-prometheus:9090/api/v1/write"
       tempo:
         metricsGenerator:
           enabled: true
