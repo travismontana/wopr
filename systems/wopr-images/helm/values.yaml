@@ -4,7 +4,7 @@ wopr-baseapp:
   replicaCount: 1
 
   image:
-    registry: docker.io
+    registry: 
     repository: nginx/nginx
     tag: latest
     pullPolicy: Always
