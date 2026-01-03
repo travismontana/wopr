@@ -1,100 +1,30 @@
-# Default values for wpor-web
+wopr-baseapp:
+  app:
+    name: wopr-web
+  replicaCount: 1
 
-replicaCount: 1
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-web
+    tag: latest
+    pullPolicy: Always
 
-image:
-  repository: ghcr.io/travismontana/wopr/wopr-web
-  pullPolicy: Always
-  tag: "latest"
-  #tag: "001630b"
+  service:
+    type: ClusterIP
+    port: 8080
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-web-tls
+        hosts:
+          - wopr.tailandtraillabs.org
+  
+  env:
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
-
-service:
-  type: ClusterIP
-  port: 8080
-
-ingress:
-  enabled: true
-  className: "studio-traefik"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: wopr.studio.abode.tailandtraillabs.org
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: wopr-web-tls
-      hosts:
-        - wopr.studio.abode.tailandtraillabs.org
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-env:
-  - name: WOPR_API_URL
-    valueFrom:
-      configMapKeyRef:
-        name: wopr-api-config
-        key: API_URL
-  - name: OTEL_SERVICE_NAME
-    value: wopr-web
-  - name: OTEL_TRACES_EXPORTER
-    value: otlp
-  - name: OTEL_METRICS_EXPORTER
-    value: otlp
-  - name: OTEL_EXPORTER_OTLP_PROTOCOL
-    value: http/protobuf
-  - name: OTEL_EXPORTER_OTLP_ENDPOINT
-    value: https://otel.monitoring.abode.tailandtraillabs.org/v1/traces
-
-labels: 
-  app.wopr.io/hasNginx: "true"
-selectorLabels: 
-  app.wopr.io/hasNginx: "true"
-
-podAnnotations: 
-  prometheus.io/scrape: "true"
-  prometheus.io/port: "4318"
-  prometheus.io/path: "/v1/metrics"
-
-sidecarContainers: 
-  - name: nginx-exporter
-    image: nginx/nginx-prometheus-exporter:latest    
-    args:
-      - -nginx.scrape-uri=http://localhost:8080/stub_status
-    ports:
-      - name: nginx-metrics
-        containerPort: 9113
-    resources:
-      limits:
-        cpu: 50m
-        memory: 64Mi
-      requests:
-        cpu: 10m
-        memory: 32Mi

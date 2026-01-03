@@ -1,0 +1,15 @@
+apiVersion: v2
+name: wopr-web
+description: WOPR Web UI
+type: application
+version: 0.1.0
+appVersion: "main-0d42092"
+keywords:
+  - wopr
+  - web
+  - react
+  - ui
+  - frontend
+maintainers:
+  - name: Bob Bomar
+    email: bob@bomar.us
