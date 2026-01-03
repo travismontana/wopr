@@ -19,7 +19,7 @@ spec:
   managed:
     roles:
       - name: wopr-config-db-user
-        comment: "wopr config database user"
+        comment: wopr config database user
         ensure: present
         login: true
         passwordSecret:
@@ -27,7 +27,7 @@ spec:
         createdb: false
         createrole: false
       - name: wopr-db-user
-        comment: "wopr database user"
+        comment: wopr database user
         ensure: present
         login: true
         passwordSecret:
@@ -35,7 +35,7 @@ spec:
         createdb: false
         createrole: false
       - name: wopr-cvat-db-user
-        comment: "wopr cvat database user"
+        comment: wopr cvat database user
         ensure: present
         login: true
         passwordSecret:
