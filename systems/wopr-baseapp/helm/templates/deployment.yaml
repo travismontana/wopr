@@ -28,8 +28,8 @@ spec:
       - name: {{ include "wopr-baseapp.fullname" . }}
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        {{- if .Values.command }}
-        command: {{- .Values.command }}
+        {{- if .Values.wopr-baseapp.command }}
+        command: {{- .Values.wopr-baseapp.command }}
         {{- end }}
         {{- if .Values.args }}
         args:
