@@ -5,7 +5,7 @@ wopr-baseapp:
 
   image:
     registry: 
-    repository: nginx/nginx
+    repository: nginx
     tag: latest
     pullPolicy: Always
 
