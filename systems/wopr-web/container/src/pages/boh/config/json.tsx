@@ -168,6 +168,7 @@ export default function JsonConfigPage() {
         {config && (
           <JsonView 
             src={config}
+            className="panel"
             theme="atom"
             enableClipboard={true}
             dark={true}
