@@ -63,6 +63,7 @@ wopr-baseapp:
       mountPath: /remote/wopr
     - name: nginx-conf
       mountPath: /etc/nginx/conf.d
+      subPath: nginx.conf
     - name: tmp
       mountPath: /tmp
     - name: cache
