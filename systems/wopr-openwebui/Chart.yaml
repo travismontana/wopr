@@ -1,0 +1,11 @@
+apiVersion: v2
+name: wopr-openwebui
+version: 0.1.5-alpha
+description: WOPR Open Web UI
+dependencies:
+  - name: open-webui
+    version: "*"
+    repository: https://helm.openwebui.com/
+  - name: redis
+    version: "19.3.1"
+    repository: "https://charts.bitnami.com/bitnami"

@@ -76,11 +76,11 @@ export default function JsonConfigPage() {
   // Handle edits from react-json-view
   const handleEdit = async (params: any) => {
     console.log('Edit params received:', params);
-    const { newValue, oldValue, namespace, path, keyPath } = params;
+    const { newValue, oldValue, parentPath, indexOrName } = params;
     
-    // Try multiple possible property names from the library
-    const actualPath = namespace || path || keyPath;
-    const key = pathToKey(actualPath);
+    // Build full path: parentPath + current indexOrName
+    const fullPath = [...(parentPath || []), indexOrName];
+    const key = pathToKey(fullPath);
     
     if (!key) {
       console.error('Could not determine key from edit params:', params);
@@ -94,11 +94,11 @@ export default function JsonConfigPage() {
   // Handle additions
   const handleAdd = async (params: any) => {
     console.log('Add params received:', params);
-    const { newValue, namespace, path, keyPath } = params;
+    const { newValue, parentPath, indexOrName } = params;
     
-    // Try multiple possible property names from the library
-    const actualPath = namespace || path || keyPath;
-    const key = pathToKey(actualPath);
+    // Build full path: parentPath + current indexOrName
+    const fullPath = [...(parentPath || []), indexOrName];
+    const key = pathToKey(fullPath);
     
     if (!key) {
       console.error('Could not determine key from add params:', params);
@@ -112,11 +112,11 @@ export default function JsonConfigPage() {
   // Handle deletions
   const handleDelete = async (params: any) => {
     console.log('Delete params received:', params);
-    const { namespace, path, keyPath } = params;
+    const { parentPath, indexOrName } = params;
     
-    // Try multiple possible property names from the library
-    const actualPath = namespace || path || keyPath;
-    const key = pathToKey(actualPath);
+    // Build full path: parentPath + current indexOrName
+    const fullPath = [...(parentPath || []), indexOrName];
+    const key = pathToKey(fullPath);
     
     if (!key) {
       console.error('Could not determine key from delete params:', params);

@@ -1,0 +1,10 @@
+open-webui:
+  ollama:
+    enabled: false
+    fullnameOverride: "groth-ollama"
+    ollamaUrls: [
+      "http://groth.abode.tailandtraillabs.org:11434"
+    ]
+  tika:
+    enabled: true
+  
