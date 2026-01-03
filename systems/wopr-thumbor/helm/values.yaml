@@ -60,6 +60,6 @@ wopr-baseapp:
     - name: RESULT_STORAGE_STORES_UNSAFE
       value: "True"
   args:
-    - "--port={{ .Values.thumbor.port }}"
+    - "--port=80"
     - "--conf=/etc/thumbor/thumbor.conf"
-    - "--processes={{ .Values.thumbor.numProcesses }}"
+    - "--processes=2"
