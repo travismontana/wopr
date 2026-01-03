@@ -23,7 +23,7 @@ export default function JsonConfigPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiUrl}/config/all`);
+      const res = await fetch(`${apiUrl}/api/v1/config/all`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${await res.text()}`);
       }
@@ -45,7 +45,7 @@ export default function JsonConfigPage() {
   const saveValue = async (key: string, value: any) => {
     setSaving(true);
     try {
-      const res = await fetch(`${apiUrl}/config/set/${key}`, {
+      const res = await fetch(`${apiUrl}/api/v1/config/set/${key}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,7 +94,7 @@ export default function JsonConfigPage() {
     
     setSaving(true);
     try {
-      const res = await fetch(`${apiUrl}/config/delete/${key}`, {
+      const res = await fetch(`${apiUrl}/api/v1/config/delete/${key}`, {
         method: 'DELETE'
       });
 
