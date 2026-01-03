@@ -24,7 +24,6 @@ spec:
         login: true
         passwordSecret:
           name: wopr-config-db-user-credentials
-          generate: true
         createdb: false
         createrole: false
       - name: wopr-db-user
@@ -33,7 +32,6 @@ spec:
         login: true
         passwordSecret:
           name: wopr-db-user-credentials
-          generate: true
         createdb: false
         createrole: false
       - name: wopr-cvat-db-user
@@ -42,6 +40,5 @@ spec:
         login: true
         passwordSecret:
           name: wopr-cvat-db-user-credentials
-          generate: true
         createdb: false
         createrole: false
