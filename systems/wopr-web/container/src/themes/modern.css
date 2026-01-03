@@ -83,3 +83,7 @@
   content: "● ";
   color: #ff0000;
 }
+
+.json-view--input {
+  color: #00ff00;
+}
