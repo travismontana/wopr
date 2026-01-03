@@ -61,7 +61,6 @@ wopr-baseapp:
       value: "True"
   args:
     - "--port=80"
-    - "--conf=/etc/thumbor/thumbor.conf"
     - "--processes=2"
   command: ["/usr/local/bin/thumbor"]
   securityContext:
