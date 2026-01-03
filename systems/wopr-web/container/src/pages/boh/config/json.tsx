@@ -344,7 +344,6 @@ export default function JsonConfigPage() {
         .json-viewer input[type="number"],
         .json-viewer textarea {
           background: #111 !important;
-          color: #0ff !important;
           border: 1px solid #0f0 !important;
           padding: 0.25rem 0.5rem !important;
           font-family: 'Courier New', Courier, monospace !important;
