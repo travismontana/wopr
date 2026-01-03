@@ -54,3 +54,9 @@ wopr-baseapp:
     WOPR_VERSION: "v0.1.4-alpha"
     WOPR_METADATA_DB: "wopr-db-database"
     WOPR_API_URL: "http://wopr-api.wopr.svc:8000"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
