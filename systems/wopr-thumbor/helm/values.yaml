@@ -59,5 +59,7 @@ wopr-baseapp:
       value: thumbor.result_storages.file_storage
     - name: RESULT_STORAGE_STORES_UNSAFE
       value: "True"
-  securityContext:
-    runAsNonRoot: false
+  args:
+    - "--port={{ .Values.thumbor.port }}"
+    - "--conf=/etc/thumbor/thumbor.conf"
+    - "--processes={{ .Values.thumbor.numProcesses }}"
