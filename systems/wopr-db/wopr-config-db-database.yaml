@@ -4,6 +4,6 @@ metadata:
   name: wopr-config-db-database
 spec:
   name: wopr-config-db-database
-  owner: wopr-config-db-database-owner
+  owner: wopr-config-db-user
   cluster:
-    name: wopr-config-db-cluster
+    name: wopr-db-cluster

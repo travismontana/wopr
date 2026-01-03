@@ -1,0 +1,11 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: wopr-db-database
+  namespace: wopr
+spec:
+  cluster:
+    name: wopr-db-cluster
+  name: wopr-db-database
+  owner: wopr-db-user

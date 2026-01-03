@@ -2,7 +2,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: wopr-config-db-cluster
+  name: wopr-db-cluster
 spec:
   instances: 1
   storage:
@@ -18,17 +18,30 @@ spec:
             key: schema.sql
   managed:
     roles:
+      - name: wopr-config-db-user
+        comment: "wopr config database user"
+        ensure: present
+        login: true
+        passwordSecret:
+          name: wopr-config-db-user-credentials
+          generate: true
+        createdb: false
+        createrole: false
       - name: wopr-db-user
         comment: "wopr database user"
         ensure: present
         login: true
         passwordSecret:
           name: wopr-db-user-credentials
-        createdb: true
+          generate: true
+        createdb: false
+        createrole: false
       - name: wopr-cvat-db-user
         comment: "wopr cvat database user"
         ensure: present
         login: true
         passwordSecret:
           name: wopr-cvat-db-user-credentials
-        createdb: true
+          generate: true
+        createdb: false
+        createrole: false
