@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: wopr-config
 data:
-  {{- with .Values.woprConfig }}
+  {{- with .Values.wopr-baseapp.woprConfig }}
   {{- toYaml . | nindent 2 }}
   {{- end }}

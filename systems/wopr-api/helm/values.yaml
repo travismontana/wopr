@@ -49,6 +49,7 @@ wopr-baseapp:
           key: port
     - name: DBNAME
       value: "wopr-db-database"
+      
   woprConfig:
     WOPR_VERSION: "v0.1.4-alpha"
     WOPR_METADATA_DB: "wopr-db"
