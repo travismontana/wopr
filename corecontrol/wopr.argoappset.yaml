@@ -7,7 +7,7 @@ spec:
   generators:
     - list:
         elements:
-           - name: wopr-edm
+           - name: wopr-rook-ceph
              path: systems/wopr-edm/helm
              namespace: rook-ceph
              wave: "0"
