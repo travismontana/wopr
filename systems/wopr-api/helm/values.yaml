@@ -39,12 +39,12 @@ wopr-baseapp:
     - name: DBHOST
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: host
     - name: DBPORT
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: port
     - name: DBNAME
       value: "wopr-db-database"
