@@ -7,11 +7,11 @@ wopr-baseapp:
     registry: docker.io
     repository: nginx
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   service:
     type: ClusterIP
-    port: 80
+    port: 8080
 
   ingress:
     enabled: true
