@@ -30,7 +30,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.service }}
         ports:
-        - name: {{ include "wopr-baseapp.fullName" . }}
+        - name: {{ include "wopr-baseapp.fullname" . }}
           containerPort: {{ .Values.service.port }}
           protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
         {{- end }}
@@ -71,7 +71,7 @@ spec:
       {{- with .Values.sidecarContainers }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
-        {{- if .Values.volumes}}
+      {{- if .Values.volumes}}
       volumes:
         {{- toYaml .Values.volumes | nindent 8 }}
       {{- end }}
