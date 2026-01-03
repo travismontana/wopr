@@ -23,7 +23,7 @@ export default function JsonConfigPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiUrl}/api/v1/config/all`);
+      const res = await fetch(`${apiUrl}/config/all`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${await res.text()}`);
       }
@@ -45,7 +45,7 @@ export default function JsonConfigPage() {
   const saveValue = async (key: string, value: any) => {
     setSaving(true);
     try {
-      const res = await fetch(`${apiUrl}/api/v1/config/set/${key}`, {
+      const res = await fetch(`${apiUrl}/config/set/${key}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,7 +94,7 @@ export default function JsonConfigPage() {
     
     setSaving(true);
     try {
-      const res = await fetch(`${apiUrl}/api/v1/config/delete/${key}`, {
+      const res = await fetch(`${apiUrl}/config/delete/${key}`, {
         method: 'DELETE'
       });
 
@@ -337,6 +337,38 @@ export default function JsonConfigPage() {
         .json-viewer .collapsed-icon,
         .json-viewer .expanded-icon {
           color: #0f0 !important;
+        }
+
+        /* Fix input fields when editing */
+        .json-viewer input[type="text"],
+        .json-viewer input[type="number"],
+        .json-viewer textarea {
+          background: #111 !important;
+          color: #0ff !important;
+          border: 1px solid #0f0 !important;
+          padding: 0.25rem 0.5rem !important;
+          font-family: 'Courier New', Courier, monospace !important;
+          font-size: 0.9rem !important;
+        }
+
+        .json-viewer input[type="text"]:focus,
+        .json-viewer input[type="number"]:focus,
+        .json-viewer textarea:focus {
+          outline: none !important;
+          border-color: #0ff !important;
+          box-shadow: 0 0 5px #0ff !important;
+        }
+
+        /* Fix add/edit dialog inputs */
+        .json-viewer .rjv-modal input {
+          background: #111 !important;
+          color: #0ff !important;
+          border: 1px solid #0f0 !important;
+        }
+
+        .json-viewer .rjv-modal input:focus {
+          border-color: #0ff !important;
+          box-shadow: 0 0 5px #0ff !important;
         }
       `}</style>
     </div>
