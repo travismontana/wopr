@@ -37,7 +37,11 @@ export default function JsonConfigPage() {
   };
 
   // Convert path array to dot notation key
-  const pathToKey = (path: (string | number)[]): string => {
+  const pathToKey = (path: (string | number)[] | undefined): string => {
+    if (!path || !Array.isArray(path)) {
+      console.error('pathToKey received invalid path:', path);
+      return '';
+    }
     return path.join('.');
   };
 
@@ -71,26 +75,54 @@ export default function JsonConfigPage() {
 
   // Handle edits from react-json-view
   const handleEdit = async (params: any) => {
-    const { newValue, oldValue, namespace } = params;
+    console.log('Edit params received:', params);
+    const { newValue, oldValue, namespace, path, keyPath } = params;
     
-    // namespace is array like ['storage', 'base_path']
-    const key = pathToKey(namespace);
+    // Try multiple possible property names from the library
+    const actualPath = namespace || path || keyPath;
+    const key = pathToKey(actualPath);
+    
+    if (!key) {
+      console.error('Could not determine key from edit params:', params);
+      setError('Invalid path received from editor');
+      return;
+    }
     
     await saveValue(key, newValue);
   };
 
   // Handle additions
   const handleAdd = async (params: any) => {
-    const { newValue, namespace } = params;
-    const key = pathToKey(namespace);
+    console.log('Add params received:', params);
+    const { newValue, namespace, path, keyPath } = params;
+    
+    // Try multiple possible property names from the library
+    const actualPath = namespace || path || keyPath;
+    const key = pathToKey(actualPath);
+    
+    if (!key) {
+      console.error('Could not determine key from add params:', params);
+      setError('Invalid path received from editor');
+      return;
+    }
     
     await saveValue(key, newValue);
   };
 
   // Handle deletions
   const handleDelete = async (params: any) => {
-    const { namespace } = params;
-    const key = pathToKey(namespace);
+    console.log('Delete params received:', params);
+    const { namespace, path, keyPath } = params;
+    
+    // Try multiple possible property names from the library
+    const actualPath = namespace || path || keyPath;
+    const key = pathToKey(actualPath);
+    
+    if (!key) {
+      console.error('Could not determine key from delete params:', params);
+      setError('Invalid path received from editor');
+      return;
+    }
     
     setSaving(true);
     try {
