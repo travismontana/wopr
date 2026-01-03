@@ -63,11 +63,23 @@ wopr-baseapp:
       mountPath: /remote/wopr
     - name: nginx-conf
       mountPath: /etc/nginx/conf.d
+    - name: tmp
+      mountPath: /tmp
+    - name: cache
+      mountPath: /var/cache/nginx
+    - name: run
+      mountPath: /var/run
   volumes:
     - name: wopr-data
       persistentVolumeClaim:
         claimName: wopr-nfs-pvc
     - name: nginx-conf
+      emptyDir: {}
+    - name: tmp
+      emptyDir: {}
+    - name: cache
+      emptyDir: {}
+    - name: run
       emptyDir: {}
 
       
