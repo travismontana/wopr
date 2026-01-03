@@ -8,7 +8,7 @@ spec:
     - list:
         elements:
            - name: wopr-rook-ceph
-             path: systems/wopr-edm/helm
+             path: systems/wopr-rook-ceph/helm
              namespace: rook-ceph
              wave: "0"
 #          - name: wopr-api
