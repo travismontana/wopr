@@ -75,8 +75,9 @@ wopr-baseapp:
       persistentVolumeClaim:
         claimName: wopr-nfs-pvc
     - name: nginx-conf
-      configMap:
-        name: wopr-images-config
+      persistentVolumeClaim:
+        configMap:
+          name: wopr-images-config
     - name: tmp
       emptyDir: {}
     - name: cache
