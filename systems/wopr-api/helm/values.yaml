@@ -47,4 +47,4 @@ wopr-baseapp:
           name: wopr-config-db-cluster-app
           key: port
     - name: DBNAME
-      key: "wopr-db-database"
+      value: "wopr-db-database"
