@@ -185,7 +185,7 @@ export default function JsonConfigPage() {
           padding: 1rem;
           max-width: 1600px;
           margin: 0 auto;
-          background: #000;
+          background: #333666;
           min-height: 100vh;
         }
 
