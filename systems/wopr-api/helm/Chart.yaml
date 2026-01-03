@@ -1,0 +1,8 @@
+apiVersion: v2
+name: wopr-api
+version: 0.1.5-alpha
+description: WOPR API
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"

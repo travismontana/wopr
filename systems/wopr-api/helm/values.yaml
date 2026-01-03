@@ -1,0 +1,50 @@
+wopr-baseapp:
+  app:
+    name: wopr-api
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-api
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: api.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-api-tls
+        hosts:
+          - api.wopr.tailandtraillabs.org
+  
+  env:
+    - name: DBUSER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: username
+    - name: DBPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: password
+    - name: DBHOST
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-cluster-app
+          key: host
+    - name: DBPORT
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-cluster-app
+          key: port
+    - name: DBNAME
+      key: "wopr-db-database"
