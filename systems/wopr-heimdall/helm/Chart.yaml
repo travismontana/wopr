@@ -1,0 +1,9 @@
+apiVersion: v2
+name: wopr-heimdall
+\version: 0.1.5-alpha
+description: WOPR Core Systems - heimdall
+
+dependencies:
+  - name: heimdall
+    repository: https://djjudas21.github.io/charts/
+    version: '*'

@@ -1,0 +1,21 @@
+heimdall:
+  ingress:
+    main:
+      enabled: true
+      hosts:
+        - host: home.wopr.tailandtraillabs.org
+          paths:
+            - path: /
+      ingressClassName: wopr-traefik
+      annotations:
+        kubernetes.io/ingress.class: wopr-traefik
+      tls:
+        - secretName: wildcard-tls
+          hosts:
+            - home.wopr.tailandtraillabs.org
+  persistence:
+    config:
+      enabled: true
+  probes:
+    startup:
+      enabled: false
