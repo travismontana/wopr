@@ -58,7 +58,7 @@ resources:
 
 ingress:
   enabled: false
-  className: "studio-traefik"
+  className: "wopr-traefik"
   annotations: {}
   hosts: 
     - host: chart-example.local
