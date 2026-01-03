@@ -8,6 +8,7 @@ export default function ConfigPage() {
       <nav className="secondary-nav" aria-label="Config">
         <ul>
           <li><NavLink to="control">Control</NavLink></li>
+          <li><NavLink to="json">JSON</NavLink></li>
           <li><NavLink to="edit">Edit</NavLink></li>
           <li><NavLink to="other">Other</NavLink></li>
         </ul>

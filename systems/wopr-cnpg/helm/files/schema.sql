@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_history_changed_at ON config_history(changed_at);
 -- Seed initial configuration (examples)
 INSERT INTO settings (key, value, value_type, description, environment) VALUES
 -- Storage
-('storage.base_path', '"/mnt/nas/twat"', 'string', 'Base storage path for images', 'default'),
+('storage.base_path', '"/remote/wopr"', 'string', 'Base storage path for images', 'default'),
 ('storage.games_subdir', '"games"', 'string', 'Subdirectory for game data', 'default'),
 ('storage.default_extension', '"jpg"', 'string', 'Default image extension', 'default'),
 ('storage.image_extensions', '["jpg", "png"]', 'list', 'Allowed image extensions', 'default'),
