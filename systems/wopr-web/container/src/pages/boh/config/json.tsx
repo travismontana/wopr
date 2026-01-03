@@ -185,7 +185,7 @@ export default function JsonConfigPage() {
           padding: 1rem;
           max-width: 1600px;
           margin: 0 auto;
-          background: #333666;
+          background: #003300;
           min-height: 100vh;
         }
 
@@ -311,7 +311,6 @@ export default function JsonConfigPage() {
 
         /* Override react-json-view theme to match WOPR aesthetic */
         .json-viewer .react-json-view {
-          background: #000 !important;
           font-family: 'Courier New', Courier, monospace !important;
         }
 
