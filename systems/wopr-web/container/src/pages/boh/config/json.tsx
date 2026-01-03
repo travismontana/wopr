@@ -301,7 +301,7 @@ export default function JsonConfigPage() {
         }
 
         .json-viewer {
-          background: #000;
+          background: #666666
           padding: 1rem;
           border: 1px solid #333;
           border-radius: 4px;
