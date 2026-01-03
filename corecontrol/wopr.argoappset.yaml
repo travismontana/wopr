@@ -19,10 +19,6 @@ spec:
             path: systems/wopr-cnpg/helm
             namespace: wopr
             wave: "1"
-          - name: wopr-db
-            path: systems/wopr-db/helm
-            namespace: wopr
-            wave: "1"
 #          - name: wopr-api
 #            path: systems/wopr-api/helm
 #            namespace: wopr
