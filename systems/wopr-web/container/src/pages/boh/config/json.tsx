@@ -76,7 +76,15 @@ export default function JsonConfigPage() {
   // Handle edits from react-json-view
   const handleEdit = async (params: any) => {
     console.log('Edit params received:', params);
-    const { newValue, oldValue, parentPath, indexOrName } = params;
+    const { src, parentPath, indexOrName } = params;
+        // Navigate to the parent object using parentPath
+    let parent = src;
+    for (const key of parentPath) {
+        parent = parent[key];
+    }
+    
+    // Extract the newly added value
+    const newValue = parent[indexOrName];
     
     // Build full path: parentPath + current indexOrName
     const fullPath = [...(parentPath || []), indexOrName];
@@ -94,7 +102,15 @@ export default function JsonConfigPage() {
   // Handle additions
   const handleAdd = async (params: any) => {
     console.log('Add params received:', params);
-    const { newValue, parentPath, indexOrName } = params;
+    const { src, parentPath, indexOrName } = params;
+        // Navigate to the parent object using parentPath
+    let parent = src;
+    for (const key of parentPath) {
+        parent = parent[key];
+    }
+    
+    // Extract the newly added value
+    const newValue = parent[indexOrName];
     
     // Build full path: parentPath + current indexOrName
     const fullPath = [...(parentPath || []), indexOrName];
