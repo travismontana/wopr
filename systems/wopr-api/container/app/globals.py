@@ -74,7 +74,7 @@ def get_directus_config():
 
 WOPR_CONFIG = get_directus_config()
 
-if WOPR_CONFIG.get('nelson') != "haha":
+if WOPR_CONFIG['nelson'] != "haha":
     print("WOPR_CONFIG fetch failed or is invalid. Exiting.")
     exit(1)
 
