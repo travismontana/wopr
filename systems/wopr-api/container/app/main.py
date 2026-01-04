@@ -149,22 +149,28 @@ if tracing_enabled:
     app.include_router(mlimages.router, prefix="/api/v1/mlimages", tags=["mlimages"])
     app.include_router(homeauto.router, prefix="/api/v1/homeauto", tags=["homeauto"])
     app.include_router(ml.router) 
+    """----------------------"""
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
+        logger.debug(f"[MIDDLEWARE] Processing {request.method} {request.url.path}")
+        logger.debug(f"[MIDDLEWARE] Span exists: {span is not None}, Recording: {span.is_recording() if span else 'N/A'}")
         
         # Read request body
         body = await request.body()
+        logger.debug(f"[MIDDLEWARE] Request body length: {len(body)}")
         
         # Capture request body in span
         if span and span.is_recording() and body:
             try:
                 body_dict = json.loads(body)
                 span.set_attribute("http.request.body", json.dumps(body_dict))
-            except:
-                # Not JSON or parse failed - store as string (truncate if huge)
+                logger.debug("[MIDDLEWARE] Set http.request.body attribute")
+            except Exception as e:
+                logger.warning(f"[MIDDLEWARE] Failed to parse request body as JSON: {e}")
                 body_str = body.decode()[:1000]
                 span.set_attribute("http.request.body", body_str)
+                logger.debug("[MIDDLEWARE] Set http.request.body as string")
         
         # Reconstruct request so FastAPI can still read the body
         async def receive():
@@ -174,36 +180,47 @@ if tracing_enabled:
         
         # Process request
         response = await call_next(request)
+        logger.debug(f"[MIDDLEWARE] Response status: {response.status_code}")
         
-        # Capture response headers
+        # Capture response headers and body
         if span and span.is_recording():
+            logger.debug("[MIDDLEWARE] Capturing response data")
             for key in CAPTURE_RESPONSE_HEADERS:
                 if key in response.headers:
                     span.set_attribute(f"http.response.header.{key}", response.headers[key])
-                    # NEW: Capture response body
+            
+            # Capture response body
             response_body = b""
-            async for chunk in response.body_iterator:
-                response_body += chunk
+            try:
+                async for chunk in response.body_iterator:
+                    response_body += chunk
+                logger.debug(f"[MIDDLEWARE] Captured response body length: {len(response_body)}")
+            except Exception as e:
+                logger.error(f"[MIDDLEWARE] Failed to read response body: {e}")
+                return response
             
             # Store response body in span (truncate if large)
             if response_body:
                 try:
                     body_json = json.loads(response_body)
                     span.set_attribute("http.response.body", json.dumps(body_json))
-                except:
-                    # Not JSON or parse failed - store as string (truncate)
+                    logger.debug("[MIDDLEWARE] Set http.response.body as JSON")
+                except Exception as e:
+                    logger.warning(f"[MIDDLEWARE] Response not JSON: {e}")
                     body_str = response_body.decode()[:1000]
                     span.set_attribute("http.response.body", body_str)
+                    logger.debug("[MIDDLEWARE] Set http.response.body as string")
             
             # Reconstruct response with captured body
-            from fastapi.responses import Response
             return Response(
                 content=response_body,
                 status_code=response.status_code,
                 headers=dict(response.headers),
                 media_type=response.media_type
             )
-        return response  # <-- CRITICAL: Was missing!
+        
+        logger.debug("[MIDDLEWARE] No span recording, returning original response")
+        return response
 
 else:
     tracer = None
