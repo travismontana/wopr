@@ -1,12 +1,11 @@
 open-webui:
   ollama:
     enabled: false
-    fullnameOverride: "groth-ollama"
   sso:
     enabled: true
     google:
       enabled: true
-      enableSignup: true
+      enableSignup: false
       clientId: "522570646134-4nmsbnlql25k4l1f6u96qa7mqlvu3bne.apps.googleusercontent.com"
       clientExistingSecret: "openwebui-google-oauth"
       clientExistingSecretKey: "clientSecret"
