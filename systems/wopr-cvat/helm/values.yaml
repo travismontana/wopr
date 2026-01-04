@@ -1,21 +1,22 @@
 cvat:
-  backend:
-    replicas: 1
-    defaultStorage:
+  cvat:
+    backend:
+      replicas: 1
+      defaultStorage:
+        storageClass: "rook-cephfs"
+        accessModes:
+          - ReadWriteOnce
+    persistence:
       storageClass: "rook-cephfs"
-      accessModes:
-        - ReadWriteOnce
-  persistence:
-    storageClass: "rook-cephfs"
-  frontend:
-    replicas: 1
-  postgresql:
-    enabled: true
-  redis:
-    enabled: true
-  ingress:
-    enabled: true
-    hostname: cvat.wopr.tailandtraillabs.org
-    className: wopr-traefik
-    tls: true
-    tlsSecretName: cvat-tls
+    frontend:
+      replicas: 1
+    postgresql:
+      enabled: true
+    redis:
+      enabled: true
+    ingress:
+      enabled: true
+      hostname: cvat.wopr.tailandtraillabs.org
+      className: wopr-traefik
+      tls: true
+      tlsSecretName: cvat-tls
