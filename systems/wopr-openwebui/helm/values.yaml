@@ -17,5 +17,5 @@ open-webui:
     google:
       enabled: true
       clientId: "522570646134-4nmsbnlql25k4l1f6u96qa7mqlvu3bne.apps.googleusercontent.com"
-      clientExistingSecret: openwebui-google-oauth
+      clientExistingSecret: "openwebui-google-oauth"
       clientExistingSecretKey: "clientSecret"
