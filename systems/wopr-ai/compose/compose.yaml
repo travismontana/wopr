@@ -1,7 +1,10 @@
-version: '3.8'
-
 services:
   open-webui:
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8g
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
     ports: 
@@ -14,6 +17,11 @@ services:
       - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
     restart: unless-stopped
   ollama:
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8g
     image: ollama/ollama
     container_name: ollama
     ports:
