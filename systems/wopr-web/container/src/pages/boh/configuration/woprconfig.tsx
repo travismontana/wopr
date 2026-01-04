@@ -113,7 +113,7 @@ export default function WoprConfig() {
         Enable Dark Mode
       </label>
       <br /><br />
-      <a href="https://directus.wopr.tailandtraillabs.org/" target="_blank" rel="noopener noreferrer">Edit Configuration in Directus</a>
+      <a href="https://directus.wopr.tailandtraillabs.org/admin/settings/data-model/woprconfig" target="_blank" rel="noopener noreferrer">Edit Configuration in Directus</a>
       <br /><br />
       {loading && <p>Loading configuration...</p>}
       {configData && (
