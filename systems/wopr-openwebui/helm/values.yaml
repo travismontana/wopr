@@ -2,6 +2,12 @@ open-webui:
   ollama:
     enabled: false
     fullnameOverride: "groth-ollama"
+    sso:
+      google:
+        enabled: true
+        clientId: "522570646134-4nmsbnlql25k4l1f6u96qa7mqlvu3bne.apps.googleusercontent.com"
+        clientExistingSecret: "openwebui-google-oauth"
+        clientExistingSecretKey: "clientSecret"
   ollamaUrls:
     - "http://groth.abode.tailandtraillabs.org:11434"
   ollamaUrlsFromExtraEnv: true
@@ -13,9 +19,3 @@ open-webui:
     host: "openwebui.wopr.tailandtraillabs.org"
     tls: true
     existingSecret: "wildcard-tls
-  sso:
-    google:
-      enabled: true
-      clientId: "522570646134-4nmsbnlql25k4l1f6u96qa7mqlvu3bne.apps.googleusercontent.com"
-      clientExistingSecret: "openwebui-google-oauth"
-      clientExistingSecretKey: "clientSecret"
