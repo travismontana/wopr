@@ -1,6 +1,8 @@
 cvat:
   backend:
     replicas: 1
+    defaultStorage:
+      storageClass: "rook-cephfs"
   persistence:
     storageClass: "rook-cephfs"
   frontend:
