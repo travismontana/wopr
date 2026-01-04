@@ -14,7 +14,7 @@ APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
 APP_DOMAIN = "wopr.tailandtraillabs.org"
 APP_API_URL = "https://wopr-api." + APP_DOMAIN
-APP_OTEL_URL = "https://otel.wopr.tailandtraillabs.org"
+APP_OTEL_URL = "http://wopr-monitoring-tempo:4318"
 WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
 DATABASE_URL = (
     'postgresql://' + 
