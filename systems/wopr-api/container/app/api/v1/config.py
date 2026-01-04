@@ -168,7 +168,6 @@ async def get_environments():
             
             if span and span.is_recording():
                 span.set_attribute("config.found", True)
-                span.set_attribute("config.keys_count", len(config_data.keys()))
             
             logger.info(f"Successfully retrieved result for {config_data}")
             return config_data
