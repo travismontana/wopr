@@ -373,7 +373,6 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
                     value_type = EXCLUDED.value_type,
                     description = COALESCE(EXCLUDED.description, settings.description),
                     updated_at = NOW(),
-                    updated_by = EXCLUDED.updated_by
                 RETURNING key,
                         value::text AS value,
                         value_type,
@@ -394,7 +393,6 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
                     value_type = EXCLUDED.value_type,
                     description = COALESCE(EXCLUDED.description, settings.description),
                     updated_at = NOW(),
-                    updated_by = EXCLUDED.updated_by
                 RETURNING key, value::text AS value, value_type, description
                 """,
                 (key, value_json, value_type, update.description, environment, update.updated_by)
