@@ -54,8 +54,7 @@ export default function JsonConfigPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           "value": value,
-          "description": "Updated",
-          "updated_by": "wopr-web"
+          "description": "Updated"
         })
       });
 
