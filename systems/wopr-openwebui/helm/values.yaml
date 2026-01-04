@@ -1,6 +1,8 @@
 open-webui:
   ollama:
     enabled: false
+  persistence:
+    storageClass: "rook-ceph-block"
   #sso:
   #  enabled: true
   #  google:

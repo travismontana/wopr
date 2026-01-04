@@ -1,6 +1,8 @@
 cvat:
   backend:
     replicas: 1
+  persistence:
+    storageClass: "rook-ceph-block"
   frontend:
     replicas: 1
   postgresql:
