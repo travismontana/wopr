@@ -53,8 +53,7 @@ export default function JsonConfigPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          value: value,
-          "updated_by": 'web-ui-json'
+          value: value
         })
       });
 
