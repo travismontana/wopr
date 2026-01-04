@@ -185,6 +185,9 @@ if tracing_enabled:
         # Capture response headers and body
         if span and span.is_recording():
             logger.debug("[MIDDLEWARE] Capturing response data")
+            span.set_attribute("middleware.test.marker", "PAYLOAD_CAPTURE_ACTIVE")
+            span.set_attribute("middleware.request.method", request.method)
+            span.set_attribute("middleware.request.path", request.url.path)
             for key in CAPTURE_RESPONSE_HEADERS:
                 if key in response.headers:
                     span.set_attribute(f"http.response.header.{key}", response.headers[key])
