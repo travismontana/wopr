@@ -113,6 +113,86 @@ async def get_all(environment: str = "production"):
                 detail="Invalid response from Directus API"
             )
 
+@router.get("/environments")
+async def get_environments():
+    """
+    Get entire configuration for specified environment.
+    Proxies request to Directus API.
+    
+    Args:
+        environment: Config environment (production, stage, dev)
+    
+    Returns:
+        Configuration JSONB document
+    """
+    # Start custom span for better tracing granularity
+    with tracer.start_as_current_span("config.get_environments") if tracer else nullcontext() as span:
+        if span and span.is_recording():
+            span.set_attribute("config.source", "directus")
+
+        logger.info(f"Fetching all environments config")
+        
+        # Build Directus API request
+        url = f"{DIRECTUS_URL}/items/woprconfig?groupBy[]=environment&aggregate[count]=*"
+        params = {
+                "fields": "data"
+        }
+        
+        headers = {}
+        if DIRECTUS_TOKEN:
+            headers["Authorization"] = f"Bearer {DIRECTUS_TOKEN}"
+        
+        try:
+            # HTTPX call - automatically instrumented
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(url, params=params, headers=headers)
+                response.raise_for_status()
+            
+            if span and span.is_recording():
+                span.set_attribute("http.response.status_code", response.status_code)
+                span.set_attribute("config.directus.url", url)
+            
+            result = response.json()
+            
+            # Extract config data from Directus response
+            if not result.get("data") or len(result["data"]) == 0:
+                if span and span.is_recording():
+                    span.set_attribute("config.found", False)
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No configuration found for environment: {environment}"
+                )
+            
+            # Return the actual config JSONB (unwrap Directus wrapper)
+            config_data = result["data"][0]["data"]
+            
+            if span and span.is_recording():
+                span.set_attribute("config.found", True)
+                span.set_attribute("config.keys_count", len(config_data.keys()))
+            
+            logger.info(f"Successfully retrieved config for {environment}")
+            return config_data
+            
+        except httpx.HTTPError as e:
+            logger.error(f"Directus API error: {e}")
+            if span and span.is_recording():
+                span.set_attribute("error", True)
+                span.set_attribute("error.type", type(e).__name__)
+                span.set_attribute("error.message", str(e))
+            raise HTTPException(
+                status_code=503,
+                detail=f"Failed to fetch config from Directus: {str(e)}"
+            )
+        except (KeyError, IndexError) as e:
+            logger.error(f"Unexpected Directus response format: {e}")
+            if span and span.is_recording():
+                span.set_attribute("error", True)
+                span.set_attribute("error.type", "invalid_response_format")
+            raise HTTPException(
+                status_code=500,
+                detail="Invalid response from Directus API"
+            )
+
 
 @router.get("/health")
 async def health_check():
