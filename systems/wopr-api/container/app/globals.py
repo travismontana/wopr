@@ -8,12 +8,12 @@ import os
 # Application Identity
 APP_NAME = "wopr-api"
 APP_TITLE = "WOPR API"
-APP_VERSION = "0.1.3-beta"
+APP_VERSION = "0.1.5-alpha"
 APP_DESCRIPTION = "WOPR API application package"
 APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
 APP_DOMAIN = "wopr.tailandtraillabs.org"
-APP_API_URL = "https://wopr-api." + APP_DOMAIN
+APP_API_URL = "http://wopr-api:8000"
 APP_OTEL_URL = "http://wopr-monitoring-tempo:4318"
 WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
 DATABASE_URL = (
