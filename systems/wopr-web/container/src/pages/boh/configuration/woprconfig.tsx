@@ -17,6 +17,9 @@ import { apiUrl } from '@lib/api';
  * And enable/disable  dark mode with a checkbox.
  * 
  * the page auto updates when any of the options change.
+ * 
+ * There is Edit link that goes to "https://directus.wopr.tailandtraillabs.org/" that opens
+ * the link in a new tab.
  */
 
 export default function WoprConfig() {
@@ -109,6 +112,8 @@ export default function WoprConfig() {
         />
         Enable Dark Mode
       </label>
+      <br /><br />
+      <a href="https://directus.wopr.tailandtraillabs.org/" target="_blank" rel="noopener noreferrer">Edit Configuration in Directus</a>
       <br /><br />
       {loading && <p>Loading configuration...</p>}
       {configData && (
