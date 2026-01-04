@@ -3,17 +3,23 @@ cvat:
     backend:
       replicas: 1
       defaultStorage:
-        storageClass: "rook-cephfs"
+        storageClassName: "rook-cephfs"  # ← Changed
         accessModes:
           - ReadWriteMany
     persistence:
-      storageClass: "rook-cephfs"
-    frontend:
-      replicas: 1
+      storageClass: "rook-cephfs"  # Might be unused, but doesn't hurt
     postgresql:
       enabled: true
+      primary:
+        persistence:
+          storageClass: "rook-cephfs"  # PostgreSQL also needs RWX
     redis:
       enabled: true
+      master:
+        persistence:
+          storageClass: "rook-cephfs"  # Redis for consistency
+    frontend:
+      replicas: 1
     ingress:
       enabled: true
       hostname: cvat.wopr.tailandtraillabs.org
