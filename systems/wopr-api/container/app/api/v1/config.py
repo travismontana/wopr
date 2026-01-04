@@ -160,7 +160,7 @@ async def get_environments():
                     span.set_attribute("config.found", False)
                 raise HTTPException(
                     status_code=404,
-                    detail=f"No configuration found for environment: {environment}"
+                    detail=f"No configuration found for data: {data}"
                 )
             
             # Return the actual config JSONB (unwrap Directus wrapper)
