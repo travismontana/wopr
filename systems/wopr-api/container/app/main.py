@@ -59,8 +59,10 @@ logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API application: booting up...")
-logger.debug(f"WOPR API globals: {woprvar.__dict__}")
+
+logger.debug(f"WOPR API globals: {woprvar.WOPR_CONFIG}")
 woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
+
 # Determine if tracing is enabled
 tracing_enabled = woprconfig.get_bool("tracing.enable", True)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
@@ -132,10 +134,7 @@ if tracing_enabled:
     else:
         logger.warning("Tracing is enabled but failed to initialize tracer.")
     # send a copy of all the variables seen in globals.py to the logger.
-    for key, value in globals().items():
-        if key.isupper():
-            logger.debug(f"Global variable: {key} = {value}")
-            
+
     def request_hook(span, scope):
         if span and span.is_recording():
             headers = dict(scope.get("headers", []))
