@@ -364,7 +364,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
             cur.execute(
                 """
                 INSERT INTO settings (key, value, value_type, description, environment)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (key, environment)
                 DO UPDATE SET 
                     value = EXCLUDED.value,
@@ -384,7 +384,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
             cur.execute(
                 """
                 INSERT INTO settings (key, value, value_type, description, environment)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (key, environment)
                 DO UPDATE SET
                     value = EXCLUDED.value,
