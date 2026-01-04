@@ -2,7 +2,7 @@ cvat:
   backend:
     replicas: 1
   persistence:
-    storageClass: "rook-ceph-block"
+    storageClass: "rook-cephfs"
   frontend:
     replicas: 1
   postgresql:
