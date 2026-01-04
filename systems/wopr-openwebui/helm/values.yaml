@@ -12,4 +12,10 @@ open-webui:
     class: "wopr-traefik"
     host: "openwebui.wopr.tailandtraillabs.org"
     tls: true
-    existingSecret: "wildcard-tls"
+    existingSecret: "wildcard-tls
+  sso:
+    google:
+      enabled: true
+      clientId: "522570646134-4nmsbnlql25k4l1f6u96qa7mqlvu3bne.apps.googleusercontent.com"
+      clientExistingSecret: openwebui-google-oauth
+      clientExistingSecretKey: "clientSecret"
