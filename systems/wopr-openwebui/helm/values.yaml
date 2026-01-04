@@ -19,4 +19,4 @@ open-webui:
     class: "wopr-traefik"
     host: "openwebui.wopr.tailandtraillabs.org"
     tls: true
-    existingSecret: "wildcard-tls
+    existingSecret: "wildcard-tls"
