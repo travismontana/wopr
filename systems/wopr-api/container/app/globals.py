@@ -4,6 +4,13 @@ Global constants and configuration for WOPR API.
 Single source of truth for all static values.
 """
 import os
+import logging
+import sys
+
+logger = logging.getLogger("Bootup")
+logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+logger.info("WOPR API - Pre Initialization Globals")
 
 CONFDB_URL = (
     'postgresql://' + 
