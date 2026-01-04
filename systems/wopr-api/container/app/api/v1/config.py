@@ -56,7 +56,7 @@ class ConfigValue(BaseModel):
 class ConfigUpdate(BaseModel):
     """Config update model"""
     value: Any
-    description: Optional[str] = Noned
+    description: Optional[str] = None
 
 
 def parse_value(value: Any, value_type: str) -> Any:
