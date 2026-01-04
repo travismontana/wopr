@@ -1,4 +1,5 @@
 {
+  "nelson": "haha",
   "storage": {
     "base_path": "/remote/wopr",
     "default_extension": "jpg",
@@ -20,12 +21,13 @@
     "failed"
   ],
   "api": {
-    "camera_service_url": "http://wopr-cam.hangar.bpfx.org:5000",
-    "camera_timeout_seconds": 30,
     "host": "0.0.0.0",
     "port": 8000,
     "ollama_timeout_seconds": 60,
-    "ollama_url": "http://groth.abode.tailandtraillabs.org:11434"
+    "ollama_url": "http://groth.abode.tailandtraillabs.org:11434",
+    "internalUrl": "http://wopr-api.wopr.svc:8000",
+    "externalUrl": "https://api.wopr.tailandtraillabs.org",
+    "version": "v1"
   },
   "camera": {
     "buffer_count": 2,
@@ -44,6 +46,23 @@
       "720p": {
         "height": 720,
         "width": 1280
+      }
+    },
+    "camDict": {
+      "1": {
+        "id": 1,
+        "name": "Camera 1",
+        "host": "wopr-cam.hangar.bpfx.org"
+      },
+      "2": {
+        "id": 2,
+        "name": "Camera 2",
+        "host": "wopr-cam.hangar.bpfx.org"
+      },
+      "3": {
+        "id": 3,
+        "name": "Camera 3",
+        "host": "wopr-cam.hangar.bpfx.org"
       }
     }
   },
@@ -88,7 +107,6 @@
       "Bottom Left": "bottomLeft"
     }
   },
-  
   "vision": {
     "default_model": "qwen2-vl:7b",
     "gaussian_blur_kernel": [
@@ -107,12 +125,17 @@
     "opencv_change_threshold": 30
   },
   "tracing": {
-    "enabled": false,
+    "enabled": true,
     "hostInternal": "http://wopr-monitoring-tempo",
     "portInternal": 4318,
     "hostExternal": "https://tempo.monitoring.abode.tailandtraillabs.org",
     "portExternal": 443,
     "service_name": "wopr-unknown",
     "sampling_rate": 1.0
+  },
+  "baseDomain": "wopr.tailandtraillabs.org",
+  "homeAssistant": {
+    "enabled": true,
+    "host": "http://homeassistant.local:8123"
   }
 }

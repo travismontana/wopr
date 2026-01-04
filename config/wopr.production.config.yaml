@@ -46,7 +46,7 @@
       "720p": {
         "height": 720,
         "width": 1280
-      },
+      }
     },
     "camDict": {
       "1": {
@@ -64,7 +64,7 @@
         "name": "Camera 3",
         "host": "wopr-cam.hangar.bpfx.org"
       }
-    },
+    }
   },
   "database": {
     "connection_pool_size": 5,
@@ -125,7 +125,7 @@
     "opencv_change_threshold": 30
   },
   "tracing": {
-    "enabled": false,
+    "enabled": true,
     "hostInternal": "http://wopr-monitoring-tempo",
     "portInternal": 4318,
     "hostExternal": "https://tempo.monitoring.abode.tailandtraillabs.org",
@@ -136,6 +136,6 @@
   "baseDomain": "wopr.tailandtraillabs.org",
   "homeAssistant": {
     "enabled": true,
-    "host": "http://homeassistant.local:8123",
+    "host": "http://homeassistant.local:8123"
+  }
 }
-}}
