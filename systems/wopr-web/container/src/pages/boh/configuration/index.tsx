@@ -1,19 +1,17 @@
 import { Link } from "react-router-dom";
+import { Outlet, NavLink } from 'react-router-dom';
 
 export default function ConfigurationIndex() {
-  const items = [
-    { to: "/boh/configuration/apiview", title: "APIView", desc: "View of the configuration as seen from the API" },
-  ];
 
   return (
-    <div className="page">
-      <div className="navList">
-        {items.map((i) => (
-          <div key={i.to} className="navItem">
-            <Link to={i.to}><button>{i.title}</button></Link>
-            <span className="desc"> - {i.desc}</span>
-          </div>
-        ))}
+    <div className="Configuration">
+      <nav className="secondary-nav" aria-label="Configuration">
+        <ul>
+          <li><NavLink to="apiview">APIView</NavLink></li>
+        </ul>
+      </nav>
+      <div className="boh-content">
+        <Outlet />
       </div>
     </div>
   );
