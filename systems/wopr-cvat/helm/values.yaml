@@ -9,7 +9,7 @@ cvat:
     enabled: true
   ingress:
     enabled: true
-    hostsname: cvat.studio.abode.tailandtraillabs.org
-    className: studio-traefik
+    hostname: cvat.wopr.tailandtraillabs.org
+    className: wopr-traefik
     tls: true
-    tlsSecretName: cvat-studio-tls
+    tlsSecretName: cvat-tls

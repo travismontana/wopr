@@ -43,8 +43,8 @@ spec:
             path: systems/wopr-monitoring/helm
             namespace: wopr
             wave: "3"
-          - name: wopr-openwebui
-            path: systems/wopr-openwebui/helm
+          - name: wopr-cvat
+            path: systems/wopr-cvat/helm
             namespace: wopr
             wave: "3"
 
