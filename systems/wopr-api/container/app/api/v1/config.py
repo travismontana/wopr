@@ -164,13 +164,13 @@ async def get_environments():
                 )
             
             # Return the actual config JSONB (unwrap Directus wrapper)
-            config_data = result["data"][0]["data"]
+            config_data = result["data"]
             
             if span and span.is_recording():
                 span.set_attribute("config.found", True)
                 span.set_attribute("config.keys_count", len(config_data.keys()))
             
-            logger.info(f"Successfully retrieved data for {data}")
+            logger.info(f"Successfully retrieved result for {config_data}")
             return config_data
             
         except httpx.HTTPError as e:
