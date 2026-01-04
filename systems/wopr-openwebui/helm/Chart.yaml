@@ -1,5 +1,5 @@
 apiVersion: v2
-name: wopr-openwebui
+name: openwebui
 version: 0.1.5-alpha
 description: WOPR Open Web UI
 dependencies:
