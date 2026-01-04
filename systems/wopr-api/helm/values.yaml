@@ -64,6 +64,7 @@ wopr-baseapp:
       
   woprConfig:
     WOPR_VERSION: "v0.1.5-alpha"
+    WOPR_ENVIRONMENT: "production"
     WOPR_METADATA_DB: "wopr-db-database"
     WOPR_API_URL: "http://wopr-api.wopr.svc:8000"
 

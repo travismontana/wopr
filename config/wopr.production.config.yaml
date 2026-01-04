@@ -1,4 +1,5 @@
 {
+  "nelson": "haha",
   "storage": {
     "base_path": "/remote/wopr",
     "default_extension": "jpg",
@@ -88,7 +89,6 @@
       "Bottom Left": "bottomLeft"
     }
   },
-  
   "vision": {
     "default_model": "qwen2-vl:7b",
     "gaussian_blur_kernel": [
@@ -114,5 +114,14 @@
     "portExternal": 443,
     "service_name": "wopr-unknown",
     "sampling_rate": 1.0
-  }
+  },
+  "baseDomain": "wopr.tailandtraillabs.org",
+  "api": {
+    "internalUrl": "http://wopr-api.wopr.svc:8000",
+    "externalUrl": "https://api.wopr.tailandtraillabs.org",
+    "version": "v1"
+  },
+  "homeAssistant": {
+    "enabled": true,
+    "host": "http://homeassistant.local:8123",
 }

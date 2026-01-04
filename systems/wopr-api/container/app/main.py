@@ -129,7 +129,11 @@ if tracing_enabled:
         
     else:
         logger.warning("Tracing is enabled but failed to initialize tracer.")
-
+    # send a copy of all the variables seen in globals.py to the logger.
+    for key, value in globals().items():
+        if key.isupper():
+            logger.debug(f"Global variable: {key} = {value}")
+            
     def request_hook(span, scope):
         if span and span.is_recording():
             headers = dict(scope.get("headers", []))
