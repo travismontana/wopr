@@ -17,5 +17,4 @@ export default function ConfigurationIndex() {
       </div>
     </div>
   );
-  );
 }
