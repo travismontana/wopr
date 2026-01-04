@@ -6,18 +6,6 @@ cvat:
         storageClassName: "rook-cephfs"  # ← Changed
         accessModes:
           - ReadWriteMany
-    persistence:
-      storageClass: "rook-cephfs"  # Might be unused, but doesn't hurt
-    postgresql:
-      enabled: true
-      primary:
-        persistence:
-          storageClass: "rook-cephfs"  # PostgreSQL also needs RWX
-    redis:
-      enabled: true
-      master:
-        persistence:
-          storageClass: "rook-cephfs"  # Redis for consistency
     frontend:
       replicas: 1
     ingress:
@@ -26,3 +14,21 @@ cvat:
       className: wopr-traefik
       tls: true
       tlsSecretName: cvat-tls
+    persistence:
+      storageClass: "rook-cephfs"  # Might be unused, but doesn't hurt
+postgresql:
+  enabled: false
+  auth:
+    existingSecret: wopr-cvat-db-user-credentials
+  secret:
+    false
+  external:
+    host: wopr-db-cluster-rw.wopr.svc.cluster.local
+    port: 5432
+    host: 
+redis:
+  enabled: true
+  master:
+    persistence:
+      storageClass: "rook-cephfs"  # Redis for consistency
+    
