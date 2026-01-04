@@ -26,7 +26,10 @@
     "host": "0.0.0.0",
     "port": 8000,
     "ollama_timeout_seconds": 60,
-    "ollama_url": "http://groth.abode.tailandtraillabs.org:11434"
+    "ollama_url": "http://groth.abode.tailandtraillabs.org:11434",
+    "internalUrl": "http://wopr-api.wopr.svc:8000",
+    "externalUrl": "https://api.wopr.tailandtraillabs.org",
+    "version": "v1"
   },
   "camera": {
     "buffer_count": 2,
@@ -46,7 +49,24 @@
         "height": 720,
         "width": 1280
       }
-    }
+    },
+    camDict: {
+      "1": {
+        "id": 1,
+        "name": "Camera 1",
+        "host": "wopr-cam.hangar.bpfx.org"
+      },
+      "2": {
+        "id": 2,
+        "name": "Camera 2",
+        "host": "wopr-cam.hangar.bpfx.org"
+      },
+      "3": {
+        "id": 3,
+        "name": "Camera 3",
+        "host": "wopr-cam.hangar.bpfx.org"
+      }
+    },
   },
   "database": {
     "connection_pool_size": 5,
@@ -116,11 +136,6 @@
     "sampling_rate": 1.0
   },
   "baseDomain": "wopr.tailandtraillabs.org",
-  "api": {
-    "internalUrl": "http://wopr-api.wopr.svc:8000",
-    "externalUrl": "https://api.wopr.tailandtraillabs.org",
-    "version": "v1"
-  },
   "homeAssistant": {
     "enabled": true,
     "host": "http://homeassistant.local:8123",

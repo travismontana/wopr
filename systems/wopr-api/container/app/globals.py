@@ -14,13 +14,9 @@ CONFDB_URL = (
     os.getenv('CONFDBNAME', 'config_db_name')
 )
 
-APP_HOST = "0.0.0.0"
-APP_PORT = 8000
 
-# Service Configuration
-SERVICE_NAME = os.getenv("SERVICE_NAME", APP_NAME)
-SERVICE_HOST = os.getenv("SERVICE_HOST", APP_HOST)
-SERVICE_PORT = int(os.getenv("SERVICE_PORT", APP_PORT))
+
+
 
 HACK_CAMERA_DICT = {
     "1": {
@@ -111,3 +107,12 @@ HOMEASSISTANT_TOKEN = os.getenv(
     "HOMEASSISTANT_TOKEN",
     ""  # Must be set via environment variable or secret
 )
+
+APP_HOST = "0.0.0.0"
+APP_PORT = 8000
+
+# Service Configuration
+SERVICE_NAME = APP_NAME
+SERVICE_HOST = APP_HOST
+SERVICE_PORT = int(APP_PORT)
+
