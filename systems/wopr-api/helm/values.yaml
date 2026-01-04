@@ -27,6 +27,11 @@ wopr-baseapp:
           - api.wopr.tailandtraillabs.org
   
   env:
+    - name: WOPR_ENVIRONMENT
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_ENVIRONMENT
     - name: DBUSER
       valueFrom:
         secretKeyRef:
