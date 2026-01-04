@@ -12,9 +12,9 @@ APP_VERSION = "0.1.3-beta"
 APP_DESCRIPTION = "WOPR API application package"
 APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
-APP_DOMAIN = "studio.abode.tailandtraillabs.org"
+APP_DOMAIN = "wopr.tailandtraillabs.org"
 APP_API_URL = "https://wopr-api." + APP_DOMAIN
-APP_OTEL_URL = "https://otel.monitoring.abode.tailandtraillabs.org"
+APP_OTEL_URL = "https://otel.wopr.tailandtraillabs.org"
 WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
 DATABASE_URL = (
     'postgresql://' + 
