@@ -4,8 +4,8 @@ version: 0.1.5-alpha
 description: WOPR Open Web UI
 dependencies:
   - name: open-webui
-    version: "*"
+    version: "9.0.0"
     repository: https://helm.openwebui.com/
   - name: redis
-    version: "19.3.1"
+    version: "24.1.0"
     repository: "https://charts.bitnami.com/bitnami"
