@@ -1,0 +1,47 @@
+log_level: info
+
+schedule:
+  interval: 1h  # Sync interval
+
+storage:
+  path: /data
+
+openwebui:
+  base_url: "http://groth.abode.tailandtraillabs.org:3000"
+  api_key: ""
+
+# GitHub adapter configuration
+github:
+  enabled: true
+  token: ""  # Set via GITHUB_TOKEN environment variable
+  repositories:
+    - "owner/repo1"
+    - "owner/repo2"
+  knowledge_id: ""  # Set via GITHUB_KNOWLEDGE_ID environment variable
+
+# Confluence adapter configuration
+confluence:
+  enabled: false
+  base_url: "https://your-domain.atlassian.net"
+  username: "your-email@example.com"
+  api_key: ""  # Set via CONFLUENCE_API_KEY environment variable
+  spaces:
+    - "SPACEKEY1"
+    - "SPACEKEY2"
+  parent_page_ids: []  # Optional: specific parent page IDs to process sub-pages only
+  knowledge_id: ""  # Set via CONFLUENCE_KNOWLEDGE_ID environment variable
+  page_limit: 100  # Maximum pages to fetch per space (0 = no limit)
+  include_attachments: true  # Whether to download and sync page attachments
+
+# Jira adapter configuration
+jira:
+  enabled: false
+  base_url: "https://your-domain.atlassian.net"
+  username: "your-email@example.com"
+  page_limit: 100  # Maximum pages to fetch per space (default = 100)
+  api_key: ""  # Set via JIRA_API_KEY environment variable
+  project_mappings:
+    - project_key: "PROJ"
+      knowledge_id: "your-knowledge-base-id"
+    - project_key: "ANOTHER"
+      knowledge_id: "another-knowledge-base-id"

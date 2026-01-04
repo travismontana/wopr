@@ -15,6 +15,9 @@ services:
       - ollama
     environment:
       - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
+      - 'ENABLE_API=true'
+      - 'ENABLE_OLLAMA_API=true'
+      - 'ENABLE_API_KEYS=true'
     restart: unless-stopped
   ollama:
     deploy:
