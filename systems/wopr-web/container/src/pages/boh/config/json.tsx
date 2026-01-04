@@ -53,7 +53,7 @@ export default function JsonConfigPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          "value": value,
+          "value": typeof value === 'object' ? JSON.stringify(value) : value,
           "description": "Updated"
         })
       });
