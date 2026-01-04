@@ -7,7 +7,7 @@ export default function ConfigurationIndex() {
     <div className="Configuration">
       <nav className="secondary-nav" aria-label="Configuration">
         <ul>
-          <li><NavLink to="apiview">APIView</NavLink></li>
+          <li><NavLink to="woprconfig">WOPR Configuration</NavLink></li>
         </ul>
       </nav>
       <div className="boh-content">

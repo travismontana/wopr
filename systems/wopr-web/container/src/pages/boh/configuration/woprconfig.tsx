@@ -19,7 +19,7 @@ import { apiUrl } from '@lib/api';
  * the page auto updates when any of the options change.
  */
 
-export default function ApiView() {
+export default function WoprConfig() {
   const [environments, setEnvironments] = useState<string[]>([]);
   const [selectedEnv, setSelectedEnv] = useState<string>('');
   const [configData, setConfigData] = useState<any>(null);
@@ -71,7 +71,7 @@ export default function ApiView() {
 
   return (
     <div>
-      <h1>API Configuration Viewer</h1>
+      <h1>WOPR Configuration</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <label htmlFor="env-select">Select Environment: </label>
       <select
