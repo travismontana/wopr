@@ -40,6 +40,7 @@ from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from app.api.v1 import cameras
 from app.api.v1 import config
 from app.api.v1 import status
