@@ -133,9 +133,9 @@ async def get_environments():
         logger.info(f"Fetching all environments config")
         
         # Build Directus API request
-        url = f"{DIRECTUS_URL}/items/woprconfig?fields=environment"
+        url = f"{DIRECTUS_URL}/items/woprconfig"
         params = {
-                "fields": "data"
+                "fields": "environment"
         }
         
         headers = {}
