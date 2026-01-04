@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="wopr-core",
-    version="0.1.0",
+    version="0.1.5-alpha",
     description="Core library for WOPR - Tactical Wargaming Adjudication Tracker",
     author="Bob",
     author_email="bob@example.com",

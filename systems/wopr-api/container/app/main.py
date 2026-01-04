@@ -51,14 +51,16 @@ from app.api.v1 import mlimages
 from app.api.v1 import homeauto
 from app.routers import ml
 
-woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
+
+
 
 # Set normal logging not using woprlogg.
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API application: booting up...")
-
+logger.debug(f"WOPR API globals: {woprvar.__dict__}")
+woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 # Determine if tracing is enabled
 tracing_enabled = woprconfig.get_bool("tracing.enable", True)
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
