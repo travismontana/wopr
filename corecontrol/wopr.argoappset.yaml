@@ -19,38 +19,38 @@ spec:
             path: systems/wopr-cnpg/helm
             namespace: wopr
             wave: "1"
+          - name: wopr-conf-db
+            path: systems/wopr-conf-db/helm
+            namespace: wopr
+            wave: "2"
           - name: wopr-api
             path: systems/wopr-api/helm
             namespace: wopr
-            wave: "2"
+            wave: "3
           - name: wopr-web
             path: systems/wopr-web/helm
             namespace: wopr
-            wave: "2"
+            wave: "3"
           - name: wopr-images
             path: systems/wopr-images/helm
             namespace: wopr
-            wave: "2"
+            wave: "3"
           - name: wopr-thumbor
             path: systems/wopr-thumbor/helm
             namespace: wopr
-            wave: "2"
+            wave: "3"
           - name: wopr-directus
             path: systems/wopr-directus/helm
             namespace: wopr
-            wave: "2"
+            wave: "3"
           - name: wopr-monitoring
             path: systems/wopr-monitoring/helm
             namespace: wopr
-            wave: "3"
+            wave: "4"
           - name: wopr-cvat
             path: systems/wopr-cvat/helm
             namespace: wopr
-            wave: "3"
-          - name: wopr-openwebui
-            path: systems/wopr-openwebui/helm
-            namespace: wopr
-            wave: "3"
+            wave: "4"
 
   template:
     metadata:
