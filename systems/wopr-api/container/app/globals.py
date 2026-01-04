@@ -79,10 +79,11 @@ def get_directus_config():
         print(f"Error fetching config from Directus: {e}")
         exit(1)
 
-WOPR_CONFIG = get_directus_config()
+WOPR_CONFIG = get_directus_config()[0]
+logger.info("WOPR_CONFIG: %s", WOPR_CONFIG)
 
 if WOPR_CONFIG['nelson'] != "haha":
-    print("WOPR_CONFIG fetch failed or is invalid. Exiting.")
+    logger.info("WOPR_CONFIG fetch failed or is invalid. Exiting.")
     exit(1)
 
 APP_NAME = "wopr-api"
