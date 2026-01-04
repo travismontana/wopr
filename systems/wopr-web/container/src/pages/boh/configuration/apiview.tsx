@@ -13,7 +13,7 @@ import { apiUrl } from '@lib/api';
  * No styling is required.
  */
 
-const ApiView: React.FC = () => {
+export default function ApiView() {
   const [environments, setEnvironments] = useState<string[]>([]);
   const [selectedEnv, setSelectedEnv] = useState<string>('');
   const [configData, setConfigData] = useState<any>(null);
