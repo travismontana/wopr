@@ -44,7 +44,7 @@ DIRECTUS_HOST = "http://wopr-directus"
 ENVIRONMENT = os.getenv('WOPR_ENVIRONMENT', 'development')
 
 if ENVIRONMENT != 'production':
-    DIRECTUS_HOST += "-{ENVIRONMENT}"
+    DIRECTUS_HOST += f"-{ENVIRONMENT}"
 
 DIRECTUS_URL = f"{DIRECTUS_HOST}:8055"
 
@@ -70,7 +70,7 @@ def get_directus_config():
         return config_data.get('data', [])
     except requests.RequestException as e:
         print(f"Error fetching config from Directus: {e}")
-        return []
+        exit(1)
 
 WOPR_CONFIG = get_directus_config()
 
