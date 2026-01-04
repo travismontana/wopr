@@ -170,7 +170,7 @@ async def get_environments():
                 span.set_attribute("config.found", True)
                 span.set_attribute("config.keys_count", len(config_data.keys()))
             
-            logger.info(f"Successfully retrieved config for {environment}")
+            logger.info(f"Successfully retrieved data for {data}")
             return config_data
             
         except httpx.HTTPError as e:
