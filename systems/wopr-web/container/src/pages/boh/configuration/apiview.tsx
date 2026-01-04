@@ -11,6 +11,12 @@ import { apiUrl } from '@lib/api';
  * Then the user can select which environment to load the config for in a dropdown, 
  * when they select, it will load that config to view using react18-json-view to render it.
  * No styling is required.
+ * 
+ * I'd like to select the theme of react18-json-view with a select box as well, with options:
+ * - default | a11y | github | vscode | atom|winter-is-coming
+ * And enable/disable  dark mode with a checkbox.
+ * 
+ * the page auto updates when any of the options change.
  */
 
 export default function ApiView() {
@@ -50,6 +56,19 @@ export default function ApiView() {
     }
   }, [selectedEnv]);
 
+  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTheme(e.target.value);
+  };
+
+  const handleDarkModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDarkMode(e.target.checked);
+  };
+
+  const [theme, setTheme] = useState<string>('default');
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+
+
   return (
     <div>
       <h1>API Configuration Viewer</h1>
@@ -66,6 +85,31 @@ export default function ApiView() {
           </option>
         ))}
       </select>
+      <br /><br />
+      <label htmlFor="theme-select">Select Theme: </label>
+      <select
+        id="theme-select"
+        value={theme}
+        onChange={handleThemeChange}
+      >
+        <option value="default">Default</option>
+        <option value="a11y">A11y</option>
+        <option value="github">GitHub</option>
+        <option value="vscode">VSCode</option>
+        <option value="atom">Atom</option>
+        <option value="winter-is-coming">Winter is Coming</option>
+      </select>
+      <br /><br />
+      <label htmlFor="dark-mode-checkbox">
+        <input
+          type="checkbox"
+          id="dark-mode-checkbox"
+          checked={darkMode}
+          onChange={handleDarkModeChange}
+        />
+        Enable Dark Mode
+      </label>
+      <br /><br />
       {loading && <p>Loading configuration...</p>}
       {configData && (
         <div style={{ marginTop: '20px' }}>
@@ -73,10 +117,10 @@ export default function ApiView() {
             src={configData} 
             collapsed={2}
             className="panel"
-            theme="atom"
+            theme={theme}
             enableClipboard={true}
-            dark={true}
-            editable={true} />
+            dark={darkMode}
+            editable={false} />
         </div>
       )}
     </div>
