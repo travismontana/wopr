@@ -9,7 +9,7 @@ open-webui:
     enabled: true
   ingress:
     enabled: true
-    class: "wopr-trafeik"
+    class: "wopr-traefik"
     host: "openwebui.wopr.tailandtraillabs.org"
     tls: true
     existingSecret: "wildcard-tls"
