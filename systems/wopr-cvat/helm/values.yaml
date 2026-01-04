@@ -5,7 +5,7 @@ cvat:
       defaultStorage:
         storageClass: "rook-cephfs"
         accessModes:
-          - ReadWriteOnce
+          - ReadWriteMany
     persistence:
       storageClass: "rook-cephfs"
     frontend:
