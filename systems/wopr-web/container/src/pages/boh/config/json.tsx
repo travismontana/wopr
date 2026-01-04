@@ -49,11 +49,23 @@ export default function JsonConfigPage() {
   const saveValue = async (key: string, value: any) => {
     setSaving(true);
     try {
+      let finalValue = value;
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+            (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+          try {
+            finalValue = JSON.parse(trimmed);
+          } catch {
+            // If parse fails, keep as string
+          }
+        }
+      }
       const res = await fetch(`${apiUrl}/api/v1/config/set/${key}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          "value": typeof value === 'object' ? JSON.stringify(value) : value,
+          "value": typeof finalValue === 'object' ? JSON.stringify(finalValue) : finalValue,
           "description": "Updated"
         })
       });

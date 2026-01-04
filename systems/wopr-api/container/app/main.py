@@ -179,7 +179,29 @@ if tracing_enabled:
             for key in CAPTURE_RESPONSE_HEADERS:
                 if key in response.headers:
                     span.set_attribute(f"http.response.header.{key}", response.headers[key])
-        
+                    # NEW: Capture response body
+            response_body = b""
+            async for chunk in response.body_iterator:
+                response_body += chunk
+            
+            # Store response body in span (truncate if large)
+            if response_body:
+                try:
+                    body_json = json.loads(response_body)
+                    span.set_attribute("http.response.body", json.dumps(body_json))
+                except:
+                    # Not JSON or parse failed - store as string (truncate)
+                    body_str = response_body.decode()[:1000]
+                    span.set_attribute("http.response.body", body_str)
+            
+            # Reconstruct response with captured body
+            from fastapi.responses import Response
+            return Response(
+                content=response_body,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.media_type
+            )
         return response  # <-- CRITICAL: Was missing!
 
 else:

@@ -7,11 +7,9 @@ Use these at the top of every source file.
 ```python
 #!/usr/bin/env python3
 """
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob <bob@bomar.us>
+# WOPR - Wargaming Oversight & Position Recognition
+# Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
 # See git log for detailed authorship
-
-Brief description of what this file does.
 """
 ```
 ## YAML Files (.yaml, .yml)
