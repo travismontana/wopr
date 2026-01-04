@@ -56,8 +56,7 @@ class ConfigValue(BaseModel):
 class ConfigUpdate(BaseModel):
     """Config update model"""
     value: Any
-    description: Optional[str] = None
-    updated_by: Optional[str] = None
+    description: Optional[str] = Noned
 
 
 def parse_value(value: Any, value_type: str) -> Any:
@@ -343,7 +342,6 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
         {
             "value": "/new/path",
             "description": "Updated storage path",
-            "updated_by": "bob"
         }
     """
     if environment is None:
@@ -365,7 +363,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
             # Upsert new value
             cur.execute(
                 """
-                INSERT INTO settings (key, value, value_type, description, environment, updated_by)
+                INSERT INTO settings (key, value, value_type, description, environment)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (key, environment)
                 DO UPDATE SET 
@@ -378,14 +376,14 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
                         value_type,
                         description
                 """,
-                (key, value_json, value_type, update.description, environment, update.updated_by)
+                (key, value_json, value_type, update.description, environment)
             )
             result = cur.fetchone()
             
             # Record history
             cur.execute(
                 """
-                INSERT INTO settings (key, value, value_type, description, environment, updated_by)
+                INSERT INTO settings (key, value, value_type, description, environment)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (key, environment)
                 DO UPDATE SET
@@ -395,7 +393,7 @@ def set_value(key: str, update: ConfigUpdate, environment: str = None):
                     updated_at = NOW(),
                 RETURNING key, value::text AS value, value_type, description
                 """,
-                (key, value_json, value_type, update.description, environment, update.updated_by)
+                (key, value_json, value_type, update.description, environment)
             )
             
             conn.commit()
@@ -470,12 +468,11 @@ async def import_yaml(request: dict):
         {
             "yaml_content": "<YAML string>",
             "environment": "prod",
-            "updated_by": "bob"
+
         }
     """
     yaml_content = request.get('yaml_content', '')
     environment = request.get('environment', 'default')
-    updated_by = request.get('updated_by', 'system')
     
     try:
         data = yaml.safe_load(yaml_content)
@@ -503,16 +500,15 @@ async def import_yaml(request: dict):
                 
                 cur.execute(
                     """
-                    INSERT INTO settings (key, value, value_type, environment, updated_by)
+                    INSERT INTO settings (key, value, value_type, environment)
                     VALUES (%s, %s::jsonb, %s, %s, %s)
                     ON CONFLICT (key, environment)
                     DO UPDATE SET
                         value = EXCLUDED.value,
                         value_type = EXCLUDED.value_type,
-                        updated_at = NOW(),
-                        updated_by = EXCLUDED.updated_by
+                        updated_at = NOW()
                     """,
-                    (key, value_json, value_type, environment, updated_by)
+                    (key, value_json, value_type, environment)
                 )
             
             conn.commit()
