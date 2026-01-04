@@ -1,10 +1,10 @@
 cvat:
   backend:
     replicas: 1
-    defaultStorage:
-      storageClass: "rook-cephfs"
-      accessModes:
-        - ReadWriteOnce
+  defaultStorage:
+    storageClass: "rook-cephfs"
+    accessModes:
+      - ReadWriteOnce
   persistence:
     storageClass: "rook-cephfs"
   frontend:
