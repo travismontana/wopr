@@ -79,7 +79,7 @@ def get_directus_config():
         print(f"Error fetching config from Directus: {e}")
         exit(1)
 
-WOPR_CONFIG = get_directus_config()[0]
+WOPR_CONFIG = get_directus_config()[0]{'data'}
 logger.info("WOPR_CONFIG: %s", WOPR_CONFIG)
 
 if WOPR_CONFIG['nelson'] != "haha":
