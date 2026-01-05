@@ -66,6 +66,11 @@ wopr-baseapp:
         secretKeyRef:
           name: wopr-config-db-user-credentials
           key: password
+    - name: HOMEASSISTANT_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: wopr-homeassistant-token
+          key: HOMEASSISTANT_TOKEN
       
   woprConfig:
     WOPR_VERSION: "v0.1.5-alpha"
