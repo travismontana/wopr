@@ -62,7 +62,7 @@ def capture_piece_image(payload: dict):
   game_catalog_id = response.json().get('data', {}).get('game_catalog_id')
   image_id = response.json().get('data', {}).get('id')
   colorTempName = response.json().get('data', {}).get('color_temp')
-  colorTemp = woprvar.WOPR_CONFIG['lightSettings']['temps'].get(colorTempName)
+  colorTemp = woprvar.WOPR_CONFIG['lightSettings']['temp'].get(colorTempName)
   lightIntensity = response.json().get('data', {}).get('light_intensity')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
@@ -75,7 +75,7 @@ def capture_piece_image(payload: dict):
       "thumbImageFilename": THUMBNAME
     }
   }
-
+ 
   # Update directus record with filenames
   try:
       response = requests.patch(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
