@@ -11,7 +11,7 @@ IMGURL = "https://images.wopr.tailandtraillabs.org/ml/incoming/"
 THUMBURL = f"https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fit:300/plain/{IMGURL}"
 
 def get_image_list():
-    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/4")
+    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/name/4")
     response.raise_for_status()
     #st.write(f"Found: {response.json()}")
     return response.json()
@@ -22,7 +22,7 @@ imgDict = get_image_list()
 for img in imgDict:
     #st.write(f"Image Title: {img}")
     id = img['id']
-    title = f"P:{img['piece_id']} G:{img['game_catalog_id']} {img['light_intensity']}%@{img['color_temp']}"
+    title = f"P:{img['piece_id']['name']} G:{img['game_catalog_id']} {img['light_intensity']}%@{img['color_temp']}"
     thumbnail_url = f"{THUMBURL}{img['filenames']['fullImageFilename']}"
     full_image_url = f"{IMGURL}{img['filenames']['fullImageFilename']}"
     images.append({

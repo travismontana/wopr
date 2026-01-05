@@ -120,25 +120,42 @@ def selectObjectRotation():
     return rotation_index
 
 def selectObjectPosition():
-    selected_position = st.selectbox(
-        "Choose object position:",
-        options=list(config['object']['positions'].keys())
-    )
-    return selected_position
+    positions = config["object"]["positions"]  # dict: label -> value
 
-def emptyRun(piece_id: int):
+    # One-time default (pick whatever makes sense)
+    if "object_position_key" not in st.session_state:
+        st.session_state.object_position_key = "Center"
+
+    keys = list(positions.keys())
+
+    selected_key = st.selectbox(
+        "Choose object position:",
+        options=keys,
+        index=keys.index(st.session_state.object_position_key),
+    )
+
+    value = positions[selected_key]
+
+    # Persist selection
+    st.session_state.object_position_key = selected_key
+
+    return value
+
+
+def emptyRun(selectedGame, selectedPiece, objectRotation, objectPosition):
     for cTemp in config['lightSettings']['temp'].keys():
         for cIntensity in config['lightSettings']['intensity']:
             st.write(f"Image capture for temp {cTemp}, intensity {cIntensity}")
             payload = {
-                "game_catalog_id": st.session_state.selectedGame['id'],
-                "piece_id": piece_id,
+                "game_catalog_id": selectedGame['id'],
+                "piece_id": selectedPiece['id'],
                 "light_intensity": cIntensity,
                 "color_temp": cTemp,
-                "object_rotation": "0",
-                "object_position": "center"
+                "object_rotation": objectRotation,
+                "object_position": objectPosition
             }
             post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
+            #st.write(f"Simulated API call with payload: {payload}")
             time.sleep(1)  # To avoid overwhelming the server
 
 
@@ -162,24 +179,21 @@ if "selectedGame" not in st.session_state:
 
 config = fetch_config()
 selectedGame = selectGame()
-
+selectedPiece = selectPiece(selectedGame)
+st.write(f"You selected piece: {selectedPiece['name']} from game: {selectedGame['name']}")
+objectRotation = selectObjectRotation()
+objectPosition = selectObjectPosition()
 # Check if we want to run through empty table or move on to normal capture
-if st.button("Run Empty Table Capture"):
+if st.button("Run through all light settings for this piece"):
     config = fetch_config()
-    emptyTableRun("49")
-    st.success("Empty table capture requests submitted!")
-elif st.button("Run Empty Board Capture"):
-    config = fetch_config()
-    emptyRun("50")
+    emptyRun(selectedGame, selectedPiece, objectRotation, objectPosition)
     st.success("Empty board capture requests submitted!")
 else:
-    selectedPiece = selectPiece(selectedGame)
-    st.write(f"You selected piece: {selectedPiece['name']} from game: {selectedGame['name']}")
+
 
     lightIntensity = selectLightIntensity()
     lightTemp = selectLightTemperature()
-    objectRotation = selectObjectRotation()
-    objectPosition = selectObjectPosition()
+
 
     with st.form("capture_form"):
         submit = st.form_submit_button("Capture Image")

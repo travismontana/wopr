@@ -27,51 +27,51 @@ import requests
 router = APIRouter(tags=["images"])
 logger.info("Images API module loaded")
 
+def oneGet(url: str, headers: dict, params: dict) -> dict:
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logger.error(f"Error fetching data from Directus: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching data, error: {e}")
+
 @router.get("/gameid/{game_catalog_id}/", response_model=list[dict])
 @router.get("/gameid/{game_catalog_id}", response_model=list[dict])
 def get_images_by_game_catalog_id(game_catalog_id: int):
-  """Get all images for a specific game catalog ID"""
+  #"""Get all images for a specific game catalog ID"""
   logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
   PARAMS = f"filter[game_catalog_id][_eq]={game_catalog_id}"
-  try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS, params=PARAMS)
-    response.raise_for_status()
-    data = response.json()
-    return data.get('data', [])
-  except requests.RequestException as e:
-    logger.error(f"Error fetching images from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching images, error: {e}")
+  return oneGet(URL, woprvar.DIRECTUS_HEADERS, PARAMS)
+
+@router.get("/gameid/names/{game_catalog_id}/", response_model=list[dict])
+@router.get("/gameid/names/{game_catalog_id}", response_model=list[dict])
+def get_images_by_game_catalog_id(game_catalog_id: int):
+  #"""Get all images for a specific game catalog ID"""
+  logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
+  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
+  PARAMS = f"filter[game_catalog_id][_eq]={game_catalog_id}&fields=piece.name,light_intensity,color_temp,object_rotation,object_position,image_file"
+  return oneGet(URL, woprvar.DIRECTUS_HEADERS, PARAMS)
+
 
 @router.get("/pieceid/{piece_id}/", response_model=list[dict])
 @router.get("/pieceid/{piece_id}", response_model=list[dict])
 def get_images_by_piece_id(piece_id: int):
-  """Get all images for a specific piece ID"""
+  #"""Get all images for a specific piece ID"""
   logger.info(f"Fetching images for piece ID {piece_id} from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages?filter[piece_id][_eq]={piece_id}"
-  
-  try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
-    response.raise_for_status()
-    data = response.json()
-    return data.get('data', [])
-  except requests.RequestException as e:
-    logger.error(f"Error fetching images from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching images, error: {e}")
+  return oneGet(URL, woprvar.DIRECTUS_HEADERS, {})
+
 
 @router.get("/all/", response_model=list[dict])
 @router.get("/all", response_model=list[dict])
 def get_all_images():
-  """Get all images"""
+  #"""Get all images"""
   logger.info("Fetching all images from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
-  
-  try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
-    response.raise_for_status()
-    data = response.json()
-    return data.get('data', [])
-  except requests.RequestException as e:
-    logger.error(f"Error fetching images from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching images, error: {e}") 
-    
+  return oneGet(URL, woprvar.DIRECTUS_HEADERS, {})
