@@ -23,6 +23,7 @@ from wopr import logging as woprlogging
 from wopr import tracing as woprtracing
 from app import globals as woprvar
 from app.logging import configure_logging
+import logging
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider

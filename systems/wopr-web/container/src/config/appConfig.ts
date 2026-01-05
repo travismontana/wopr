@@ -10,3 +10,5 @@
  *   That retuns a json
  * 3. exports woprconfig 
  */
+
+export interface WoprConfig {}
