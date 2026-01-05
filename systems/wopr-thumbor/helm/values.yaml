@@ -55,12 +55,6 @@ wopr-baseapp:
       value: /data
     - name: STORAGE
       value: thumbor.storages.file_storage
-    - name: RESULT_STORAGE_FILE_STORAGE_ROOT_PATH
-      value: /data/thumbor/results 
-    - name: RESULT_STORAGE
-      value: thumbor.result_storages.file_storage
-    - name: RESULT_STORAGE_STORES_UNSAFE
-      value: "False"
   args:
     - "--port=80"
     - "--processes=2"
