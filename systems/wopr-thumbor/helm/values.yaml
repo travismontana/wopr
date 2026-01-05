@@ -60,7 +60,7 @@ wopr-baseapp:
     - name: RESULT_STORAGE
       value: thumbor.result_storages.file_storage
     - name: RESULT_STORAGE_STORES_UNSAFE
-      value: "True"
+      value: "False"
   args:
     - "--port=80"
     - "--processes=2"
