@@ -86,8 +86,8 @@ def capture_piece_image(payload: dict):
   time.sleep(1)
   colorTemp = payload.get('color_temp', 4000)
   lightIntensity = payload.get('light_intensity', 70)
-  woprvar.WOPR_CONFIG['homeAssistant']['host']
-  HAURL = f"{woprvar.HOMEASSISTANT_URL}/api/services/script/office_lights_preset"
+  HAURL = f"{woprvar.WOPR_CONFIG['homeAssistant']['host']}/api/services/script/office_lights_preset"
+  #HAURL = f"{woprvar.HOMEASSISTANT_URL}/api/services/script/office_lights_preset"
   headers = {
     "Authorization": f"Bearer {woprvar.HOMEASSISTANT_TOKEN}",
     "Content-Type": "application/json"
