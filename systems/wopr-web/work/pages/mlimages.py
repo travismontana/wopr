@@ -2,6 +2,7 @@ import streamlit as st
 import httpx
 import os 
 import requests
+import time
 
 st.title("WOPR ML Image Capture System")
 st.write("Welcome to the WOPR ML Image Capture System.")
@@ -125,6 +126,27 @@ def selectObjectPosition():
     )
     return selected_position
 
+def emptyRun(piece_id: int):
+    for cTemp in config['lightSettings']['temp'].keys():
+        for cIntensity in config['lightSettings']['intensity']:
+            st.write(f"Image capture for temp {cTemp}, intensity {cIntensity}")
+            payload = {
+                "game_catalog_id": st.session_state.selectedGame['id'],
+                "piece_id": piece_id,
+                "light_intensity": cIntensity,
+                "color_temp": cTemp,
+                "object_rotation": "0",
+                "object_position": "center"
+            }
+            post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
+            time.sleep(1)  # To avoid overwhelming the server
+
+
+ #########################
+ # Main Application Logic
+ #
+ ######################### 
+
 if "lightTemp" not in st.session_state:
     st.session_state.lightTemp = "neutral"
 if "lightIntensity" not in st.session_state:
@@ -138,27 +160,37 @@ if "selectedPiece" not in st.session_state:
 if "selectedGame" not in st.session_state:
     st.session_state.selectedGame = None
 
-selectedGame = selectGame()
-selectedPiece = selectPiece(selectedGame)
-st.write(f"You selected piece: {selectedPiece['name']} from game: {selectedGame['name']}")
-
 config = fetch_config()
+selectedGame = selectGame()
 
-lightIntensity = selectLightIntensity()
-lightTemp = selectLightTemperature()
-objectRotation = selectObjectRotation()
-objectPosition = selectObjectPosition()
+# Check if we want to run through empty table or move on to normal capture
+if st.button("Run Empty Table Capture"):
+    config = fetch_config()
+    emptyTableRun("49")
+    st.success("Empty table capture requests submitted!")
+elif st.button("Run Empty Board Capture"):
+    config = fetch_config()
+    emptyRun("50")
+    st.success("Empty board capture requests submitted!")
+else:
+    selectedPiece = selectPiece(selectedGame)
+    st.write(f"You selected piece: {selectedPiece['name']} from game: {selectedGame['name']}")
 
-with st.form("capture_form"):
-    submit = st.form_submit_button("Capture Image")
-    if submit:
-        payload = {
-            "game_catalog_id": selectedGame['id'],
-            "piece_id": selectedPiece['id'],
-            "light_intensity": lightIntensity,
-            "color_temp": lightTemp,
-            "object_rotation": objectRotation,
-            "object_position": objectPosition
-        }
-        post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
-        st.success("Image capture request submitted!")
+    lightIntensity = selectLightIntensity()
+    lightTemp = selectLightTemperature()
+    objectRotation = selectObjectRotation()
+    objectPosition = selectObjectPosition()
+
+    with st.form("capture_form"):
+        submit = st.form_submit_button("Capture Image")
+        if submit:
+            payload = {
+                "game_catalog_id": selectedGame['id'],
+                "piece_id": selectedPiece['id'],
+                "light_intensity": lightIntensity,
+                "color_temp": lightTemp,
+                "object_rotation": objectRotation,
+                "object_position": objectPosition
+            }
+            post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
+            st.success("Image capture request submitted!")

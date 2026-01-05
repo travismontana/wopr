@@ -47,6 +47,7 @@ from app.api.v2 import config
 from app.api.v2 import games
 from app.api.v2 import pieces
 from app.api.v2 import mlimages
+from app.api.v2 import images
 
 # Set normal logging not using woprlogg.
 configure_logging("/var/log/wopr-api.log")
@@ -149,6 +150,7 @@ if tracing_enabled:
     app.include_router(games.router, prefix="/api/v2/games", tags=["games"])
     app.include_router(pieces.router, prefix="/api/v2/pieces", tags=["pieces"])
     app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
+    app.include_router(images.router, prefix="/api/v2/images", tags=["images"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
