@@ -7,6 +7,8 @@ st.title("WOPR ML Image Capture System")
 st.write("Welcome to the WOPR ML Image Capture System.")
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+IMGURL = "https://images.wopr.tailandtraillabs.org/ml/incoming/"
+THUMBURL = f"https://imgproxy.wopr.tailandtraillabs.org/300x/{IMGURL}"
 
 """
 We'll get the list of files from the API.
@@ -27,8 +29,8 @@ for img in imgDict:
     #st.write(f"Image Title: {img}")
     id = img['id']
     title = img['id']
-    thumbnail_url = f"https://thumbor.wopr.tailandtraillabs.org/unsafe/300x0/ml/incoming/{img['filenames']['fullImageFilename']}"
-    full_image_url = f"https://images.wopr.tailandtraillabs.org/ml/incoming/{img['filenames']['fullImageFilename']}"
+    thumbnail_url = f"{THUMBURL}{img['filenames']['fullImageFilename']}"
+    full_image_url = f"{IMGURL}{img['filenames']['fullImageFilename']}"
     images.append({
         'id': id,
         'title': title,

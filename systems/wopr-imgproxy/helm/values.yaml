@@ -1,10 +1,11 @@
 imgproxy:
-  ingress:
-    enabled: true
-    className: wopr-traefik
-    hosts:
-      - host: imgproxy.wopr.tailandtraillabs.org
-    tls:
-      - secretName: wildcard-tls
-        hosts:
-          - imgproxy.wopr.tailandtraillabs.org
+  resources:
+    ingress:
+      enabled: true
+      className: wopr-traefik
+      hosts:
+        - host: imgproxy.wopr.tailandtraillabs.org
+      tls:
+        - secretName: wildcard-tls
+          hosts:
+            - imgproxy.wopr.tailandtraillabs.org
