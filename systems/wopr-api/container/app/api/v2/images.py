@@ -27,13 +27,13 @@ import requests
 router = APIRouter(tags=["images"])
 logger.info("Images API module loaded")
 
-@router.get("/gameid/{game_catalog_uuid}/", response_model=list[dict])
-@router.get("/gameid/{game_catalog_uuid}", response_model=list[dict])
-def get_images_by_game_catalog_uuid(game_catalog_uuid: int):
-  """Get all images for a specific game catalog UUID"""
-  logger.info(f"Fetching images for game catalog UUID {game_catalog_uuid} from the directus api")
+@router.get("/gameid/{game_catalog_id}/", response_model=list[dict])
+@router.get("/gameid/{game_catalog_id}", response_model=list[dict])
+def get_images_by_game_catalog_id(game_catalog_id: int):
+  """Get all images for a specific game catalog ID"""
+  logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
-  PARAMS = f"filter[game_catalog_uuid][_eq]={game_catalog_id}"
+  PARAMS = f"filter[game_catalog_id][_eq]={game_catalog_id}"
   try:
     response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS, params=PARAMS)
     response.raise_for_status()
