@@ -72,10 +72,10 @@
     "max_overflow": 10
   },
   "filenames": {
-    "image_template": "{timestamp}-{subject}.{extension}",
-    "image_with_sequence_template": "{timestamp}-{subject}-{sequence:03d}.{extension}",
-    "thumbnail_template": "{timestamp}-{subject}-thumb.{extension}",
-    "timestamp_format": "%Y%m%d-%H%M%S"
+    "mlcapture": {
+      "fullImageFilename": "{{pieces_id}}-{{game_catalog_id}}-{{capture_id}}.jpg",
+      "thumbnailFilename": "{{pieces_id}}-{{game_catalog_id}}-{{capture_id}}-thumb.jpg"
+    }
   },
   "logging": {
     "date_format": "%Y-%m-%d %H:%M:%S",

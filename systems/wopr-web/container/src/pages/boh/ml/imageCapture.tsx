@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { MLGallery } from './imageList';
 import { MLExplorerPage } from './imageExplorer';
 import { apiUrl } from "@lib/api";
+import { useConfig } from "@/config/ConfigContext";
+
 interface Game {
   id: number;
   name: string;
@@ -67,7 +69,7 @@ export default function MLImagesPage() {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/v1/games`);
+        const response = await fetch(`${API_BASE}/api/v2/games`);
         if (!response.ok) throw new Error('Failed to fetch games');
         const data = await response.json();
         setGames(data);
@@ -82,17 +84,7 @@ export default function MLImagesPage() {
 
   // Fetch config on mount
   useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/v1/config/all`);
-        if (!response.ok) throw new Error('Failed to fetch config');
-        const data = await response.json();
-        setConfig(data);
-      } catch (error) {
-        console.error('Error fetching config:', error);
-        setMessage({ type: 'error', text: 'Failed to load configuration' });
-      }
-    };
+    const fetchConfig = useConfig();
 
     fetchConfig();
   }, []);
