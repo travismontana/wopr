@@ -27,8 +27,8 @@ import requests
 
 logger.info("Images API module loaded")
 
-@router.get("/gameid/{game_catalog_uuid}/", response_model=list[dict])
-@router.get("/gameid/{game_catalog_uuid}", response_model=list[dict])
+@router.get("/api/v2/images/gameid/{game_catalog_uuid}/", response_model=list[dict])
+@router.get("/api/v2/images/gameid/{game_catalog_uuid}", response_model=list[dict])
 def get_images_by_game_catalog_uuid(game_catalog_uuid: int):
   """Get all images for a specific game catalog UUID"""
   logger.info(f"Fetching images for game catalog UUID {game_catalog_uuid} from the directus api")
@@ -43,8 +43,8 @@ def get_images_by_game_catalog_uuid(game_catalog_uuid: int):
     logger.error(f"Error fetching images from Directus: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching images, error: {e}")
 
-@router.get("/pieceid/{piece_id}/", response_model=list[dict])
-@router.get("/pieceid/{piece_id}", response_model=list[dict])
+@router.get("/api/v2/images/pieceid/{piece_id}/", response_model=list[dict])
+@router.get("/api/v2/images/pieceid/{piece_id}", response_model=list[dict])
 def get_images_by_piece_id(piece_id: int):
   """Get all images for a specific piece ID"""
   logger.info(f"Fetching images for piece ID {piece_id} from the directus api")
@@ -59,8 +59,8 @@ def get_images_by_piece_id(piece_id: int):
     logger.error(f"Error fetching images from Directus: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching images, error: {e}")
 
-@router.get("/all/", response_model=list[dict])
-@router.get("/all", response_model=list[dict])
+@router.get("/api/v2/images/all/", response_model=list[dict])
+@router.get("/api/v2/images/all", response_model=list[dict])
 def get_all_images():
   """Get all images"""
   logger.info("Fetching all images from the directus api")

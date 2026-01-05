@@ -26,7 +26,7 @@ import os
 
 
 
-@router.post("/capture", response_model=dict)
+@router.post("/api/v2/mlimages/capture", response_model=dict)
 def capture_piece_image(payload: dict):
   """Capture an image for a specific piece"""
   """ Receiving application/json payload with:
