@@ -87,34 +87,8 @@ async def list_games(
     status: Optional[str] = None
 ):
     """
-    List all games with optional pagination and status filtering.
+    List all games
     
-    Args:
-        limit: Maximum number of results (default 100)
-        offset: Number of results to skip (default 0)
-        status: Optional status filter (draft|published)
-    """
-    logger.debug(f"Listing games: limit={limit}, offset={offset}, status={status}")
-    
-    with get_db() as conn:
-        logger.debug("opened DB connection for listing games")
-        with conn.cursor(row_factory=dict_row) as cur:
-            logger.debug("created DB cursor for listing games")
-            
-            query = "SELECT * FROM game_catalog WHERE 1=1"
-            params = []
-            
-            if status:
-                query += " AND status = %s"
-                params.append(status)
-            
-            query += " ORDER BY date_created DESC LIMIT %s OFFSET %s"
-            params.extend([limit, offset])
-            
-            cur.execute(query, params)
-            games = cur.fetchall()
-            logger.debug(f"Fetched {len(games)} games from DB")
-            return games
 
 
 @router.get("/{game_id}", response_model=GameResponse)

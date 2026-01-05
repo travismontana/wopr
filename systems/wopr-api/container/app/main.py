@@ -22,6 +22,7 @@ from wopr import storage as woprstorage
 from wopr import logging as woprlogging
 from wopr import tracing as woprtracing
 from app import globals as woprvar
+from app.logging import configure_logging
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -55,11 +56,8 @@ from app.routers import ml
 
 
 # Set normal logging not using woprlogg.
-logger = logging.getLogger(woprvar.APP_NAME)
-logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+configure_logging("/var/log/wopr-api.log")
 logger.info("WOPR API application: booting up...")
-
 logger.debug(f"WOPR API globals: {woprvar.WOPR_CONFIG}")
 woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 

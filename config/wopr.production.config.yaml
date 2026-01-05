@@ -27,7 +27,7 @@
     "ollama_url": "http://groth.abode.tailandtraillabs.org:11434",
     "internalUrl": "http://wopr-api.wopr.svc:8000",
     "externalUrl": "https://api.wopr.tailandtraillabs.org",
-    "version": "v1"
+    "version": "v2"
   },
   "camera": {
     "buffer_count": 2,

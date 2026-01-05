@@ -60,18 +60,18 @@ DIRECTUS_TOKEN = os.getenv('DIRECTUS_TOKEN')
 
 # Now grab the config from directus, if the token is set great, use  it, if not, then fine, get the config without it.
 if DIRECTUS_TOKEN:
-    HEADERS = {
+    DIRECTUS_HEADERS = {
         "Authorization": f"Bearer {DIRECTUS_TOKEN}"
     }
 else:
-    HEADERS = {}
+    DIRECTUS_HEADERS = {}
 DIRECTUS_CONFIG_ENDPOINT = f"{DIRECTUS_URL}/items/woprconfig?environment={ENVIRONMENT}"
 
 def get_directus_config():
     """Fetch configuration from Directus CMS."""
     import requests
     try:
-        response = requests.get(DIRECTUS_CONFIG_ENDPOINT, headers=HEADERS)
+        response = requests.get(DIRECTUS_CONFIG_ENDPOINT, headers=DIRECTUS_HEADERS)
         response.raise_for_status()
         config_data = response.json()
         return config_data.get('data', [])
