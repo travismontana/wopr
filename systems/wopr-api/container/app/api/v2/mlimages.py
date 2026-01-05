@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 import time 
+import os
 
 @router.post("/capture", response_model=dict)
 def capture_piece_image(payload: dict):
@@ -67,7 +68,7 @@ def capture_piece_image(payload: dict):
       }
   }
   try:
-      response = requests.patch(f"{URL}/{piece_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response = requests.put(f"{URL}/{piece_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
       return response.json()
