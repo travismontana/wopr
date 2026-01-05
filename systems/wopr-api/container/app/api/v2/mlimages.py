@@ -63,7 +63,7 @@ def capture_piece_image(payload: dict):
       "filename": FILENAME
   }
   try:
-      response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response = requests.patch(f"{URL}/{piece_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
       return response.json()
