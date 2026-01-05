@@ -61,6 +61,8 @@ def capture_piece_image(payload: dict):
   piece_id = response.json().get('data', {}).get('piece_id')
   game_catalog_id = response.json().get('data', {}).get('game_catalog_id')
   image_id = response.json().get('data', {}).get('id')
+  colorTemp = response.json().get('data', {}).get('color_temp')
+  lightIntensity = response.json().get('data', {}).get('light_intensity')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
@@ -84,8 +86,6 @@ def capture_piece_image(payload: dict):
 
   # Set the lights to the desired settings
   time.sleep(1)
-  colorTemp = payload.get('color_temp', 4000)
-  lightIntensity = payload.get('light_intensity', 70)
   HAURL = f"{woprvar.WOPR_CONFIG['homeAssistant']['host']}/api/services/script/office_lights_preset"
   logger.info("Setting lights via Home Assistant API at %s", HAURL)
   logger.info("Config: %s", woprvar.WOPR_CONFIG)
