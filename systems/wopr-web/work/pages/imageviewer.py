@@ -11,17 +11,24 @@ API_BASE = "https://api.wopr.tailandtraillabs.org"
 """
 We'll get the list of files from the API.
 then we'll 
+
 """
 
 def get_image_list():
-    response = httpx.get(f"{API_BASE}/api/v2/images")
+    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/4")
     response.raise_for_status()
-    return response.json()
+    st.write(f"Found: {response.json()}")
+    for img in response.json()[0]:
+        img['thumb_url'] = f"https://thumbor.wopr.tailandtraillabs.org/unsafe/300x0/ml/incoming/{img['filenames']['thumbImageFilename']}"
+        img['full_url'] = f"https://images.wopr.tailandtraillabs.org/ml/incoming/{img['filenames']['fullImageFilename']}"
+        img['title'] = f"Piece {img['piece_id']} - Game {img['game_catalog_id']}"
+    return img
 
-images = [
-    {"title": "Board State 001", "thumb": "https://example.com/thumbs/1.jpg", "full": "https://example.com/full/1.jpg"},
-    {"title": "Board State 002", "thumb": "https://example.com/thumbs/2.jpg", "full": "https://example.com/full/2.jpg"},
-]
+imgDict = get_image_list()
+for img in imgDict:
+    images = [
+        {"title": img['title'], "thumb": img['thumb_url'], "full": img['full_url']},
+    ]
 
 st.set_page_config(layout="wide")
 st.title("Image Gallery (click thumbnail opens full-size)")
