@@ -24,7 +24,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
-
+router = APIRouter(tags=["images"])
 logger.info("Images API module loaded")
 
 @router.get("/gameid/{game_catalog_uuid}/", response_model=list[dict])

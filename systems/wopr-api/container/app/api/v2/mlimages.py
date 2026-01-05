@@ -24,7 +24,7 @@ import requests
 import time 
 import os
 
-
+router = APIRouter(tags=["mlimages"])
 
 @router.post("/capture", response_model=dict)
 def capture_piece_image(payload: dict):

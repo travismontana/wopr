@@ -21,7 +21,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
-
+router = APIRouter(tags=["pieces"])
 @router.get("/gameid/{game_id}/", response_model=list[dict])
 @router.get("/gameid/{game_id}", response_model=list[dict])
 def get_pieces(game_id: int):
