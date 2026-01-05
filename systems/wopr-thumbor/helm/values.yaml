@@ -51,6 +51,8 @@ wopr-baseapp:
       value: /data
     - name: LOADER
       value: thumbor.loaders.file_loader
+    - name: FILE_STORAGE_ROOT_PATH
+      value: /data/thumbor
     - name: STORAGE
       value: thumbor.storages.file_storage
     - name: RESULT_STORAGE_FILE_STORAGE_ROOT_PATH
