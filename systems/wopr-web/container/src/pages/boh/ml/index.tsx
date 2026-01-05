@@ -10,6 +10,7 @@ export default function MLIndex() {
         <ul>
           <li><Link to="/boh/ml/imageCapture">Image Capture</Link> - Capture training images with controlled lighting</li>
           <li><Link to="/boh/ml/imageExplorer">Image Explorer</Link> - Explore and analyze captured images</li>
+          <li><Link to="/boh/ml/capture">Capture</Link> - Capture images for training</li>
         </ul>
       </nav>
     </div>
