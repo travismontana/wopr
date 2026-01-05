@@ -26,6 +26,7 @@ from app import globals as woprvar
 import requests
 
 @router.get("/", response_model=list[dict])
+@router.get("", response_model=list[dict])
 def get_games():
   """Get all games"""
   logger.info("Fetching all games from the directus api")
