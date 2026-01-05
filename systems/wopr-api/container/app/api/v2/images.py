@@ -32,10 +32,10 @@ logger.info("Images API module loaded")
 def get_images_by_game_catalog_uuid(game_catalog_uuid: int):
   """Get all images for a specific game catalog UUID"""
   logger.info(f"Fetching images for game catalog UUID {game_catalog_uuid} from the directus api")
-  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages?filter[game_catalog_uuid][_eq]={game_catalog_uuid}"
-  
+  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
+  PARAMS = {"filter[game_catalog_uuid][_eq]": game_catalog_uuid}
   try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
+    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS, params=PARAMS)
     response.raise_for_status()
     data = response.json()
     return data.get('data', [])
