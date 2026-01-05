@@ -70,15 +70,6 @@ export default function MLCapturePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  if (!config || !config.lightSettings || !config.object || !config.filenames) {
-    return <div>Loading configuration...</div>;
-  }
-
-  const lightTemp = config.lightSettings.temp;
-  const lightIntensity = config.lightSettings.intensity;
-  const objectRotations = config.object.rotations;
-  const objectPositions = config.object.positions;
-
   // Load games on mount
   useEffect(() => {
     const loadGames = async () => {
@@ -92,6 +83,15 @@ export default function MLCapturePage() {
     };
     loadGames();
   }, []);
+  
+  if (!config || !config.lightSettings || !config.object || !config.filenames) {
+    return <div>Loading configuration...</div>;
+  }
+
+  const lightTemp = config.lightSettings.temp;
+  const lightIntensity = config.lightSettings.intensity;
+  const objectRotations = config.object.rotations;
+  const objectPositions = config.object.positions;
 
   // Load pieces when game changes
   const handleGameChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
