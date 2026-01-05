@@ -99,7 +99,7 @@ def capture_piece_image(payload: dict):
     "kelvin": colorTemp
   }
   try:
-    response = requests.patch(f"{HAURL}", json=service_data, headers=headers)
+    response = requests.post(f"{HAURL}", json=service_data, headers=headers)
     response.raise_for_status()
     logger.info("Successfully updated lights, response: %s", response.json())
   except requests.RequestException as e:
