@@ -61,7 +61,8 @@ def capture_piece_image(payload: dict):
   piece_id = response.json().get('data', {}).get('piece_id')
   game_catalog_id = response.json().get('data', {}).get('game_catalog_id')
   image_id = response.json().get('data', {}).get('id')
-  colorTemp = response.json().get('data', {}).get('color_temp')
+  colorTempName = response.json().get('data', {}).get('color_temp')
+  colorTemp = woprvar.WOPR_CONFIG['lightSettings']['temps'].get(colorTempName)
   lightIntensity = response.json().get('data', {}).get('light_intensity')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
