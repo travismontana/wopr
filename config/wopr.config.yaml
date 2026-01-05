@@ -144,5 +144,18 @@
   "homeAssistant": {
     "enabled": true,
     "host": "http://homeassistant.local:8123"
-  }
+  },
+  "notifications": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.example.com",
+      "smtp_port": 587,
+      "use_tls": true,
+      "username": "",
+      "password": ""
+    },
+    "discord": {
+      "enabled": true,
+      "webhook_url": "https://discord.com/api/webhooks/1457873231133544459/3yUwg89RsfjgRu-AmZB_hr0LU586d3OMZ2HniDdoW8YpgNhOO4rcBwCSKaSLJPYq01yE"
+    }
 }
