@@ -56,10 +56,6 @@ async function createCapture(formData: FormData) {
 
 export default function MLCapturePage() {
   const config = useConfig();
-  const lightTemp = config.lightSettings.temp;
-  const lightIntensity = config.lightSettings.intensity;
-  const objectRotations = config.object.rotations;
-  const objectPositions = config.object.positions;
 
   const [games, setGames] = useState<Game[]>([]);
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -73,6 +69,15 @@ export default function MLCapturePage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  if (!config || !config.lightSettings || !config.object || !config.filenames) {
+    return <div>Loading configuration...</div>;
+  }
+
+  const lightTemp = config.lightSettings.temp;
+  const lightIntensity = config.lightSettings.intensity;
+  const objectRotations = config.object.rotations;
+  const objectPositions = config.object.positions;
 
   // Load games on mount
   useEffect(() => {
