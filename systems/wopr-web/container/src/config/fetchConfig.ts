@@ -1,6 +1,6 @@
 import type { WoprConfig } from "./appConfig";
 
-const directusurl = "https://wopr-directus:8055";
+const directusurl = "https://directus.wopr.tailandtraillabs.org";
 const environment = "production";
 
 export async function fetchWoprConfig(): Promise<WoprConfig> {
