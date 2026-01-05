@@ -5,8 +5,8 @@
 
 import { useState, useEffect } from "react";
 import { useConfig } from "@/config/ConfigContext";
-import { apiUrl } from "@lib/api";
 
+const apiUrl = "https://api.wopr.tailandtraillabs.org";
 interface Game {
   id: number;
   uuid: string;
