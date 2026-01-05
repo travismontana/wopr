@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("WOPR Test")
+st.title("WOPR Back of House")
 st.write("If you can read this, Streamlit is working.")
 
 # This is the key difference from Flask/FastAPI:

@@ -24,6 +24,8 @@ import requests
 import time 
 import os
 
+
+
 @router.post("/capture", response_model=dict)
 def capture_piece_image(payload: dict):
   """Capture an image for a specific piece"""
@@ -38,6 +40,8 @@ def capture_piece_image(payload: dict):
   then need to send, that to 
   {woprvar.DIRECTUS_URL}/items/mlimages
   """
+
+  # Received the payload, now post to Directus to create the mlimage record
   logger.info("Capturing piece image with payload: %s", payload)
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
 
@@ -52,6 +56,7 @@ def capture_piece_image(payload: dict):
   time.sleep(2)
   """ now we get the uuid, then build the filename, then call teh camera API to take the picture """ 
 
+  # Now build the filenames
   image_uuid = response.json().get('data', {}).get('uuid')
   piece_id = response.json().get('data', {}).get('piece_id')
   game_catalog_id = response.json().get('data', {}).get('game_catalog_id')
@@ -59,7 +64,6 @@ def capture_piece_image(payload: dict):
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
-
   FILENAME = f"{piece_id}-{game_catalog_id}-{image_uuid}.jpg"
   THUMBNAME = f"{piece_id}-{game_catalog_id}-{image_uuid}-thumb.jpg"
   payload = {
@@ -68,6 +72,8 @@ def capture_piece_image(payload: dict):
       "thumbImageFilename": THUMBNAME
     }
   }
+
+  # Update directus record with filenames
   try:
       response = requests.patch(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
@@ -76,6 +82,31 @@ def capture_piece_image(payload: dict):
       logger.error(f"Error capturing piece image: {e}")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
 
+  # Set the lights to the desired settings
+  time.sleep(1)
+  colorTemp = payload.get('color_temp', 4000)
+  lightIntensity = payload.get('light_intensity', 70)
+  HAURL = f"{woprvar.HOMEASSISTANT_URL}/api/services/script/office_lights_preset"
+  headers = {
+    "Authorization": f"Bearer {woprvar.HOMEASSISTANT_TOKEN}",
+    "Content-Type": "application/json"
+  }
+  # Prepare service data
+  service_data = {
+    "brightness": lightIntensity,
+    "kelvin": colorTemp
+  }
+  try:
+    response = requests.patch(f"{HAURL}", json=service_data, headers=headers)
+    response.raise_for_status()
+    logger.info("Successfully updated lights, response: %s", response.json())
+  except requests.RequestException as e:
+    logger.error(f"Error capturing piece image: {e}")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
+
+  time.sleep(2)
+
+  # Start the camera capture process
   CAMURL = woprvar.WOPR_CONFIG['camera']['camDict']['1']['host']
 
   payload = {
