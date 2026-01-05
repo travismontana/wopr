@@ -17,18 +17,26 @@ then we'll
 def get_image_list():
     response = httpx.get(f"{API_BASE}/api/v2/images/gameid/4")
     response.raise_for_status()
-    st.write(f"Found: {response.json()}")
-    for img in response.json()[0]:
-        img['thumb_url'] = f"https://thumbor.wopr.tailandtraillabs.org/unsafe/300x0/ml/incoming/{img['filenames']['thumbImageFilename']}"
-        img['full_url'] = f"https://images.wopr.tailandtraillabs.org/ml/incoming/{img['filenames']['fullImageFilename']}"
-        img['title'] = f"Piece {img['piece_id']} - Game {img['game_catalog_id']}"
-    return img
+    #st.write(f"Found: {response.json()}")
+    return response.json()
 
+
+images = []
 imgDict = get_image_list()
 for img in imgDict:
-    images = [
-        {"title": img['title'], "thumb": img['thumb_url'], "full": img['full_url']},
-    ]
+    #st.write(f"Image Title: {img}")
+    id = img['id']
+    title = img['id']
+    thumbnail_url = f"https://thumbor.wopr.tailandtraillabs.org/unsafe/300x0/ml/incoming/{img['filenames']['fullImageFilename']}"
+    full_image_url = f"https://images.wopr.tailandtraillabs.org/ml/incoming/{img['filenames']['fullImageFilename']}"
+    images.append({
+        'id': id,
+        'title': title,
+        'thumb': thumbnail_url,
+        'full': full_image_url
+    })
+    
+
 
 st.set_page_config(layout="wide")
 st.title("Image Gallery (click thumbnail opens full-size)")

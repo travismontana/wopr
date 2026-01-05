@@ -64,4 +64,4 @@ wopr-baseapp:
     - "--processes=2"
   command: ["/usr/local/bin/thumbor"]
   securityContext:
-    runAsNonRoot: false
+    runAsNonRoot: true
