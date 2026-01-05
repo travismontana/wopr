@@ -1,0 +1,37 @@
+wopr-baseapp:
+  app:
+    name: wopr-web
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-web
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8501
+
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-web-tls
+        hosts:
+          - wopr.tailandtraillabs.org
+  
+  env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
+  
+
+      
