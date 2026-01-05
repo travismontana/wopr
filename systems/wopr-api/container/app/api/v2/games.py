@@ -22,6 +22,7 @@ WOPR API - games CRUD endpoints (Directus schema).
 from . import router, logger
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
+from app import globals as woprvar
 import requests
 
 @router.get("/", response_model=list[dict])
