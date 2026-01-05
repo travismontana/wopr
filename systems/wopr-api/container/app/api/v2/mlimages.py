@@ -76,7 +76,7 @@ def capture_piece_image(payload: dict):
       logger.error(f"Error capturing piece image: {e}")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
 
-  CAMURL = woprvar.WOPR_CONFIG['camDict']{'1'}{'host'}
+  CAMURL = woprvar.WOPR_CONFIG['camDict']['1']['host']
 
   payload = {
     "filename": FILENAME
