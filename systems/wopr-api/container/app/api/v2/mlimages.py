@@ -54,7 +54,25 @@ def capture_piece_image(payload: dict):
     response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
     response.raise_for_status()
     data = response.json()
-    return data.get('data', [])
   except requests.RequestException as e:
     logger.error(f"Error fetching games from Directus: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching games, error: {e}")
+
+  logger.info("Fetched mlimage data: %s", data)
+  """ now we have the data, build the filename """
+  image_uuid = data.get('data', {}).get('uuid')
+  if not image_uuid:
+      logger.error("No UUID found in mlimage data")
+      raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
+  
+  FILENAME = f"{piece_id}-{game_id}-{image_uuid}.jpg"
+  payload = {
+      "filename": FILENAME
+  }
+  try:
+      response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response.raise_for_status()
+      logger.info("Successfully updated piece filename, response: %s", response.json())
+  except requests.RequestException as e:
+      logger.error(f"Error capturing piece image: {e}")
+      raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
