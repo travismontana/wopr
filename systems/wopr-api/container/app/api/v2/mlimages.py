@@ -59,8 +59,12 @@ def capture_piece_image(payload: dict):
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
   
   FILENAME = f"{piece_id}-{game_id}-{image_uuid}.jpg"
+  THUMBNAME = f"{piece_id}-{game_id}-{image_uuid}-thumb.jpg"
   payload = {
-      "filename": FILENAME
+      "filenames": {
+        "fullImageFilename": FILENAME,
+        "thumbImageFilename": THUMBNAME
+      }
   }
   try:
       response = requests.patch(f"{URL}/{piece_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
