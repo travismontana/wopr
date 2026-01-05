@@ -4,7 +4,7 @@ const directusurl = "http://wopr-directus:8055";
 const environment = "production";
 
 export async function fetchWoprConfig(): Promise<WoprConfig> {
-  const res = await fetch(`${directusurl}/api/v2/config/all?environment=${environment}`, {
+  const res = await fetch(`${directusurl}/items/woprconfig/1`, {
     headers: { Accept: "application/json" },
   });
 
