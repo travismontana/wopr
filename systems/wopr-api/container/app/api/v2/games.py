@@ -32,7 +32,7 @@ def get_games():
   URL = f"{woprvar.DIRECTUS_URL}/items/game_catalog"
   
   try:
-    response = requests.get(URL, headers=DIRECTUS_HEADERS)
+    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
     response.raise_for_status()
     data = response.json()
     return data.get('data', [])
