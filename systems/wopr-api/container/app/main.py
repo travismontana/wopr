@@ -146,8 +146,8 @@ if tracing_enabled:
     #app.include_router(homeauto.router, prefix="/api/v2/homeauto", tags=["homeauto"])
     #app.include_router(ml.router) 
     """----------------------"""
-    app.include_router(cameras.router, prefix="/api/v2/config", tags=["config"])
-    app.include_router(config.router, prefix="/api/v2/games", tags=["games"])
+    app.include_router(config.router, prefix="/api/v2/config", tags=["config"])
+    app.include_router(games.router, prefix="/api/v2/games", tags=["games"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
