@@ -85,6 +85,7 @@ def capture_piece_image(payload: dict):
     response = requests.post(f"http://{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
     response.raise_for_status()
     logger.info("Successfully called camera API, response: %s", response.json())
+    return response.json()
   except requests.RequestException as e:
     logger.error(f"Error capturing piece image: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
