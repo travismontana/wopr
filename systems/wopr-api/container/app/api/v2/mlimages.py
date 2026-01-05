@@ -55,6 +55,7 @@ def capture_piece_image(payload: dict):
   image_uuid = response.json().get('data', {}).get('uuid')
   piece_id = response.json().get('data', {}).get('piece_id')
   game_id = response.json().get('data', {}).get('game_id')
+  image_id = response.json().get('data', {}).get('id')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
@@ -68,7 +69,7 @@ def capture_piece_image(payload: dict):
       }
   }
   try:
-      response = requests.put(f"{URL}/{piece_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response = requests.put(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
       return response.json()
