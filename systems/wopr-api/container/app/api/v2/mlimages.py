@@ -82,7 +82,7 @@ def capture_piece_image(payload: dict):
     "filename": FILENAME
   }
   try:
-    response = requests.patch(f"http://{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+    response = requests.post(f"http://{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
     response.raise_for_status()
     logger.info("Successfully called camera API, response: %s", response.json())
   except requests.RequestException as e:
