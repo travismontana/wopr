@@ -28,7 +28,7 @@ import os
 def capture_piece_image(payload: dict):
   """Capture an image for a specific piece"""
   """ Receiving application/json payload with:
-    "game_id": selectedGame['id'],
+    "game_catalog_id": selectedGame['id'],
     "piece_id": selectedPiece['id'],
     "light_intensity": lightIntensity,
     "color_temp": lightTemp,
@@ -54,14 +54,14 @@ def capture_piece_image(payload: dict):
 
   image_uuid = response.json().get('data', {}).get('uuid')
   piece_id = response.json().get('data', {}).get('piece_id')
-  game_id = response.json().get('data', {}).get('game_id')
+  game_catalog_id = response.json().get('data', {}).get('game_catalog_id')
   image_id = response.json().get('data', {}).get('id')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
-  
-  FILENAME = f"{piece_id}-{game_id}-{image_uuid}.jpg"
-  THUMBNAME = f"{piece_id}-{game_id}-{image_uuid}-thumb.jpg"
+
+  FILENAME = f"{piece_id}-{game_catalog_id}-{image_uuid}.jpg"
+  THUMBNAME = f"{piece_id}-{game_catalog_id}-{image_uuid}-thumb.jpg"
   payload = {
     "filenames": {
       "fullImageFilename": FILENAME,
@@ -72,7 +72,19 @@ def capture_piece_image(payload: dict):
       response = requests.patch(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
-      return response.json()
   except requests.RequestException as e:
       logger.error(f"Error capturing piece image: {e}")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
+
+  CAMURL = woprvar.WOPR_CONFIG['camDict']{'1'}{'host'}
+
+  payload = {
+    "filename": FILENAME
+  }
+  try:
+    response = requests.patch(f"{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+    response.raise_for_status()
+    logger.info("Successfully called camera API, response: %s", response.json())
+  except requests.RequestException as e:
+    logger.error(f"Error capturing piece image: {e}")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")

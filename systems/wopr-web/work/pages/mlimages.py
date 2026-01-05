@@ -153,7 +153,7 @@ with st.form("capture_form"):
     submit = st.form_submit_button("Capture Image")
     if submit:
         payload = {
-            "game_id": selectedGame['id'],
+            "game_catalog_id": selectedGame['id'],
             "piece_id": selectedPiece['id'],
             "light_intensity": lightIntensity,
             "color_temp": lightTemp,
