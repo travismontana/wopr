@@ -61,6 +61,8 @@ def capture_piece_image(payload: dict):
   logger.info("Fetched mlimage data: %s", data)
   """ now we have the data, build the filename """
   image_uuid = data.get('data', {}).get('uuid')
+  piece_id = data.get('data', {}).get('piece_id')
+  game_id = data.get('data', {}).get('game_id')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
