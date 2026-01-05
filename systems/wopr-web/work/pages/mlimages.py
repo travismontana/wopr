@@ -63,18 +63,21 @@ def selectLightIntensity():
     return selected_intensity
 
 def selectLightTemperature():
-    temps = config["lightSettings"]["temp"]
+    temps = config["lightSettings"]["temp"]  # dict: name -> kelvin
+
+    # Build display label → key mapping
     display_to_key = {
         f"{k} ({v})": k
         for k, v in temps.items()
     }
 
+    # One-time default
     if "light_temp_key" not in st.session_state:
         st.session_state.light_temp_key = "neutral"
 
     display_options = list(display_to_key.keys())
 
-    # Find default index from stored key
+    # Resolve default display from stored key
     default_display = next(
         label for label, key in display_to_key.items()
         if key == st.session_state.light_temp_key
@@ -83,21 +86,37 @@ def selectLightTemperature():
     selected_display = st.selectbox(
         "Light temperature",
         options=display_options,
-        index=display_options.index(default_display)
+        index=display_options.index(default_display),
     )
 
     # Resolve back to key + value
     temp_key = display_to_key[selected_display]
     temp_value = temps[temp_key]
-    
-    return temp_value
+
+    # Persist selection
+    st.session_state.light_temp_key = temp_key
+
+    return temp_key
 
 def selectObjectRotation():
-    selected_rotation = st.selectbox(
+    rotations = config["object"]["rotations"]
+
+    display_to_index = {
+        f"{deg}°": idx
+        for idx, deg in enumerate(rotations)
+    }
+
+    display_options = list(display_to_index.keys())
+
+    selected_display = st.selectbox(
         "Choose object rotation:",
-        options=config['object']['rotations']
+        options=display_options
     )
-    return selected_rotation
+
+    rotation_index = display_to_index[selected_display]
+    rotation_degrees = rotations[rotation_index]
+
+    return rotation_index
 
 def selectObjectPosition():
     selected_position = st.selectbox(

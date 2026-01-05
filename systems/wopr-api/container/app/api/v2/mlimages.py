@@ -22,12 +22,33 @@ from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 
-@router.get("/gameid/{game_id}/", response_model=list[dict])
-@router.get("/gameid/{game_id}", response_model=list[dict])
-def get_pieces(game_id: int):
-  """Get all pieces for a specific game"""
-  logger.info(f"Fetching pieces for game ID {game_id} from the directus api")
-  URL = f"{woprvar.DIRECTUS_URL}/items/pieces?filter[game_catalog_uuid][_eq]={game_id}"
+@router.post("/capture", response_model=dict)
+def capture_piece_image(payload: dict):
+  """Capture an image for a specific piece"""
+  """ Receiving application/json payload with:
+    "game_id": selectedGame['id'],
+    "piece_id": selectedPiece['id'],
+    "light_intensity": lightIntensity,
+    "color_temp": lightTemp,
+    "object_rotation": objectRotation,
+    "object_position": objectPosition
+  
+  then need to send, that to 
+  {woprvar.DIRECTUS_URL}/items/mlimages
+  """
+  logger.info("Capturing piece image with payload: %s", payload)
+  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
+
+  try:
+      response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response.raise_for_status()
+      logger.info("Successfully captured piece image, response: %s", response.json())
+  except requests.RequestException as e:
+      logger.error(f"Error capturing piece image: {e}")
+      raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error capturing piece image, error: {e}")
+
+  """ now we get the uuid, then build the filename, then call teh camera API to take the picture """ 
+  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages/{response.json().get('data', {}).get('id')}"
   
   try:
     response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
@@ -35,30 +56,5 @@ def get_pieces(game_id: int):
     data = response.json()
     return data.get('data', [])
   except requests.RequestException as e:
-    logger.error(f"Error fetching pieces from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching pieces, error: {e}")
-
-@router.post("/capture", response_model=dict)
-def capture_piece_image(payload: dict):
-    """Capture an image for a specific piece"""
-    """ Receiving application/json payload with:
-      "game_id": selectedGame['id'],
-      "piece_id": selectedPiece['id'],
-      "light_intensity": lightIntensity,
-      "color_temp": lightTemp,
-      "object_rotation": objectRotation,
-      "object_position": objectPosition
-    
-    then need to send, that to 
-    {woprvar.DIRECTUS_URL}/items/mlimages
-    """
-    logger.info("Capturing piece image with payload: %s", payload)
-    URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
-
-    try:
-        response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        logger.error(f"Error capturing piece image: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error capturing piece image, error: {e}")
+    logger.error(f"Error fetching games from Directus: {e}")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching games, error: {e}")
