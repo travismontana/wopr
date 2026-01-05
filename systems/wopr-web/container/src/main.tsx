@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Routes } from "@generouted/react-router";
-import { configContext } from "@/config/configContext";
+import { ConfigContext } from "@/config/ConfigContext";
 import { fetchWoprConfig } from "@/config/fetchConfig";
 
 

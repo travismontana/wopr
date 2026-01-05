@@ -5,7 +5,7 @@
  *
  */
 
-import { useConfig } from "@/config/configContext";
+import { useConfig } from "@/config/ConfigContext";
 
 export default function Home() {
   const cfg = useConfig();
