@@ -31,7 +31,7 @@ except:
     tracer = None
 
 
-@router.get("/api/v2/config/all")
+@router.get("/all")
 async def get_all(environment: str = "production"):
     """
     Get entire configuration for specified environment.
@@ -113,7 +113,7 @@ async def get_all(environment: str = "production"):
                 detail="Invalid response from Directus API"
             )
 
-@router.get("/api/v2/config/environments")
+@router.get("/environments")
 async def get_environments():
     """
     Get entire configuration for specified environment.

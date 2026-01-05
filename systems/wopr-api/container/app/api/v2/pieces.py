@@ -22,8 +22,8 @@ from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 
-@router.get("/api/v2/pieces/gameid/{game_id}/", response_model=list[dict])
-@router.get("/api/v2/pieces/gameid/{game_id}", response_model=list[dict])
+@router.get("/gameid/{game_id}/", response_model=list[dict])
+@router.get("/gameid/{game_id}", response_model=list[dict])
 def get_pieces(game_id: int):
   """Get all pieces for a specific game"""
   logger.info(f"Fetching pieces for game ID {game_id} from the directus api")

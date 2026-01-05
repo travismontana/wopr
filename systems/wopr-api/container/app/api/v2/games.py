@@ -25,8 +25,8 @@ from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 
-@router.get("/api/v2/games/", response_model=list[dict])
-@router.get("/api/v2/games", response_model=list[dict])
+@router.get("/", response_model=list[dict])
+@router.get("", response_model=list[dict])
 def get_games():
   """Get all games"""
   logger.info("Fetching all games from the directus api")
@@ -41,7 +41,7 @@ def get_games():
     logger.error(f"Error fetching games from Directus: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching games, error: {e}")
 
-@router.get("/api/v2/games/{game_id}", response_model=dict)
+@router.get("/{game_id}", response_model=dict)
 def get_game(game_id: int):
   """Get a specific game by ID"""
   logger.info(f"Fetching game with ID {game_id} from the directus api")
