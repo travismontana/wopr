@@ -4,7 +4,7 @@ imgproxy:
       enabled: true
       className: wopr-traefik
       hosts:
-        - host: imgproxy.wopr.tailandtraillabs.org
+        - imgproxy.wopr.tailandtraillabs.org
       tls:
         - secretName: wildcard-tls
           hosts:
