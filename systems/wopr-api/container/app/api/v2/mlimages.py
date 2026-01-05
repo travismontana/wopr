@@ -21,6 +21,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
+import os
 
 @router.post("/capture", response_model=dict)
 def capture_piece_image(payload: dict):
