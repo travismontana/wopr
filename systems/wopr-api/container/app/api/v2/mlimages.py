@@ -47,6 +47,7 @@ def capture_piece_image(payload: dict):
       logger.error(f"Error capturing piece image: {e}")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error capturing piece image, error: {e}")
 
+  os.sleep(2)
   """ now we get the uuid, then build the filename, then call teh camera API to take the picture """ 
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages/{response.json().get('data', {}).get('id')}"
   
