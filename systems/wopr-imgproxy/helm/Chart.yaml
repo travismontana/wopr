@@ -1,0 +1,8 @@
+apiVersion: v2
+name: wopr-imageproxy
+version: 0.1.5-alpha
+description: WOPR Image Proxy
+dependencies:
+  - name: imgproxy
+    version: 1.1.0
+    repository: https://helm.imgproxy.net/

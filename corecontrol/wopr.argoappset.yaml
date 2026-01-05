@@ -35,8 +35,8 @@ spec:
             path: systems/wopr-images/helm
             namespace: wopr
             wave: "3"
-          - name: wopr-thumbor
-            path: systems/wopr-thumbor/helm
+          - name: wopr-imgproxy
+            path: systems/wopr-imgproxy/helm
             namespace: wopr
             wave: "3"
           - name: wopr-directus
