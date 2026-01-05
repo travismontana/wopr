@@ -63,15 +63,10 @@ def capture_piece_image(payload: dict):
   FILENAME = f"{piece_id}-{game_id}-{image_uuid}.jpg"
   THUMBNAME = f"{piece_id}-{game_id}-{image_uuid}-thumb.jpg"
   payload = {
-      "id": image_id,
-      "collection": "mlimages",
-      "data": {
-        "filenames": {
-          "fullImageFilename": FILENAME,
-          "thumbImageFilename": THUMBNAME
-        }
-      "meta": 
-      }
+    "filenames": {
+      "fullImageFilename": FILENAME,
+      "thumbImageFilename": THUMBNAME
+    }
   }
   try:
       response = requests.patch(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
