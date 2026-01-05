@@ -33,4 +33,4 @@ pieces = fetch_pieces(selected_game['id'])
 
 st.write(f"Pieces for game: {selected_game_name}")
 for piece in pieces:
-    st.write(f"- Piece ID: {piece['id']}, Type: {piece['type']}, Position: ({piece['x']}, {piece['y']})")
+    st.write(f"- Piece : {piece} ")
