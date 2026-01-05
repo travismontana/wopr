@@ -46,7 +46,6 @@ from app.api.v1 import cameras
 from app.api.v1 import config
 from app.api.v1 import status
 from app.api.v1 import health
-from app.api.v1 import games
 from app.api.v1 import pieces
 from app.api.v1 import mlimages
 from app.api.v1 import homeauto
