@@ -55,7 +55,7 @@ def get_images_by_game_catalog_id(game_catalog_id: int):
   #"""Get all images for a specific game catalog ID"""
   logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/mlimages"
-  PARAMS = f"filter[game_catalog_id][_eq]={game_catalog_id}&fields=piece.name,light_intensity,color_temp,object_rotation,object_position,image_file"
+  PARAMS = f"filter[game_catalog_id][_eq]={game_catalog_id}&fields=*,piece_id.id,piece_id.name,piece_id.game_catalog_uuid.id,piece_id.game_catalog_uuid.name"
   return oneGet(URL, woprvar.DIRECTUS_HEADERS, PARAMS)
 
 

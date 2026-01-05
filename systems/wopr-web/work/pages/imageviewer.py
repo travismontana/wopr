@@ -11,7 +11,7 @@ IMGURL = "https://images.wopr.tailandtraillabs.org/ml/incoming/"
 THUMBURL = f"https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fit:300/plain/{IMGURL}"
 
 def get_image_list():
-    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/name/4")
+    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/names/4")
     response.raise_for_status()
     #st.write(f"Found: {response.json()}")
     return response.json()
