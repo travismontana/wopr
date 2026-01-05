@@ -50,21 +50,10 @@ def capture_piece_image(payload: dict):
 
   time.sleep(2)
   """ now we get the uuid, then build the filename, then call teh camera API to take the picture """ 
-  URL = f"{woprvar.DIRECTUS_URL}/items/mlimages/{response.json().get('data', {}).get('id')}"
-  
-  try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
-    response.raise_for_status()
-    data = response.json()
-  except requests.RequestException as e:
-    logger.error(f"Error fetching games from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching games, error: {e}")
 
-  logger.info("Fetched mlimage data: %s", data)
-  """ now we have the data, build the filename """
-  image_uuid = data.get('data', {}).get('uuid')
-  piece_id = data.get('data', {}).get('piece_id')
-  game_id = data.get('data', {}).get('game_id')
+  image_uuid = response.json().get('data', {}).get('uuid')
+  piece_id = response.json().get('data', {}).get('piece_id')
+  game_id = response.json().get('data', {}).get('game_id')
   if not image_uuid:
       logger.error("No UUID found in mlimage data")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No UUID found in mlimage data")
@@ -77,6 +66,7 @@ def capture_piece_image(payload: dict):
       response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
+      return response.json()
   except requests.RequestException as e:
       logger.error(f"Error capturing piece image: {e}")
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
