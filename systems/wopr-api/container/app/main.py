@@ -43,14 +43,8 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-from app.api.v1 import cameras
-from app.api.v1 import config
-from app.api.v1 import status
-from app.api.v1 import health
-from app.api.v1 import pieces
-from app.api.v1 import mlimages
-from app.api.v1 import homeauto
-from app.routers import ml
+from app.api.v2 import config
+from app.api.v2 import games
 
 
 

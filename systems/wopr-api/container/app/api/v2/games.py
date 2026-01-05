@@ -28,7 +28,7 @@ import requests
 def get_games():
   """Get all games"""
   logger.info("Fetching all games from the directus api")
-  URL = f"{woprvar.DIRECTUS_URL}/items/games"
+  URL = f"{woprvar.DIRECTUS_URL}/items/game_catalog"
   
   try:
     response = requests.get(URL, headers=DIRECTUS_HEADERS)
@@ -43,7 +43,7 @@ def get_games():
 def get_game(game_id: int):
   """Get a specific game by ID"""
   logger.info(f"Fetching game with ID {game_id} from the directus api")
-  URL = f"{woprvar.DIRECTUS_URL}/items/games/{game_id}"
+  URL = f"{woprvar.DIRECTUS_URL}/items/game_catalog/{game_id}"
   
   try:
     response = requests.get(URL, headers=DIRECTUS_HEADERS)
