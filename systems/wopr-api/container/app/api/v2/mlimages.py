@@ -63,13 +63,18 @@ def capture_piece_image(payload: dict):
   FILENAME = f"{piece_id}-{game_id}-{image_uuid}.jpg"
   THUMBNAME = f"{piece_id}-{game_id}-{image_uuid}-thumb.jpg"
   payload = {
-      "filenames": {
-        "fullImageFilename": FILENAME,
-        "thumbImageFilename": THUMBNAME
+      "id": image_id,
+      "collection": "mlimages",
+      "data": {
+        "filenames": {
+          "fullImageFilename": FILENAME,
+          "thumbImageFilename": THUMBNAME
+        }
+      "meta": 
       }
   }
   try:
-      response = requests.put(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+      response = requests.patch(f"{URL}/{image_id}", json=payload, headers=woprvar.DIRECTUS_HEADERS)
       response.raise_for_status()
       logger.info("Successfully updated piece filename, response: %s", response.json())
       return response.json()
