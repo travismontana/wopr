@@ -41,7 +41,7 @@ from wopr.storage import imagefilename
 import globals as g
 
 # Initialize config first
-init_config()
+init_config(service_url=g.WOPR_API_URL)
 
 logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
