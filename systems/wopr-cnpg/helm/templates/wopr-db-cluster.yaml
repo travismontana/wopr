@@ -49,11 +49,11 @@ type: kubernetes.io/basic-auth
 ---
 apiVersion: v1
 stringData:
-  username: wopr-cvat-db-user
+  username: wopr-labelstudio-db-user
   password: '<change to something S3c7e7!>'
 kind: Secret
 metadata:
-  name: wopr-cvat-db-user-credentials
+  name: wopr-labelstudio-db-user-credentials
   labels:
     cnpg.io/reload: "true"
 type: kubernetes.io/basic-auth

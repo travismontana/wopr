@@ -1,0 +1,10 @@
+apiVersion: v2
+name: wopr-labelstudio
+version: 1.0.0
+description: WOPR Label Studio Application Chart
+type: application
+
+dependencies:
+  - name: label-studio
+    version: "1.11.7"
+    repository: https://charts.heartex.com/

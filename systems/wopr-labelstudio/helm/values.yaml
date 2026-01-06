@@ -1,0 +1,27 @@
+label-studio:
+  global: 
+    pgConfig:
+      host: "wopr-db-cluster-rw.wopr.svc.cluster.local"
+      port: 5432
+      dbName: "wopr-labelstudio-db-database"
+      userName: "wopr-labelstudio-db-user"
+      password:
+        secretName: "wopr-labelstudio-db-user-credentials"
+        secretKey: "password"
+    persistence:
+      enabled: true
+      volume:
+        storageClass: "rook-ceph-block"
+        size: 10Gi
+        existingClaim: "wopr-labelstudio-pvc"
+    ingress:
+      enabled: true
+      className: "wopr-traefik"
+      host: "labelstudio.wopr.tailandtraillabs.org"
+      tls:
+        - secretName: "wildcard-tls"
+          hosts:
+            - "labelstudio.wopr.tailandtraillabs.org"
+  postgresql:
+    enabled: false
+  q

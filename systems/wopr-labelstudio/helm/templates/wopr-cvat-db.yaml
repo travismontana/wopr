@@ -1,0 +1,10 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: wopr-labelstudio-db-database
+spec:
+  name: wopr-labelstudio-db-database
+  owner: wopr-labelstudio-db-database-owners
+  cluster:
+    name: wopr-labelstudio-db-cluster

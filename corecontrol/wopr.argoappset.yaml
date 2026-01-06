@@ -47,8 +47,8 @@ spec:
             path: systems/wopr-monitoring/helm
             namespace: wopr
             wave: "4"
-          - name: wopr-cvat
-            path: systems/wopr-cvat/helm
+          - name: wopr-labelstudio
+            path: systems/wopr-labelstudio/helm
             namespace: wopr
             wave: "4"
 
