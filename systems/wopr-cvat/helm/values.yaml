@@ -3,16 +3,23 @@ cvat:
     backend:
       replicas: 1
       defaultStorage:
+        enabled: true
         storageClassName: "rook-cephfs"
         accessModes:
           - ReadWriteMany
+        size: 20Gi
     
     frontend:
       replicas: 1
     
     kvrocks:
+      enabled: true
       defaultStorage:
+        enabled: true
         storageClassName: "rook-cephfs"
+        accessModes:
+          - ReadWriteOnce  # Kvrocks doesn't need RWX
+        size: 100Gi
     
     ingress:
       enabled: true
@@ -21,21 +28,23 @@ cvat:
       tls: true
       tlsSecretName: wildcard-tls
   
-  # POSTGRESQL CONFIG - All at top level under cvat
+  # Built-in PostgreSQL - uses defaults
   postgresql:
-    enabled: false
-    external:
-      host: "wopr-db-cluster-rw.wopr.svc.cluster.local"
-      port: "5432"  # String format per chart convention
-    auth:
-      existingSecret: "wopr-cvat-db-user-credentials"
-      username: "wopr-cvat-db-user"     # Match your DB username
-      database: "wopr-cvat-db-database"     # Match your DB name
-    secret:
-      create: false
+    enabled: true
+    primary:
+      persistence:
+        storageClass: "rook-cephfs"
   
+  # Built-in Redis - uses defaults
   redis:
     enabled: true
+    master:
+      persistence:
+        storageClass: "rook-cephfs"
   
+  # Disable ClickHouse analytics unless needed
   clickhouse:
+    enabled: false
+  
+  analytics:
     enabled: false
