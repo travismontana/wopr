@@ -3,30 +3,49 @@ cvat:
     backend:
       replicas: 1
       defaultStorage:
-        storageClassName: "rook-cephfs"  # ← Changed
+        storageClassName: "rook-cephfs"
         accessModes:
           - ReadWriteMany
+      # ADD THESE - Environment variables for external DB
+      additionalEnv:
+        - name: CVAT_POSTGRES_HOST
+          value: "wopr-db-cluster-rw.wopr.svc.cluster.local"
+        - name: CVAT_POSTGRES_PORT
+          value: "5432"
+        - name: CVAT_POSTGRES_DBNAME
+          value: "wopr-db-database"  # ← Whatever you named the database
+        - name: CVAT_POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: wopr-cvat-db-user-credentials
+              key: username  # ← Adjust key name to match your secret
+        - name: CVAT_POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wopr-cvat-db-user-credentials
+              key: password  # ← Adjust key name to match your secret
+    
     frontend:
       replicas: 1
+    
     kvrocks:
       defaultStorage:
-        storageClassName: "rook-cephfs"  # ← Changed
-  ingress:
-    enabled: true
-    hostname: cvat.wopr.tailandtraillabs.org
-    className: wopr-traefik
-    tls: true
-    tlsSecretName: wildcard-tls
+        storageClassName: "rook-cephfs"
+    
+    # MOVE INGRESS HERE - Inside cvat.cvat
+    ingress:
+      enabled: true
+      hostname: cvat.wopr.tailandtraillabs.org
+      className: wopr-traefik
+      tls: true
+      tlsSecretName: wildcard-tls
+  
+  # THESE STAY AT cvat LEVEL (not cvat.cvat)
   postgresql:
     enabled: false
-  auth:
-    existingSecret: wopr-cvat-db-user-credentials
-  secret:
-    create: false
-  external:
-    host: wopr-db-cluster-rw.wopr.svc.cluster.local
-    port: 5432
-  clickhouse:
-    enabled: false
+  
   redis:
     enabled: true
+  
+  clickhouse:
+    enabled: false
