@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wopr-fb-nfs-pvc
+  namespace: wopr
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: ""
+  volumeName: wopr-fb-nfs-pv
+

@@ -26,23 +26,6 @@ wopr-baseapp:
           - filebrowser.wopr.tailandtraillabs.org
 
   # PV first - must exist before PVC
-  pv:
-    - name: wopr-fb-nfs-pv
-      enabled: true
-      size: 1Ti                              # ← FIXED (was capacity:)
-      accessModes:
-        - ReadWriteMany
-      reclaimPolicy: Retain                  # ← FIXED (was persistentVolumeReclaimPolicy:)
-      storageClass: ""
-      mountOptions:
-        - hard
-        - intr
-        - noexec
-        - noatime
-        - vers=3
-      nfs:
-        server: danas.hangar.bpfx.org
-        path: /volume2/wopr
 
   # PVCs
   pvc:
@@ -59,14 +42,6 @@ wopr-baseapp:
       accessModes:
         - ReadWriteOnce
       storageClass: rook-ceph-block
-    
-    - name: wopr-fb-nfs-pvc
-      enabled: true
-      size: 1Ti
-      accessModes:
-        - ReadWriteMany
-      storageClass: ""                       # ← Will now render correctly
-      volumeName: wopr-fb-nfs-pv            # ← Binds to specific PV
 
   volumes:
     - name: wopr-data
