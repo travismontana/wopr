@@ -13,7 +13,7 @@ cvat:
       replicas: 1
     
     kvrocks:
-      enabled: true
+      enabled: false
       defaultStorage:
         enabled: true
         storageClassName: "rook-cephfs"
