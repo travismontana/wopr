@@ -31,7 +31,7 @@ metadata:
   namespace: rook-ceph
 spec:
   bucketName: wopr-s3-bucket
-  storageClassName: rook-ceph-buckets
+  storageClassName: rook-ceph-bucket-wopr
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
