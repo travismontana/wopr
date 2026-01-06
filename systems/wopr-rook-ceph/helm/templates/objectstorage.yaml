@@ -39,6 +39,6 @@ metadata:
   name: rook-ceph-bucket-wopr
 provisioner: rook-ceph.ceph.rook.io/bucket
 parameters:
-  objectStoreName: wopr-store
+  objectStoreName: objectstore
   objectStoreNamespace: rook-ceph
 reclaimPolicy: Delete
