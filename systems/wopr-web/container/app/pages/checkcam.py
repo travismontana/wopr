@@ -33,8 +33,7 @@ camera_options = {cam['name']: cam['id'] for cam in cameras.values()}
 selected_camera_name = st.selectbox("Select a camera", list(camera_options.keys()))
 selected_camera_id = camera_options[selected_camera_name]
 
-if st.button("Grab Image"):
+if st.button("Display Image"):
     response = httpx.get(f"{API_BASE}/api/v2/stream/grab/{selected_camera_id}")
     response.raise_for_status()
-    image_data = response.json()
-    st.image(image_data['url'], caption=image_data['name'])
+    st.image(response.content, caption=f"Image from {selected_camera_name}")
