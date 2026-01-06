@@ -16,7 +16,7 @@ APP_DOMAIN = "wopr.tailandtraillabs.org"
 APP_API_URL = "https://api." + APP_DOMAIN
 APP_OTEL_URL = "https://otel." + APP_DOMAIN
 #WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
-WOPR_API_URL = APP_API_URL + "/api/v1"
+WOPR_API_URL = APP_API_URL + "/api/v2"
 
 APP_HOST = "0.0.0.0"
 APP_PORT = 5000
