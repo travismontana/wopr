@@ -49,10 +49,10 @@ wopr-baseapp:
         claimName: wopr-nfs-pvc
     - name: wopr-filebrowser-database-volume
       persistentVolumeClaim:
-        claimName: wopr-filebrowser-database-pvc
+        claimName: fb-db-pvc
     - name: wopr-filebrowser-config-volume
       persistentVolumeClaim:
-        claimName: wopr-filebrowser-config-pvc
+        claimName: fb-config-pvc
 
   pvc:
     - name: fb-db-pvc
