@@ -220,7 +220,6 @@ if tracing_enabled:
                     except UnicodeDecodeError:
                         # Binary response (image, etc.), skip or log differently
                         span.set_attribute("http.response.body", f"<binary data, {len(response_body)} bytes>")
-                    span.set_attribute("http.response.body", body_str)
                     logger.debug("[MIDDLEWARE] Set http.response.body as string")
             
             # Reconstruct response with captured body
