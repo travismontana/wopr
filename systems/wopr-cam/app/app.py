@@ -100,17 +100,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 class Subject(str, Enum):
     setup = "setup"
     capture = "capture"
     move = "move"
     thumbnail = "thumbnail"
 
-
 class CaptureRequest(BaseModel):
     filename: Optional[str] = Field(None, description="Optional filename override")
-
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request, exc: ValueError):
@@ -121,7 +118,6 @@ async def value_error_handler(request, exc: ValueError):
             "message": str(exc),
         },
     )
-
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request, exc: Exception):
@@ -316,3 +312,31 @@ def list_images(game_id: str):
             "count": len(result),
             "images": result,
         }
+
+@app.get("/stream/{camera_id}")
+def stream_camera(camera_id: int):
+    with _trace_if_enabled("camera.stream") as span:
+        if span:
+            span.set_attribute("camera.id", camera_id)
+        
+        try:
+            cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
+            if not cap.isOpened():
+                raise RuntimeError("Camera device could not be opened")
+
+            ret, frame = cap.read()
+            cap.release()
+
+            if not ret:
+                raise RuntimeError("Camera capture failed (no frame read)")
+
+            _, img_encoded = cv2.imencode('.jpg', frame)
+            if span:
+                span.set_status(Status(StatusCode.OK))
+            return PlainTextResponse(content=img_encoded.tobytes(), media_type="image/jpeg")
+        
+        except Exception as e:
+            if span:
+                span.set_status(Status(StatusCode.ERROR, str(e)))
+                span.record_exception(e)
+            raise HTTPException(status_code=500, detail="Camera stream failed")
