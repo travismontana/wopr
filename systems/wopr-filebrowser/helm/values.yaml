@@ -69,6 +69,7 @@ wopr-baseapp:
       storageClassName: rook-ceph-block
     - name: wopr-fb-nfs-pvc
       enabled: true
+      storageClassName: ""
       size: 1Ti
       accessModes:
         - ReadWriteMany
@@ -78,6 +79,15 @@ wopr-baseapp:
       capacity: 1Ti
       accessModes:
         - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: ""
+      mountOptions:
+        - hard
+        - intr
+        - noexec
+        - noatime
+        - vers=3
       nfs:
         server: danas.hangar.bpfx.org
         path: /volume2/wopr
+      name: wopr-nfs-pv
