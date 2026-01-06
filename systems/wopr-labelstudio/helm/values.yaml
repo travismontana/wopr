@@ -16,6 +16,9 @@ label-studio:
           size: 10Gi
           existingClaim: "wopr-labelstudio-pvc"
   app:
+    extraEnvironmentVariables:
+      LOCAL_FILES_SERVING_ENABLED: "true"
+      LOCAL_FILES_DOCUMENT_ROOT: "/export/wopr/labelstudio/data"
     ingress:
       enabled: true
       className: "wopr-traefik"
