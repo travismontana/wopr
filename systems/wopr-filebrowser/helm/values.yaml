@@ -38,9 +38,9 @@ wopr-baseapp:
     - name: wopr-data
       mountPath: /srv
       readOnly: true
-    - name: wopr-filebrowser-database-pvc
+    - name: fb-db-pvc
       mountPath: /database
-    - name: wopr-filebrowser-config-pvc
+    - name: fb-config-pvc
       mountPath: /config
 
   volumes:
