@@ -32,7 +32,7 @@ def grab_stream(camera_id: str):
     CAMURL = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['host']
     CAMPORT = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['port']
     CAMLCLID = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['id']
-    URL = f"{CAMURL}:{CAMPORT}/camera/{CAMLCLID}/stream"
+    URL = f"{CAMURL}:{CAMPORT}/camera/stream/{CAMLCLID}"
     
     try:
         response = requests.get(URL)
