@@ -33,9 +33,44 @@ def post_json(url: str, payload: dict) -> requests.Response:
     r.raise_for_status()
     return r
 
+def show_config():
+    st.header("WOPR Configuration")
+    config = fetch_config()
+    st.json(config)
 
+def show_games():
+    st.header("Games")
+    games = fetch_games()
+    for game in games['data']:
+        st.subheader(f"Game ID: {game['id']}")
+        st.json(game)
 
-config = fetch_config()
+def show_pieces(game_id: str):
+    st.header(f"Pieces for Game ID: {game_id}")
+    pieces = fetch_pieces(game_id)
+    for piece in pieces['data']:
+        st.subheader(f"Piece ID: {piece['id']}")
+        st.json(piece)
 
-st.header("Current WOPR Configuration")
-st.json(config)
+#
+# Stuff to list:
+# Games, Pieces, Config
+# Games will list the games
+# Pieces, you'll be asked for the game_id to list pieces for
+# Config will just dump the current config
+#
+
+st.header("WOPR Data Viewer")
+option = st.selectbox(
+    "Select data to view:",
+    ("Configuration", "Games", "Pieces by Game ID")
+)
+
+if option == "Configuration":
+    show_config()
+elif option == "Games":
+    show_games()
+elif option == "Pieces by Game ID":
+    game_id = st.text_input("Enter Game ID:")
+    if game_id:
+        show_pieces(game_id)
