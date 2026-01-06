@@ -12,10 +12,11 @@ APP_VERSION = "0.1.4-beta"
 APP_DESCRIPTION = "WOPR Camera API application package"
 APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
-APP_DOMAIN = "studio.abode.tailandtraillabs.org"
+APP_DOMAIN = "wopr.tailandtraillabs.org"
 APP_API_URL = "https://wopr-api." + APP_DOMAIN
-APP_OTEL_URL = "https://otel.monitoring.abode.tailandtraillabs.org"
-WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
+APP_OTEL_URL = "https://otel." + APP_DOMAIN
+#WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
+WOPR_API_URL = APP_API_URL + "/api/v1"
 
 APP_HOST = "0.0.0.0"
 APP_PORT = 5000
