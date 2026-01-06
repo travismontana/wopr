@@ -1,8 +1,7 @@
 wopr-baseapp:
   app:
     name: wopr-fb
-  replicaCount: 1
-
+  
   image:
     registry: docker.io
     repository: filebrowser/filebrowser
@@ -26,22 +25,48 @@ wopr-baseapp:
         hosts:
           - filebrowser.wopr.tailandtraillabs.org
 
-  env:
-    - name: WOPR_API_URL
-      valueFrom:
-        configMapKeyRef:
-          name: wopr-config
-          key: WOPR_API_URL
-  
-  
-  volumeMounts:
-    - name: wopr-data
-      mountPath: /srv
-      readOnly: true
-    - name: wopr-filebrowser-database-volume
-      mountPath: /database
-    - name: wopr-filebrowser-config-volume
-      mountPath: /config
+  # PV first - must exist before PVC
+  pv:
+    - name: wopr-fb-nfs-pv
+      enabled: true
+      size: 1Ti                              # ← FIXED (was capacity:)
+      accessModes:
+        - ReadWriteMany
+      reclaimPolicy: Retain                  # ← FIXED (was persistentVolumeReclaimPolicy:)
+      storageClass: ""
+      mountOptions:
+        - hard
+        - intr
+        - noexec
+        - noatime
+        - vers=3
+      nfs:
+        server: danas.hangar.bpfx.org
+        path: /volume2/wopr
+
+  # PVCs
+  pvc:
+    - name: fb-db-pvc
+      enabled: true
+      size: 10Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: rook-ceph-block
+    
+    - name: fb-config-pvc
+      enabled: true
+      size: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: rook-ceph-block
+    
+    - name: wopr-fb-nfs-pvc
+      enabled: true
+      size: 1Ti
+      accessModes:
+        - ReadWriteMany
+      storageClass: ""                       # ← Will now render correctly
+      volumeName: wopr-fb-nfs-pv            # ← Binds to specific PV
 
   volumes:
     - name: wopr-data
@@ -54,41 +79,18 @@ wopr-baseapp:
       persistentVolumeClaim:
         claimName: fb-config-pvc
 
-  pvc:
-    - name: fb-db-pvc
-      enabled: true
-      accessModes:
-        - ReadWriteOnce
-      size: 10Gi
-      storageClassName: rook-ceph-block
-    - name: fb-config-pvc
-      enabled: true
-      accessModes:
-        - ReadWriteOnce
-      size: 1Gi
-      storageClassName: rook-ceph-block
-    - name: wopr-fb-nfs-pvc
-      enabled: true
-      storageClassName: ""
-      size: 1Ti
-      accessModes:
-        - ReadWriteMany
-      volumeName: wopr-fb-nfs-pv
-  pv:
-    - name: wopr-fb-nfs-pv
-      enabled: true
-      capacity: 1Ti
-      accessModes:
-        - ReadWriteMany
-      persistentVolumeReclaimPolicy: Retain
-      storageClassName: ""
-      mountOptions:
-        - hard
-        - intr
-        - noexec
-        - noatime
-        - vers=3
-      nfs:
-        server: danas.hangar.bpfx.org
-        path: /volume2/wopr
-      name: wopr-nfs-pv
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /srv
+      readOnly: true
+    - name: wopr-filebrowser-database-volume
+      mountPath: /database
+    - name: wopr-filebrowser-config-volume
+      mountPath: /config
+
+  env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
