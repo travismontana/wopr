@@ -110,7 +110,7 @@ def capture_piece_image(payload: dict):
   time.sleep(2)
 
   # Start the camera capture process
-  CAMURL = woprvar.WOPR_CONFIG['camera']['camDict']['1']['host']
+  CAMURL = woprvar.WOPR_CONFIG['camera']['camDict']['0']['host']
 
   payload = {
     "filename": FILENAME
