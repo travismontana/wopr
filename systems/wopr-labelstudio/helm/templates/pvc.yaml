@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteMany
   resources:
-    requests
+    requests:
       storage: 1Ti
   storageClassName: ""
   volumeName: wopr-labelstudio-nfs-pv
