@@ -29,8 +29,9 @@ def grab_stream(camera_id: str):
     Grab a stream from a specific camera.
     """
     logger.info(f"Grabbing stream from camera ID {camera_id}")
-    CAMURL = woprvar['camera"]["camDict"]']
-    URL = f"{woprvar.WOPR_API_URL}/camera/{camera_id}/stream"
+    CAMURL = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['host']['port']
+    CAMLCLID = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['id']
+    URL = f"{CAMURL}/camera/{CAMLCLID}/stream"
     
     try:
         response = requests.get(URL)

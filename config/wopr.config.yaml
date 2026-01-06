@@ -49,8 +49,8 @@
       }
     },
     "camDict": {
-      "1": {
-        "id": 1,
+      "0": {
+        "id": 0,
         "name": "Camera 1",
         "host": "wopr-cam.hangar.bpfx.org",
         "port": "5000"
