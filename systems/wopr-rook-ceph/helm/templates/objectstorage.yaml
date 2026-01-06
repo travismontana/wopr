@@ -23,3 +23,12 @@ metadata:
 spec:
   store: objectstore
   displayName: "WOPR S3 User"
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: wopr-s3-bucket-claim
+  namespace: rook-ceph
+spec:
+  bucketName: wopr-s3-bucket
+  storageClassName: rook-ceph-buckets
