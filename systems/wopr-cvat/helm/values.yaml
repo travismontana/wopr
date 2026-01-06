@@ -21,12 +21,12 @@ cvat:
           - ReadWriteOnce  # Kvrocks doesn't need RWX
         size: 100Gi
     
-    ingress:
-      enabled: true
-      hostname: cvat.wopr.tailandtraillabs.org
-      className: wopr-traefik
-      tls: true
-      tlsSecretName: wildcard-tls
+  ingress:
+    enabled: true
+    hostname: cvat.wopr.tailandtraillabs.org
+    className: wopr-traefik
+    tls: true
+    tlsSecretName: wildcard-tls
   
   # Built-in PostgreSQL - uses defaults
   postgresql:
