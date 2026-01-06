@@ -258,13 +258,13 @@ def run_all_lights(config):
             post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
             time.sleep(1)
     status_line.write("Done.")
-    notifications("All-light capture requests complete.")
+    notifications(f"All-light capture requests complete, piece: {st.session_state.selected_piece_name}")
 
 
 def run_single_light(config):
     payload = build_capture_payload(config)
     post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
-    notifications("Single light capture request complete.")
+    notifications(f"Single light capture request complete, piece: {st.session_state.selected_piece_name}.")
 
 
 def reset_all():
