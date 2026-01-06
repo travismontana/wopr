@@ -53,9 +53,9 @@ wopr-baseapp:
     - name: wopr-filebrowser-config-volume
       persistentVolumeClaim:
         claimName: wopr-filebrowser-config-pvc
-        
+
   pvc:
-    - name: wopr-filebrowser-database-pvc
+    - name: fb-db-pvc
       enabled: true
       accessModes:
         - ReadWriteOnce
@@ -63,7 +63,7 @@ wopr-baseapp:
         requests:
           storage: 10Gi
       storageClassName: rook-ceph-block
-    - name: wopr-filebrowser-config-pvc
+    - name: fb-config-pvc
       enabled: true
       accessModes:
         - ReadWriteOnce
