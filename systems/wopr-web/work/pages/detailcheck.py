@@ -5,8 +5,6 @@ import pandas as pd
 st.title("WOPR ML Image Coverage")
 st.write("Checking ML training image coverage across pieces, positions, and lighting conditions.")
 
-# Directus endpoint
-DIRECTUS_BASE = "https://directus.wopr.tailandtraillabs.org"
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
 @st.cache_data(ttl=60)
@@ -15,66 +13,15 @@ def fetch_games():
     response.raise_for_status()
     return response.json()
 
-def fetch_pieces_directus(game_catalog_id):
-    """Fetch ALL pieces from Directus with pagination"""
-    all_pieces = []
-    limit = 100
-    offset = 0
-    
-    while True:
-        url = f"{DIRECTUS_BASE}/items/pieces"
-        params = {
-            "filter[game_catalog_uuid][_eq]": game_catalog_id,
-            "limit": limit,
-            "offset": offset
-        }
-        response = httpx.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        
-        items = data.get("data", [])
-        if not items:
-            break
-            
-        all_pieces.extend(items)
-        offset += limit
-        
-        # Safety valve
-        if offset > 1000:
-            break
-    
-    return all_pieces
+def fetch_pieces(game_id):
+    response = httpx.get(f"{API_BASE}/api/v2/pieces/gameid/{game_id}")
+    response.raise_for_status()
+    return response.json()
 
-def fetch_mlimages_directus(game_catalog_id):
-    """Fetch ALL mlimages from Directus with pagination"""
-    all_images = []
-    limit = 100
-    offset = 0
-    
-    while True:
-        url = f"{DIRECTUS_BASE}/items/mlimages"
-        params = {
-            "filter[game_catalog_id][_eq]": game_catalog_id,
-            "limit": limit,
-            "offset": offset
-        }
-        response = httpx.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        
-        items = data.get("data", [])
-        if not items:
-            break
-            
-        all_images.extend(items)
-        offset += limit
-        
-        # Safety valve
-        if offset > 10000:
-            break
-    
-    st.sidebar.write(f"Loaded {len(all_images)} images...")
-    return all_images
+def fetch_mlimages(game_id):
+    response = httpx.get(f"{API_BASE}/api/v2/images/gameid/{game_id}")
+    response.raise_for_status()
+    return response.json()
 
 def fetch_config():
     response = httpx.get(f"{API_BASE}/api/v2/config/all")
@@ -91,19 +38,13 @@ def selectGame():
 # Load data
 config = fetch_config()
 selectedGame = selectGame()
-
-st.sidebar.write("Loading pieces...")
-pieces = fetch_pieces_directus(selectedGame['id'])
-st.sidebar.write(f"Loaded {len(pieces)} pieces")
-
-st.sidebar.write("Loading images...")
-mlimages = fetch_mlimages_directus(selectedGame['id'])
-st.sidebar.write(f"Loaded {len(mlimages)} images")
+pieces = fetch_pieces(selectedGame['id'])
+mlimages = fetch_mlimages(selectedGame['id'])
 
 # Extract config values
 positions = config["object"]["positions"]
-color_temps = ["warm", "neutral", "cool"]
-intensities = config["lightSettings"]["intensity"]
+color_temps = ["warm", "neutral", "cool"]  # from config["lightSettings"]["temp"]
+intensities = config["lightSettings"]["intensity"]  # [10, 20, 30, ..., 100]
 
 st.write(f"**Requirements:**")
 st.write(f"- All positions covered: {len(positions)} positions")
@@ -150,17 +91,16 @@ for piece in pieces:
     
     piece_status.append({
         "Piece": piece_name,
-        "Total Images": len(piece_images),
         "All Positions": "✓" if positions_complete else f"✗ Missing: {', '.join(missing_positions)}",
         "Center Coverage": "✓" if center_complete else f"✗ Missing {len(missing_combos)} combos",
         "Random Count": f"✓ ({random_count})" if random_complete else f"✗ ({random_count})",
         "Complete": "✓ READY" if all_complete else "✗ INCOMPLETE",
-        "_sort": all_complete
+        "_sort": all_complete  # for sorting
     })
 
 # Convert to DataFrame
 df = pd.DataFrame(piece_status)
-df = df.sort_values("_sort", ascending=True)
+df = df.sort_values("_sort", ascending=True)  # incomplete first
 df = df.drop(columns=["_sort"])
 
 # Summary

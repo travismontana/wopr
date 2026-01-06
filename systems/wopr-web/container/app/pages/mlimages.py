@@ -283,7 +283,7 @@ def notifications(message: str):
     # API/api/v2/notifications
     # Color green
     payload = {
-        "message": message,
+        "description": message,
         "title": "WOPR ML Image Capture",
         "color": "green"
     }
