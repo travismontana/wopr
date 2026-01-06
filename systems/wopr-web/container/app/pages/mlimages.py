@@ -145,7 +145,7 @@ def selectObjectPosition():
 def emptyRun(selectedGame, selectedPiece, objectRotation, objectPosition):
     for cTemp in config['lightSettings']['temp'].keys():
         for cIntensity in config['lightSettings']['intensity']:
-            st.write(f"Image capture for temp {cTemp}, intensity {cIntensity}")
+            status_line.text(f"Image capture for temp {cTemp}, intensity {cIntensity}")
             payload = {
                 "game_catalog_id": selectedGame['id'],
                 "piece_id": selectedPiece['id'],
@@ -186,15 +186,12 @@ objectPosition = selectObjectPosition()
 # Check if we want to run through empty table or move on to normal capture
 if st.button("Run through all light settings for this piece"):
     config = fetch_config()
+    status_line = st.empty()
     emptyRun(selectedGame, selectedPiece, objectRotation, objectPosition)
     st.success("Empty board capture requests submitted!")
 else:
-
-
     lightIntensity = selectLightIntensity()
     lightTemp = selectLightTemperature()
-
-
     with st.form("capture_form"):
         submit = st.form_submit_button("Capture Image")
         if submit:
