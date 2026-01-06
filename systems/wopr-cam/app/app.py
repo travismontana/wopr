@@ -46,7 +46,7 @@ init_config()
 logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info(f"Starting {g.APP_TITLE} v{g.APP_VERSION}")
-logger.debug(f"WOPR API URL: {g.WOPR_API_URL}")
+logger.info(f"WOPR API URL: {g.WOPR_API_URL}")
 # Initialize tracer using centralized setup with globals
 tracer = create_tracer(
     tracer_name=g.APP_NAME,
