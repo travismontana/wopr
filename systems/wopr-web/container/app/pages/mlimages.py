@@ -258,11 +258,13 @@ def run_all_lights(config):
             post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
             time.sleep(1)
     status_line.write("Done.")
+    notifications("All-light capture requests complete.")
 
 
 def run_single_light(config):
     payload = build_capture_payload(config)
     post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
+    notifications("Single light capture request complete.")
 
 
 def reset_all():
@@ -277,6 +279,14 @@ def reset_all():
             del st.session_state[k]
     st.rerun()
 
+def notifications(message: str):
+    # API/api/v2/notifications
+    # Color green
+    payload = {
+        "message": message,
+        "title": "WOPR ML Image Capture",
+        "color": "green"
+    }
 
 # -----------------------
 # Main UI
