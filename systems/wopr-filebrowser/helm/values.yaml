@@ -69,6 +69,7 @@ wopr-baseapp:
       storageClassName: rook-ceph-block
     - name: wopr-fs-nfs-pvc
       enabled: true
+      size: 1Ti
       accessModes:
         - ReadWriteMany
   pv:
