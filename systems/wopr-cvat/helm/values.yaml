@@ -14,18 +14,9 @@ cvat:
     className: wopr-traefik
     tls: true
     tlsSecretName: wildcard-tls
-    persistence:
-      storageClass: "rook-cephfs"  # Might be unused, but doesn't hurt
   postgresql:
     enabled: false
   clickhouse:
     enabled: false
-    persistence:
-      storageClass: "rook-cephfs"  # ClickHouse for performance
-
   redis:
     enabled: true
-    master:
-      persistence:
-        storageClass: "rook-cephfs"  # Redis for consistency
-    
