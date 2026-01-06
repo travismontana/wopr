@@ -7,4 +7,4 @@ spec:
   name: wopr-labelstudio-db-database
   owner: wopr-labelstudio-db-user
   cluster:
-    name: wopr-labelstudio-db-cluster
+    name: wopr-db-cluster
