@@ -37,7 +37,7 @@ cvat:
   
   # Built-in Redis - uses defaults
   redis:
-    enabled: true
+    enabled: false
   
   # Disable ClickHouse analytics unless needed
   clickhouse:
