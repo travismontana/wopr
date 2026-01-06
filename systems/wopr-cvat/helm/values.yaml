@@ -8,6 +8,9 @@ cvat:
           - ReadWriteMany
     frontend:
       replicas: 1
+    kvrocks:
+      defaultStorage:
+        storageClassName: "rook-cephfs"  # ← Changed
   ingress:
     enabled: true
     hostname: cvat.wopr.tailandtraillabs.org
