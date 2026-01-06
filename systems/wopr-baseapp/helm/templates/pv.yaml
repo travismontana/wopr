@@ -17,7 +17,7 @@ spec:
   {{- toYaml .accessModes | nindent 2 }}
   persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }}
   {{- if .storageClass }}
-  storageClassName: {{ .storageClass }}
+  storageClassName: {{ .storageClass | quote }}
   {{- end }}
   {{- if .mountOptions }}
   mountOptions:
