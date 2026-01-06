@@ -38,9 +38,6 @@ cvat:
   # Built-in Redis - uses defaults
   redis:
     enabled: true
-    master:
-      persistence:
-        storageClass: "rook-cephfs"
   
   # Disable ClickHouse analytics unless needed
   clickhouse:
