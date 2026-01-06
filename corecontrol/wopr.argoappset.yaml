@@ -51,7 +51,7 @@ spec:
             path: systems/wopr-labelstudio/helm
             namespace: wopr
             wave: "4"
-          - name: wopr-filebrowser
+          - name: wopr-fb
             path: systems/wopr-filebrowser/helm
             namespace: wopr
             wave: "4"
