@@ -15,6 +15,7 @@ label-studio:
           storageClass: "rook-cephfs"
           size: 10Gi
           existingClaim: "wopr-labelstudio-pvc"
+  app:
     ingress:
       enabled: true
       className: "wopr-traefik"
