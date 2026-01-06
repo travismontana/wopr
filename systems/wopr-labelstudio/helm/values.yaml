@@ -17,7 +17,7 @@ label-studio:
           existingClaim: "wopr-labelstudio-pvc"
     extraEnvironmentVars:
       LOCAL_FILES_SERVING_ENABLED: "true"
-      LOCAL_FILES_DOCUMENT_ROOT: "/label-studio/data"
+      LOCAL_FILES_DOCUMENT_ROOT: "/label-studio/mydata"
   app:
     ingress:
       enabled: true
