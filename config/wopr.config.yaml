@@ -52,7 +52,7 @@
       "0": {
         "id": 0,
         "name": "Camera 1",
-        "host": "wopr-cam.hangar.bpfx.org",
+        "host": "wopr-cam.abode.tailandtraillabs.org",
         "port": "5000"
       },
       "2": {
