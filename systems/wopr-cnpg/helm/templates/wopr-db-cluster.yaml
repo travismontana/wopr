@@ -26,12 +26,12 @@ spec:
           name: wopr-db-user-credentials
         createdb: true
         createrole: true
-      - name: wopr-cvat-db-user
-        comment: wopr cvat database user
+      - name: wopr-labelstudio-db-user
+        comment: wopr label studio database user
         ensure: present
         login: true
         passwordSecret:
-          name: wopr-cvat-db-user-credentials
+          name: wopr-labelstudio-db-user-credentials
         createdb: false
         createrole: false
 
