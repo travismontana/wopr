@@ -1,6 +1,6 @@
 wopr-baseapp:
   app:
-    name: wopr-filebrowser
+    name: wopr-fb
   replicaCount: 1
 
   image:
