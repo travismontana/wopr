@@ -10,10 +10,11 @@ label-studio:
         secretKey: "password"
     persistence:
       enabled: true
-      volume:
-        storageClass: "rook-ceph-block"
-        size: 10Gi
-        existingClaim: "wopr-labelstudio-pvc"
+      config:
+        volume:
+          storageClass: "rook-ceph-block"
+          size: 10Gi
+          existingClaim: "wopr-labelstudio-pvc"
     ingress:
       enabled: true
       className: "wopr-traefik"
