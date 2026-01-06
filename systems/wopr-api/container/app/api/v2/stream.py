@@ -23,6 +23,7 @@ from app import globals as woprvar
 import requests
 router = APIRouter(tags=["stream"])
 
+@router.get("/grab/{camera_id}", response_model=dict)
 @router.get("/grab/{camera_id}/", response_model=dict)
 def grab_stream(camera_id: str):
     """
