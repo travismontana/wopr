@@ -13,9 +13,7 @@ metadata:
 spec:
   accessModes: 
   {{- toYaml .accessModes | nindent 2 }}
-  {{- if hasKey . "storageClass" }}
   storageClassName: {{ .storageClass | quote }}
-  {{- end }}
   {{- if .volumeName }}
   volumeName: {{ .volumeName }}
   {{- end }}
