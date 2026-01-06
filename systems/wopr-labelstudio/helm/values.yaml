@@ -24,6 +24,13 @@ label-studio:
         - secretName: "wildcard-tls"
           hosts:
             - "labelstudio.wopr.tailandtraillabs.org"
+    extraVolumes:
+    - name: wopr-storage
+      persistentVolumeClaim:
+        claimName: wopr-labelstudio-nfs-pvc
+    extraVolumeMounts:
+    - name: wopr-storage
+      mountPath: /export/wopr
   postgresql:
     enabled: false
   redis:
