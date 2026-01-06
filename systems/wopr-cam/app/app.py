@@ -215,7 +215,7 @@ def capture_ml(req: CaptureRequest):
         try:
             # Generate filepath
             filename = req.filename if req.filename else "noname.jpg"
-            base_path = get_str('storage.base_path')
+            base_path = "/rempote/wopr"
             ml_subdir = "ml"
             ml_dir = Path(base_path) / ml_subdir / 'incoming'
             filepath = ml_dir / f"{filename}"
