@@ -32,3 +32,16 @@ metadata:
 spec:
   bucketName: wopr-s3-bucket
   storageClassName: rook-ceph-buckets
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-bucket-wopr
+  labels:
+    aws-s3/object
+provisioner: rook-ceph.ceph.rook.io/bucket
+parameters:
+  objectStoreName: woppr-store
+  objectStoreNamespace: wopr
+  bucketName: wopr-s3-bucket
+reclaimPolicy: Delete
