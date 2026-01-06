@@ -1,0 +1,25 @@
+---
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: objectstore
+  namespace: rook-ceph
+spec:
+  metadataPool:
+    replicated:
+      size: 1
+  dataPool:
+    replicated:
+      size: 1
+  gateway:
+    port: 80
+    instances: 1
+---
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: wopr-s3-user
+  namespace: rook-ceph
+spec:
+  store: objectstore
+  displayName: "WOPR S3 User"
