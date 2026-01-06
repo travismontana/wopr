@@ -215,7 +215,11 @@ if tracing_enabled:
                     logger.debug("[MIDDLEWARE] Set http.response.body as JSON")
                 except Exception as e:
                     logger.warning(f"[MIDDLEWARE] Response not JSON: {e}")
-                    body_str = response_body.decode()[:1000]
+                    try:
+                        span.set_attribute("http.response.body", response_body.decode()[:1000])
+                    except UnicodeDecodeError:
+                        # Binary response (image, etc.), skip or log differently
+                        span.set_attribute("http.response.body", f"<binary data, {len(response_body)} bytes>")
                     span.set_attribute("http.response.body", body_str)
                     logger.debug("[MIDDLEWARE] Set http.response.body as string")
             
