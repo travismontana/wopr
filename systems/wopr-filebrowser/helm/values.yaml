@@ -73,6 +73,7 @@ wopr-baseapp:
       size: 1Ti
       accessModes:
         - ReadWriteMany
+      volumeName: wopr-fb-nfs-pv
   pv:
     - name: wopr-fb-nfs-pv
       enabled: true
