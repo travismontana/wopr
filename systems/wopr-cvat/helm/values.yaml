@@ -19,6 +19,13 @@ cvat:
     tlsSecretName: wildcard-tls
   postgresql:
     enabled: false
+  auth:
+    existingSecret: wopr-cvat-db-user-credentials
+  secret:
+    create: false
+  external:
+    host: wopr-db-cluster-rw.wopr.svc.cluster.local
+    port: 5432
   clickhouse:
     enabled: false
   redis:
