@@ -34,6 +34,7 @@ def post_json(url: str, payload: dict) -> requests.Response:
     return r
 
 
+
 config = fetch_config()
 
 st.header("Current WOPR Configuration")

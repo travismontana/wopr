@@ -4,7 +4,7 @@ WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
 # See git log for detailed authorship
 
-WOPR API - games CRUD endpoints (Directus schema).
+WOPR API - games CRUD endpoints (Directus schema)
 """
 
 """
