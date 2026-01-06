@@ -38,27 +38,36 @@ wopr-baseapp:
     - name: wopr-data
       mountPath: /srv
       readOnly: true
-    - name: nginx-conf
-      mountPath: /etc/nginx/nginx.conf
-      subPath: nginx.conf
-    - name: tmp
-      mountPath: /tmp
-    - name: cache
-      mountPath: /var/cache/nginx
-    - name: run
-      mountPath: /var/run
+    - name: wopr-filebrowser-database-pvc
+      mountPath: /database
+    - name: wopr-filebrowser-config-pvc
+      mountPath: /config
+
   volumes:
     - name: wopr-data
       persistentVolumeClaim:
         claimName: wopr-nfs-pvc
-    - name: nginx-conf
-      configMap:
-        name: wopr-images-config
-    - name: tmp
-      emptyDir: {}
-    - name: cache
-      emptyDir: {}
-    - name: run
-      emptyDir: {}
-
-      
+    - name: wopr-filebrowser-database-volume
+      persistentVolumeClaim:
+        claimName: wopr-filebrowser-database-pvc
+    - name: wopr-filebrowser-config-volume
+      persistentVolumeClaim:
+        claimName: wopr-filebrowser-config-pvc
+        
+  pvc:
+    - name: wopr-filebrowser-database-pvc
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: rook-ceph-block
+    - name: wopr-filebrowser-config-pvc
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: rook-ceph-block
