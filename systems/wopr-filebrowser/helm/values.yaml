@@ -67,3 +67,16 @@ wopr-baseapp:
         - ReadWriteOnce
       size: 1Gi
       storageClassName: rook-ceph-block
+    - name: wopr-fs-nfs-pvc
+      enabled: false
+      accessModes:
+        - ReadWriteMany
+  pv:
+    - name: wopr-fb-nfs-pv
+      enabled: false
+      capacity: 1Ti
+      accessModes:
+        - ReadWriteMany
+      nfs:
+        server: danas.hangar.bpfx.org
+        path: /volume2/wopr
