@@ -33,7 +33,7 @@ label-studio:
         claimName: wopr-labelstudio-nfs-pvc
     extraVolumeMounts:
     - name: wopr-storage
-      mountPath: /export/wopr
+      mountPath: /label-studio/mydata
   postgresql:
     enabled: false
   redis:
