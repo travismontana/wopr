@@ -157,7 +157,20 @@ def emptyRun(selectedGame, selectedPiece, objectRotation, objectPosition):
             post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
             #st.write(f"Simulated API call with payload: {payload}")
             time.sleep(1)  # To avoid overwhelming the server
+    sendNotification(f"Completed run for piece {selectedPiece['name']} from game {selectedGame['name']}.")
 
+def sendNotification(message: str):
+    notification = {
+        "username": "WOPR ML Image Capture",
+        "embeds": [
+            {
+                "title": "Image Capture Notification",
+                "description": message,
+                "color": 65280  # Green
+            }
+        ]
+    }
+    post_json(f"{API_BASE}/api/v2/notifications", notification)
 
  #########################
  # Main Application Logic
