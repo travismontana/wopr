@@ -285,7 +285,7 @@ def notifications(message: str):
     payload = {
         "description": message,
         "title": "WOPR ML Image Capture",
-        "color": "green"
+        "color": "149502"
     }
     post_json(f"{API_BASE}/api/v2/notifications", payload)
 
