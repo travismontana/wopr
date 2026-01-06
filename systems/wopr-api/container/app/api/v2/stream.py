@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#/api/v2/stream.py
 """
 WOPR - Wargaming Oversight & Position Recognition
 # Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
@@ -17,15 +18,15 @@ WOPR API - games CRUD endpoints (Directus schema)
   
 """
 from . import router, logger
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Response
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 router = APIRouter(tags=["stream"])
 
-@router.get("/grab/{camera_id}", response_model=dict)
-@router.get("/grab/{camera_id}/", response_model=dict)
-def grab_stream(camera_id: str):
+@router.get("/grab/{camera_id}")
+@router.get("/grab/{camera_id}/")
+def grab(camera_id: str):
     """
     Grab a stream from a specific camera.
     """
@@ -33,13 +34,12 @@ def grab_stream(camera_id: str):
     CAMURL = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['host']
     CAMPORT = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['port']
     CAMLCLID = woprvar.WOPR_CONFIG['camera']['camDict'][camera_id]['id']
-    URL = f"http://{CAMURL}:{CAMPORT}/stream/{CAMLCLID}"
+    URL = f"http://{CAMURL}:{CAMPORT}/grab/{CAMLCLID}"
     
     try:
         response = requests.get(URL)
         response.raise_for_status()
-        data = response.json()
-        return data
+        return Response(content=response.content, media_type="image/jpeg")
     except requests.RequestException as e:
         logger.error(f"Error grabbing stream from WOPR API: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error grabbing stream, error: {e}")

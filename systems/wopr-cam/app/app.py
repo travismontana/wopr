@@ -314,9 +314,10 @@ def list_images(game_id: str):
             "images": result,
         }
 
-@app.get("/stream/{camera_id}")
-def stream_camera(camera_id: int):
-    with _trace_if_enabled("camera.stream") as span:
+@app.get("/grab/{camera_id}")
+@app.get("/grab/{camera_id}/")
+def grab_camera(camera_id: int):
+    with _trace_if_enabled("camera.grab") as span:
         if span:
             span.set_attribute("camera.id", camera_id)
         
