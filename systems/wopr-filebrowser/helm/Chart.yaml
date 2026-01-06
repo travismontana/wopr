@@ -1,0 +1,8 @@
+apiVersion: v2
+name: wopr-filebrowser
+version: 0.1.5-alpha
+description: WOPR File Browser
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"

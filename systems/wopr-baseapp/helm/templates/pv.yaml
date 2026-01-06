@@ -1,0 +1,43 @@
+{{- range .Values.pv }}
+{{- if .enabled }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "wopr-baseapp.labels" $ | nindent 4 }}
+    {{- if .extraLabels }}
+    {{- toYaml .extraLabels | nindent 4 }}
+    {{- end }}
+spec:
+  capacity:
+    storage: {{ .size }}
+  accessModes:
+  {{- toYaml .accessModes | nindent 2 }}
+  persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }}
+  {{- if .storageClass }}
+  storageClassName: {{ .storageClass }}
+  {{- end }}
+  {{- if .mountOptions }}
+  mountOptions:
+  {{- toYaml .mountOptions | nindent 2 }}
+  {{- end }}
+  {{- if .nfs }}
+  nfs:
+    server: {{ .nfs.server }}
+    path: {{ .nfs.path }}
+  {{- end }}
+  {{- if .hostPath }}
+  hostPath:
+    path: {{ .hostPath.path }}
+    {{- if .hostPath.type }}
+    type: {{ .hostPath.type }}
+    {{- end }}
+  {{- end }}
+  {{- if .csi }}
+  csi:
+    {{- toYaml .csi | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,64 @@
+wopr-baseapp:
+  app:
+    name: wopr-filebrowser
+  replicaCount: 1
+
+  image:
+    registry: docker.io
+    repository: filebrowser/filebrowser
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: filebrowser.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-filebrowser-tls
+        hosts:
+          - filebrowser.wopr.tailandtraillabs.org
+
+  env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
+  
+  
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /srv
+      readOnly: true
+    - name: nginx-conf
+      mountPath: /etc/nginx/nginx.conf
+      subPath: nginx.conf
+    - name: tmp
+      mountPath: /tmp
+    - name: cache
+      mountPath: /var/cache/nginx
+    - name: run
+      mountPath: /var/run
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-nfs-pvc
+    - name: nginx-conf
+      configMap:
+        name: wopr-images-config
+    - name: tmp
+      emptyDir: {}
+    - name: cache
+      emptyDir: {}
+    - name: run
+      emptyDir: {}
+
+      

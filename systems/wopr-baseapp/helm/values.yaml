@@ -131,3 +131,50 @@ securityContext:
   runAsUser: 2222
   runAsGroup: 2222
   fsGroup: 2222
+# PersistentVolume array (optional)
+# pv:
+#   - name: my-nfs-pv
+#     enabled: true
+#     size: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     reclaimPolicy: Retain  # Default: Retain
+#     storageClass: ""       # Empty string for no storage class
+#     mountOptions:
+#       - hard
+#       - intr
+#       - noatime
+#       - vers=3
+#     nfs:
+#       server: storage.example.com
+#       path: /exports/data
+#     extraLabels: {}
+#
+#   - name: my-local-pv
+#     enabled: true
+#     size: 10Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     hostPath:
+#       path: /mnt/data
+#       type: DirectoryOrCreate
+#     storageClass: local-storage
+
+# PersistentVolumeClaim array (optional)
+# pvc:
+#   - name: my-app-data
+#     enabled: true
+#     size: 10Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     storageClass: "rook-cephfs"
+#     extraLabels: {}
+#
+#   - name: my-shared-data
+#     enabled: true
+#     size: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     storageClass: ""        # Empty for binding to PV by selector/label
+#     extraLabels:
+#       storage-type: nfs
