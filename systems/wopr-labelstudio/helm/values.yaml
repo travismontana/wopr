@@ -12,7 +12,7 @@ label-studio:
       enabled: true
       config:
         volume:
-          storageClass: "rook-ceph-block"
+          storageClass: "rook-cephfs"
           size: 10Gi
           existingClaim: "wopr-labelstudio-pvc"
     ingress:
