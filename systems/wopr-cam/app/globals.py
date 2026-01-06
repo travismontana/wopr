@@ -8,7 +8,7 @@ import os
 # Application Identity
 APP_NAME = "wopr-cam"
 APP_TITLE = "WOPR Camera API"
-APP_VERSION = "0.1.4-beta"
+APP_VERSION = "0.1.5-alpha"
 APP_DESCRIPTION = "WOPR Camera API application package"
 APP_AUTHOR = "Bob Bomar"
 APP_AUTHOR_EMAIL = "bob@bomar.us"
