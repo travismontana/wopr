@@ -24,4 +24,5 @@ label-studio:
             - "labelstudio.wopr.tailandtraillabs.org"
   postgresql:
     enabled: false
-  q
+  redis:
+    enabled: true
