@@ -33,7 +33,7 @@ router = APIRouter(tags=["notifications"])
 @router.post("")
 async def create_notification(notification: dict):
     """Create a notification"""
-    logger.info("Sending notification to Discord webhook")
+    logger.info("Sending notification to Discord webhook: notification: %s", notification)
     URL = woprvar.WOPR_CONFIG['notifications']['discord']['webhook_url']
     logger.debug(f"Discord Webhook URL: {URL}")
     try:
