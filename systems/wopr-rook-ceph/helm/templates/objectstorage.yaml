@@ -42,3 +42,21 @@ parameters:
   objectStoreName: objectstore
   objectStoreNamespace: rook-ceph
 reclaimPolicy: Delete
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: wopr-ls-target-claim
+  namespace: rook-ceph
+spec:
+  bucketName: wopr-ls-target-bucket
+  storageClassName: rook-ceph-bucket-wopr
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: wopr-ls-source-claim
+  namespace: rook-ceph
+spec:
+  bucketName: wopr-ls-source-bucket
+  storageClassName: rook-ceph-bucket-wopr
