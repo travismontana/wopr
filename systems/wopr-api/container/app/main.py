@@ -154,7 +154,7 @@ if tracing_enabled:
     app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
     app.include_router(images.router, prefix="/api/v2/images", tags=["images"])
     app.include_router(notifications.router, prefix="/api/v2/notifications", tags=["notifications"])
-    app.include_router(stream.router), prefix="/api/v2/stream", tags=["stream"])
+    app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()
