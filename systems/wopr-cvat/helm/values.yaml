@@ -29,7 +29,8 @@ cvat:
       port: "5432"  # String format per chart convention
     auth:
       existingSecret: "wopr-cvat-db-user-credentials"
-      
+      username: "wopr-cvat-db-user"     # Match your DB username
+      database: "wopr-cvat-db-database"     # Match your DB name
     secret:
       create: false
   
