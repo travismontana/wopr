@@ -11,4 +11,4 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: "rook-cephfs"
-  volumeName: wopr-labelstudio-pv
+
