@@ -226,8 +226,8 @@ def capture_ml(req: CaptureRequest):
                 span.set_attribute("camera.ml_mode", True)
 
             resolution = "4k"
-            width = 4608
-            height = 2592            
+            width = 4056
+            height = 3040
             if span:
                 span.set_attribute("camera.resolution", resolution)
                 span.set_attribute("camera.width", width)
