@@ -18,6 +18,7 @@ Global constants and configuration for WOPR API.
 Single source of truth for all static values.
 """
 import os
+import httpx
 
 # Application Identity
 APP_NAME = "wopr-cam"
@@ -49,3 +50,17 @@ HACK_CAMERA_DICT = {
         "capabilities": [ "games", "ml"]
     }
 }
+
+URL = f"{WOPR_API_URL}/config/all"
+try:
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(URL)
+        response.raise_for_status()
+    result = response.json()
+except httpx.HTTPError as e:
+    logger.error(f"Directus API error: {e}")
+
+if result:
+    WOPR_CONFIG=result
+else:
+    WOPR_CONFIG={}

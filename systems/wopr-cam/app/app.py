@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from picamera2 import Picamera2
 
 # OTel imports
 from opentelemetry import metrics
@@ -32,7 +33,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
 from opentelemetry.trace.status import Status, StatusCode
 
-from wopr.config import init_config, get_str, get_int, get_bool
+#from wopr.config import init_config, get_str, get_int, get_bool
 from wopr.logging import setup_logging
 from wopr.tracing import create_tracer
 from wopr.storage import imagefilename
@@ -42,7 +43,7 @@ import globals as g
 
 # Initialize config first
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2/config"
-init_config(service_url=WOPR_API_URL)
+#init_config(service_url=WOPR_API_URL)
 
 logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -278,49 +279,26 @@ def status():
     with _trace_if_enabled("camera.status"):
         return {"status": "ready"}
 
-
-@app.get("/images/{game_id}")
-def list_images(game_id: str):
-    with _trace_if_enabled("camera.list_images") as span:
-        if span:
-            span.set_attribute("game.id", game_id)
-        
-        # Use storage.base_path from config
-        wopr_root = Path(get_str('storage.base_path'))
-        game_dir = wopr_root / "games" / game_id
-
-        if not game_dir.exists():
-            if span:
-                span.set_status(Status(StatusCode.ERROR, "Game not found"))
-            raise HTTPException(status_code=404, detail="Game not found")
-
-        images = sorted(
-            p for p in game_dir.rglob("*.jpg")
-            if p.is_file()
-        )
-
-        result = [
-            f"/wopr/{p.relative_to(wopr_root)}"
-            for p in images
-        ]
-
-        if span:
-            span.set_attribute("images.count", len(result))
-            span.set_status(Status(StatusCode.OK))
-        
-        return {
-            "game_id": game_id,
-            "count": len(result),
-            "images": result,
-        }
-
 @app.get("/grab/{camera_id}")
 @app.get("/grab/{camera_id}/")
 def grab_camera(camera_id: int):
     with _trace_if_enabled("camera.grab") as span:
         if span:
             span.set_attribute("camera.id", camera_id)
-        
+    camType = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["type"]
+    if camType = "blank":
+        return "no id"
+    
+    if camType == "imx477":
+        picam2 = Picamera2()
+        camera_config = picam2.create_preview_configuration()
+        picam2.configure(camera_config)
+        picam2.start()
+        time.sleep(2)
+        image_array = picam2.capture_array("main")
+        picam2.stop()
+        return image_array
+    else:
         try:
             cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
             if not cap.isOpened():
