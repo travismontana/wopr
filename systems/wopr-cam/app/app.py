@@ -286,7 +286,7 @@ def grab_camera(camera_id: int):
         if span:
             span.set_attribute("camera.id", camera_id)
     camType = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["type"]
-    if camType = "blank":
+    if camType == "blank":
         return "no id"
     
     if camType == "imx477":
