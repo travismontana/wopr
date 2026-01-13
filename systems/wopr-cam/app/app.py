@@ -324,6 +324,7 @@ def grab_camera(camera_id: int):
         image_array = picam2.capture_array("main")
         picam2.stop()
         picam2.close()
+        image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(image_array)
         buf = io.BytesIO()
         img.save(buf, format='JPEG')
