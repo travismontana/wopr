@@ -56,7 +56,7 @@ try:
     response.raise_for_status()
     result = response.json()
 except httpx.HTTPError as e:
-    logger.error(f"Directus API error: {e}")
+    return 1
 
 if result:
     WOPR_CONFIG=result
