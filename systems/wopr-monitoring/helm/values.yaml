@@ -283,7 +283,7 @@ alloy-operator:
   crds:
     deployPodLogsCRD: true
     
-pushgateway:
+prometheus-pushgateway:
   ingress:
     enabled: false
     className: "wopr-traefik"
