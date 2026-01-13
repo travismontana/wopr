@@ -317,6 +317,7 @@ def grab_camera(camera_id: int):
         camera_config = picam2.create_preview_configuration()
         camera_config["main"]["size"] = (width, height)
         camera_config["main"]["format"] = "RGB888"
+        camera_config["main"]["transform"] = Transform(hflip=True,vflip=True)
         picam2.configure(camera_config)
         picam2.start()
         time.sleep(2)
