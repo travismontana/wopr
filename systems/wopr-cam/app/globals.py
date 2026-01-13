@@ -53,9 +53,8 @@ HACK_CAMERA_DICT = {
 
 URL = f"{WOPR_API_URL}/config/all"
 try:
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(URL)
-        response.raise_for_status()
+    response = httpx.get(f"{API_BASE}/api/v2/config/all")
+    response.raise_for_status()
     result = response.json()
 except httpx.HTTPError as e:
     logger.error(f"Directus API error: {e}")
