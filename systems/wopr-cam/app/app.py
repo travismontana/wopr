@@ -254,7 +254,6 @@ def capture_ml(req: CaptureRequest):
                 with _trace_if_enabled("camera.frame_capture"):
                     ret, frame = cap.read()
                     cap.release()
-
                     if not ret:
                         raise RuntimeError("Camera capture failed (no frame read)")
 
@@ -270,8 +269,7 @@ def capture_ml(req: CaptureRequest):
                 time.sleep(2)
                 picam2.capture_file(
                     str(filepath),
-                    format='jpeg',
-                    quality=95
+                    format='jpeg'
                 )
                 picam2.stop()
                 picam2.close()
