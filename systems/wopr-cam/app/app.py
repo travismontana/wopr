@@ -65,7 +65,7 @@ resource = Resource(attributes={
 
 metric_reader = PeriodicExportingMetricReader(
     OTLPMetricExporter(
-        endpoint=get_str("otel.metrics.endpoint", f"{g.APP_OTEL_URL}/v1/metrics"),
+        endpoint=f"{g.APP_OTEL_URL}/v1/metrics",
     )
 )
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
@@ -160,9 +160,9 @@ def capture(req: CaptureRequest):
                 span.set_attribute("camera.filepath", str(filepath))
                 span.set_attribute("camera.filename_override", bool(req.filename))
 
-            resolution = get_str("camera.default_resolution")
-            width = get_int(f"camera.resolutions.{resolution}.width")
-            height = get_int(f"camera.resolutions.{resolution}.height")
+            resolution = "4k"
+            width = "4056"
+            height = "3040"
             
             if span:
                 span.set_attribute("camera.resolution", resolution)
