@@ -285,7 +285,7 @@ alloy-operator:
     
 prometheus-pushgateway:
   ingress:
-    enabled: false
+    enabled: true
     className: "wopr-traefik"
     hosts:
       - pushgateway.wopr.tailandtraillabs.org
