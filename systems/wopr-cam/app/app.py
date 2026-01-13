@@ -265,7 +265,7 @@ def capture_ml(req: CaptureRequest):
                 camera_config = picam2.create_preview_configuration()
                 camera_config["main"]["size"] = (width, height)
                 camera_config["main"]["format"] = "RGB888"
-                camera_config["main"]["transform"] = Transform(hflip=True,vflip=True)
+                camera_config["main"]["transform"] = Transform(hflip=1,vflip=1)
                 picam2.options["quality"] = 95
                 picam2.options["compress_level"] = 1
                 picam2.configure(camera_config)
@@ -317,7 +317,7 @@ def grab_camera(camera_id: int):
         camera_config = picam2.create_preview_configuration()
         camera_config["main"]["size"] = (width, height)
         camera_config["main"]["format"] = "RGB888"
-        camera_config["main"]["transform"] = Transform(hflip=True,vflip=True)
+        camera_config["main"]["transform"] = Transform(hflip=1,vflip=1)
         picam2.configure(camera_config)
         picam2.start()
         time.sleep(2)
