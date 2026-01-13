@@ -19,7 +19,7 @@ kube-prometheus-stack:
     upgradeJob:
       enabled: true
   alertmanager:
-    enabled: true
+    enabled: false
     ingress:
       enabled: true
       ingressClassName: wopr-traefik
