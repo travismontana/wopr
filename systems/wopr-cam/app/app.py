@@ -314,10 +314,10 @@ def grab_camera(camera_id: int):
     height = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["height"]
     if camType == "imx477":
         picam2 = Picamera2()
-        camera_config = picam2.create_preview_configuration()
-        camera_config["main"]["size"] = (width, height)
-        camera_config["main"]["format"] = "RGB888"
-        camera_config["main"]["transform"] = Transform(hflip=1,vflip=1)
+        camera_config = picam2.create_preview_configuration(
+                    main={"size": (width, height), "format": "RGB888"},
+                    transform=Transform(hflip=1,vflip=1)
+                )
         picam2.configure(camera_config)
         picam2.start()
         time.sleep(2)
