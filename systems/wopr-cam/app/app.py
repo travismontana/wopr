@@ -263,10 +263,9 @@ def capture_ml(req: CaptureRequest):
             elif camType == "imx477":
                 picam2 = Picamera2()
                 camera_config = picam2.create_preview_configuration(
+                    main={"size": (width, height), "format": "RGB888"},
                     transform=Transform(hflip=1,vflip=1)
                 )
-                camera_config["main"]["size"] = (width, height)
-                camera_config["main"]["format"] = "RGB888"
                 picam2.options["quality"] = 95
                 picam2.options["compress_level"] = 1
                 picam2.configure(camera_config)
