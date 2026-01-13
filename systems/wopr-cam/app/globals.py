@@ -52,7 +52,7 @@ HACK_CAMERA_DICT = {
 }
 
 
-response = httpx.get(f"{WOPR_API_URL}/api/v2/config/all")
+response = httpx.get(f"{WOPR_API_URL}/config/all")
 response.raise_for_status()
 result = response.json()
 
