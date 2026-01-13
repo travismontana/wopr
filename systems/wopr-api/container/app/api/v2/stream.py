@@ -39,7 +39,7 @@ def grab(camera_id: str):
     try:
         response = requests.get(URL)
         response.raise_for_status()
-        return Response(content=response.content, media_type="image/jpeg")
+        return Response(content=response.content)
     except requests.RequestException as e:
         logger.error(f"Error grabbing stream from WOPR API: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error grabbing stream, error: {e}")
