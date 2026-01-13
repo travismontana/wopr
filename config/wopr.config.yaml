@@ -55,7 +55,10 @@
         "description": "IMX 477 with M12 lens",
         "host": "wopr-cam.abode.tailandtraillabs.org",
         "port": "5000",
-        "type": "imx477"
+        "type": "imx477",
+        "width": 4056,
+        "height": 3040,
+        "mode": "RGB888"
       },
       "1": {
         "id": 1,
@@ -63,7 +66,10 @@
         "description": "Eemeet almost 4k webcam",
         "host": "wopr-cam.hangar.bpfx.org",
         "port": "5000",
-        "type": "usb"
+        "type": "usb",
+        "width": 3840,
+        "height": 2160,
+        "mode": "RGB888"
       },
       "2": {
         "id": 2,

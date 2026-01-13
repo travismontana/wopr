@@ -17,6 +17,8 @@ import sys
 from enum import Enum
 from typing import Optional
 from pathlib import Path
+import io
+from PIL import Image
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -292,8 +294,6 @@ def grab_camera(camera_id: int):
     height = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["height"]
     if camType == "imx477":
         picam2 = Picamera2()
-        picam2.stop()
-        picam2.close()
         camera_config = picam2.create_preview_configuration()
         camera_config["main"]["size"] = (width, height)
         camera_config["main"]["format"] = "RGB888"
@@ -302,7 +302,11 @@ def grab_camera(camera_id: int):
         time.sleep(2)
         image_array = picam2.capture_array("main")
         picam2.stop()
-        return image_array
+        picam2.close()
+        img = Image.fromarray(image_array)
+        buf = io.BytesIO()
+        img.save(buf, format='JPEG')
+        return PlainTextResponse(content=buf.getvalue(), media_type="image/jpeg"
     else:
         try:
             cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
