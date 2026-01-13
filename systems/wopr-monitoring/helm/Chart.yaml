@@ -35,3 +35,7 @@ dependencies:
   - name: alloy-operator
     version: 0.3.14
     repository: "https://grafana.github.io/helm-charts"
+
+  - name: pushgateway
+    version: 3.6.0
+    repository: "https://prometheus-community.github.io/helm-charts"

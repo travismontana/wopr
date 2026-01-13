@@ -282,3 +282,17 @@ tempo:
 alloy-operator:
   crds:
     deployPodLogsCRD: true
+    
+pushgateway:
+  ingress:
+    enabled: false
+    className: "wopr-traefik"
+    hosts:
+      - pushgateway.wopr.tailandtraillabs.org
+    tls:
+      - secretName: wildcard-tls
+        hosts:
+          - pushgateway.wopr.tailandtraillabs.org
+  serviceMonitor:
+    enabled: true
+    namespace: wopr
