@@ -214,6 +214,7 @@ def capture(req: CaptureRequest):
 def capture_ml(req: CaptureRequest):
     with _trace_if_enabled("camera.capture_ml") as span:
         start_time = time.time()
+        camera_id = 0
         
         try:
             # Generate filepath
@@ -229,8 +230,9 @@ def capture_ml(req: CaptureRequest):
                 span.set_attribute("camera.ml_mode", True)
 
             resolution = "4k"
-            width = 4056
-            height = 3040
+            width = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["width"]
+            height = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["height"]
+            camType = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["type"]
             if span:
                 span.set_attribute("camera.resolution", resolution)
                 span.set_attribute("camera.width", width)
@@ -238,25 +240,41 @@ def capture_ml(req: CaptureRequest):
             
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
-            # Camera initialization and capture
-            with _trace_if_enabled("camera.device_init"):
-                cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-                if not cap.isOpened():
-                    raise RuntimeError("Camera device could not be opened")
+            if camType == "usb":
+                # Camera initialization and capture
+                with _trace_if_enabled("camera.device_init"):
+                    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+                    if not cap.isOpened():
+                        raise RuntimeError("Camera device could not be opened")
 
-                cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
-                cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+                    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+                    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-            with _trace_if_enabled("camera.frame_capture"):
-                ret, frame = cap.read()
-                cap.release()
+                with _trace_if_enabled("camera.frame_capture"):
+                    ret, frame = cap.read()
+                    cap.release()
 
-                if not ret:
-                    raise RuntimeError("Camera capture failed (no frame read)")
+                    if not ret:
+                        raise RuntimeError("Camera capture failed (no frame read)")
 
-            with _trace_if_enabled("camera.image_write"):
-                cv2.imwrite(str(filepath), frame)
+                with _trace_if_enabled("camera.image_write"):
+                    cv2.imwrite(str(filepath), frame)
+            elif camType == "imx477":
+                picam2 = Picamera2()
+                camera_config = picam2.create_preview_configuration()
+                camera_config["main"]["size"] = (width, height)
+                camera_config["main"]["format"] = "RGB888"
+                picam2.configure(camera_config)
+                picam2.start()
+                time.sleep(2)
+                picam2.capture_file(
+                    str(filepath),
+                    format='jpeg',
+                    quality=95
+                )
+                picam2.stop()
+                picam2.close()
 
             duration_ms = (time.time() - start_time) * 1000
             capture_duration.record(duration_ms, {"endpoint": "capture_ml"})

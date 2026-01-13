@@ -378,7 +378,7 @@ ready = all([
     st.session_state.objectPositionKey,
 ])
 
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 
 with c1:
     if st.button("Run all lights", use_container_width=True, disabled=not ready):
@@ -391,6 +391,11 @@ with c2:
         st.success("Single capture request submitted!")
 
 with c3:
+    if st.button("Take capture", use_container_width=True, disabled=not ready):
+        take_capture(config)
+        st.success("Capture request submitted!")
+
+with c4:
     if st.button("Reset", use_container_width=True):
         reset_all()
 

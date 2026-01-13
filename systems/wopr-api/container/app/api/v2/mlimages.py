@@ -86,27 +86,26 @@ def capture_piece_image(payload: dict):
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
 
   # Set the lights to the desired settings
-  time.sleep(1)
-  HAURL = f"{woprvar.WOPR_CONFIG['homeAssistant']['host']}/api/services/script/office_lights_preset"
-  logger.info("Setting lights via Home Assistant API at %s", HAURL)
-  logger.info("Config: %s", woprvar.WOPR_CONFIG)
-  headers = {
-    "Authorization": f"Bearer {woprvar.HOMEASSISTANT_TOKEN}",
-    "Content-Type": "application/json"
-  }
+  #time.sleep(1)
+  #HAURL = f"{woprvar.WOPR_CONFIG['homeAssistant']['host']}/api/services/script/office_lights_preset"
+  #logger.info("Setting lights via Home Assistant API at %s", HAURL)
+  #logger.info("Config: %s", woprvar.WOPR_CONFIG)
+  #headers = {
+  #  "Authorization": f"Bearer {woprvar.HOMEASSISTANT_TOKEN}",
+  #  "Content-Type": "application/json"
+  #}
   # Prepare service data
-  service_data = {
-    "brightness": lightIntensity,
-    "kelvin": colorTemp
-  }
-  try:
-    response = requests.post(f"{HAURL}", json=service_data, headers=headers)
-    response.raise_for_status()
-    logger.info("Successfully updated lights, response: %s", response.json())
-  except requests.RequestException as e:
-    logger.error(f"Error capturing piece image: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
-
+  #service_data = {
+  #  "brightness": lightIntensity,
+  #  "kelvin": colorTemp
+  #}
+  #try:
+  #  response = requests.post(f"{HAURL}", json=service_data, headers=headers)
+  #  response.raise_for_status()
+  #  logger.info("Successfully updated lights, response: %s", response.json())
+  #except requests.RequestException as e:
+  #  logger.error(f"Error capturing piece image: {e}")
+  #  raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
   time.sleep(2)
 
   # Start the camera capture process
