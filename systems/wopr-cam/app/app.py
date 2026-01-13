@@ -25,6 +25,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from picamera2 import Picamera2
+from libcamera import Transform
 
 # OTel imports
 from opentelemetry import metrics
@@ -264,6 +265,9 @@ def capture_ml(req: CaptureRequest):
                 camera_config = picam2.create_preview_configuration()
                 camera_config["main"]["size"] = (width, height)
                 camera_config["main"]["format"] = "RGB888"
+                camera_config["main"]["transform"] = Transform(hflip=True,vflip=True)
+                picam2.options["quality"] = 95
+                picam2.options["compress_level"] = 1
                 picam2.configure(camera_config)
                 picam2.start()
                 time.sleep(2)
