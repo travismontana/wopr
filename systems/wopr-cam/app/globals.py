@@ -53,7 +53,7 @@ HACK_CAMERA_DICT = {
 
 URL = f"{WOPR_API_URL}/config/all"
 try:
-    response = httpx.get(f"{API_BASE}/api/v2/config/all")
+    response = httpx.get(f"{URL}/api/v2/config/all")
     response.raise_for_status()
     result = response.json()
 except httpx.HTTPError as e:
