@@ -55,8 +55,6 @@ try:
     response = httpx.get(f"{WOPR_API_URL}/api/v2/config/all")
     response.raise_for_status()
     result = response.json()
-except httpx.HTTPError as e:
-    return 1
 
 if result:
     WOPR_CONFIG=result
