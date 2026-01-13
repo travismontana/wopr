@@ -306,7 +306,7 @@ def grab_camera(camera_id: int):
         img = Image.fromarray(image_array)
         buf = io.BytesIO()
         img.save(buf, format='JPEG')
-        return PlainTextResponse(content=buf.getvalue(), media_type="image/jpeg"
+        return PlainTextResponse(content=buf.getvalue(), media_type="image/jpeg")
     else:
         try:
             cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
