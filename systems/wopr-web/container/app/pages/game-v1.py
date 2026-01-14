@@ -97,6 +97,15 @@ else:
 	# Round in progress
 	else:
 		st.info(f"Round {st.session_state.current_round} in progress...")
+
+		if st.button("Mid game capture"):
+			# Capture midgame state
+			result = takeCapture(
+				st.session_state.session_uuid,
+				config.get('default_camera_id', 1),
+				"mid"
+			)
+			st.success(f"Mid game capture taken for round {st.session_state.current_round}")
 		
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
