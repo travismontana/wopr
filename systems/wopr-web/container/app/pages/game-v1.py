@@ -48,8 +48,8 @@ def newSession(game_id):
 	response.raise_for_status()
 	return response.json().get('sessionuuid')
 
-def takeCapture(sessionuuid, camid, startorend):
-	filename = f"game-{sessionuuid}-round{st.session_state.current_round}-{startorend}.jpg"
+def takeCapture(sessionuuid, camid, startorend, gameid):
+	filename = f"game-gameid{gameid}-{sessionuuid}-round{st.session_state.current_round}-{startorend}.jpg"
 	payload = {
 		"camid": camid,
 		"filename": filename,
@@ -88,7 +88,8 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"start"
+				"start",
+				game['id']
 			)
 			st.success(f"Round {st.session_state.current_round} started - Initial state captured")
 			st.session_state.round_started = True
@@ -103,7 +104,8 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"mid"
+				"mid",
+				game['id']
 			)
 			st.success(f"Mid game capture taken for round {st.session_state.current_round}")
 		
@@ -112,7 +114,8 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"end"
+				"end",
+				game['id']
 			)
 			st.success(f"Round {st.session_state.current_round} ended - Final state captured")
 			
