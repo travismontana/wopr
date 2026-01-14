@@ -13,27 +13,6 @@
 # limitations under the License.
 
 {
-  "nelson": "haha",
-  "storage": {
-    "base_path": "/remote/wopr",
-    "default_extension": "jpg",
-    "ensure_directories": true,
-    "games_subdir": "games",
-    "image_extensions": [
-      "jpg",
-      "png"
-    ],
-    "thumbnail_size": [
-      480,
-      480
-    ]
-  },
-  "analysis_statuses": [
-    "pending",
-    "processing",
-    "completed",
-    "failed"
-  ],
   "api": {
     "host": "0.0.0.0",
     "port": 8000,
@@ -43,6 +22,7 @@
     "externalUrl": "https://api.wopr.tailandtraillabs.org",
     "version": "v2"
   },
+  "baseDomain": "wopr.tailandtraillabs.org",
   "camera": {
     "buffer_count": 2,
     "capture_delay_seconds": 2,
@@ -111,6 +91,7 @@
     "enabled": true,
     "host": "http://moya.hangar.bpfx.org:8123"
   },
+  "nelson": "haha",
   "object": {
     "rotations": [ 0, 45, 90, 135, 180, 225, 270, 315 ],
     "positions": {
@@ -127,23 +108,27 @@
       "Bottom Left": "bottomLeft"
     }
   },
-  "vision": {
-    "default_model": "qwen2-vl:7b",
-    "gaussian_blur_kernel": [
-      21,
-      21
+
+  "storage": {
+    "base_path": "/remote/wopr",
+    "default_extension": "jpg",
+    "ensure_directories": true,
+    "games_subdir": "games",
+    "image_extensions": [
+      "jpg",
+      "png"
     ],
-    "min_change_area_pixels": 1000,
-    "morphology_iterations": {
-      "dilate": 2,
-      "erode": 1
-    },
-    "morphology_kernel": [
-      5,
-      5
-    ],
-    "opencv_change_threshold": 30
+    "thumbnail_size": [
+      480,
+      480
+    ]
   },
+  "analysis_statuses": [
+    "pending",
+    "processing",
+    "completed",
+    "failed"
+  ],
   "tracing": {
     "enabled": true,
     "hostInternal": "http://wopr-monitoring-tempo",
@@ -153,7 +138,6 @@
     "service_name": "wopr-unknown",
     "sampling_rate": 1.0
   },
-  "baseDomain": "wopr.tailandtraillabs.org",
   "homeAssistant": {
     "enabled": true,
     "host": "http://moya.hangar.bpfx.org:8123"
@@ -171,5 +155,23 @@
       "enabled": true,
       "webhook_url": "https://discord.com/api/webhooks/1457873231133544459/3yUwg89RsfjgRu-AmZB_hr0LU586d3OMZ2HniDdoW8YpgNhOO4rcBwCSKaSLJPYq01yE"
     }
+  },
+  "vision": {
+    "default_model": "qwen2-vl:7b",
+    "gaussian_blur_kernel": [
+      21,
+      21
+    ],
+    "label_studio_url": "https://labelstudio.wopr.tailandtraillabs.org",
+    "min_change_area_pixels": 1000,
+    "morphology_iterations": {
+      "dilate": 2,
+      "erode": 1
+    },
+    "morphology_kernel": [
+      5,
+      5
+    ],
+    "opencv_change_threshold": 30
   }
 }
