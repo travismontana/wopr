@@ -43,3 +43,9 @@ def fetch_games():
 	response.raise_for_status()
 	return response.json()
 
+@st.cache_data(ttl=60)
+def fetch_projects():
+	response = httpx.get(f"{API_BASE}/api/v2/vision/projects")
+	response.raise_for_status()
+	return response.json()
+
