@@ -392,7 +392,7 @@ with c2:
 
 with c3:
     if st.button("Take capture", use_container_width=True, disabled=not ready):
-        take_capture(config)
+        run_single_light(config)
         st.success("Capture request submitted!")
 
 with c4:
