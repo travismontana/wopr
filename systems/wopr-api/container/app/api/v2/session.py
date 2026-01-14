@@ -45,7 +45,7 @@ async def getnewsession(game_id: int):
 		response.raise_for_status()
 		logger.info("Successfully created new session, response: %s", response.json())
 		sessionuuid = response.json().get('data', {}).get('uuid')
-		return {"sessionuuid": sessionuuid}
   except requests.RequestException as e:
 		logger.error(f"Error creating new session: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating new session, error: {e}")
+  return {"sessionuuid": sessionuuid}
