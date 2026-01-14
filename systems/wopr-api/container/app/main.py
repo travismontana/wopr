@@ -50,6 +50,7 @@ from app.api.v2 import mlimages
 from app.api.v2 import images
 from app.api.v2 import notifications
 from app.api.v2 import stream
+from app.api.v2 import session
 
 # Set normal logging not using woprlogg.
 configure_logging("/var/log/wopr-api.log")
@@ -155,6 +156,7 @@ if tracing_enabled:
     app.include_router(images.router, prefix="/api/v2/images", tags=["images"])
     app.include_router(notifications.router, prefix="/api/v2/notifications", tags=["notifications"])
     app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
+    app.include_router(session.router, prefix="/api/v2/session", tags=["session"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()

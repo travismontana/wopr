@@ -26,23 +26,32 @@ st.write("Welcome to the WOPR Game Interface.")
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
 def fetch_config():
-    response = httpx.get(f"{API_BASE}/api/v2/config/all")
-    response.raise_for_status()
-    return response.json()
+	response = httpx.get(f"{API_BASE}/api/v2/config/all")
+	response.raise_for_status()
+	return response.json()
 
 config = fetch_config()
 
 @st.cache_data(ttl=60)
 def fetch_games():
-    response = httpx.get(f"{API_BASE}/api/v2/games")
-    response.raise_for_status()
-    return response.json()
+	response = httpx.get(f"{API_BASE}/api/v2/games")
+	response.raise_for_status()
+	return response.json()
 
 def selectGame():
-    games = fetch_games()
-    game_names = [game['name'] for game in games]
-    selected_game_name = st.selectbox("Select a game:", options=game_names)
-    selected_game = next(g for g in games if g['name'] == selected_game_name)
-    return selected_game
+	games = fetch_games()
+	game_names = [game['name'] for game in games]
+	selected_game_name = st.selectbox("Select a game:", options=game_names)
+	selected_game = next(g for g in games if g['name'] == selected_game_name)
+	return selected_game
+
+def newSession(game_id):
+	response = httpx.get(f"{API_BASE}/api/v2/session/new/{game_id}")
+	response.raise_for_status()
+	st.write(f"New game session started with UUID: {response.json().get('sessionuuid')}")
+	return response.json().get('sessionuuid')
 
 selectedGame = selectGame()
+
+if st.button("Start new game"):
+	newSession(selectedGame['id'])
