@@ -14,23 +14,16 @@
 # limitations under the License.
 
 """
-WOPR Session Service
+WOPR Config Service - Directus API Proxy
 """
 from fastapi import APIRouter, HTTPException, status
 import requests
-import os
 import logging
-import sys
+from app import globals as woprvar
 from opentelemetry import trace
 from contextlib import nullcontext
 
-# Assuming woprvar is imported from somewhere in your codebase
-# Add this import based on where woprvar lives:
-# from app.config import woprvar  # or wherever it actually is
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger(woprvar.APP_NAME)
 
 router = APIRouter(tags=["session"])
 
