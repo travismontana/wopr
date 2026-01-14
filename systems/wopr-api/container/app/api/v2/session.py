@@ -14,15 +14,19 @@
 # limitations under the License.
 
 """
-WOPR Config Service - Directus API Proxy
+WOPR Session Service
 """
-from fastapi import APIRouter, HTTPException
-import httpx
+from fastapi import APIRouter, HTTPException, status
+import requests
 import os
 import logging
 import sys
 from opentelemetry import trace
 from contextlib import nullcontext
+
+# Assuming woprvar is imported from somewhere in your codebase
+# Add this import based on where woprvar lives:
+# from app.config import woprvar  # or wherever it actually is
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
@@ -45,7 +49,7 @@ async def getnewsession(game_id: int):
 		response.raise_for_status()
 		logger.info("Successfully created new session, response: %s", response.json())
 		sessionuuid = response.json().get('data', {}).get('uuid')
-  except requests.RequestException as e:
+	except requests.RequestException as e:
 		logger.error(f"Error creating new session: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating new session, error: {e}")
-  return {"sessionuuid": sessionuuid}
+	return {"sessionuuid": sessionuuid}
