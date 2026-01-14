@@ -53,8 +53,8 @@ async def capture_session(payload: dict):
 	camid = payload["camid"]
 	filename = payload["filename"]
 	CAMURL = woprvar.WOPR_CONFIG['camera']['camDict']['0']['host']
-  payload = {
-    "filename": FILENAME
+	payload = {
+    "filename": filename
   }
   try:
     response = requests.post(f"http://{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
