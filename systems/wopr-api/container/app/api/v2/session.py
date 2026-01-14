@@ -46,3 +46,21 @@ async def getnewsession(game_id: int):
 		logger.error(f"Error creating new session: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating new session, error: {e}")
 	return {"sessionuuid": sessionuuid}
+
+@router.post("/capture")
+async def capture_session(payload: dict):
+	logger.info(f"Capturing session data for payload: {payload}")
+	camid = payload["camid"]
+	filename = payload["filename"]
+	CAMURL = woprvar.WOPR_CONFIG['camera']['camDict']['0']['host']
+  payload = {
+    "filename": FILENAME
+  }
+  try:
+    response = requests.post(f"http://{CAMURL}:5000/capture_ml", json=payload, headers=woprvar.DIRECTUS_HEADERS)
+    response.raise_for_status()
+    logger.info("Successfully called camera API, response: %s", response.json())
+    return response.json()
+  except requests.RequestException as e:
+    logger.error(f"Error capturing piece image: {e}")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
