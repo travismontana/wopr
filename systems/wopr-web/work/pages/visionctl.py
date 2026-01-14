@@ -49,3 +49,7 @@ def fetch_projects():
 	response.raise_for_status()
 	return response.json()
 
+#project_names = fetch_projects()
+#selected_project = st.selectbox("Select a project:", options=project_names)
+if st.button("Get projects"):
+	st.json(fetch_projects())
