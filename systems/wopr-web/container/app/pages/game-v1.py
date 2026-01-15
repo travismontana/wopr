@@ -138,8 +138,9 @@ else:
 	
 	# Emergency reset
 	st.divider()
-	if st.button("⚠️ Abort Game", type="secondary"):
+	if st.button("End Game", type="secondary"):
 		st.session_state.session_uuid = None
 		st.session_state.current_round = 0
+		st.session_state.current_round_play = 0
 		st.session_state.round_started = False
 		st.rerun()

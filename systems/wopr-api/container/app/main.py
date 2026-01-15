@@ -52,6 +52,7 @@ from app.api.v2 import notifications
 from app.api.v2 import stream
 from app.api.v2 import session
 from app.api.v2 import vision
+from app.api.v2 import players
 
 # Set normal logging not using woprlogg.
 configure_logging("/var/log/wopr-api.log")
@@ -159,6 +160,7 @@ if tracing_enabled:
     app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
     app.include_router(session.router, prefix="/api/v2/session", tags=["session"])
     app.include_router(vision.router, prefix="/api/v2/vision", tags=["vision"])
+    app.include_router(players.router, prefix="/api/v2/players", tags=["players"])
     @app.middleware("http")
     async def capture_headers_and_payloads(request, call_next):
         span = trace.get_current_span()

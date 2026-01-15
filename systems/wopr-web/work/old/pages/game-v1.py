@@ -25,8 +25,6 @@ if 'session_uuid' not in st.session_state:
 	st.session_state.session_uuid = None
 if 'current_round' not in st.session_state:
 	st.session_state.current_round = 0
-if 'current_round_play' not in st.session_state:
-	st.session_state.current_round_play = 0
 if 'round_started' not in st.session_state:
 	st.session_state.round_started = False
 if 'selected_game' not in st.session_state:
@@ -73,7 +71,6 @@ if st.session_state.session_uuid is None:
 		st.session_state.session_uuid = newSession(selected_game['id'])
 		st.session_state.current_round = 1
 		st.session_state.round_started = False
-		
 		st.success(f"New game session started: {st.session_state.session_uuid}")
 		st.rerun()
 
@@ -101,15 +98,15 @@ else:
 	else:
 		st.info(f"Round {st.session_state.current_round} in progress...")
 		
-		if st.button(f"Play {st.session_state.current_round_play} Round {st.session_state.current_round}"):
-			# Capture play state
+		if st.button(f"Mid Round {st.session_state.current_round}"):
+			# Capture mid state
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				f"play{st.session_state.current_round_play}"
+				"mid"
 			)
-			st.success(f"Round {st.session_state.current_round} - Play {st.session_state.current_round_play} - State captured")
-      st.session_state.current_round_play += 1
+			st.success(f"Round {st.session_state.current_round} - mid game - State captured")
+
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
 			result = takeCapture(
@@ -130,17 +127,14 @@ else:
 					st.session_state.round_started = False
 					st.rerun()
 			else:
-
 				st.session_state.current_round += 1
-				st.session_state.current_round_play += 1
 				st.session_state.round_started = False
 				st.rerun()
 	
 	# Emergency reset
 	st.divider()
-	if st.button("End Game", type="secondary"):
+	if st.button("⚠️ Abort Game", type="secondary"):
 		st.session_state.session_uuid = None
 		st.session_state.current_round = 0
-		st.session_state.current_round_play = 0
 		st.session_state.round_started = False
 		st.rerun()
