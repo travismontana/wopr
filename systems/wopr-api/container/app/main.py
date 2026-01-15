@@ -53,7 +53,7 @@ from app.api.v2 import stream
 from app.api.v2 import session
 from app.api.v2 import vision
 from app.api.v2 import players
-from app.api.vs import plays
+from app.api.v2 import plays
 
 # Set normal logging not using woprlogg.
 configure_logging("/var/log/wopr-api.log")
