@@ -20,6 +20,8 @@ st.write("Welcome to the WOPR Game Interface.")
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
+midcounter = 0
+
 # Initialize session state
 if 'session_uuid' not in st.session_state:
 	st.session_state.session_uuid = None
@@ -91,6 +93,7 @@ else:
 				"start"
 			)
 			st.success(f"Round {st.session_state.current_round} started - Initial state captured")
+			midcounter = 0
 			st.session_state.round_started = True
 			st.rerun()
 	
@@ -103,8 +106,9 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"mid"
+				f"mid{midcounter}"
 			)
+			midcounter += 1
 			st.success(f"Round {st.session_state.current_round} - mid game - State captured")
 
 		if st.button(f"End Round {st.session_state.current_round}"):
