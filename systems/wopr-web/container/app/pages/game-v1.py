@@ -37,7 +37,7 @@ def fetch_config():
 
 config = fetch_config()
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=240)
 def fetch_games():
 	response = httpx.get(f"{API_BASE}/api/v2/games")
 	response.raise_for_status()
@@ -48,14 +48,14 @@ def newSession(game_id):
 	response.raise_for_status()
 	return response.json().get('sessionuuid')
 
-def takeCapture(sessionuuid, camid, startorend, gameid):
-	filename = f"game-gameid{gameid}-{sessionuuid}-round{st.session_state.current_round}-{startorend}.jpg"
+def takeCapture(sessionuuid, camid, startorend):
+	filename = f"game-{sessionuuid}-round{st.session_state.current_round}-{startorend}.jpg"
 	payload = {
 		"camid": camid,
 		"filename": filename,
 		"sessionuuid": sessionuuid
 	}
-	response = httpx.post(f"{API_BASE}/api/v2/session/capture", json=payload)
+	response = httpx.post(f"{API_BASE}/api/v2/session/capture", json=payload, timeout=120.0)
 	response.raise_for_status()
 	return response.json()
 
@@ -88,8 +88,7 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"start",
-				game['id']
+				"start"
 			)
 			st.success(f"Round {st.session_state.current_round} started - Initial state captured")
 			st.session_state.round_started = True
@@ -98,24 +97,22 @@ else:
 	# Round in progress
 	else:
 		st.info(f"Round {st.session_state.current_round} in progress...")
-
-		if st.button("Mid game capture"):
-			# Capture midgame state
+		
+		if st.button(f"Mid Round {st.session_state.current_round}"):
+			# Capture mid state
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"mid",
-				game['id']
+				"mid"
 			)
-			st.success(f"Mid game capture taken for round {st.session_state.current_round}")
-		
+			st.success(f"Round {st.session_state.current_round} - mid game - State captured")
+
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				"end",
-				game['id']
+				"end"
 			)
 			st.success(f"Round {st.session_state.current_round} ended - Final state captured")
 			
@@ -136,7 +133,7 @@ else:
 	
 	# Emergency reset
 	st.divider()
-	if st.button("End Game", type="secondary"):
+	if st.button("⚠️ Abort Game", type="secondary"):
 		st.session_state.session_uuid = None
 		st.session_state.current_round = 0
 		st.session_state.round_started = False

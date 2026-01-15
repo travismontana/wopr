@@ -37,7 +37,7 @@ def fetch_config():
 
 config = fetch_config()
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=240)
 def fetch_games():
 	response = httpx.get(f"{API_BASE}/api/v2/games")
 	response.raise_for_status()
@@ -55,7 +55,7 @@ def takeCapture(sessionuuid, camid, startorend):
 		"filename": filename,
 		"sessionuuid": sessionuuid
 	}
-	response = httpx.post(f"{API_BASE}/api/v2/session/capture", json=payload)
+	response = httpx.post(f"{API_BASE}/api/v2/session/capture", json=payload, timeout=120.0)
 	response.raise_for_status()
 	return response.json()
 
@@ -98,6 +98,15 @@ else:
 	else:
 		st.info(f"Round {st.session_state.current_round} in progress...")
 		
+		if st.button(f"Mid Round {st.session_state.current_round}"):
+			# Capture mid state
+			result = takeCapture(
+				st.session_state.session_uuid,
+				config.get('default_camera_id', 1),
+				"mid"
+			)
+			st.success(f"Round {st.session_state.current_round} - mid game - State captured")
+
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
 			result = takeCapture(
