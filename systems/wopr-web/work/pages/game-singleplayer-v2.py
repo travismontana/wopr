@@ -102,12 +102,11 @@ def newSession(game_id):
 	log.info(f"GET {url}")
 	response = httpx.get(url, timeout=30.0)
 	response.raise_for_status()
-	sessionuuid = response.json().get("sessionuuid")
-	sessionid = response.json().get("sessionid")
+	sessionuuid = response.json().get("uuid")
+	sessionid = response.json().get("id")
 	log.info(f"BLAH: {response.json()}")
 	log.info(f"New session created sessionuuid={sessionuuid} sessionid={sessionid}")
 	return sessionuuid, sessionid
-
 
 def takeCapture(sessionuuid, camid, suffix):
 	filename = f"game-{sessionuuid}-round{st.session_state.current_round}-{suffix}.jpg"
@@ -143,14 +142,14 @@ def player_key_sort(k: str) -> int:
 	m = re.search(r"(\d+)$", k)
 	return int(m.group(1)) if m else 0
 
-def updateplaydb(session_id, player_name, play_num, play_note, imagefile):
+def updateplaydb(session_id, player_id, gameid, play_note, imagefile):
 		imagefilename = Path(imagefile.get("filename")).name
 		log.info(f"Fetched filename: {imagefilename}")
 		payload = {
-			"session_id": st.session_state.session_id,
-			"player_name": player_name,
-			"play_num": play_num,
-			"play_note": play_note,
+			"sessionid": st.session_state.session_id,
+			"playerid": player_id,
+			"gameid": gameid,
+			"note": play_note,
 			"filename": imagefilename
 		}
 		log.info(f"Updating player DB with payload: {payload}")
@@ -335,7 +334,7 @@ else:
 							st.error(f"Capture failed: {e}")
 						else:
 							st.json(result)
-							result = updateplaydb(st.session_state.session_id,current_player['name'], play_num, st.session_state.playnote,result)
+							result = updateplaydb(st.session_state.session_id,current_player['id'], game.get("id"), st.session_state.playnote,result)
 							log.info(f"Play DB update result: {result}")
 							st.success(f"Round {st.session_state.current_round} - {current_player['name']}'s play captured")
 							st.session_state.current_round_play += 1
