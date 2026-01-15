@@ -103,3 +103,11 @@ wopr-baseapp:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /remote/wopr
+      readOnly: true
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-nfs-pvc
