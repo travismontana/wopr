@@ -104,6 +104,7 @@ def newSession(game_id):
 	response.raise_for_status()
 	sessionuuid = response.json().get("sessionuuid")
 	sessionid = response.json().get("sessionid")
+	log.info(f"BLAH: {response.json()}")
 	log.info(f"New session created sessionuuid={sessionuuid} sessionid={sessionid}")
 	return sessionuuid, sessionid
 
@@ -146,7 +147,7 @@ def updateplaydb(session_id, player_name, play_num, play_note, imagefile):
 		imagefilename = Path(imagefile.get("filename")).name
 		log.info(f"Fetched filename: {imagefilename}")
 		payload = {
-			"session_id": session_id,
+			"session_id": st.session_state.session_id,
 			"player_name": player_name,
 			"play_num": play_num,
 			"play_note": play_note,

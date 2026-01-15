@@ -41,12 +41,12 @@ async def getnewsession(game_id: int):
 		response = requests.post(URL, json=payload, headers=woprvar.DIRECTUS_HEADERS)
 		response.raise_for_status()
 		logger.info("Successfully created new session, response: %s", response.json())
-		sessionuuid = response.json().get('data', {}).get('uuid')
+		session = response.json().get('data', {})
 	except requests.RequestException as e:
 		logger.error(f"Error creating new session: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating new session, error: {e}")
-	return {"sessionuuid": sessionuuid}
-
+	return session
+	
 @router.post("/capture")
 async def capture_session(payload: dict):
 	logger.info(f"Capturing session data for payload: {payload}")
