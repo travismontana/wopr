@@ -92,3 +92,12 @@ def get_all_images():
     logger.info("Fetching all images from the directus api")
     url = f"{woprvar.DIRECTUS_URL}/items/mlimages"
     return oneGet(url, woprvar.DIRECTUS_HEADERS, {})
+
+@router.get("/byfilename/{imagefilename}", response_model=list[dict])
+def get_images_by_filename(imagefilename: str):
+    logger.info(f"Fetching images for filename {imagefilename} from the directus api")
+    url = f"{woprvar.DIRECTUS_URL}/items/mlimages"
+    params = {
+        "filter[filename][_eq]": imagefilename,
+    }
+    return oneGet(url, woprvar.DIRECTUS_HEADERS, params)
