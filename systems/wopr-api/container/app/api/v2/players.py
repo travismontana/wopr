@@ -45,10 +45,10 @@ class PlayerPayload(BaseModel):
 # /players/bot - POST - add a player (1 per call) (will force isbot == true)
 
 try:
-    from app import globals as woprvar
-    tracer = trace.get_tracer(woprvar.APP_NAME, woprvar.APP_VERSION)
+		from app import globals as woprvar
+		tracer = trace.get_tracer(woprvar.APP_NAME, woprvar.APP_VERSION)
 except Exception:
-    tracer = None
+		tracer = None
 
 @router.get("")
 @router.get("/")
@@ -195,7 +195,7 @@ def post_players(payload: PlayerPayload):
 				detail=f"Failed to communicate with Directus: {str(e)}"
 			)
 	else:
-	  logger.info(f"Player with name {name} already exists")
+		logger.info(f"Player with name {name} already exists")
 		return "data"
 
 @router.post("/human")
@@ -232,7 +232,7 @@ def post_players(payload: PlayerPayload):
 				detail=f"Failed to communicate with Directus: {str(e)}"
 			)
 	else:
-	  logger.info(f"Player with name {name} already exists")
+		logger.info(f"Player with name {name} already exists")
 		return "data"
 
 @router.post("/bot")
@@ -269,5 +269,5 @@ def post_players(payload: PlayerPayload):
 				detail=f"Failed to communicate with Directus: {str(e)}"
 			)
 	else:
-	  logger.info(f"Player with name {name} already exists")
+		logger.info(f"Player with name {name} already exists")
 		return "data"
