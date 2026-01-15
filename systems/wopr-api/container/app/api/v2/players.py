@@ -139,7 +139,7 @@ async def get_bots():
 # Posts
 #
 
-asyncdef doesplayerexist(name: str) -> bool:
+async def doesplayerexist(name: str) -> bool:
 	url = f"{woprvar.DIRECTUS_URL}/items/players?filter[name][_eq]={name}"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
