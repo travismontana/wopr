@@ -110,4 +110,4 @@ wopr-baseapp:
   volumes:
     - name: wopr-data
       persistentVolumeClaim:
-        claimName: wopr-nfs-pvc
+        claimName: wopr-api-nfs-pvc
