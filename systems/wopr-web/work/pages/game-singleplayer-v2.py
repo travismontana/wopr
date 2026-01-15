@@ -5,6 +5,7 @@ import re
 import logging
 import sys
 from datetime import datetime
+from pathlib import Path
 
 # -------------------------
 # Logging
@@ -96,8 +97,6 @@ def fetch_games():
 	log.info("Games fetched")
 	return response.json()
 
-def fetch_imageid()
-
 def newSession(game_id):
 	url = f"{API_BASE}/api/v2/session/new/{game_id}"
 	log.info(f"GET {url}")
@@ -143,22 +142,17 @@ def player_key_sort(k: str) -> int:
 	m = re.search(r"(\d+)$", k)
 	return int(m.group(1)) if m else 0
 
-def fetch_image_id(imagefilename):
-	url = f"{API_BASE}/api/v2/images/{imagefilename}"
-	response = httpx.get(url,timeout=30.0)
-
-def updateplayerdb(session_id, player_name, play_num, play_note, imagefile):
-    # Function implementation goes here
-		imagefilenamelist = imagefile.split("/")
-		imagefilename = imagefilenamelist[-1]
-		fetch_image_id(imagefilename)
+def updateplaydb(session_id, player_name, play_num, play_note, imagefile):
+		imagefilename = Path(imagefile.get("filename")).name
+		log.info(f"Fetched filename: {imagefilename}")
 		payload = {
 			"session_id": session_id,
 			"player_name": player_name,
 			"play_num": play_num,
 			"play_note": play_note,
-			"imageid": imageid
+			"filename": imagefilename
 		}
+		log.info(f"Updating player DB with payload: {payload}")
 		pass
 
 # -------------------------

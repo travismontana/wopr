@@ -31,7 +31,7 @@ class PlayPayload(BaseModel):
 	gameid: int
 	sessionid: int
 	note: str
-	imageid: int
+	filename: str
 
 @router.get("/{game_id}")
 @router.get("/{game_id}/")
