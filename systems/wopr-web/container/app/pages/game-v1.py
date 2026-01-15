@@ -109,7 +109,7 @@ else:
 				f"mid{midcounter}"
 			)
 			midcounter += 1
-			st.success(f"Round {st.session_state.current_round} - mid game - State captured")
+			st.success(f"Round {st.session_state.current_round} - mid game {midcounter} - State captured")
 
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
