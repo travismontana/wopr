@@ -34,8 +34,7 @@ router = APIRouter(tags=["vision"])
 
 
 
-if not LABEL_STUDIO_TOKEN:
-    logger.warning("LABEL_STUDIO_TOKEN not set - vision endpoints will fail")
+
 
 # Get tracer (if tracing enabled)
 try:
@@ -47,7 +46,8 @@ except Exception:
 # Label Studio configuration
 LABEL_STUDIO_URL = woprvar.CONFIG["vision"]["label_studio_url"]
 LABEL_STUDIO_TOKEN = os.getenv('LABEL_STUDIO_TOKEN', '')
-
+if not LABEL_STUDIO_TOKEN:
+    logger.warning("LABEL_STUDIO_TOKEN not set - vision endpoints will fail")
 # Request/Response models
 class ProjectListResponse(BaseModel):
     """Label Studio projects list response"""
