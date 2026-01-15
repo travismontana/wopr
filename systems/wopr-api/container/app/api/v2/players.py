@@ -36,7 +36,6 @@ class PlayerPayload(BaseModel):
 	name: str
 	isbot: Optional[bool] = False
 
-
 # /players - GET / - get list of all players, human and rivals
 # /players - POST - add a player (1 per call)
 # /players/human - GET / - get list of all isbot != true players
@@ -58,12 +57,12 @@ async def get_players():
 		async with httpx.AsyncClient(timeout=10.0) as client:
 			response = await client.get(
 			url,
-			headers=headers
+			headers=woprvar.DIRECTUS_HEADERS
 		)
 		response.raise_for_status()
 		data = response.json()
-		logger.info(f"Retrieved {len(data.get('results', []))} projects")
-		return ProjectListResponse(**data)
+		logger.info(f"Retrieved {data}")
+		return data
 	except httpx.HTTPStatusError as e:
 		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 		raise HTTPException(
@@ -87,12 +86,12 @@ async def get_humans():
 		async with httpx.AsyncClient(timeout=10.0) as client:
 			response = await client.get(
 			url,
-			headers=headers
+			headers=woprvar.DIRECTUS_HEADERS
 		)
 		response.raise_for_status()
 		data = response.json()
-		logger.info(f"Retrieved {len(data.get('results', []))} projects")
-		return ProjectListResponse(**data)
+		logger.info(f"Retrieved {data}")
+		return data
 	except httpx.HTTPStatusError as e:
 		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 		raise HTTPException(
@@ -116,12 +115,12 @@ async def get_bots():
 		async with httpx.AsyncClient(timeout=10.0) as client:
 			response = await client.get(
 			url,
-			headers=headers
+			headers=woprvar.DIRECTUS_HEADERS
 		)
 		response.raise_for_status()
 		data = response.json()
-		logger.info(f"Retrieved {len(data.get('results', []))} projects")
-		return ProjectListResponse(**data)
+		logger.info(f"Retrieved {data}")
+		return data
 	except httpx.HTTPStatusError as e:
 		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 		raise HTTPException(
@@ -139,18 +138,19 @@ async def get_bots():
 # Posts
 #
 
-async def doesplayerexist(name: str) -> bool:
+async def doesplayerexist(name: str) -> list:
 	url = f"{woprvar.DIRECTUS_URL}/items/players?filter[name][_eq]={name}"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
 			response = await client.get(
 			url,
-			headers=headers
+			headers=woprvar.DIRECTUS_HEADERS
 		)
 		response.raise_for_status()
 		data = response.json()
-		logger.info(f"Retrieved {len(data.get('results', []))} projects")
-		return data.get('results', [isbot])
+		players = data.get('data', [])
+		logger.info(f"Retrieved {len(players)} players")
+		return players
 	except httpx.HTTPStatusError as e:
 		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 		raise HTTPException(
@@ -170,18 +170,19 @@ async def post_players(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
-	if not doesplayerexist(name):
+	existplayerinfo = await doesplayerexist(name)
+	if len(existplayerinfo) == 0:
 		try:
 			async with httpx.AsyncClient(timeout=10.0) as client:
 				response = await client.post(
 				url,
-				headers=headers,
-				json=payload
+				headers=woprvar.DIRECTUS_HEADERS,
+				json=payload.model_dump()
 			)
 			response.raise_for_status()
 			data = response.json()
-			logger.info(f"Retrieved {len(data.get('results', []))} players")
-			return ProjectListResponse(**data)
+			logger.info(f"Created {data}")
+			return data
 		except httpx.HTTPStatusError as e:
 			logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 			raise HTTPException(
@@ -196,29 +197,30 @@ async def post_players(payload: PlayerPayload):
 			)
 	else:
 		logger.info(f"Player with name {name} already exists")
-		return "data"
+		return existplayerinfo[0]
 
 @router.post("/human")
 @router.post("/human/")
 @router.post("/humans")
 @router.post("/humans/")
-async def post_players(payload: PlayerPayload):
+async def post_humans(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
-	if not doesplayerexist(name):
+	existplayerinfo = await doesplayerexist(name)
+	if len(existplayerinfo) == 0:
 		try:
 			payload.isbot = False
 			async with httpx.AsyncClient(timeout=10.0) as client:
 				response = await client.post(
 				url,
-				headers=headers,
-				json=payload
+				headers=woprvar.DIRECTUS_HEADERS,
+				json=payload.model_dump()
 			)
 			response.raise_for_status()
 			data = response.json()
-			logger.info(f"Retrieved {len(data.get('results', []))} players")
-			return ProjectListResponse(**data)
+			logger.info(f"Created {data}")
+			return data
 		except httpx.HTTPStatusError as e:
 			logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 			raise HTTPException(
@@ -233,29 +235,30 @@ async def post_players(payload: PlayerPayload):
 			)
 	else:
 		logger.info(f"Player with name {name} already exists")
-		return "data"
+		return existplayerinfo[0]
 
 @router.post("/bot")
 @router.post("/bot/")
 @router.post("/bots")
 @router.post("/bot/")
-async def post_players(payload: PlayerPayload):
+async def post_bots(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
-	if not doesplayerexist(name):
+	existplayerinfo = await doesplayerexist(name)
+	if len(existplayerinfo) == 0:
 		try:
 			payload.isbot = True
 			async with httpx.AsyncClient(timeout=10.0) as client:
 				response = await client.post(
 				url,
-				headers=headers,
-				json=payload
+				headers=woprvar.DIRECTUS_HEADERS,
+				json=payload.model_dump()
 			)
 			response.raise_for_status()
 			data = response.json()
-			logger.info(f"Retrieved {len(data.get('results', []))} players")
-			return ProjectListResponse(**data)
+			logger.info(f"Created {data}")
+			return data
 		except httpx.HTTPStatusError as e:
 			logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
 			raise HTTPException(
@@ -270,4 +273,4 @@ async def post_players(payload: PlayerPayload):
 			)
 	else:
 		logger.info(f"Player with name {name} already exists")
-		return "data"
+		return existplayerinfo[0]
