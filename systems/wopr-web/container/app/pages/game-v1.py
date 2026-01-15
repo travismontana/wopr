@@ -27,6 +27,8 @@ if 'session_uuid' not in st.session_state:
 	st.session_state.session_uuid = None
 if 'current_round' not in st.session_state:
 	st.session_state.current_round = 0
+if 'current_round_play' not in st.session_state:
+	st.session_state.current_round_play = 0
 if 'round_started' not in st.session_state:
 	st.session_state.round_started = False
 if 'selected_game' not in st.session_state:
@@ -73,6 +75,7 @@ if st.session_state.session_uuid is None:
 		st.session_state.session_uuid = newSession(selected_game['id'])
 		st.session_state.current_round = 1
 		st.session_state.round_started = False
+		
 		st.success(f"New game session started: {st.session_state.session_uuid}")
 		st.rerun()
 
@@ -93,7 +96,6 @@ else:
 				"start"
 			)
 			st.success(f"Round {st.session_state.current_round} started - Initial state captured")
-			midcounter = 0
 			st.session_state.round_started = True
 			st.rerun()
 	
@@ -106,10 +108,10 @@ else:
 			result = takeCapture(
 				st.session_state.session_uuid,
 				config.get('default_camera_id', 1),
-				f"mid{midcounter}"
+				f"mid{st.session_state.current_round_play}"
 			)
-			midcounter += 1
-			st.success(f"Round {st.session_state.current_round} - mid game {midcounter} - State captured")
+			st.session_state.current_round_play += 1
+			st.success(f"Round {st.session_state.current_round} - mid game {st.session_state.current_round_play} - State captured")
 
 		if st.button(f"End Round {st.session_state.current_round}"):
 			# Capture end state
@@ -131,7 +133,9 @@ else:
 					st.session_state.round_started = False
 					st.rerun()
 			else:
+
 				st.session_state.current_round += 1
+				st.session_state.current_round_play += 1
 				st.session_state.round_started = False
 				st.rerun()
 	
