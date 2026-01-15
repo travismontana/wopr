@@ -251,24 +251,24 @@ async def health_check() -> Dict[str, str]:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Label Studio unavailable: {str(e)}"
             )
-            
+
 @router.get("/projects/{project_id}/tasks")
 async def list_tasks(project_id: int) -> Dict[str, Any]:
-        """
-    Get specific Label Studio project details. TASKs
+    """
+    List all annotation tasks (images) in a Label Studio project.
     
     Args:
         project_id: Label Studio project ID
     
     Returns:
-        Project details
+        Tasks list with image data
     """
-    with tracer.start_as_current_span("vision.get_project") if tracer else nullcontext() as span:
+    with tracer.start_as_current_span("vision.list_tasks") if tracer else nullcontext() as span:
         if span and span.is_recording():
-            span.set_attribute("labelstudio.operation", "get_project")
+            span.set_attribute("labelstudio.operation", "list_tasks")
             span.set_attribute("labelstudio.project_id", project_id)
         
-        logger.info(f"Fetching Label Studio project {project_id}")
+        logger.info(f"Fetching tasks for Label Studio project {project_id}")
         
         url = f"{LABEL_STUDIO_URL}/api/projects/{project_id}/tasks"
         
