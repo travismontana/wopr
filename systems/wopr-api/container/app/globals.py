@@ -26,19 +26,6 @@ logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API - Pre Initialization Globals")
 
-CONFDB_URL = (
-    'postgresql://' + 
-    os.getenv('CONFDBUSER', 'config_user') + ":" + 
-    os.getenv('CONFDBPASSWORD', 'config_password') + "@" + 
-    os.getenv('DBHOST', 'config_db_host') + ":" + 
-    os.getenv('DBPORT', '5432') + "/" + 
-    os.getenv('CONFDBNAME', 'config_db_name')
-)
-
-
-
-
-
 HACK_CAMERA_DICT = {
     "1": {
         "id": "1",

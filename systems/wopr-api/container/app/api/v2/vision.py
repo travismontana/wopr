@@ -44,7 +44,7 @@ except Exception:
     tracer = None
 
 # Label Studio configuration
-LABEL_STUDIO_URL = woprvar.CONFIG["vision"]["label_studio_url"]
+LABEL_STUDIO_URL = woprvar.WOPR_CONFIG["vision"]["label_studio_url"]
 LABEL_STUDIO_TOKEN = os.getenv('LABEL_STUDIO_TOKEN', '')
 if not LABEL_STUDIO_TOKEN:
     logger.warning("LABEL_STUDIO_TOKEN not set - vision endpoints will fail")
