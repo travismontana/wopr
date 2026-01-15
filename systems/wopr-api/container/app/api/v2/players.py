@@ -52,7 +52,7 @@ except Exception:
 
 @router.get("")
 @router.get("/")
-def get_players():
+async def get_players():
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
@@ -81,7 +81,7 @@ def get_players():
 @router.get("/human/")
 @router.get("/humans")
 @router.get("/humans/")
-def get_humans():
+async def get_humans():
 	url = f"{woprvar.DIRECTUS_URL}/items/players?filter[isbot][_eq]=false"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
@@ -110,7 +110,7 @@ def get_humans():
 @router.get("/bot/")
 @router.get("/bots")
 @router.get("/bots/")
-def get_bots():
+async def get_bots():
 	url = f"{woprvar.DIRECTUS_URL}/items/players?filter[isbot][_eq]=true"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
@@ -139,7 +139,7 @@ def get_bots():
 # Posts
 #
 
-def doesplayerexist(name: str) -> bool:
+asyncdef doesplayerexist(name: str) -> bool:
 	url = f"{woprvar.DIRECTUS_URL}/items/players?filter[name][_eq]={name}"
 	try:
 		async with httpx.AsyncClient(timeout=10.0) as client:
@@ -166,7 +166,7 @@ def doesplayerexist(name: str) -> bool:
 
 @router.post("")
 @router.post("/")
-def post_players(payload: PlayerPayload):
+async def post_players(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
@@ -202,7 +202,7 @@ def post_players(payload: PlayerPayload):
 @router.post("/human/")
 @router.post("/humans")
 @router.post("/humans/")
-def post_players(payload: PlayerPayload):
+async def post_players(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
@@ -239,7 +239,7 @@ def post_players(payload: PlayerPayload):
 @router.post("/bot/")
 @router.post("/bots")
 @router.post("/bot/")
-def post_players(payload: PlayerPayload):
+async def post_players(payload: PlayerPayload):
 	url = f"{woprvar.DIRECTUS_URL}/items/players"
 	logger.info(f"Received POST request to /players: {payload}")
 	name = payload.name
