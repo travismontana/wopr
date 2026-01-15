@@ -88,8 +88,8 @@ wopr-baseapp:
     - name: LABEL_STUDIO_TOKEN
       valueFrom:
         secretKeyRef:
-          name: labelstudio-secret
-          key: labelstudio-pat
+          name: labelstudio-token-secret
+          key: labelstudio-token
 
       
   woprConfig:
