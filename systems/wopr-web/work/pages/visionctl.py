@@ -49,7 +49,19 @@ def fetch_projects():
 	response.raise_for_status()
 	return response.json()
 
-#project_names = fetch_projects()
-#selected_project = st.selectbox("Select a project:", options=project_names)
-if st.button("Get projects"):
-	st.json(fetch_projects())
+@st.cache_data(ttl=60)
+def fetch_projects_detail(id):
+	response = httpx.get(f"{API_BASE}/api/v2/vision/projects/{id}")
+	response.raise_for_status()
+	return response.json()
+
+project_names = fetch_projects()
+
+st.json(project_names)
+selected_project = st.selectbox("Select a project:", 
+  options=project_names["results"],
+	format_func=lambda x: x['title'])
+
+if st.button("Get Details"):
+	selectedProjectDeets = fetch_projects_detail(selected_project['id'])
+	st.json(selectedProjectDeets)

@@ -251,3 +251,43 @@ async def health_check() -> Dict[str, str]:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Label Studio unavailable: {str(e)}"
             )
+
+@router.get("/projects/{project_id}/tasks")
+async def list_tasks(project_id: int) -> Dict[str, Any]:
+    """
+    List all annotation tasks (images) in a Label Studio project.
+    
+    Args:
+        project_id: Label Studio project ID
+    
+    Returns:
+        Tasks list with image data
+    """
+    with tracer.start_as_current_span("vision.list_tasks") if tracer else nullcontext() as span:
+        if span and span.is_recording():
+            span.set_attribute("labelstudio.operation", "list_tasks")
+            span.set_attribute("labelstudio.project_id", project_id)
+        
+        logger.info(f"Fetching tasks for Label Studio project {project_id}")
+        
+        url = f"{LABEL_STUDIO_URL}/api/projects/{project_id}/tasks"
+        headers = await get_ls_headers()
+        
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(url, headers=headers)
+                response.raise_for_status()
+                return response.json()
+                
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Label Studio API error: {e.response.status_code} - {e.response.text}")
+            raise HTTPException(
+                status_code=e.response.status_code,
+                detail=f"Label Studio API error: {e.response.text}"
+            )
+        except httpx.HTTPError as e:
+            logger.error(f"Failed to reach Label Studio: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Failed to communicate with Label Studio: {str(e)}"
+            )
