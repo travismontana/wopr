@@ -85,6 +85,12 @@ wopr-baseapp:
         secretKeyRef:
           name: wopr-homeassistant-token
           key: HOMEASSISTANT_TOKEN
+    - name: LABEL_STUDIO_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: labelstudio-pat
+          key: labelstudio-pat
+
       
   woprConfig:
     WOPR_VERSION: "v0.1.5-alpha"
