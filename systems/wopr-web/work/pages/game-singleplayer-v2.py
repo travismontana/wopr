@@ -153,7 +153,11 @@ def updateplaydb(session_id, player_name, play_num, play_note, imagefile):
 			"filename": imagefilename
 		}
 		log.info(f"Updating player DB with payload: {payload}")
-		pass
+		url = f"{API_BASE}/api/v2/plays"
+		response = httpx.post(url, json=payload, timeout=30.0)
+		response.raise_for_status()
+		log.info("Player DB updated successfully")
+		return response
 
 # -------------------------
 # UI Flow
@@ -330,7 +334,8 @@ else:
 							st.error(f"Capture failed: {e}")
 						else:
 							st.json(result)
-							updateplaydb(st.session_state.session_id,current_player['name'], play_num, st.session_state.playnote,result)
+							result = updateplaydb(st.session_state.session_id,current_player['name'], play_num, st.session_state.playnote,result)
+							log.info(f"Play DB update result: {result}")
 							st.success(f"Round {st.session_state.current_round} - {current_player['name']}'s play captured")
 							st.session_state.current_round_play += 1
 							log.info(f"Advance to next play current_round_play={st.session_state.current_round_play}")
