@@ -253,7 +253,7 @@ async def health_check() -> Dict[str, str]:
             )
 
 @router.get("/projects/{project_id}/tasks")
-async def list_tasks(project_id: int) -> Dict[str, Any]:
+async def list_tasks(project_id: int) -> List[Dict[str, Any]]:
     """
     List all annotation tasks (images) in a Label Studio project.
     

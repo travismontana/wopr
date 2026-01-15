@@ -63,14 +63,14 @@ def fetch_tasks(project_id):
 
 project_names = fetch_projects()
 
-st.json(project_names)
+#st.json(project_names)
 selected_project = st.selectbox("Select a project:", 
   options=project_names["results"],
 	format_func=lambda x: x['title'])
 
 if st.button("Get Details"):
 	selectedProjectDeets = fetch_projects_detail(selected_project['id'])
-	st.json(selectedProjectDeets)
+	st.json(selectedProjectDeets,expanded=False)
 
 if st.button("Get Tasks"):
 	tasks = fetch_tasks(selected_project['id'])
