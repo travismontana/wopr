@@ -21,6 +21,7 @@ import logging
 import httpx
 from pydantic import BaseModel
 from app import globals as woprvar
+from app.directus_client import get_one, get_all, post, update, delete
 
 logger = logging.getLogger(woprvar.APP_NAME)
 
@@ -29,65 +30,35 @@ router = APIRouter(tags=["plays"])
 class PlayPayload(BaseModel):
 	playerid: int
 	gameid: int
-	sessionid: int
+	playid: int
 	note: str
 	filename: str
 
-@router.get("/{game_id}")
-@router.get("/{game_id}/")
-async def get_play(game_id: int):
-	logger.info(f"Getting plays for game_id: {game_id}")
-	
-	url = f"{woprvar.DIRECTUS_URL}/items/playtracker?filter[gameid][_eq]={game_id}"
-	try:
-		async with httpx.AsyncClient(timeout=10.0) as client:
-			response = await client.get(
-				url,
-				headers=woprvar.DIRECTUS_HEADERS
-			)
-		response.raise_for_status()
-		data = response.json()
-		logger.info(f"Retrieved {data}")
-		return data
-	except httpx.HTTPStatusError as e:
-		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
-		raise HTTPException(
-			status_code=e.response.status_code,
-			detail=f"Directus API error: {e.response.text}"
-		)
-	except httpx.HTTPError as e:
-		logger.error(f"Failed to reach Directus: {str(e)}")
-		raise HTTPException(
-			status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-			detail=f"Failed to communicate with Directus: {str(e)}"
-		)
+# GET / - GETS ALL
+# POST / - creates a new entry
+# UPDATE / - updates entry
+
+@router.get("")
+async def get_plays():
+    logger.info("Fetching all plays")
+    return get_all("playtracker")
+
+@router.get("/{play_id}")
+async def get_play(play_id: str):
+    logger.info(f"Fetching play with ID: {play_id}")
+    return get_one("playtracker", play_id)
 
 @router.post("")
-@router.post("/")
-async def post_play(payload: PlayPayload):
-	url = f"{woprvar.DIRECTUS_URL}/items/playtracker"
-	logger.info(f"Received POST request to /playtracker: {payload}")
-	
-	try:
-		async with httpx.AsyncClient(timeout=10.0) as client:
-			response = await client.post(
-				url,
-				headers=woprvar.DIRECTUS_HEADERS,
-				json=payload.model_dump()
-			)
-		response.raise_for_status()
-		data = response.json()
-		logger.info(f"Created {data}")
-		return data
-	except httpx.HTTPStatusError as e:
-		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
-		raise HTTPException(
-			status_code=e.response.status_code,
-			detail=f"Directus API error: {e.response.text}"
-		)
-	except httpx.HTTPError as e:
-		logger.error(f"Failed to reach Directus: {str(e)}")
-		raise HTTPException(
-			status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-			detail=f"Failed to communicate with Directus: {str(e)}"
-		)
+async def create_play(payload: dict):
+	logger.info(f"Creating a new play with payload: {payload}")
+	return post("playtracker", payload)
+
+@router.put("/{play_id}")
+async def update_play(play_id: str, payload: dict):
+    logger.info(f"Updating play {play_id} with payload: {payload}")
+    return update("playtracker", play_id, payload)
+
+@router.delete("/{play_id}")
+async def delete_play(play_id: str):
+    logger.info(f"Deleting play with ID: {play_id}")
+    return delete("playtracker", play_id)

@@ -22,6 +22,7 @@ import logging
 from app import globals as woprvar
 from opentelemetry import trace
 from contextlib import nullcontext
+from app.directus_client import get_one, get_all, post, update, delete
 
 logger = logging.getLogger(woprvar.APP_NAME)
 
@@ -69,3 +70,32 @@ async def capture_session(payload: dict):
 	except requests.RequestException as e:
 		logger.error(f"Error capturing piece image: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error setting filename for piece image, error: {e}")
+
+# GET / - GETS ALL
+# POST / - creates a new entry
+# UPDATE / - updates entry
+
+@router.get("")
+async def get_sessions():
+    logger.info("Fetching all sessions")
+    return get_all("sessiontracker")
+
+@router.get("/{session_id}")
+async def get_session(session_id: str):
+    logger.info(f"Fetching session with ID: {session_id}")
+    return get_one("sessiontracker", session_id)
+
+@router.post("")
+async def create_session(payload: dict):
+	logger.info(f"Creating a new session with payload: {payload}")
+	return post("sessiontracker", payload)
+
+@router.put("/{session_id}")
+async def update_session(session_id: str, payload: dict):
+    logger.info(f"Updating session {session_id} with payload: {payload}")
+    return update("sessiontracker", session_id, payload)
+
+@router.delete("/{session_id}")
+async def delete_session(session_id: str):
+    logger.info(f"Deleting session with ID: {session_id}")
+    return delete("sessiontracker", session_id)
