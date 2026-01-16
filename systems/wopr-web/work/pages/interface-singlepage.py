@@ -70,7 +70,7 @@ def get_all(noun) -> list:
     try:
         response = httpx.get(url, timeout=10.0)
         response.raise_for_status()
-        items = response.json().get("data", [])
+        items = response.json()
         log.info(f"Fetched {len(items)} items from {noun}")
         return items
     except httpx.HTTPError as e:
