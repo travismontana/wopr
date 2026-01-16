@@ -53,7 +53,7 @@ def get_random_phrase() -> str:
 st.header("Single Page Interface")
 mainselection = ["Sessions", "Plays", "Games", "Pieces", "Players"]
 mainselection_dict = {
-    "Sessions": "sessions",
+    "Sessions": "session",
     "Plays": "plays",
     "Games": "games",
     "Pieces": "pieces",
