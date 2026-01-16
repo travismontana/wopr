@@ -24,6 +24,8 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
+from app.directus_client import get_one, get_all, post, update, delete
+
 router = APIRouter(tags=["games"])
 
 

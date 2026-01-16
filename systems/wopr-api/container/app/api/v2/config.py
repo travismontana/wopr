@@ -23,6 +23,7 @@ import logging
 import sys
 from opentelemetry import trace
 from contextlib import nullcontext
+from app.directus_client import get_one, get_all, post, update, delete
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
