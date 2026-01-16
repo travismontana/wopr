@@ -133,7 +133,8 @@ def workplayer(playername, playerkind):
 	log.info(f"POST {url} name={playername} isbot={isbot}")
 	response = httpx.post(url, json=payload, timeout=30.0)
 	response.raise_for_status()
-	player = response.json()
+	data = response.json()
+	player = data.get('data',data)
 	log.info(f"Player OK id={player.get('id')} name={player.get('name')} isbot={player.get('isbot')}")
 	return player
 
