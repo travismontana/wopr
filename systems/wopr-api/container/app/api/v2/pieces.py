@@ -53,7 +53,7 @@ async def get_piece(piece_id: str):
 @router.post("")
 async def create_piece(payload: dict):
 	logger.info(f"Creating a new piece with payload: {payload}")
-	return post("pieces", payload)
+	return post("pieces", payload.model_dump())
 
 @router.patch("/{piece_id}")
 async def update_piece(piece_id: str, payload: dict):
