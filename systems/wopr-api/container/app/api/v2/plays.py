@@ -49,9 +49,9 @@ async def get_play(play_id: str):
     return get_one("playtracker", play_id)
 
 @router.post("")
-async def create_play(payload: PlayPayload):
+async def create_play(payload: dict):
 	logger.info(f"Creating a new play with payload: {payload}")
-	return post("playtracker", payload.model_dump())
+	return post("playtracker", payload)
 
 @router.patch("/{play_id}")
 async def update_play(play_id: str, payload: dict):
