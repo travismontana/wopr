@@ -88,7 +88,7 @@ async def get_session(session_id: str):
 @router.post("")
 async def create_session(payload: dict):
 	logger.info(f"Creating a new session with payload: {payload}")
-	return post("sessiontracker", payload.model_dump())
+	return post("sessiontracker", payload)
 
 @router.patch("/{session_id}")
 async def update_session(session_id: str, payload: dict):

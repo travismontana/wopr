@@ -227,7 +227,7 @@ async def get_config_item(config_id: str):
 @router.post("")
 async def create_config_item(payload: dict):
 	logger.info(f"Creating a new config item with payload: {payload}")
-	return post("woprconfig", payload.model_dump())
+	return post("woprconfig", payload)
 
 @router.patch("/{config_id}")
 async def update_config_item(config_id: str, payload: dict):

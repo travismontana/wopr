@@ -57,7 +57,7 @@ async def get_game(game_id: str):
 @router.post("")
 async def create_game(payload: dict):
 	logger.info(f"Creating a new game with payload: {payload}")
-	return post("game_catalog", payload.model_dump())
+	return post("game_catalog", payload)
 
 @router.patch("/{game_id}")
 async def update_game(game_id: str, payload: dict):

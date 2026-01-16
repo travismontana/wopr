@@ -49,7 +49,7 @@ async def get_play(play_id: str):
     return get_one("playtracker", play_id)
 
 @router.post("")
-async def create_play(payload: dict):
+async def create_play(payload: PlayPayload):
 	logger.info(f"Creating a new play with payload: {payload}")
 	return post("playtracker", payload.model_dump())
 
