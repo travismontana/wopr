@@ -34,8 +34,8 @@ log = setup_logger()
 # -------------------------
 # Streamlit UI
 # -------------------------
-st.title("WOPR Single Player Game Interface")
-st.write("Welcome to the WOPR Single Player Game Interface.")
+st.title("WOPR Game Interface")
+st.write("Welcome to the WOPR Game Interface.")
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
