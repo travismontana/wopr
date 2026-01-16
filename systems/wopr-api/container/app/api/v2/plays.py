@@ -53,7 +53,7 @@ async def create_play(payload: dict):
 	logger.info(f"Creating a new play with payload: {payload}")
 	return post("playtracker", payload)
 
-@router.put("/{play_id}")
+@router.patch("/{play_id}")
 async def update_play(play_id: str, payload: dict):
     logger.info(f"Updating play {play_id} with payload: {payload}")
     return update("playtracker", play_id, payload)

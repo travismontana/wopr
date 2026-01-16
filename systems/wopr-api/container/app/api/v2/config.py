@@ -212,3 +212,28 @@ async def health_check():
     """Health check endpoint"""
     with tracer.start_as_current_span("config.health") if tracer else nullcontext():
         return {"status": "ok", "service": "wopr-config"}
+
+@router.get("")
+async def get_config():
+    logger.info("Fetching all config")
+    return get_all("woprconfig")
+
+@router.get("/{config_id}")
+async def get_config_item(config_id: str):
+    logger.info(f"Fetching config item with ID: {config_id}")
+    return get_one("woprconfig", config_id)
+
+@router.post("")
+async def create_config_item(payload: dict):
+	logger.info(f"Creating a new config item with payload: {payload}")
+	return post("woprconfig", payload)
+
+@router.patch("/{config_id}")
+async def update_config_item(config_id: str, payload: dict):
+    logger.info(f"Updating config item {config_id} with payload: {payload}")
+    return update("woprconfig", config_id, payload)
+
+@router.delete("/{config_id}")
+async def delete_config_item(config_id: str):
+    logger.info(f"Deleting config item with ID: {config_id}")
+    return delete("woprconfig", config_id)

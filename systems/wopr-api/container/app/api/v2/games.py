@@ -25,21 +25,7 @@ from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
 router = APIRouter(tags=["games"])
-@router.get("/", response_model=list[dict])
-@router.get("", response_model=list[dict])
-def get_games():
-  """Get all games"""
-  logger.info("Fetching all games from the directus api")
-  URL = f"{woprvar.DIRECTUS_URL}/items/game_catalog"
-  
-  try:
-    response = requests.get(URL, headers=woprvar.DIRECTUS_HEADERS)
-    response.raise_for_status()
-    data = response.json()
-    return data.get('data', [])
-  except requests.RequestException as e:
-    logger.error(f"Error fetching games from Directus: {e}")
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching games, error: {e}")
+
 
 @router.get("/{game_id}", response_model=dict)
 def get_game(game_id: int):
@@ -56,4 +42,27 @@ def get_game(game_id: int):
     logger.error(f"Error fetching game {game_id} from Directus: {e}")
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching game {game_id}, error: {e}")
   
-  
+@router.get("")
+async def get_games():
+    logger.info("Fetching all games")
+    return get_all("game_catalog")
+
+@router.get("/{game_id}")
+async def get_game(game_id: str):
+    logger.info(f"Fetching game with ID: {game_id}")
+    return get_one("game_catalog", game_id)
+
+@router.post("")
+async def create_game(payload: dict):
+	logger.info(f"Creating a new game with payload: {payload}")
+	return post("game_catalog", payload)
+
+@router.patch("/{game_id}")
+async def update_game(game_id: str, payload: dict):
+    logger.info(f"Updating game {game_id} with payload: {payload}")
+    return update("game_catalog", game_id, payload)
+
+@router.delete("/{game_id}")
+async def delete_game(game_id: str):
+    logger.info(f"Deleting game with ID: {game_id}")
+    return delete("game_catalog", game_id)

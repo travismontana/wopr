@@ -25,6 +25,8 @@ import sys
 from opentelemetry import trace
 from contextlib import nullcontext
 from typing import Optional, List, Dict, Any
+from app.directus_client import get_one, get_all, post, update, delete
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
@@ -50,31 +52,9 @@ except Exception:
 		tracer = None
 
 @router.get("")
-@router.get("/")
 async def get_players():
-	url = f"{woprvar.DIRECTUS_URL}/items/players"
-	try:
-		async with httpx.AsyncClient(timeout=10.0) as client:
-			response = await client.get(
-			url,
-			headers=woprvar.DIRECTUS_HEADERS
-		)
-		response.raise_for_status()
-		data = response.json()
-		logger.info(f"Retrieved {data}")
-		return data
-	except httpx.HTTPStatusError as e:
-		logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
-		raise HTTPException(
-			status_code=e.response.status_code,
-			detail=f"Directus API error: {e.response.text}"
-		)
-	except httpx.HTTPError as e:
-		logger.error(f"Failed to reach Directus: {str(e)}")
-		raise HTTPException(
-			status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-			detail=f"Failed to communicate with Directus: {str(e)}"
-		)
+    logger.info("Fetching all players")
+    return get_all("players")	
 
 @router.get("/human")
 @router.get("/human/")
@@ -166,38 +146,9 @@ async def doesplayerexist(name: str) -> list:
 
 @router.post("")
 @router.post("/")
-async def post_players(payload: PlayerPayload):
-	url = f"{woprvar.DIRECTUS_URL}/items/players"
-	logger.info(f"Received POST request to /players: {payload}")
-	name = payload.name
-	existplayerinfo = await doesplayerexist(name)
-	if len(existplayerinfo) == 0:
-		try:
-			async with httpx.AsyncClient(timeout=10.0) as client:
-				response = await client.post(
-				url,
-				headers=woprvar.DIRECTUS_HEADERS,
-				json=payload.model_dump()
-			)
-			response.raise_for_status()
-			data = response.json()
-			logger.info(f"Created {data}")
-			return data
-		except httpx.HTTPStatusError as e:
-			logger.error(f"Directus API error: {e.response.status_code} - {e.response.text}")
-			raise HTTPException(
-				status_code=e.response.status_code,
-				detail=f"Directus API error: {e.response.text}"
-			)
-		except httpx.HTTPError as e:
-			logger.error(f"Failed to reach Directus: {str(e)}")
-			raise HTTPException(
-				status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-				detail=f"Failed to communicate with Directus: {str(e)}"
-			)
-	else:
-		logger.info(f"Player with name {name} already exists")
-		return existplayerinfo[0]
+async def create_players(payload: PlayerPayload):
+	logger.info(f"Creating a new player with payload: {payload}")
+	return post("players", payload)
 
 @router.post("/human")
 @router.post("/human/")
@@ -274,3 +225,19 @@ async def post_bots(payload: PlayerPayload):
 	else:
 		logger.info(f"Player with name {name} already exists")
 		return existplayerinfo[0]
+
+
+@router.patch("/{player_id}")
+async def update_player(player_id: str, payload: dict):
+    logger.info(f"Updating player {player_id} with payload: {payload}")
+    return update("players", player_id, payload)
+
+@router.delete("/{player_id}")
+async def delete_player(player_id: str):
+    logger.info(f"Deleting player with ID: {player_id}")
+    return delete("players", player_id)
+
+@router.get("/{player_id}")
+async def get_player(player_id: str):
+    logger.info(f"Fetching player with ID: {player_id}")
+    return get_one("players", player_id)

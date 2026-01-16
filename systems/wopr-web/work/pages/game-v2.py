@@ -43,6 +43,11 @@ PLAYPHRASES = [
 	"My move is made",
 	"The feud continues",
 	"The next blow is struck",
+	"I was friend of Jamis",
+	"Fear is the mind killer",
+	"There is no escape",
+	"You're worm food",
+	"Hasta la vista wormy"
 ]
 
 # -------------------------

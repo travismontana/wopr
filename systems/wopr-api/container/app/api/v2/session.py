@@ -90,7 +90,7 @@ async def create_session(payload: dict):
 	logger.info(f"Creating a new session with payload: {payload}")
 	return post("sessiontracker", payload)
 
-@router.put("/{session_id}")
+@router.patch("/{session_id}")
 async def update_session(session_id: str, payload: dict):
     logger.info(f"Updating session {session_id} with payload: {payload}")
     return update("sessiontracker", session_id, payload)
