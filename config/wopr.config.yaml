@@ -111,6 +111,8 @@
 
   "storage": {
     "base_path": "/remote/wopr",
+    "incoming_subdir": "incoming",
+    "archive_subdir": "archive",
     "default_extension": "jpg",
     "ensure_directories": true,
     "games_subdir": "games",
@@ -163,6 +165,9 @@
       21
     ],
     "label_studio_url": "https://labelstudio.wopr.tailandtraillabs.org",
+    "base_path": "labelstudio",
+    "source_path": "source",
+    "target_path": "target",
     "min_change_area_pixels": 1000,
     "morphology_iterations": {
       "dilate": 2,

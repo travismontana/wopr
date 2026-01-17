@@ -125,3 +125,11 @@ SERVICE_NAME = APP_NAME
 SERVICE_HOST = APP_HOST
 SERVICE_PORT = int(APP_PORT)
 
+storage_paths = {
+    "visionbase_path": Path(f"{WOPR_CONFIG['storage']['base_path']}/{WOPR_CONFIG['vision']['base_path']}"),  # Remove quotes, fix assignment syntax
+    "session_incoming_path": Path(f"{fullbase_path}/{WOPR_CONFIG['storage']['incoming_subdir']}"),
+    "labelstudio_base_path": Path(f"{fullbase_path}/{WOPR_CONFIG['vision']['base_path']}"),  # Maybe? Depends on intent
+    "labelstudio_source_path": Path(f"{fullbase_path}/{WOPR_CONFIG['vision']['source_path']}"),
+    "labelstudio_target_path": Path(f"{fullbase_path}/{WOPR_CONFIG['vision']['target_path']}"),
+    "archive_base_path": Path(f"{WOPR_CONFIG['storage']['base_path']}/{WOPR_CONFIG['storage']['archive_subdir']}")
+}

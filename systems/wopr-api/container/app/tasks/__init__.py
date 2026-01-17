@@ -1,10 +1,15 @@
 # Copyright 2026 Bob Bomar
 # Licensed under the Apache License, Version 2.0
 
-#from .image_tasks import *  # noqa
+import logging
+from app import globals as woprvar
+from app.logging import configure_logging
+
+configure_logging(woprvar.LOG_LEVEL, woprvar.LOG_FILE)
+from .session_tasks import *  # noqa
 
 # Export tasks for discovery
-#__all__ = [
-#    'stage_images_to_labelstudio',
-#    'archive_session',
-#]
+__all__ = [
+    'archive_session',
+]
+
