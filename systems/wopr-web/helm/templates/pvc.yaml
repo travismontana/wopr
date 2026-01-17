@@ -25,7 +25,7 @@ spec:
     requests:
       storage: 1Ti
   storageClassName: ""
-  volumeName: wopr-nfs-pv
+  volumeName: wopr-web-nfs-pv
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
