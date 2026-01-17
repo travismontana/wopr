@@ -20,3 +20,6 @@ dependencies:
   - name: wopr-baseapp
     version: "*"
     repository: "oci://ghcr.io/travismontana/wopr/charts"
+  - name: valkey
+    version: "0.9.3"
+    repository: "https://valkey.io/valkey-helm/"

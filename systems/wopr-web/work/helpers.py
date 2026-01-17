@@ -58,6 +58,9 @@ def setup_logger() -> logging.Logger:
 
 log = setup_logger()
 
+imgproxy = "http://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300/plain/https://images.wopr.tailandtraillabs.org/ml/incoming"
+imgurl = "https://images.wopr.tailandtraillabs.org/ml/incoming"
+
 def get_random_phrase() -> str:
     return random.choice(PLAYPHRASES)
 
@@ -132,6 +135,62 @@ def games_selectbox():
 
 def sessions_selectbox():
     sessions = get_all("sessions")
-    session_names = [session['name'] for session in sessions]
-    selected_session = st.selectbox("Select a Session", session_names)
-    return selected_session
+    session_uuid = [session['uuid'] for session in sessions]
+    selected_session = st.selectbox("Select a Session", session_uuid)
+    session = sessions[session_uuid.index(selected_session)]
+    session_gameid = sessions[session_uuid.index(selected_session)]['gameid']
+    log.info(f"Selected session ID: {session}")
+    return selected_session, session
+
+def get_session_plays(session_id):
+    plays = get_all("plays")
+    session_plays = [play for play in plays if play['sessionid'] == session_id]
+    return session_plays
+
+# In helpers.py
+
+def lazy_tabs(tabs, default_tab=None, key_prefix="lazy_tab"):
+    """
+    Render tabs that only execute when selected.
+    
+    Args:
+        tabs: dict of {"Tab Name": callable_function} or list of tuples
+        default_tab: str, name of default tab (uses first if None)
+        key_prefix: str, unique key for session state
+    
+    Example:
+        tabs = {
+            "New Session": new_session,
+            "Existing Session": existing_session
+        }
+        lazy_tabs(tabs)
+    """
+    # Convert dict to list of tuples if needed (maintains order in 3.7+)
+    if isinstance(tabs, dict):
+        tab_list = list(tabs.items())
+    else:
+        tab_list = tabs
+    
+    tab_names = [name for name, _ in tab_list]
+    tab_funcs = {name: func for name, func in tab_list}
+    
+    # Initialize state
+    state_key = f"{key_prefix}_active"
+    if state_key not in st.session_state:
+        st.session_state[state_key] = default_tab or tab_names[0]
+    
+    # Render selector
+    selected_tab = st.radio(
+        "Mode",
+        tab_names,
+        horizontal=True,
+        index=tab_names.index(st.session_state[state_key]),
+        key=f"{key_prefix}_selector",
+        label_visibility="collapsed"
+    )
+    
+    # Update state and render
+    st.session_state[state_key] = selected_tab
+    
+    # Call the selected function
+    tab_funcs[selected_tab]()

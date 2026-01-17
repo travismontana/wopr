@@ -111,3 +111,10 @@ wopr-baseapp:
     - name: wopr-data
       persistentVolumeClaim:
         claimName: wopr-api-nfs-pvc
+
+valkey:
+  enabled: true
+  master:
+    persistence:
+      enabled: true
+      size: 1Gi
