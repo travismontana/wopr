@@ -30,11 +30,23 @@ if "selected_session_id" not in st.session_state:
 st.title("WOPR Session Interface")
 st.write("Welcome to the WOPR Session Interface.")
 
-
-
 def new_session():
     st.subheader("Start a New Session")
     st.write("Functionality to start a new session will go here.")
+
+def session_management():
+    st.subheader("Session Management")
+    st.write("Functionality for session management will go here.")
+    current_session_id = st.session_state.get("selected_session_id", None)
+    session_info = get_one("sessions", {"id": current_session_id}) if current_session_id else None
+    log.info(f"Current Session Info: {session_info}")
+    if current_session_id:
+        log.info(f"Managing session ID: {current_session_id}")
+        plays = get_session_plays(current_session_id)
+        log.info(f"Number of Plays in this Session: {len(plays)}")
+        session_info['plays'] = plays
+        
+
 
 def ml_prep():
     st.subheader("ML Preparation")
@@ -88,6 +100,7 @@ def existing_session():
     st.write(f"Session Game: {gamename}")
 
     sesstabs = {
+        "Session Management": session_management,
         "ML Prep": ml_prep,
         "Play Walkthrough": lambda: play_walkthrough(plays, players)
     }
