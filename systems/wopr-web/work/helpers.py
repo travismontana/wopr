@@ -123,3 +123,15 @@ def delete_item(noun, item_id) -> bool:
     except httpx.HTTPError as e:
         log.error(f"Error deleting item {item_id} from {noun}: {e}")
         return False
+
+def games_selectbox():
+    games = get_all("games")
+    game_names = [game['name'] for game in games]
+    selected_game = st.selectbox("Select a Game", game_names)
+    return selected_game
+
+def sessions_selectbox():
+    sessions = get_all("sessions")
+    session_names = [session['name'] for session in sessions]
+    selected_session = st.selectbox("Select a Session", session_names)
+    return selected_session

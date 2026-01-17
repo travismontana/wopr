@@ -160,6 +160,7 @@ if tracing_enabled:
     app.include_router(notifications.router, prefix="/api/v2/notifications", tags=["notifications"])
     app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
     app.include_router(session.router, prefix="/api/v2/session", tags=["session"])
+    app.include_router(session.router, prefix="/api/v2/sessions", tags=["session"])
     app.include_router(vision.router, prefix="/api/v2/vision", tags=["vision"])
     app.include_router(players.router, prefix="/api/v2/players", tags=["players"])
     app.include_router(plays.router, prefix="/api/v2/plays", tags=["plays"])
