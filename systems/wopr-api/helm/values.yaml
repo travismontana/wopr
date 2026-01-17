@@ -122,6 +122,12 @@ wopr-baseapp:
 
   celeryWorker:
     enabled: true
+    replicaCount: 1
+    env:
+      - name: CELERY_BROKER_URL
+        value: "redis://wopr-api-valkey-master:6379/0"
+      - name: CELERY_RESULT_BACKEND
+        value: "redis://wopr-api-valkey-master:6379/0"
 
 valkey:
   enabled: true
