@@ -121,7 +121,7 @@ wopr-baseapp:
     - "8000"
 
   celeryWorker:
-    enabled: true
+    enabled: false
     replicaCount: 1
     env:
       - name: CELERY_BROKER_URL
