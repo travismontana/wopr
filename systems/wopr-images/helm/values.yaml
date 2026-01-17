@@ -88,7 +88,7 @@ wopr-baseapp:
   volumes:
     - name: wopr-data
       persistentVolumeClaim:
-        claimName: wopr-nfs-pvc
+        claimName: wopr-images-nfs-pvc
     - name: nginx-conf
       configMap:
         name: wopr-images-config
