@@ -55,6 +55,8 @@ from app.api.v2 import vision
 from app.api.v2 import players
 from app.api.v2 import plays
 
+from app.celery_app import celery_app
+
 # Set normal logging not using woprlogg.
 configure_logging("/var/log/wopr-api.log")
 logger.info("WOPR API application: booting up...")
