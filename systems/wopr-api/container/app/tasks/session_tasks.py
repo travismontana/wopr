@@ -4,7 +4,7 @@ from app.directus_client import get_one, get_all
 from app import globals as woprvar
 from app.logging import logger
 from app.lib.safe_file import SafeFS
-from app.lib.safe_file import NotFoundError, ExistsError  # ADD THIS IMPORT
+from app.lib.safe_file import NotFoundError, ExistsError
 
 # Archive
 # Files in incoming
@@ -12,7 +12,7 @@ from app.lib.safe_file import NotFoundError, ExistsError  # ADD THIS IMPORT
 # Copy to labelstudio
 
 @celery_app.task(name="archive_session")
-def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:  # CHANGED RETURN TYPE
+def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:
     """Archive a session by moving its files to the archive directory."""
     logger.info(f"Archiving session {session_id}")
     
@@ -20,6 +20,7 @@ def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:  # CHAN
     if not session_data:
         logger.error(f"Session {session_id} not found")
         raise ValueError(f"Session {session_id} not found")
+    
     session_uuid = session_data.get("uuid")
     if not session_uuid:
         logger.error(f"Session {session_id} has no UUID")
@@ -27,14 +28,11 @@ def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:  # CHAN
 
     logger.info(f"Session UUID: {session_uuid}")
 
-    try:
-        base_path = Path(woprvar.WOPR_CONFIG['storage']['base_path']).resolve()
-        archive_base_path = (base_path /woprvar.WOPR_CONFIG['storage']['archive_subdir']).resolve()
-        archive_path = ( archive_base_path / session_uuid ).resolve()
-        incoming_path = (base_path / woprvar.WOPR_CONFIG['storage']['incoming_subdir']).resolve()
-    except KeyError as e:
-        logger.error(f"Missing required storage config key: {e}")
-        raise ValueError(f"Invalid storage configuration: {e}")
+    # Use centralized storage paths from globals
+    base_path = woprvar.storage_paths["base_path"]
+    archive_base_path = woprvar.storage_paths["archive_base_path"]
+    incoming_path = woprvar.storage_paths["incoming_path"]
+    archive_path = (archive_base_path / session_uuid).resolve()
 
     session_plays = get_all("plays", filters={"session_id": {"_eq": session_id}})
     if not session_plays:
@@ -59,12 +57,12 @@ def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:  # CHAN
     try:
         # Create archive directory if it doesn't exist
         logger.info(f"Creating archive directory at {archive_path}")
-        filesafe.mkdir(str(archive_path.relative_to(base_path)), exist_ok=True)  # CHANGED
+        filesafe.mkdir(str(archive_path.relative_to(base_path)), exist_ok=True)
     except Exception as e:
         logger.error(f"Failed to create archive directory {archive_path}: {e}")
         raise
 
-    # CHANGED: Per-file error handling for best-effort archiving
+    # Per-file error handling for best-effort archiving
     results = []
     failures = []
     for filename in files_to_archive:
@@ -94,7 +92,7 @@ def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:  # CHAN
             logger.exception(e)
             failures.append({"filename": filename, "error": str(e)})
     
-    # CHANGED: Summary logging and return structure
+    # Summary logging and return structure
     if failures:
         logger.warning(
             f"Session {session_id} partial archive: "
