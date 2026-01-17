@@ -120,7 +120,7 @@ wopr-baseapp:
     - "--port"
     - "8000"
 
-  celeryWorker:
+  celeryWorker1:
     enabled: true
     replicaCount: 1
     env:
