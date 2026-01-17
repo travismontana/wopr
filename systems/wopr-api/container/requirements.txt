@@ -11,6 +11,9 @@ psycopg[binary]~=3.2.3
 pyyaml~=6.0.1
 pydantic~=2.10.4
 asyncpg
+celery>=5.4.0
+flower>=2.0.1
+redis>=5.2.1
 
 opentelemetry-api~=1.39.1
 opentelemetry-sdk~=1.39.1
