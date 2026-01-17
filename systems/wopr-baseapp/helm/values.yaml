@@ -194,7 +194,7 @@ securityContext:
 #       storage-type: nfs
 
 celeryWorker:
-  enabled: true
+  enabled: false
   replicaCount: 1
   
   # Override command/args if needed

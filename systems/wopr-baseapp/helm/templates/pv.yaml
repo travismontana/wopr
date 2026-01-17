@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+{{- if .Values.pv }}
 {{- range .Values.pv }}
 {{- if .enabled }}
 ---
@@ -53,5 +54,6 @@ spec:
   csi:
     {{- toYaml .csi | nindent 4 }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
