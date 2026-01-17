@@ -26,19 +26,3 @@ spec:
       storage: 1Ti
   storageClassName: ""
   volumeName: wopr-web-nfs-pv
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: wopr-nfs-pvc
-  namespace: wopr
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Ti
-  storageClassName: ""
-  volumeName: wopr-nfs-pv
-
-
