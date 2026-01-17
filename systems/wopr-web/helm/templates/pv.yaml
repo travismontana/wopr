@@ -16,7 +16,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: wopr-nfs-pv
+  name: wopr-web-nfs-pv
 spec:
   capacity:
     storage: 1Ti

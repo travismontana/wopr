@@ -46,6 +46,11 @@ wopr-baseapp:
         configMapKeyRef:
           name: wopr-config
           key: WOPR_API_URL
-  
-
-      
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /remote/wopr
+      readOnly: true
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-web-nfs-pvc
