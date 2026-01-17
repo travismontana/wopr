@@ -125,9 +125,9 @@ wopr-baseapp:
     replicaCount: 1
     env:
       - name: CELERY_BROKER_URL
-        value: "redis://wopr-api-valkey-master:6379/0"
+        value: "redis://wopr-api-valkey:6379/0"
       - name: CELERY_RESULT_BACKEND
-        value: "redis://wopr-api-valkey-master:6379/0"
+        value: "redis://wopr-api-valkey:6379/0"
 
 valkey:
   enabled: true
