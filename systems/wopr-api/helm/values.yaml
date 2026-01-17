@@ -112,6 +112,17 @@ wopr-baseapp:
       persistentVolumeClaim:
         claimName: wopr-api-nfs-pvc
 
+  args:
+    - "/home/wopr/.local/bin/uvicorn"
+    - "app.main:app"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
+
+  celeryWorker:
+    enabled: true
+
 valkey:
   enabled: true
   master:

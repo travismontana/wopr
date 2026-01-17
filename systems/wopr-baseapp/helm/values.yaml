@@ -192,3 +192,36 @@ securityContext:
 #     storageClass: ""        # Empty for binding to PV by selector/label
 #     extraLabels:
 #       storage-type: nfs
+
+celeryWorker:
+  enabled: false
+  replicaCount: 1
+  
+  # Override command/args if needed
+  command: ["/home/wopr/.local/bin/celery"]
+  args:
+    - "-A"
+    - "app.celery_app"
+    - "worker"
+    - "--loglevel=info"
+  
+  # Worker-specific env vars (merged with global env)
+  env: []
+  #  - name: CELERY_WORKER_PREFETCH_MULTIPLIER
+  #    value: "4"
+  
+  # Celery inspect ping probe
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
