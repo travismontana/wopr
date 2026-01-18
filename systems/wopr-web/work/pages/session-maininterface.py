@@ -44,7 +44,11 @@ def archive_play_records(session_id: str, plays: list):
         play_id = play['id']
         log.info('update("plays", play_id, payload)')
     return {"status": "success", "message": f"Archived {len(plays)} plays."}
-    
+
+def jobs_interface():
+    st.subheader("Jobs Interface")
+    st.write("Functionality for managing and viewing jobs will go here.")
+    st.table(get_all_session_tasks())
 
 def session_management():
     st.subheader("Session Management")
@@ -168,7 +172,8 @@ def existing_session():
     sesstabs = {
         "Session Management": session_management,
         "ML Prep": ml_prep,
-        "Play Walkthrough": lambda: play_walkthrough(plays, players)
+        "Play Walkthrough": lambda: play_walkthrough(plays, players),
+        "Jobs": jobs_interface
     }
 
     lazy_tabs(sesstabs, key_prefix="session_tabs")

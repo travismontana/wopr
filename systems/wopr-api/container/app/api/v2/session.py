@@ -167,3 +167,7 @@ async def get_session_task(task_id: str):
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching task details for task ID {task_id}, error: {e}")
 	return response
 
+@router.get("/task")
+async def get_all_session_tasks():
+	logger.info("Fetching all active session tasks")
+	return get_all_active_tasks()

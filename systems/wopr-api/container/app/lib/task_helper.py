@@ -143,3 +143,90 @@ def get_task_info(task_id: str) -> Dict[str, Any]:
         info["completed_at"] = task.date_done
         
     return info
+
+def get_all_tasks(filter_state: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Get all tasks from Celery workers.
+    
+    Args:
+        filter_state: Optional filter (active, scheduled, reserved, registered)
+    
+    Returns:
+        Dict with tasks grouped by worker and state
+        
+    Note: Only sees tasks known to currently running workers.
+          Completed tasks may not appear unless result backend stores them.
+    """
+    from celery import current_app
+    
+    inspect = current_app.control.inspect()
+    
+    # Gather different task states
+    tasks = {
+        "active": inspect.active() or {},      # Currently executing
+        "scheduled": inspect.scheduled() or {}, # Waiting for ETA
+        "reserved": inspect.reserved() or {},   # Claimed by worker, not started
+        "registered": inspect.registered() or {} # All known task types
+    }
+    
+    # If filter requested, return only that state
+    if filter_state and filter_state in tasks:
+        return {filter_state: tasks[filter_state]}
+    
+    # Otherwise return everything
+    return tasks
+
+
+def get_all_active_tasks() -> list:
+    """
+    Flatten all active/scheduled/reserved tasks into a simple list.
+    
+    Returns:
+        List of dicts with task_id, name, state, worker, args
+    """
+    from celery import current_app
+    
+    inspect = current_app.control.inspect()
+    all_tasks = []
+    
+    # Get active tasks
+    active = inspect.active() or {}
+    for worker, tasks in active.items():
+        for task in tasks:
+            all_tasks.append({
+                "task_id": task.get("id"),
+                "name": task.get("name"),
+                "state": "ACTIVE",
+                "worker": worker,
+                "args": task.get("args", []),
+                "kwargs": task.get("kwargs", {})
+            })
+    
+    # Get scheduled tasks
+    scheduled = inspect.scheduled() or {}
+    for worker, tasks in scheduled.items():
+        for task in tasks:
+            all_tasks.append({
+                "task_id": task.get("id"),
+                "name": task.get("name"),
+                "state": "SCHEDULED",
+                "worker": worker,
+                "eta": task.get("eta"),
+                "args": task.get("args", []),
+                "kwargs": task.get("kwargs", {})
+            })
+    
+    # Get reserved tasks (acknowledged but not started)
+    reserved = inspect.reserved() or {}
+    for worker, tasks in reserved.items():
+        for task in tasks:
+            all_tasks.append({
+                "task_id": task.get("id"),
+                "name": task.get("name"),
+                "state": "RESERVED",
+                "worker": worker,
+                "args": task.get("args", []),
+                "kwargs": task.get("kwargs", {})
+            })
+    
+    return all_tasks

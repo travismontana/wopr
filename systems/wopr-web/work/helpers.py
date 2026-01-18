@@ -319,3 +319,30 @@ def poll_task_until_complete(task_id: str, interval: int = 2, max_attempts: int 
     
     log.warning(f"Task {task_id} did not complete after {max_attempts} attempts")
     return {"state": "POLLING_TIMEOUT", "task_id": task_id}
+
+def get_all_session_tasks(filter_state: str = None) -> list:
+    """
+    Get all tasks in the Celery queue.
+    
+    Args:
+        filter_state: Optional state filter (PENDING, STARTED, SUCCESS, FAILURE, RETRY, REVOKED)
+    
+    Returns:
+        List of task dicts with id, state, name, args, etc.
+    """
+    url = f"{API_BASE}/api/v2/session/tasks"
+    params = {}
+    if filter_state:
+        params['state'] = filter_state
+    
+    try:
+        response = httpx.get(url, params=params, timeout=10.0)
+        response.raise_for_status()
+        tasks = response.json()
+        log.info(f"Fetched {len(tasks)} tasks from queue" + 
+                 (f" (state={filter_state})" if filter_state else ""))
+        return tasks
+    except httpx.HTTPError as e:
+        log.error(f"Error fetching tasks from queue: {e}")
+        st.error(f"Failed to load tasks: {e}")
+        return []
