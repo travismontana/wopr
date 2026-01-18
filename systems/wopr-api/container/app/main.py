@@ -64,7 +64,7 @@ from app.celery_app import celery_app
 # -------------------------
 
 # Configure logging first
-configure_logging("/var/log/wopr-api.log")
+logger = configure_logging("/var/log/wopr-api.log")
 logger.info("WOPR API application: booting up...")
 logger.debug(f"WOPR API globals: {woprvar.WOPR_CONFIG}")
 
