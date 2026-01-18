@@ -51,7 +51,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
         raise ValueError(f"No valid filenames found in plays for session {session_id}")
     logger.info(f"Files to archive: {files_to_archive}")
 
-    filesafe = SafeFS(base_dir=str(base_path), forbid_symlinks=True)
+    filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
 
     try:
         # Create archive directory if it doesn't exist
