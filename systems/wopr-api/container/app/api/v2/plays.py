@@ -25,9 +25,9 @@ from app.directus_client import get_one, get_all, post, update, delete
 from app.logging import configure_logging
 
 logger = configure_logging(woprvar.APP_NAME)
-
+logger.info("Initializing Plays API router")
 router = APIRouter(tags=["plays"])
-
+logger.info("Plays API router initialized")
 class PlayPayload(BaseModel):
 	playerid: int
 	gameid: int
