@@ -106,7 +106,7 @@ wopr-baseapp:
   volumeMounts:
     - name: wopr-data
       mountPath: /remote/wopr
-      readOnly: true
+      readOnly: false
   volumes:
     - name: wopr-data
       persistentVolumeClaim:
