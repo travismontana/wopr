@@ -136,8 +136,13 @@ def ml_prep():
     log.info(f"File status task completed with results: {presence}")
     if st.button("Copy files to source"):
         results = copy_files_to_source(st.session_state.selected_session_id)
+        log.info(f"Copy files to source completed with results: {results}")
+        task_id = results.get("task_id", "N/A")
+        if task_id != "N/A":
+            results2 = wait_for_task(task_id)
+        log.info(f"File copy task completed with results: {results2}")
         st.success("Files copied to source.")
-        st.table(results)
+        st.table(results2)
     st.table(presence)
     
 

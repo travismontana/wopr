@@ -315,8 +315,9 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     session_data, session_uuid = _get_session_data(session_id)
 
     # Get storage paths from globals
-    base_path = woprvar.storage_paths["base_path"]
+    base_path = woprvar.storage_paths["base_path"] / "ml"
     incoming_base_path = woprvar.storage_paths["incoming_path"]
+    incoming_path = (incoming_base_path / session_uuid).resolve()
     archive_base_path = woprvar.storage_paths["archive_base_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
 
