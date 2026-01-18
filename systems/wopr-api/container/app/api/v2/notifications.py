@@ -26,7 +26,8 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from app import globals as woprvar
 import requests
-
+from app.logging import configure_logging
+logger = configure_logging(woprvar.APP_NAME)
 router = APIRouter(tags=["notifications"])
 
 @router.post("/")

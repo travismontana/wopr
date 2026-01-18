@@ -24,11 +24,9 @@ import sys
 from opentelemetry import trace
 from contextlib import nullcontext
 from app.directus_client import get_one, get_all, post, update, delete
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
+from app import globals as woprvar
+from app.logging import configure_logging
+logger = configure_logging(woprvar.APP_NAME)
 router = APIRouter(tags=["config"])
 
 # Directus configuration

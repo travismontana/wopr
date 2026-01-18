@@ -16,7 +16,8 @@ from . import router, logger
 from fastapi import APIRouter, HTTPException, status
 from app import globals as woprvar
 import requests
-
+from app.logging import configure_logging
+logger = configure_logging(woprvar.APP_NAME)
 router = APIRouter(tags=["images"])
 logger.info("Images API module loaded")
 

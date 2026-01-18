@@ -23,7 +23,8 @@ from app import globals as woprvar
 import requests
 import time 
 import os
-
+from app.logging import configure_logging
+logger = configure_logging(woprvar.APP_NAME)
 router = APIRouter(tags=["mlimages"])
 
 @router.post("/capture", response_model=dict)

@@ -25,6 +25,7 @@ import sys
 from opentelemetry import trace
 from contextlib import nullcontext
 from typing import Optional, List, Dict, Any
+from app import globals as woprvar
 from app.logging import configure_logging
 
 logger = configure_logging(woprvar.APP_NAME)

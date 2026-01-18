@@ -13,7 +13,6 @@ from opentelemetry import trace
 from typing import Optional
 from app.directus_client import get_one, get_all, post, update, delete
 from app.logging import configure_logging
-
 logger = configure_logging(woprvar.APP_NAME)
 
 router = APIRouter(tags=["players"])
