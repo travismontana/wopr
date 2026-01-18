@@ -12,8 +12,8 @@ from app.lib.safe_file import NotFoundError, ExistsError
 # Copy to labelstudio
 
 configure_logging("/var/log/wopr_api.log")
-@celery_app.task(name="archive_session")
-def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:
+@celery_app.task(name="archive_session_images")
+def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     """Archive a session by moving its files to the archive directory."""
     logger.info(f"Archiving session {session_id}")
     
