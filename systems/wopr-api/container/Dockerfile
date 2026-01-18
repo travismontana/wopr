@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt autoclean \
     && rm -rf /var/lib/apt/lists/* 
 
-RUN useradd -m wopr && \
+RUN useradd -m -u 2222 wopr && \
     mkdir -p /app /var/log/wopr && \
     chown -R wopr:wopr /app /var/log/wopr
 
