@@ -228,7 +228,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     # Get list of files to check
     files_to_check = _get_session_filenames(session_id)
     logger.info(f"Checking {len(files_to_check)} files across storage locations")
-
+    wopr_base_path = woprvar.storage_paths["wopr_base_path"]
     # Initialize SafeFS wrapper
     filesafe = SafeFS(base_dir=woprvar.storage_paths["wopr_base_path"], forbid_symlinks=True)
     logger.info(f"SafeFS initialized with base_dir={woprvar.storage_paths['wopr_base_path']}, forbid_symlinks=True")
@@ -245,7 +245,8 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
 
     # Initialize result structure
     presence = {key: [] for key in locations.keys()}
-    logger.info(f"Beginning file presence check across {len([k for k, v in locations.items() if v is not None])} configured locations")
+    logger.info(f"Beginning file presence check across "
+        f"{len([k for k, v in locations.items() if v is not None])} configured locations")
 
     # Check each file's presence in each location
     for filename in files_to_check:
