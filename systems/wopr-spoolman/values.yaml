@@ -1,0 +1,27 @@
+wopr-baseapp:
+  app:
+    name: wopr-spoolman
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: donkie/spoolman
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: spoolman.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-spoolman-tls
+        hosts:
+          - spoolman.wopr.tailandtraillabs.org
