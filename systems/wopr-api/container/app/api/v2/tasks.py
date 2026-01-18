@@ -103,7 +103,7 @@ async def get_all_session_tasks():
 	logger.info("Fetching all active session tasks")
 	return get_all_active_tasks()
 
-@router.get("/session/{session_id}/file_status")
+@router.post("/session/{session_id}/file_status")
 async def check_session_file_status(session_id: str):
 	logger.info(f"Checking file status for session ID: {session_id}")
 	try:

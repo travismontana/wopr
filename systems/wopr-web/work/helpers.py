@@ -123,6 +123,7 @@ def get_all(noun: str) -> list:
     except httpx.HTTPError as e:
         log.error(f"Failed to fetch {noun}: {e}")
         st.error(f"Failed to load {noun}: {e}")
+        st.stop()
         return []
 
 

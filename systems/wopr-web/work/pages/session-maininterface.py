@@ -128,8 +128,7 @@ def session_management():
 def ml_prep():
     st.subheader("ML Preparation")
     st.write("Functionality for ML preparation will go here.")
-    presence = session_image_status(st.session_state.selected_session_id)
-    st.write(f"Image Presence Status: {presence}")
+    presence = queue_session_task(st.session_state.selected_session_id, "file_status")
     
 
 def play_walkthrough(plays, players):
