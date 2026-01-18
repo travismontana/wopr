@@ -33,6 +33,7 @@ from app.lib.task_helper import (
 )
 from app.logging import configure_logging
 from app.tasks.session_tasks import archive_session_images  # Import the task
+from app.tasks.session_tasks import check_session_file_status_task  # Import the task
 
 logger = configure_logging(woprvar.LOGFILE)
 
