@@ -118,35 +118,9 @@ def wait_for_task(task_id: str, timeout: Optional[float] = None) -> Dict[str, An
             "error": str(e)
         }
 
-
-def get_task_info(task_id: str) -> Dict[str, Any]:
-    """
-    Get detailed task metadata.
-    
-    Returns:
-        Dict with task name, args, kwargs, etc.
-    """
-    task = AsyncResult(task_id, app=celery_app)
-    
-    info = {
-        "task_id": task_id,
-        "state": task.state,
-        "name": task.name,
-    }
-    
-    # Some backends provide more detail
-    if hasattr(task, 'args'):
-        info["args"] = task.args
-    if hasattr(task, 'kwargs'):
-        info["kwargs"] = task.kwargs
-    if task.date_done:
-        info["completed_at"] = task.date_done
-        
-    return info
-
 def get_all_tasks(filter_state: Optional[str] = None) -> Dict[str, Any]:
     """
-    Get all tasks from Celery workers.
+    Get all tasks from Celery workers across different states.
     
     Args:
         filter_state: Optional filter (active, scheduled, reserved, registered)
@@ -154,27 +128,41 @@ def get_all_tasks(filter_state: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         Dict with tasks grouped by worker and state
         
-    Note: Only sees tasks known to currently running workers.
-          Completed tasks may not appear unless result backend stores them.
+    Note:
+        Only sees tasks known to currently running workers.
+        Completed tasks may not appear unless result backend stores them.
+        
+    Limitations:
+        The inspect API queries all workers synchronously.
+        Performance degrades with many workers.
     """
-    from celery import current_app
-    
-    inspect = current_app.control.inspect()
-    
-    # Gather different task states
-    tasks = {
-        "active": inspect.active() or {},      # Currently executing
-        "scheduled": inspect.scheduled() or {}, # Waiting for ETA
-        "reserved": inspect.reserved() or {},   # Claimed by worker, not started
-        "registered": inspect.registered() or {} # All known task types
-    }
-    
-    # If filter requested, return only that state
-    if filter_state and filter_state in tasks:
-        return {filter_state: tasks[filter_state]}
-    
-    # Otherwise return everything
-    return tasks
+    try:
+        from celery import current_app
+        
+        inspect = current_app.control.inspect()
+        
+        # Gather different task states
+        tasks = {
+            "active": inspect.active() or {},       # Currently executing
+            "scheduled": inspect.scheduled() or {}, # Waiting for ETA
+            "reserved": inspect.reserved() or {},   # Claimed by worker, not started
+            "registered": inspect.registered() or {} # All known task types
+        }
+        
+        # If filter requested, return only that state
+        if filter_state and filter_state in tasks:
+            logger.info(f"Retrieved {filter_state} tasks from Celery workers")
+            return {filter_state: tasks[filter_state]}
+        
+        # Otherwise return everything
+        total_count = sum(len(worker_tasks) if isinstance(worker_tasks, dict) 
+                         else 0 for worker_tasks in tasks.values())
+        logger.info(f"Retrieved all task states from Celery workers (total workers: {total_count})")
+        return tasks
+        
+    except Exception as e:
+        logger.error(f"Failed to retrieve tasks from Celery workers: {e}")
+        raise
 
 
 def get_all_active_tasks() -> list:
@@ -182,51 +170,66 @@ def get_all_active_tasks() -> list:
     Flatten all active/scheduled/reserved tasks into a simple list.
     
     Returns:
-        List of dicts with task_id, name, state, worker, args
+        List of dicts with task_id, name, state, worker, args, kwargs
+        
+    States included:
+        - ACTIVE: Currently executing
+        - SCHEDULED: Queued with future ETA
+        - RESERVED: Acknowledged by worker, not yet started
+        
+    Note:
+        Does not include PENDING tasks (not yet sent to broker)
+        or completed tasks (SUCCESS/FAILURE/REVOKED).
     """
-    from celery import current_app
-    
-    inspect = current_app.control.inspect()
-    all_tasks = []
-    
-    # Get active tasks
-    active = inspect.active() or {}
-    for worker, tasks in active.items():
-        for task in tasks:
-            all_tasks.append({
-                "task_id": task.get("id"),
-                "name": task.get("name"),
-                "state": "ACTIVE",
-                "worker": worker,
-                "args": task.get("args", []),
-                "kwargs": task.get("kwargs", {})
-            })
-    
-    # Get scheduled tasks
-    scheduled = inspect.scheduled() or {}
-    for worker, tasks in scheduled.items():
-        for task in tasks:
-            all_tasks.append({
-                "task_id": task.get("id"),
-                "name": task.get("name"),
-                "state": "SCHEDULED",
-                "worker": worker,
-                "eta": task.get("eta"),
-                "args": task.get("args", []),
-                "kwargs": task.get("kwargs", {})
-            })
-    
-    # Get reserved tasks (acknowledged but not started)
-    reserved = inspect.reserved() or {}
-    for worker, tasks in reserved.items():
-        for task in tasks:
-            all_tasks.append({
-                "task_id": task.get("id"),
-                "name": task.get("name"),
-                "state": "RESERVED",
-                "worker": worker,
-                "args": task.get("args", []),
-                "kwargs": task.get("kwargs", {})
-            })
-    
-    return all_tasks
+    try:
+        from celery import current_app
+        
+        inspect = current_app.control.inspect()
+        all_tasks = []
+        
+        # Get active tasks (currently executing)
+        active = inspect.active() or {}
+        for worker, tasks in active.items():
+            for task in tasks:
+                all_tasks.append({
+                    "task_id": task.get("id"),
+                    "name": task.get("name"),
+                    "state": "ACTIVE",
+                    "worker": worker,
+                    "args": task.get("args", []),
+                    "kwargs": task.get("kwargs", {})
+                })
+        
+        # Get scheduled tasks (waiting for ETA)
+        scheduled = inspect.scheduled() or {}
+        for worker, tasks in scheduled.items():
+            for task in tasks:
+                all_tasks.append({
+                    "task_id": task.get("id"),
+                    "name": task.get("name"),
+                    "state": "SCHEDULED",
+                    "worker": worker,
+                    "eta": task.get("eta"),
+                    "args": task.get("args", []),
+                    "kwargs": task.get("kwargs", {})
+                })
+        
+        # Get reserved tasks (acknowledged but not started)
+        reserved = inspect.reserved() or {}
+        for worker, tasks in reserved.items():
+            for task in tasks:
+                all_tasks.append({
+                    "task_id": task.get("id"),
+                    "name": task.get("name"),
+                    "state": "RESERVED",
+                    "worker": worker,
+                    "args": task.get("args", []),
+                    "kwargs": task.get("kwargs", {})
+                })
+        
+        logger.info(f"Retrieved {len(all_tasks)} active tasks from Celery workers")
+        return all_tasks
+        
+    except Exception as e:
+        logger.error(f"Failed to retrieve active tasks from Celery workers: {e}")
+        raise
