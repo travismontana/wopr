@@ -320,7 +320,7 @@ def poll_task_until_complete(task_id: str, interval: int = 2, max_attempts: int 
     log.warning(f"Task {task_id} did not complete after {max_attempts} attempts")
     return {"state": "POLLING_TIMEOUT", "task_id": task_id}
 
-def get_all_session_tasks(filter_state: str = None) -> list:
+def all_session_tasks(filter_state: str = None) -> list:
     """
     Get all tasks in the Celery queue.
     

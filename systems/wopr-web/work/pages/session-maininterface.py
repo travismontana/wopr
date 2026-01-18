@@ -48,7 +48,7 @@ def archive_play_records(session_id: str, plays: list):
 def jobs_interface():
     st.subheader("Jobs Interface")
     st.write("Functionality for managing and viewing jobs will go here.")
-    st.table(get_all_session_tasks())
+    st.table(all_session_tasks())
 
 def session_management():
     st.subheader("Session Management")

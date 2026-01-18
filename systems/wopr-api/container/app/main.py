@@ -56,6 +56,7 @@ from app.api.v2 import session
 from app.api.v2 import vision
 from app.api.v2 import players
 from app.api.v2 import plays
+from app.api.v2 import tasks
 
 from app.celery_app import celery_app
 
@@ -197,6 +198,7 @@ app.include_router(session.router, prefix="/api/v2/sessions", tags=["session"])
 app.include_router(vision.router, prefix="/api/v2/vision", tags=["vision"])
 app.include_router(players.router, prefix="/api/v2/players", tags=["players"])
 app.include_router(plays.router, prefix="/api/v2/plays", tags=["plays"])
+app.include_router(tasks.router, prefix="/api/v2/tasks", tags=["tasks"])
 
 logger.info("All API routers registered successfully")
 
