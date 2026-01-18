@@ -28,3 +28,6 @@ wopr-baseapp:
 
   securityContext:
     runAsNonRoot: False
+    fsGroup: 0
+    runAsGroup: 0
+    runAsUser: 0
