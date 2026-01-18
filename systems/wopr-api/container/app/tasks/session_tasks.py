@@ -179,7 +179,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     return {"archived": results, "failed": failures}
 
 
-@celery_app.task(name="check_session_file_status")
+@celery_app.task(name="check_session_file_status_task")
 def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     """
     Check which files for a session are present in various storage locations.
