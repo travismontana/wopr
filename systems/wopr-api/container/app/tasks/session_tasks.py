@@ -30,6 +30,8 @@ def _get_session_data(session_id: str) -> tuple[dict, str]:
     Raises:
         ValueError: If session not found or has no UUID
     """
+    logger.info(f"=== _get_session_data START === session_id={session_id}")
+    
     session_data = get_one("sessiontracker", session_id)
     if not session_data:
         logger.error(f"Session {session_id} not found")
@@ -40,7 +42,8 @@ def _get_session_data(session_id: str) -> tuple[dict, str]:
         logger.error(f"Session {session_id} has no UUID")
         raise ValueError(f"Session {session_id} has no UUID")
 
-    logger.info(f"Session UUID: {session_uuid}")
+    logger.info(f"Session data retrieved: session_id={session_id}, session_uuid={session_uuid}")
+    logger.info(f"=== _get_session_data END === session_uuid={session_uuid}")
     return session_data, session_uuid
 
 
@@ -57,7 +60,11 @@ def _get_session_filenames(session_id: str) -> list[str]:
     Raises:
         ValueError: If no plays found or no valid filenames exist
     """
+    logger.info(f"=== _get_session_filenames START === session_id={session_id}")
+    
     session_plays = get_all("playtracker", filters={"sessionid": {"_eq": session_id}})
+    logger.info(f"Retrieved {len(session_plays) if session_plays else 0} play records from playtracker")
+    
     if not session_plays:
         logger.error(f"No plays found for session {session_id}")
         raise ValueError(f"No plays found for session {session_id}")
@@ -80,7 +87,7 @@ def _get_session_filenames(session_id: str) -> list[str]:
         logger.error(f"No valid filenames found in plays for session {session_id}")
         raise ValueError(f"No valid filenames found in plays for session {session_id}")
 
-    logger.info(f"Found {len(filenames)} files for session {session_id}")
+    logger.info(f"=== _get_session_filenames END === session_id={session_id}, filename_count={len(filenames)}, filenames={filenames}")
     return filenames
 
 
@@ -104,7 +111,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     Raises:
         ValueError: If session not found, has no UUID, or has no valid files
     """
-    logger.info(f"Archiving session {session_id}")
+    logger.info(f"=== archive_session_images START === session_id={session_id}")
 
     # Fetch and validate session
     session_data, session_uuid = _get_session_data(session_id)
@@ -115,17 +122,21 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     incoming_path = woprvar.storage_paths["incoming_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
 
+    logger.info(f"Paths: base_path={base_path}, archive_base_path={archive_base_path}, incoming_path={incoming_path}, archive_path={archive_path}")
+
     # Get list of files to archive
     files_to_archive = _get_session_filenames(session_id)
-    logger.info(f"Files to archive: {files_to_archive}")
+    logger.info(f"Files to archive: count={len(files_to_archive)}, files={files_to_archive}")
 
     # Initialize SafeFS wrapper
     filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
+    logger.info(f"SafeFS initialized with base_dir={base_path}, forbid_symlinks=True")
 
     # Create archive directory for this session
     try:
         logger.info(f"Creating archive directory at {archive_path}")
         filesafe.mkdir(str(archive_path.relative_to(base_path)), exist_ok=True)
+        logger.info(f"Archive directory created/verified at {archive_path}")
     except (OSError, ValueError, RuntimeError) as e:
         # OSError: permission/disk issues, ValueError: path validation,
         # RuntimeError: SafeFS constraint violations
@@ -135,17 +146,19 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     # Archive files with per-file error handling for best-effort completion
     results = []
     failures = []
+    logger.info(f"Beginning file archiving operations for {len(files_to_archive)} files")
 
     for filename in files_to_archive:
         src_path = incoming_path / filename
         dst_path = archive_path / filename
 
         try:
-            logger.info(f"Archiving file {src_path} to {dst_path}")
+            logger.info(f"Archiving file: src={src_path}, dst={dst_path}")
             how = filesafe.move(
                 str(src_path.relative_to(base_path)),
                 str(dst_path.relative_to(base_path))
             )
+            logger.info(f"File archived successfully: {filename}, method={how}")
             results.append({
                 "filename": filename,
                 "source": str(src_path),
@@ -175,6 +188,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
         logger.info(f"Session {session_id} archived {len(results)} files successfully")
 
     logger.debug(f"Archive results: {results}")
+    logger.info(f"=== archive_session_images END === session_id={session_id}, archived_count={len(results)}, failed_count={len(failures)}")
 
     return {"archived": results, "failed": failures}
 
@@ -199,7 +213,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     Raises:
         ValueError: If session not found, has no UUID, or has no valid files
     """
-    logger.info(f"Checking file status for session {session_id}")
+    logger.info(f"=== check_session_file_status_task START === session_id={session_id}")
 
     # Fetch and validate session
     session_data, session_uuid = _get_session_data(session_id)
@@ -221,11 +235,13 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
         label_base_path = (archive_base_path / label_subdir).resolve()
         label_source_path = (label_base_path / label_source_subdir).resolve()
         label_target_path = (label_base_path / label_target_subdir).resolve()
+        logger.info(f"Paths: base_path={base_path}, archive_base_path={archive_base_path}, incoming_path={incoming_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}, label_target_subdir={label_target_subdir}, label_base_path={label_base_path}, label_source_path={label_source_path}, label_target_path={label_target_path}")
         logger.debug("Label studio paths configured and available")
     else:
         # Use None to indicate unconfigured paths
         label_source_path = None
         label_target_path = None
+        logger.info(f"Paths: base_path={base_path}, archive_base_path={archive_base_path}, incoming_path={incoming_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}, label_target_subdir={label_target_subdir}")
         logger.debug("Label studio paths not fully configured, skipping those checks")
 
     # Get list of files to check
@@ -234,6 +250,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
 
     # Initialize SafeFS wrapper
     filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
+    logger.info(f"SafeFS initialized with base_dir={base_path}, forbid_symlinks=True")
 
     # Build location map for iteration
     # Note: Using SafeFS._resolve_rel() internal method as public API doesn't
@@ -247,6 +264,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
 
     # Initialize result structure
     presence = {key: [] for key in locations.keys()}
+    logger.info(f"Beginning file presence check across {len([k for k, v in locations.items() if v is not None])} configured locations")
 
     # Check each file's presence in each location
     for filename in files_to_check:
@@ -257,7 +275,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
                 continue
 
             file_path = location_path / filename
-            logger.info(f" - Checking in {location_key} at {file_path}")
+            logger.debug(f" - Checking in {location_key} at {file_path}")
 
             try:
                 # Check if file exists using SafeFS internal resolution
@@ -270,7 +288,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
                     presence[location_key].append(filename)
                     logger.info(f"   -> Found in {location_key}")
                 else:
-                    logger.info(f"   -> Not found in {location_key}")
+                    logger.debug(f"   -> Not found in {location_key}")
             except (ValueError, RuntimeError) as e:
                 # Path validation errors from SafeFS
                 logger.warning(
@@ -287,6 +305,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     logger.info(
         f"File status for session {session_id}: {', '.join(summary_parts) if summary_parts else 'no files found'}"
     )
+    logger.info(f"=== check_session_file_status_task END === session_id={session_id}, presence={presence}")
 
     return presence
 
@@ -309,7 +328,7 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
             - "success": List of successfully copied files with metadata
             - "failed": List of files that failed to copy with error info
     """
-    logger.info(f"Copying session {session_id} files to label studio source")
+    logger.info(f"=== copy_files_to_label_source START === session_id={session_id}")
     
     # Fetch and validate session
     session_data, session_uuid = _get_session_data(session_id)
@@ -324,24 +343,29 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     label_subdir = woprvar.storage_paths.get("label_subdir")
     label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
 
+    logger.info(f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, incoming_path={incoming_path}, archive_base_path={archive_base_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}")
+    
     if not label_subdir or not label_source_subdir:
         logger.error("Label studio paths not fully configured")
         raise ValueError("Label studio paths not fully configured")
 
     label_base_path = (archive_base_path / label_subdir).resolve()
     label_source_path = (label_base_path / label_source_subdir).resolve()
+    logger.info(f"Computed label paths: label_base_path={label_base_path}, label_source_path={label_source_path}")
 
     # Get list of files to copy
     files_to_copy = _get_session_filenames(session_id)
-    logger.info(f"Files to copy: {files_to_copy}")
+    logger.info(f"Files to copy: count={len(files_to_copy)}, files={files_to_copy}")
 
     # Initialize SafeFS wrapper
     filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
+    logger.info(f"SafeFS initialized with base_dir={base_path}, forbid_symlinks=True")
 
     # Create label source directory for this session
     try:
         logger.info(f"Creating label source directory at {label_source_path}")
         filesafe.mkdir(str(label_source_path.relative_to(base_path)), exist_ok=True)
+        logger.info(f"Label source directory created/verified at {label_source_path}")
     except (OSError, ValueError, RuntimeError) as e:
         logger.error(f"Failed to create label source directory {label_source_path}: {e}")
         raise
@@ -349,6 +373,7 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     # Copy files with per-file error handling for best-effort completion
     results = []
     failures = []
+    logger.info(f"Beginning file copy operations for {len(files_to_copy)} files")
 
     for filename in files_to_copy:
         src_path = incoming_base_path / filename
@@ -356,21 +381,25 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
         dst_path = label_source_path / filename
 
         try:
-            logger.info(f"Copying file {src_path} to {dst_path}")
+            logger.info(f"Copying file to label source: src={src_path}, dst={dst_path}")
             how = filesafe.copy(
                 str(src_path.relative_to(base_path)),
                 str(dst_path.relative_to(base_path))
             )
+            logger.info(f"File copied to label source successfully: {filename}, method={how}")
             results.append({
                 "filename": filename,
                 "source": str(src_path),
                 "destination": str(dst_path),
                 "method": str(how)
             })
+            
+            logger.info(f"Copying file to archive: src={src_path}, dst={arch_path}")
             how = filesafe.copy(
                 str(src_path.relative_to(base_path)),
                 str(arch_path.relative_to(base_path))
             )
+            logger.info(f"File copied to archive successfully: {filename}, method={how}")
             results.append({
                 "filename": filename,
                 "source": str(src_path),
@@ -387,6 +416,7 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
             logger.error(f"Failed to copy {filename}: {e}")
             logger.exception(e)
             failures.append({"filename": filename, "error": str(e)})
+    
     # Log summary of copying operation
     if failures:
         logger.warning(
@@ -396,5 +426,8 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
         logger.debug(f"Copy failures: {failures}")
     else:
         logger.info(f"Session {session_id} copied {len(results)} files successfully")
+    
     logger.debug(f"Copy results: {results}")
+    logger.info(f"=== copy_files_to_label_source END === session_id={session_id}, success_count={len(results)}, failed_count={len(failures)}")
+    
     return {"success": results, "failed": failures}
