@@ -344,11 +344,11 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
 
     logger.info(f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, 
-    incoming_path={incoming_path}, 
-    archive_base_path={archive_base_path}, 
-    archive_path={archive_path}, 
-    label_base_path={label_base_path}, 
-    label_source_subdir={label_source_subdir}")
+        incoming_path={incoming_path}, 
+        archive_base_path={archive_base_path}, 
+        archive_path={archive_path}, 
+        label_base_path={label_base_path}, 
+        label_source_subdir={label_source_subdir}")
     
     if not label_base_path or not label_source_subdir:
         logger.error("Label studio paths not fully configured")
