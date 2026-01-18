@@ -59,10 +59,32 @@ spec:
         {{- end }}
         {{- if and .Values.service .Values.service.port}}
         {{- if ne .Values.livenessProbe.enabled false }}
-        {{- toYaml .Values.livenessProbe | nindent 8 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 30 }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 5 }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+          {{- if .Values.livenessProbe.successThreshold }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          {{- end }}
         {{- end}}
         {{- if ne .Values.readinessProbe.enabled false }}
-        {{- toYaml .Values.readinessProbe | nindent 8 }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 5 }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 3 }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+          {{- if .Values.readinessProbe.successThreshold }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          {{- end }}
         {{- end}}
         {{- end}}
         {{- if .Values.resources }}
