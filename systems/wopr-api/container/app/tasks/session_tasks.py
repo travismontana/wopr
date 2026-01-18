@@ -224,26 +224,6 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     incoming_path = woprvar.storage_paths["incoming_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
 
-    # Build label studio paths if configured
-    # These are optional paths that may not be configured yet
-    label_subdir = woprvar.storage_paths.get("label_subdir")
-    label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
-    label_target_subdir = woprvar.storage_paths.get("label_target_subdir")
-
-    # Only construct label paths if all required config exists
-    if label_subdir and label_source_subdir and label_target_subdir:
-        label_base_path = (archive_base_path / label_subdir).resolve()
-        label_source_path = (label_base_path / label_source_subdir).resolve()
-        label_target_path = (label_base_path / label_target_subdir).resolve()
-        logger.info(f"Paths: base_path={base_path}, archive_base_path={archive_base_path}, incoming_path={incoming_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}, label_target_subdir={label_target_subdir}, label_base_path={label_base_path}, label_source_path={label_source_path}, label_target_path={label_target_path}")
-        logger.debug("Label studio paths configured and available")
-    else:
-        # Use None to indicate unconfigured paths
-        label_source_path = None
-        label_target_path = None
-        logger.info(f"Paths: base_path={base_path}, archive_base_path={archive_base_path}, incoming_path={incoming_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}, label_target_subdir={label_target_subdir}")
-        logger.debug("Label studio paths not fully configured, skipping those checks")
-
     # Get list of files to check
     files_to_check = _get_session_filenames(session_id)
     logger.info(f"Checking {len(files_to_check)} files across storage locations")
@@ -346,7 +326,6 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
         f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, "
         f"incoming_path={incoming_path}, archive_base_path={archive_base_path}, "
         f"archive_path={archive_path}, label_base_path={label_base_path}, "
-        f"label_source_subdir={label_source_subdir}"
     )
     
     label_source_path = (woprvar.storage_paths.get("label_source_path")).resolve()
