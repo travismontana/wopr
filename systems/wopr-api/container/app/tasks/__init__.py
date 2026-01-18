@@ -7,6 +7,6 @@ from .session_tasks import *  # noqa
 
 # Export tasks for discovery
 __all__ = [
-    'archive_session',
+    'archive_session_images',
 ]
 
