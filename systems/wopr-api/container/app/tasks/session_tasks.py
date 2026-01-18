@@ -314,7 +314,8 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     session_data, session_uuid = _get_session_data(session_id)
 
     # Get storage paths from globals
-    base_path = woprvar.storage_paths["base_path"] 
+    base_path = woprvar.storage_paths["base_path"]
+    wopr_base_path = woprvar.storage_paths["wopr_base_path"]
     incoming_base_path = woprvar.storage_paths["incoming_path"]
     incoming_path = (incoming_base_path ).resolve()
     archive_base_path = woprvar.storage_paths["archive_base_path"]
@@ -336,8 +337,8 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     logger.info(f"Files to copy: count={len(files_to_copy)}, files={files_to_copy}")
 
     # Initialize SafeFS wrapper
-    filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
-    logger.info(f"SafeFS initialized with base_dir={base_path}, forbid_symlinks=True")
+    filesafe = SafeFS(base_dir=wopr_base_path, forbid_symlinks=True)
+    logger.info(f"SafeFS initialized with base_dir={wopr_base_path}, forbid_symlinks=True")
 
     # Create label source directory for this session
     try:

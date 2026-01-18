@@ -121,6 +121,7 @@ LABEL_TARGET_SUBDIR = WOPR_CONFIG['storage']['label_target_subdir']
 
 storage_paths = {
     "base_path": BASE_PATH,
+    "wopr_base_path": WOPR_BASE_PATH,
     "archive_base_path": (BASE_PATH / ARCHIVE_SUBDIR).resolve(),
     "incoming_path": (BASE_PATH / INCOMING_SUBDIR).resolve(),
     "label_base_path": LABEL_BASE_PATH.resolve(),
