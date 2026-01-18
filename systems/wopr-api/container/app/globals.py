@@ -112,9 +112,9 @@ SERVICE_PORT = int(APP_PORT)
 BASE_PATH = Path(WOPR_CONFIG['storage']['base_path']).resolve()
 ARCHIVE_SUBDIR = WOPR_CONFIG['storage']['archive_subdir']
 INCOMING_SUBDIR = WOPR_CONFIG['storage']['incoming_subdir']
-VISION_BASE_SUBDIR = WOPR_CONFIG['vision']['base_path']
-VISION_SOURCE_SUBDIR = WOPR_CONFIG['vision']['source_path']
-VISION_TARGET_SUBDIR = WOPR_CONFIG['vision']['target_path']
+LABEL_BASE_SUBDIR = WOPR_CONFIG['storage']['label_subdir']
+LABEL_SOURCE_SUBDIR = WOPR_CONFIG['storage']['source_subdir']
+LABEL_TARGET_SUBDIR = WOPR_CONFIG['storage']['target_subdir']
 
 storage_paths = {
     "base_path": BASE_PATH,

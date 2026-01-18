@@ -58,7 +58,7 @@ mainselection_dict = {
     "Games": "games",
     "Pieces": "pieces",
     "Players": "players",
-    "Config": "woprconfig"
+    "Config": "config"
 }
 mainsection = st.selectbox("Select Section", mainselection)
 selected_noun = mainselection_dict[mainsection]
