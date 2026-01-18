@@ -340,16 +340,20 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     archive_base_path = woprvar.storage_paths["archive_base_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
 
-    label_base_path = base_path / woprvar.storage_paths.get("label_subdir")
-    label_source_subdir = (label_base_path / woprvar.storage_paths.get("label_source_subdir")).resolve()
+    label_base_path = base_path / woprvar.storage_paths.get("label_base_path")
+    label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
 
-    logger.info(f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, incoming_path={incoming_path}, archive_base_path={archive_base_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}")
+    logger.info(f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, 
+    incoming_path={incoming_path}, 
+    archive_base_path={archive_base_path}, 
+    archive_path={archive_path}, 
+    label_base_path={label_base_path}, 
+    label_source_subdir={label_source_subdir}")
     
-    if not label_subdir or not label_source_subdir:
+    if not label_base_path or not label_source_subdir:
         logger.error("Label studio paths not fully configured")
         raise ValueError("Label studio paths not fully configured")
 
-    label_base_path = (archive_base_path / label_subdir).resolve()
     label_source_path = (label_base_path / label_source_subdir).resolve()
     logger.info(f"Computed label paths: label_base_path={label_base_path}, label_source_path={label_source_path}")
 
