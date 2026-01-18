@@ -120,7 +120,6 @@ storage_paths = {
     "base_path": BASE_PATH,
     "archive_base_path": (BASE_PATH / ARCHIVE_SUBDIR).resolve(),
     "incoming_path": (BASE_PATH / INCOMING_SUBDIR).resolve(),
-    "vision_base_path": (BASE_PATH / VISION_BASE_SUBDIR).resolve(),
     "label_base_path": (BASE_PATH / LABEL_BASE_SUBDIR).resolve(),
     "label_source_path": (BASE_PATH / LABEL_SOURCE_SUBDIR).resolve(),
     "label_target_path": (BASE_PATH / LABEL_TARGET_SUBDIR).resolve(),
