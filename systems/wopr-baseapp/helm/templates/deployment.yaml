@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "wopr-baseapp.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
   template:
     metadata:
       {{- if .Values.podAnnotations }}

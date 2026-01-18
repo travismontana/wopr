@@ -16,5 +16,5 @@ spec:
     protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
     name: {{ include "wopr-baseapp.serviceName" . }}
   selector:
-    {{- include "wopr-baseapp.selectorLabels" . | nindent 4 }}
+    {{- include .Values.service.selector . | nindent 4 }}
 {{- end }}
