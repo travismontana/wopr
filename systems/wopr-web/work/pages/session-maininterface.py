@@ -128,8 +128,8 @@ def session_management():
 def ml_prep():
     st.subheader("ML Preparation")
     st.write("Functionality for ML preparation will go here.")
-    # files in /ml/incoming/ to be processed for ML training
-    # files in /labelstudio/source 
+    presence = session_image_status(st.session_state.selected_session_id)
+    st.write(f"Image Presence Status: {presence}")
     
 
 def play_walkthrough(plays, players):

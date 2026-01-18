@@ -101,3 +101,14 @@ async def get_session_task(task_id: str):
 async def get_all_session_tasks():
 	logger.info("Fetching all active session tasks")
 	return get_all_active_tasks()
+
+@router.get("/session/{session_id}/file_status")
+async def check_session_file_status(session_id: str):
+	logger.info(f"Checking file status for session ID: {session_id}")
+	try:
+		response = queue_task(check_files_for_session, session_id)
+		logger.info(f"Successfully checked file status for session ID: {session_id}")
+	except Exception as e:
+		logger.error(f"Error checking file status for session ID {session_id}: {e}")
+		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error checking file status for session ID {session_id}, error: {e}")
+	return response

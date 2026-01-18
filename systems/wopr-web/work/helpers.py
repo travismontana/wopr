@@ -604,3 +604,44 @@ def all_session_tasks(filter_state: str = None) -> list:
         log.error(f"Failed to fetch tasks from queue: {e}")
         st.error(f"Failed to load tasks: {e}")
         return []
+
+def session_image_status(session_id: str) -> list:
+    """
+    Get the status of all the images for a session.
+    
+    Args:
+        session_id: The session to monitor
+    
+    Returns:
+        List of file status dicts containing:
+            - filename: Name of the image file
+            - status: Current processing status (pending, processed, error)
+            - processed_at: Timestamp of processing completion
+        Empty list on failure
+        
+    Limitations:
+        Only returns tasks visible to currently running workers.
+        Completed tasks (SUCCESS/FAILURE) are not included unless
+        specifically persisted by result backend.
+        
+    Example:
+        # Get all tasks
+        all_tasks = all_session_tasks()
+        
+        # Get only actively executing tasks
+        active = all_session_tasks(filter_state="active")
+    """
+    url = f"{API_BASE}/api/v2/tasks/session/{session_id}/file_status"
+    try:
+        response = httpx.get(url, timeout=10.0)
+        response.raise_for_status()
+        file_statuses = response.json()
+        
+        log.info(f"Retrieved file statuses for session {session_id}, count: {len(file_statuses)}")
+        
+        return file_statuses
+    except httpx.HTTPError as e:
+        log.error(f"Failed to fetch file statuses for session {session_id}: {e}")
+        st.error(f"Failed to load file statuses: {e}")
+        return []
+    
