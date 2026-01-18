@@ -112,7 +112,7 @@ async def delete_session(session_id: str):
 # /task/{session_id}/archive - archives all images for session
 # 
 @router.post("/task/{session_id}/archive")
-async def archive_session_images(session_id: str):
+async def archive_session_tasks(session_id: str):
 	logger.info(f"Archiving images for session ID: {session_id}")
 	try:
 		# Simulate archiving process
@@ -166,3 +166,4 @@ async def get_session_task(task_id: str):
 		logger.error(f"Error fetching task details for task ID {task_id}: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error fetching task details for task ID {task_id}, error: {e}")
 	return response
+
