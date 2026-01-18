@@ -106,7 +106,7 @@ async def get_all_session_tasks():
 async def check_session_file_status(session_id: str):
 	logger.info(f"Checking file status for session ID: {session_id}")
 	try:
-		response = queue_task(check_files_for_session, session_id)
+		response = queue_task(check_session_file_status_task, session_id)
 		logger.info(f"Successfully checked file status for session ID: {session_id}")
 	except Exception as e:
 		logger.error(f"Error checking file status for session ID {session_id}: {e}")
