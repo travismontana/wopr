@@ -334,14 +334,14 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     session_data, session_uuid = _get_session_data(session_id)
 
     # Get storage paths from globals
-    base_path = woprvar.storage_paths["base_path"] / "ml"
+    base_path = woprvar.storage_paths["base_path"] 
     incoming_base_path = woprvar.storage_paths["incoming_path"]
-    incoming_path = (incoming_base_path / session_uuid).resolve()
+    incoming_path = (incoming_base_path ).resolve()
     archive_base_path = woprvar.storage_paths["archive_base_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
 
-    label_subdir = woprvar.storage_paths.get("label_subdir")
-    label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
+    label_base_path = base_path / woprvar.storage_paths.get("label_subdir")
+    label_source_subdir = (label_base_path / woprvar.storage_paths.get("label_source_subdir")).resolve()
 
     logger.info(f"Paths: base_path={base_path}, incoming_base_path={incoming_base_path}, incoming_path={incoming_path}, archive_base_path={archive_base_path}, archive_path={archive_path}, label_subdir={label_subdir}, label_source_subdir={label_source_subdir}")
     
