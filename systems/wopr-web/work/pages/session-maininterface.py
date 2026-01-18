@@ -35,15 +35,25 @@ def new_session():
     st.write("Functionality to start a new session will go here.")
 
 def archive_play_records(session_id: str, plays: list):
-    logger.info(f"Archiving play records for session ID: {session_id}")
+    log.info(f"Archiving play records for session ID: {session_id}")
     payload = {
         "status": "archived"
     }
     log.info(f"Updating {len(plays)} plays to archived status.")
     for play in plays:
         play_id = play['id']
-        log.info('update("plays", play_id, payload)')
+        log.info(f'update_item("playtracker", {play_id}, {payload})')
+        update_item("playtracker", play_id, payload)
     return {"status": "success", "message": f"Archived {len(plays)} plays."}
+
+def archive_session(session_id: str):
+    log.info(f"Archiving session ID: {session_id}")
+    payload = {
+        "status": "archived"
+    }
+    log.info(f'update_item("session", {session_id}, {payload})')
+    update_item("session", session_id, payload)
+    return {"status": "success", "message": f"Archived session {session_id}."}
 
 def jobs_interface():
     st.subheader("Jobs Interface")
@@ -79,39 +89,41 @@ def session_management():
         st.write(status)
         st.write(session_uuid)
     # Initialize session state
-    if 'confirm_archive' not in st.session_state:
-        st.session_state.confirm_archive = False
-
-    # First click: show confirmation
-    if not st.session_state.confirm_archive:
-        if st.button("🗄️ Archive", type="secondary"):
-            st.session_state.confirm_archive = True
-            st.rerun()
-
-    # Confirmation state: show warning and confirm button
-    else:
-        st.warning("⚠️ Confirm archive operation?")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("✓ Yes, Archive", type="primary"):
-                # DO THE ARCHIVE THING HERE
-                image_archive_results = queue_session_task(current_session_id, "archive")
-                task_id = image_archive_results.get("task_id", "N/A")
-                log.info(f"Queued image archive task with ID: {task_id}")
-                if task_id != "N/A":
-                    image_archive_final_results = wait_for_task(task_id)
-                log.info(f"Image archive task completed with results: {image_archive_results} and final results: {image_archive_final_results}")
-                db_archive_results = archive_play_records(current_session_id,plays)
-                log.info(f"Database archive completed with results: {db_archive_results}")
-                st.success("Archived!")
-                st.session_state.confirm_archive = False
+    if status != "archived":
+        if 'confirm_archive' not in st.session_state:
+            st.session_state.confirm_archive = False
+        # First click: show confirmation
+        if not st.session_state.confirm_archive:
+            if st.button("🗄️ Archive", type="secondary"):
+                st.session_state.confirm_archive = True
                 st.rerun()
-        
-        with col2:
-            if st.button("✗ Cancel"):
-                st.session_state.confirm_archive = False
-                st.rerun()
+
+        # Confirmation state: show warning and confirm button
+        else:
+            st.warning("⚠️ Confirm archive operation?")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("✓ Yes, Archive", type="primary"):
+                    # DO THE ARCHIVE THING HERE
+                    image_archive_results = queue_session_task(current_session_id, "archive")
+                    task_id = image_archive_results.get("task_id", "N/A")
+                    log.info(f"Queued image archive task with ID: {task_id}")
+                    if task_id != "N/A":
+                        image_archive_final_results = wait_for_task(task_id)
+                    log.info(f"Image archive task completed with results: {image_archive_results}")
+                    db_archive_results = archive_play_records(current_session_id, plays)
+                    log.info(f"Database archive completed with results: {db_archive_results}")
+                    session_archive_results = archive_session(current_session_id)
+                    log.info(f"Session archive completed with results: {session_archive_results}")
+                    st.success("Archived!")
+                    st.session_state.confirm_archive = False
+                    st.rerun()
+            
+            with col2:
+                if st.button("✗ Cancel"):
+                    st.session_state.confirm_archive = False
+                    st.rerun()
     
 
 def ml_prep():

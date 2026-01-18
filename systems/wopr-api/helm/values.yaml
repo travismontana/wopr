@@ -100,9 +100,9 @@ wopr-baseapp:
 
   securityContext:
     runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+    runAsUser: 2222
+    runAsGroup: 2222
+    fsGroup: 2222
   volumeMounts:
     - name: wopr-data
       mountPath: /remote/wopr
