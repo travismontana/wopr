@@ -98,7 +98,6 @@ wopr-baseapp:
       scheme: HTTP
     initialDelaySeconds: 15  # Give app time to initialize
     periodSeconds: 5
-    timeoutSeconds: 3
     successThreshold: 1
     failureThreshold: 3
   
@@ -109,7 +108,6 @@ wopr-baseapp:
       scheme: HTTP
     initialDelaySeconds: 30
     periodSeconds: 10
-    timeoutSeconds: 5
     successThreshold: 1
     failureThreshold: 3
       
