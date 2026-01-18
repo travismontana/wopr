@@ -2,7 +2,7 @@ from pathlib import Path
 from app.celery_app import celery_app
 from app.directus_client import get_one, get_all
 from app import globals as woprvar
-from app.logging import logger
+from app.logging import configure_logging
 from app.lib.safe_file import SafeFS
 from app.lib.safe_file import NotFoundError, ExistsError
 
@@ -11,6 +11,7 @@ from app.lib.safe_file import NotFoundError, ExistsError
 # Files in labelstudio
 # Copy to labelstudio
 
+configure_logging("/var/log/wopr_api.log")
 @celery_app.task(name="archive_session")
 def archive_session(session_id: str) -> dict[str, list[dict[str, str]]]:
     """Archive a session by moving its files to the archive directory."""
