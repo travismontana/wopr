@@ -23,7 +23,7 @@ from app import globals as woprvar
 import requests
 from app.directus_client import get_one, get_all, post, update, delete
 from app.logging import configure_logging
-logger = configure_logging(woprvar.APP_NAME)
+logger = configure_logging(woprvar.LOGFILE)
 router = APIRouter(tags=["pieces"])
 @router.get("/gameid/{game_id}/", response_model=list[dict])
 @router.get("/gameid/{game_id}", response_model=list[dict])

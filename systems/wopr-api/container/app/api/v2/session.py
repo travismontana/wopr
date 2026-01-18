@@ -33,7 +33,7 @@ from app.lib.task_helper import (
 )
 from app.logging import configure_logging
 
-logger = configure_logging(woprvar.APP_NAME)
+logger = configure_logging(woprvar.LOGFILE)
 
 router = APIRouter(tags=["session"])
 

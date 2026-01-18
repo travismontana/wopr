@@ -86,6 +86,7 @@ APP_OTEL_PORT = WOPR_CONFIG.get('tracing.portInternal', 4318)
 APP_OTEL_URL = f"{APP_OTEL_HOST}:{APP_OTEL_PORT}"
 APP_TRACING_ENABLED = WOPR_CONFIG.get('tracing.enabled', False)
 WOPR_API_URL = APP_API_URL + "/api/v1"
+LOGFILE = "/var/log/wopr-api.log"
 DATABASE_URL = (
     'postgresql://' + 
     os.getenv('DBUSER') + ":" + 

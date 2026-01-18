@@ -5,13 +5,12 @@ from app import globals as woprvar
 from app.logging import configure_logging
 from app.lib.safe_file import SafeFS
 from app.lib.safe_file import NotFoundError, ExistsError
-logger = configure_logging(woprvar.APP_NAME)
+logger = configure_logging(woprvar.LOGFILE)
 # Archive
 # Files in incoming
 # Files in labelstudio
 # Copy to labelstudio
 
-configure_logging("/var/log/wopr_api.log")
 @celery_app.task(name="archive_session_images")
 def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     """Archive a session by moving its files to the archive directory."""
