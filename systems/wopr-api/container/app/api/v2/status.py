@@ -27,9 +27,9 @@ logger = configure_logging(woprvar.LOGFILE)
 
 router = APIRouter(tags=["status"])
 
-@router.get("/gameid/{game_id}/", response_model=list[dict])
-@router.get("/gameid/{game_id}", response_model=list[dict])
-def get_pieces(game_id: int):
+
+@router.get(dict)
+def show_status():
   """Get all pieces for a specific game"""
   logger.info(f"Fetching pieces for game ID {game_id} from the directus api")
   URL = f"{woprvar.DIRECTUS_URL}/items/pieces?filter[game_catalog_uuid][_eq]={game_id}"
