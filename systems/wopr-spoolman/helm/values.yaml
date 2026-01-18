@@ -26,4 +26,5 @@ wopr-baseapp:
         hosts:
           - spoolman.wopr.tailandtraillabs.org
 
-  securityContext: {}
+  securityContext:
+    runAsNonRoot: False
