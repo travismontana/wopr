@@ -223,14 +223,15 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     archive_base_path = woprvar.storage_paths["archive_base_path"]
     incoming_path = woprvar.storage_paths["incoming_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
-
+    label_source_path = (woprvar.storage_paths.get("label_source_path")).resolve()
+    label_target_path = (woprvar.storage_paths.get("label_target_path")).resolve()
     # Get list of files to check
     files_to_check = _get_session_filenames(session_id)
     logger.info(f"Checking {len(files_to_check)} files across storage locations")
 
     # Initialize SafeFS wrapper
-    filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
-    logger.info(f"SafeFS initialized with base_dir={base_path}, forbid_symlinks=True")
+    filesafe = SafeFS(base_dir=woprvar.storage_paths["wopr_base_path"], forbid_symlinks=True)
+    logger.info(f"SafeFS initialized with base_dir={woprvar.storage_paths['wopr_base_path']}, forbid_symlinks=True")
 
     # Build location map for iteration
     # Note: Using SafeFS._resolve_rel() internal method as public API doesn't
