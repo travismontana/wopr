@@ -51,12 +51,14 @@ def get_random_phrase() -> str:
 # -------------------------
 
 st.header("Single Page Interface")
-mainselection = ["Sessions", "Plays", "Games", "Pieces", "Players"]
+mainselection = ["Sessions", "Plays", "Games", "Pieces", "Players", "Config"]
 mainselection_dict = {
     "Sessions": "sessions",
     "Plays": "plays",
     "Games": "games",
-    "Pieces": "pieces"
+    "Pieces": "pieces",
+    "Players": "players",
+    "Config": "woprconfig"
 }
 mainsection = st.selectbox("Select Section", mainselection)
 selected_noun = mainselection_dict[mainsection]

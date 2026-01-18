@@ -22,7 +22,7 @@ import httpx
 from pydantic import BaseModel
 from app import globals as woprvar
 from app.directus_client import get_one, get_all, post, update, delete
-from app.logging import configure_logger
+from app.logging import configure_logging
 
 logger = configure_logging(woprvar.APP_NAME)
 
