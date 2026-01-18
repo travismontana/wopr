@@ -5,7 +5,7 @@ from app import globals as woprvar
 from app.logging import configure_logging
 from app.lib.safe_file import SafeFS
 from app.lib.safe_file import NotFoundError, ExistsError
-
+logger = configure_logging(woprvar.APP_NAME)
 # Archive
 # Files in incoming
 # Files in labelstudio
