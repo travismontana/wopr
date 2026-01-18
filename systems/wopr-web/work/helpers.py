@@ -330,10 +330,10 @@ def get_all_session_tasks(filter_state: str = None) -> list:
     Returns:
         List of task dicts with id, state, name, args, etc.
     """
-    url = f"{API_BASE}/api/v2/session/tasks"
+    url = f"{API_BASE}/api/v2/session/task"
     params = {}
     if filter_state:
-        params['state'] = filter_state
+        params['state'] = filter_state.upper()
     
     try:
         response = httpx.get(url, params=params, timeout=10.0)
