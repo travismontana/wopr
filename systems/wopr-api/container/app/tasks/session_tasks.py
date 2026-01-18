@@ -268,6 +268,9 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
                 )
                 if resolved.exists():
                     presence[location_key].append(filename)
+                    logger.info(f"   -> Found in {location_key}")
+                else:
+                    logger.info(f"   -> Not found in {location_key}")
             except (ValueError, RuntimeError) as e:
                 # Path validation errors from SafeFS
                 logger.warning(

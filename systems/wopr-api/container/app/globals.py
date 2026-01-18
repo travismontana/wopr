@@ -109,7 +109,7 @@ SERVICE_PORT = int(APP_PORT)
 
 # Storage Paths - Single Source of Truth
 # All paths are resolved and absolute to prevent path traversal issues
-BASE_PATH = Path(WOPR_CONFIG['storage']['base_path']).resolve()
+BASE_PATH = Path(WOPR_CONFIG['storage']['base_path'], "ml").resolve()
 ARCHIVE_SUBDIR = WOPR_CONFIG['storage']['archive_subdir']
 INCOMING_SUBDIR = WOPR_CONFIG['storage']['incoming_subdir']
 LABEL_BASE_SUBDIR = WOPR_CONFIG['storage']['label_subdir']
