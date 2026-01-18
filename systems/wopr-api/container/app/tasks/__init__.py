@@ -3,8 +3,6 @@
 
 import logging
 from app import globals as woprvar
-from app.logging import configure_logging
-configure_logging()
 from .session_tasks import *  # noqa
 
 # Export tasks for discovery
