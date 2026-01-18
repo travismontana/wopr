@@ -343,7 +343,7 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
     # Create label source directory for this session
     try:
         logger.info(f"Creating label source directory at {label_source_path}")
-        filesafe.mkdir(str(label_source_path.relative_to(base_path)), exist_ok=True)
+        filesafe.mkdir(str(label_source_path.relative_to(wopr_base_path)), exist_ok=True)
         logger.info(f"Label source directory created/verified at {label_source_path}")
     except (OSError, ValueError, RuntimeError) as e:
         logger.error(f"Failed to create label source directory {label_source_path}: {e}")
@@ -362,8 +362,8 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
         try:
             logger.info(f"Copying file to label source: src={src_path}, dst={dst_path}")
             how = filesafe.copy_file(
-                str(src_path.relative_to(base_path)),
-                str(dst_path.relative_to(base_path))
+                str(src_path.relative_to(wopr_base_path)),
+                str(dst_path.relative_to(wopr_base_path))
             )
             logger.info(f"File copied to label source successfully: {filename}, method={how}")
             results.append({
@@ -375,8 +375,8 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
             
             logger.info(f"Moving file to archive: src={src_path}, dst={arch_path}")
             how = filesafe.move(
-                str(src_path.relative_to(base_path)),
-                str(arch_path.relative_to(base_path))
+                str(src_path.relative_to(wopr_base_path)),
+                str(arch_path.relative_to(wopr_base_path))
             )
             logger.info(f"File moved to archive successfully: {filename}, method={how}")
             results.append({
