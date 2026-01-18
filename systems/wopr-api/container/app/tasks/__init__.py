@@ -4,8 +4,7 @@
 import logging
 from app import globals as woprvar
 from app.logging import configure_logging
-
-configure_logging(woprvar.WOPR_CONFIG["LOG_LEVEL"], woprvar.WOPR_CONFIG["LOG_FILE"])
+configure_logging()
 from .session_tasks import *  # noqa
 
 # Export tasks for discovery
