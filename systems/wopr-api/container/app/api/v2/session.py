@@ -28,7 +28,7 @@ from app.lib.task_helper import (
     get_task_status,
     revoke_task,
     wait_for_task,
-    get_task_info,
+    get_all_tasks,
 	get_all_active_tasks
 )
 from app.logging import configure_logging
