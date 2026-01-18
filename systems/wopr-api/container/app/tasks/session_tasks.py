@@ -250,12 +250,14 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
 
     # Check each file's presence in each location
     for filename in files_to_check:
+        logger.info(f"Checking presence of file: {filename}")
         for location_key, location_path in locations.items():
             # Skip unconfigured locations
             if location_path is None:
                 continue
 
             file_path = location_path / filename
+            logger.info(f" - Checking in {location_key} at {file_path}")
 
             try:
                 # Check if file exists using SafeFS internal resolution

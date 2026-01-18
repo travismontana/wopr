@@ -129,6 +129,12 @@ def ml_prep():
     st.subheader("ML Preparation")
     st.write("Functionality for ML preparation will go here.")
     presence = queue_session_task(st.session_state.selected_session_id, "file_status")
+    task_id = presence.get("task_id", "N/A")
+    log.info(f"Queued file status task with ID: {task_id}")
+    if task_id != "N/A":
+        presence = wait_for_task(task_id)
+    log.info(f"File status task completed with results: {presence}")
+    st.table(presence)
     
 
 def play_walkthrough(plays, players):
