@@ -113,3 +113,15 @@ async def check_session_file_status(session_id: str):
 		logger.error(f"Error checking file status for session ID {session_id}: {e}")
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error checking file status for session ID {session_id}, error: {e}")
 	return response
+
+@router.get("/session/{session_id}/copy_to_label_source")
+async def copy_session_files_to_label_source(session_id: str):
+	logger.info(f"Copying session files to label studio source for session ID: {session_id}")
+	try:
+		from app.tasks.session_tasks import copy_session_files_task
+		response = queue_task(copy_session_files_task, session_id)
+		logger.info(f"Successfully queued file copy task for session ID: {session_id}")
+	except Exception as e:
+		logger.error(f"Error copying session files for session ID {session_id}: {e}")
+		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error copying session files for session ID {session_id}, error: {e}")
+	return response

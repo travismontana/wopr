@@ -645,4 +645,29 @@ def session_image_status(session_id: str) -> list:
         log.error(f"Failed to fetch file statuses for session {session_id}: {e}")
         st.error(f"Failed to load file statuses: {e}")
         return []
+
+def copy_files_to_source(session_id: str) -> dict:
+    """
+    Queue a task to copy session files to label studio source directory.
     
+    Args:
+        session_id: UUID of the session to process
+    
+    Returns:
+        Dict containing task_id and status, empty dict on failure
+        
+    Example:
+        result = copy_files_to_source("abc123")
+        task_id = result.get('task_id')
+    """
+    url = f"{API_BASE}/api/v2/tasks/session/{session_id}/copy_to_label_source"
+    try:
+        response = httpx.get(url, timeout=10.0)
+        response.raise_for_status()
+        task_data = response.json()
+        log.info(f"Queued copy_to_label_source task for session {session_id}, task_id: {task_data.get('task_id')}")
+        return task_data
+    except httpx.HTTPError as e:
+        log.error(f"Failed to queue copy_to_label_source task for session {session_id}: {e}")
+        st.error(f"Failed to queue task: {e}")
+        return {}

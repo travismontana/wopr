@@ -289,3 +289,111 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
     )
 
     return presence
+
+@celery_app.task(name="copy_files_to_label_source")
+def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]]]:
+    """
+    Copy session files from archive to label studio source directory.
+
+    Files are copied on a best-effort basis - individual file failures don't
+    stop the overall copying process. Results include both successful and
+    failed file operations.
+
+    files are copied from the incoming directory to the label studio source 
+    directory and archive (for backup).
+
+    Args:
+        session_id: The session ID to copy files for
+    Returns:
+        Dict with keys:
+            - "success": List of successfully copied files with metadata
+            - "failed": List of files that failed to copy with error info
+    """
+    logger.info(f"Copying session {session_id} files to label studio source")
+    
+    # Fetch and validate session
+    session_data, session_uuid = _get_session_data(session_id)
+
+    # Get storage paths from globals
+    base_path = woprvar.storage_paths["base_path"]
+    incoming_base_path = woprvar.storage_paths["incoming_path"]
+    archive_base_path = woprvar.storage_paths["archive_base_path"]
+    archive_path = (archive_base_path / session_uuid).resolve()
+
+    label_subdir = woprvar.storage_paths.get("label_subdir")
+    label_source_subdir = woprvar.storage_paths.get("label_source_subdir")
+
+    if not label_subdir or not label_source_subdir:
+        logger.error("Label studio paths not fully configured")
+        raise ValueError("Label studio paths not fully configured")
+
+    label_base_path = (archive_base_path / label_subdir).resolve()
+    label_source_path = (label_base_path / label_source_subdir).resolve()
+
+    # Get list of files to copy
+    files_to_copy = _get_session_filenames(session_id)
+    logger.info(f"Files to copy: {files_to_copy}")
+
+    # Initialize SafeFS wrapper
+    filesafe = SafeFS(base_dir=base_path, forbid_symlinks=True)
+
+    # Create label source directory for this session
+    try:
+        logger.info(f"Creating label source directory at {label_source_path}")
+        filesafe.mkdir(str(label_source_path.relative_to(base_path)), exist_ok=True)
+    except (OSError, ValueError, RuntimeError) as e:
+        logger.error(f"Failed to create label source directory {label_source_path}: {e}")
+        raise
+
+    # Copy files with per-file error handling for best-effort completion
+    results = []
+    failures = []
+
+    for filename in files_to_copy:
+        src_path = incoming_base_path / filename
+        arch_path = archive_path / filename
+        dst_path = label_source_path / filename
+
+        try:
+            logger.info(f"Copying file {src_path} to {dst_path}")
+            how = filesafe.copy(
+                str(src_path.relative_to(base_path)),
+                str(dst_path.relative_to(base_path))
+            )
+            results.append({
+                "filename": filename,
+                "source": str(src_path),
+                "destination": str(dst_path),
+                "method": str(how)
+            })
+            how = filesafe.copy(
+                str(src_path.relative_to(base_path)),
+                str(arch_path.relative_to(base_path))
+            )
+            results.append({
+                "filename": filename,
+                "source": str(src_path),
+                "destination": str(arch_path),
+                "method": str(how)
+            })
+        except NotFoundError:
+            logger.warning(f"Source file not found, skipping: {filename}")
+            failures.append({"filename": filename, "error": "source not found"})
+        except ExistsError:
+            logger.warning(f"Destination already exists, skipping: {filename}")
+            failures.append({"filename": filename, "error": "destination exists"})
+        except (OSError, ValueError, RuntimeError) as e:
+            logger.error(f"Failed to copy {filename}: {e}")
+            logger.exception(e)
+            failures.append({"filename": filename, "error": str(e)})
+    # Log summary of copying operation
+    if failures:
+        logger.warning(
+            f"Session {session_id} partial copy: "
+            f"{len(results)} succeeded, {len(failures)} failed"
+        )
+        logger.debug(f"Copy failures: {failures}")
+    else:
+        logger.info(f"Session {session_id} copied {len(results)} files successfully")
+    logger.debug(f"Copy results: {results}")
+    return {"success": results, "failed": failures}
