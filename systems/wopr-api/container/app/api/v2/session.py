@@ -30,7 +30,9 @@ from app.lib.task_helper import (
     wait_for_task,
     get_task_info
 )
-logger = logging.getLogger(woprvar.APP_NAME)
+from app.logging import configure_logging
+
+logger = configure_logging(woprvar.APP_NAME)
 
 router = APIRouter(tags=["session"])
 

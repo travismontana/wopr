@@ -25,3 +25,5 @@ def configure_logging(logfile: str, level=logging.DEBUG):
     root = logging.getLogger()
     if not any(isinstance(h, logging.StreamHandler) for h in root.handlers):
         root.addHandler(logging.StreamHandler(sys.stdout))
+
+    return root
