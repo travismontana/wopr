@@ -16,7 +16,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     """Archive a session by moving its files to the archive directory."""
     logger.info(f"Archiving session {session_id}")
     
-    session_data = get_one("sessions", session_id)
+    session_data = get_one("sessiontracker", session_id)
     if not session_data:
         logger.error(f"Session {session_id} not found")
         raise ValueError(f"Session {session_id} not found")
