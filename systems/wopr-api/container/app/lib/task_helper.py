@@ -1,6 +1,8 @@
 from typing import Any, Optional, Dict
 from celery.result import AsyncResult
 from app.celery_app import celery_app
+from app.logging import configure_logging
+logger = configure_logging("wopr-api")
 
 def queue_task(task_func, *args, **kwargs) -> Dict[str, Any]:
     """
