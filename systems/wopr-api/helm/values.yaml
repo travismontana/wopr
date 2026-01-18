@@ -26,8 +26,6 @@ wopr-baseapp:
   service:
     type: ClusterIP
     port: 8000
-    selector:
-      app.kubernetes.io/component: api
     
 
   ingress:

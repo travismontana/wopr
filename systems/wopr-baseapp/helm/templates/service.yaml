@@ -16,5 +16,8 @@ spec:
     protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
     name: {{ include "wopr-baseapp.serviceName" . }}
   selector:
-    {{- include .Values.service.selector . | nindent 4 }}
+    {{- include "wopr-baseapp.selectorLabels" . | nindent 4 }}
+    {{- if .Values.componentLabel }}
+    app.kubernetes.io/component: {{ .Values.componentLabel }}
+    {{- end }}
 {{- end }}
