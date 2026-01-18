@@ -113,8 +113,8 @@ BASE_PATH = Path(WOPR_CONFIG['storage']['base_path']).resolve()
 ARCHIVE_SUBDIR = WOPR_CONFIG['storage']['archive_subdir']
 INCOMING_SUBDIR = WOPR_CONFIG['storage']['incoming_subdir']
 LABEL_BASE_SUBDIR = WOPR_CONFIG['storage']['label_subdir']
-LABEL_SOURCE_SUBDIR = WOPR_CONFIG['storage']['source_subdir']
-LABEL_TARGET_SUBDIR = WOPR_CONFIG['storage']['target_subdir']
+LABEL_SOURCE_SUBDIR = WOPR_CONFIG['storage']['label_source_subdir']
+LABEL_TARGET_SUBDIR = WOPR_CONFIG['storage']['label_target_subdir']
 
 storage_paths = {
     "base_path": BASE_PATH,
