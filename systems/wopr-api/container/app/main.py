@@ -64,7 +64,7 @@ logger.debug(f"WOPR API globals: {woprvar.WOPR_CONFIG}")
 woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
 
 # Determine if tracing is enabled
-tracing_enabled = woprconfig.get_bool("tracing.enable", True)
+tracing_enabled = True
 if os.getenv("TRACING_ENABLE") is not None or tracing_enabled:
     logger.debug(f"Tracing is enabled tracing_enabled: ({tracing_enabled}).")
 else:
