@@ -24,7 +24,7 @@ from app import globals as woprvar
 from app.directus_client import get_one, get_all, post, update, delete
 from app.logging import configure_logger
 
-logger = configure_logger(woprvar.APP_NAME)
+logger = configure_logging(woprvar.APP_NAME)
 
 router = APIRouter(tags=["plays"])
 
