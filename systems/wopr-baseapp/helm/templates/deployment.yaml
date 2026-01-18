@@ -11,7 +11,9 @@ spec:
   selector:
     matchLabels:
       {{- include "wopr-baseapp.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: api
+      {{- if .Values.componentLabel }}
+      app.kubernetes.io/component: {{ .Values.componentLabel }}
+      {{- end }}
   template:
     metadata:
       {{- if .Values.podAnnotations }}
@@ -20,6 +22,9 @@ spec:
       {{- end }}
       labels:
         {{- include "wopr-baseapp.selectorLabels" . | nindent 8 }}
+        {{- if .Values.componentLabel }}
+        app.kubernetes.io/component: {{ .Values.componentLabel }}
+        {{- end }}
     spec:
       {{- with .Values.securityContext }}
       securityContext:

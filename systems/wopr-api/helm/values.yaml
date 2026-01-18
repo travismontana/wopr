@@ -16,7 +16,7 @@ wopr-baseapp:
   app:
     name: wopr-api
   replicaCount: 1
-
+  componentLabel: api
   image:
     registry: ghcr.io
     repository: travismontana/wopr/wopr-api
