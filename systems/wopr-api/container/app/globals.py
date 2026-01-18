@@ -109,10 +109,13 @@ SERVICE_PORT = int(APP_PORT)
 
 # Storage Paths - Single Source of Truth
 # All paths are resolved and absolute to prevent path traversal issues
-BASE_PATH = Path(WOPR_CONFIG['storage']['base_path'], "ml").resolve()
+
+WOPR_BASE_PATH = Path(WOPR_CONFIG['storage']['base_path']).resolve()
+BASE_PATH = WOPR_BASE_PATH / "ml"
 ARCHIVE_SUBDIR = WOPR_CONFIG['storage']['archive_subdir']
 INCOMING_SUBDIR = WOPR_CONFIG['storage']['incoming_subdir']
 LABEL_BASE_SUBDIR = WOPR_CONFIG['storage']['label_subdir']
+LABEL_BASE_PATH = WOPR_BASE_PATH / LABEL_BASE_SUBDIR
 LABEL_SOURCE_SUBDIR = WOPR_CONFIG['storage']['label_source_subdir']
 LABEL_TARGET_SUBDIR = WOPR_CONFIG['storage']['label_target_subdir']
 
@@ -120,7 +123,7 @@ storage_paths = {
     "base_path": BASE_PATH,
     "archive_base_path": (BASE_PATH / ARCHIVE_SUBDIR).resolve(),
     "incoming_path": (BASE_PATH / INCOMING_SUBDIR).resolve(),
-    "label_base_path": (BASE_PATH / LABEL_BASE_SUBDIR).resolve(),
-    "label_source_path": (BASE_PATH / LABEL_SOURCE_SUBDIR).resolve(),
-    "label_target_path": (BASE_PATH / LABEL_TARGET_SUBDIR).resolve(),
+    "label_base_path": LABEL_BASE_PATH.resolve(),
+    "label_source_path": (LABEL_BASE_PATH/ LABEL_SOURCE_SUBDIR).resolve(),
+    "label_target_path": (LABEL_BASE_PATH / LABEL_TARGET_SUBDIR).resolve(),
 }
