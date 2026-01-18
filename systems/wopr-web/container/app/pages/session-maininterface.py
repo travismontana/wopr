@@ -125,26 +125,84 @@ def session_management():
                     st.session_state.confirm_archive = False
                     st.rerun()
 
-def ml_prep():
-    st.subheader("ML Preparation")
-    st.write("Functionality for ML preparation will go here.")
+def ml_files():
+    st.subheader("ML Files")
     presence = queue_session_task(st.session_state.selected_session_id, "file_status")
     task_id = presence.get("task_id", "N/A")
     log.info(f"Queued file status task with ID: {task_id}")
     if task_id != "N/A":
         presence = wait_for_task(task_id)
     log.info(f"File status task completed with results: {presence}")
+    formatted_data = []
     if st.button("Copy files to source"):
         results = copy_files_to_source(st.session_state.selected_session_id)
         log.info(f"Copy files to source completed with results: {results}")
         task_id = results.get("task_id", "N/A")
+        results2 = None
         if task_id != "N/A":
             results2 = wait_for_task(task_id)
-        log.info(f"File copy task completed with results: {results2}")
-        st.success("Files copied to source.")
-        st.table(results2)
-    st.table(presence)
-    
+            log.info(f"File copy task completed with results: {results2}")
+            st.success("Files copied to source.")
+            formatted_data_files = handle_celery_output(results2)
+    status = presence['status']
+    if status == 'success':
+        for location in presence['result']:
+            formatted_data.append({
+                "loc": location,
+                "locname": location.replace('_', ' ').title(),
+                "count": len(presence['result'][location]),
+                "files": presence['result'][location]
+            })
+        log.info(f"Formatted file presence data: {formatted_data}")
+        if len(formatted_data) > 0:
+            st.divider()
+            st.subheader("File Presence Overview")
+            cols = st.columns(len(formatted_data))
+            for col, item in zip(cols, formatted_data):
+                with col:
+                    st.metric(item['locname'], item['count'])
+                    if item['files']:
+                        with st.expander("Files"):
+                            st.write(item['files'])
+    else:
+        st.write("No files found")
+
+def  handle_celery_output(output):
+    #st.json(output)
+    overall_status = output.get("status")
+    successes = output['result']['success']
+    failures = output['result']['failed']
+
+    # Do the display:
+    overallCol,successCol,failCol = st.columns(3)
+    with overallCol:
+        st.write(f"Overall Status: {overall_status}")
+        if overall_status == "success":
+            st.badge("Success", color="green")
+        elif overall_status == "failed":
+            st.badge("Failed", color="red")
+        else:
+            st.badge("Unknown")
+    with successCol:
+        num_success = len(successes)
+        st.metric("Successful", num_success)
+        if num_success > 0:
+            with st.expander("Files"):
+                st.table(successes)
+    with failCol:
+        num_fail = len(failures)
+        st.metric("Failed", num_fail)
+        if num_fail > 0:
+            with st.expander("Files"):
+                for item in failures:
+                    name = item.get('filename')
+                    reason = item.get('error')
+                    st.write(f"File: {name}")
+                    st.write(f"Reason: {reason}")
+                    st.divider()
+                #st.table(failures)
+                
+    return 0
 
 def play_walkthrough(plays, players):
     log.info(f"Starting Play Walkthrough with {len(plays)} plays Players: {len(players)}.")
@@ -193,15 +251,18 @@ def existing_session():
     plays = get_session_plays(st.session_state.selected_session_id)
     gamename = games[0]['name'] if games else "Unknown"
     st.write(f"Session Game: {gamename}")
-
+    sessionstatus = get_session_status(st.session_state.selected_session_id)
+    st.write(f"Session Status: {sessionstatus}")
     sesstabs = {
         "Session Management": session_management,
-        "ML Prep": ml_prep,
-        "Play Walkthrough": lambda: play_walkthrough(plays, players),
-        "Jobs": jobs_interface
+        "ML Files": ml_files,
+        "Play Walkthrough": lambda: play_walkthrough(plays, players)
     }
-
     lazy_tabs(sesstabs, key_prefix="session_tabs")
+
+def get_session_status(session_id):
+    log.info(f"Fetching status for session ID: {session_id}")
+    return get_one("sessions", session_id)["status"]
 
 # -------------------------
 #  UI - Single Page - Interface
@@ -209,7 +270,8 @@ def existing_session():
  
 tabs = {
     "New Session": new_session,
-    "Existing Session": existing_session
+    "Existing Session": existing_session,
+    "Jobs": jobs_interface
 }
 
 lazy_tabs(tabs)
