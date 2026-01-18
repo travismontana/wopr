@@ -360,7 +360,7 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
 
         try:
             logger.info(f"Copying file to label source: src={src_path}, dst={dst_path}")
-            how = filesafe.copy(
+            how = filesafe.copy_file(
                 str(src_path.relative_to(base_path)),
                 str(dst_path.relative_to(base_path))
             )
@@ -372,12 +372,12 @@ def copy_files_to_label_source(session_id: str) -> dict[str, list[dict[str, str]
                 "method": str(how)
             })
             
-            logger.info(f"Copying file to archive: src={src_path}, dst={arch_path}")
-            how = filesafe.copy(
+            logger.info(f"Moving file to archive: src={src_path}, dst={arch_path}")
+            how = filesafe.move(
                 str(src_path.relative_to(base_path)),
                 str(arch_path.relative_to(base_path))
             )
-            logger.info(f"File copied to archive successfully: {filename}, method={how}")
+            logger.info(f"File moved to archive successfully: {filename}, method={how}")
             results.append({
                 "filename": filename,
                 "source": str(src_path),
