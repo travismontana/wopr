@@ -33,8 +33,7 @@ def archive_session_images(session_id: str) -> dict[str, list[dict[str, str]]]:
     archive_base_path = woprvar.storage_paths["archive_base_path"]
     incoming_path = woprvar.storage_paths["incoming_path"]
     archive_path = (archive_base_path / session_uuid).resolve()
-
-    session_plays = get_all("playtracker", filters={"session_id": {"_eq": session_id}})
+    session_plays = get_all("playtracker", filters={"sessionid": {"_eq": session_id}})
     if not session_plays:
         logger.error(f"No plays found for session {session_id}")
         raise ValueError(f"No plays found for session {session_id}")
