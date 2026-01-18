@@ -87,7 +87,7 @@ CAPTURE_RESPONSE_HEADERS = [
 ]
 
 # Determine if tracing is enabled
-tracing_enabled = woprconfig.get_bool("tracing.enable", True)
+tracing_enabled = True
 logger.info(f"Tracing enabled: {tracing_enabled}")
 
 # Initialize tracer as None (will be set if tracing enabled)
