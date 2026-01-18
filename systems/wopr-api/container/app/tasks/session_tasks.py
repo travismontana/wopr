@@ -263,7 +263,7 @@ def check_session_file_status_task(session_id: str) -> dict[str, list[str]]:
                 # Check if file exists using SafeFS internal resolution
                 # must_exist=False prevents exception on missing files
                 resolved = filesafe._resolve_rel(
-                    str(file_path.relative_to(base_path)),
+                    str(file_path.relative_to(wopr_base_path)),
                     must_exist=False
                 )
                 if resolved.exists():
