@@ -38,7 +38,7 @@ def session_management():
     st.subheader("Session Management")
     st.write("Functionality for session management will go here.")
     current_session_id = st.session_state.get("selected_session_id", None)
-    session_info = get_one("sessions", {"id": current_session_id}) if current_session_id else None
+    session_info = get_one("sessions", current_session_id) if current_session_id else None
     log.info(f"Current Session Info: {session_info}")
     if current_session_id:
         log.info(f"Managing session ID: {current_session_id}")
@@ -46,7 +46,6 @@ def session_management():
         log.info(f"Number of Plays in this Session: {len(plays)}")
         session_info['plays'] = plays
         
-
 
 def ml_prep():
     st.subheader("ML Preparation")
@@ -56,6 +55,7 @@ def ml_prep():
     
 
 def play_walkthrough(plays, players):
+    log.info(f"Starting Play Walkthrough with {len(plays)} plays Players: {len(players)}.")
     play_data_dict = []
     for play in plays:
         playername = next((player['name'] for player in players if player['id'] == play['playerid']), "Unknown Player")
@@ -87,14 +87,17 @@ def play_walkthrough(plays, players):
 def existing_session():
     st.subheader("Work an Existing Session")
     games = get_all("games")
+    log.info(f"Fetched {len(games)} games from backend.")
     players = get_all("players")
+    log.info(f"Fetched {len(players)} players from backend.")
     
     session_uuid, session = sessions_selectbox()
+    log.info(f"Selected session from UI: {session_uuid}")
     session_id = session['id']
+    log.info(f"Session ID resolved: {session_id}")
     st.session_state.selected_session = session_uuid
     st.session_state.selected_session_id = session_id
     log.info(f"Session selected in UI: {st.session_state.selected_session} with ID {st.session_state.selected_session_id}")
-
     plays = get_session_plays(st.session_state.selected_session_id)
     gamename = games[0]['name'] if games else "Unknown"
     st.write(f"Session Game: {gamename}")

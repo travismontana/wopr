@@ -144,109 +144,111 @@ if tracing_enabled:
                     val_str = value.decode() if isinstance(value, bytes) else value
                     span.set_attribute(f"http.request.header.{key_str}", val_str)
     
-    FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
-    #app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
-    #app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
-    #app.include_router(status.router, prefix="/api/v2/status", tags=["status"])
-    #app.include_router(health.router, prefix="/api/v2/health", tags=["health"])
-    #app.include_router(pieces.router, prefix="/api/v2/pieces", tags=["pieces"])
-    #app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
-    #app.include_router(homeauto.router, prefix="/api/v2/homeauto", tags=["homeauto"])
-    #app.include_router(ml.router) 
-    """----------------------"""
-    app.include_router(config.router, prefix="/api/v2/config", tags=["config"])
-    app.include_router(games.router, prefix="/api/v2/games", tags=["games"])
-    app.include_router(pieces.router, prefix="/api/v2/pieces", tags=["pieces"])
-    app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
-    app.include_router(images.router, prefix="/api/v2/images", tags=["images"])
-    app.include_router(notifications.router, prefix="/api/v2/notifications", tags=["notifications"])
-    app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
-    app.include_router(session.router, prefix="/api/v2/session", tags=["session"])
-    app.include_router(session.router, prefix="/api/v2/sessions", tags=["session"])
-    app.include_router(vision.router, prefix="/api/v2/vision", tags=["vision"])
-    app.include_router(players.router, prefix="/api/v2/players", tags=["players"])
-    app.include_router(plays.router, prefix="/api/v2/plays", tags=["plays"])
-    @app.middleware("http")
-    async def capture_headers_and_payloads(request, call_next):
-        span = trace.get_current_span()
-        logger.debug(f"[MIDDLEWARE] Processing {request.method} {request.url.path}")
-        logger.debug(f"[MIDDLEWARE] Span exists: {span is not None}, Recording: {span.is_recording() if span else 'N/A'}")
-        
-        # Read request body
-        body = await request.body()
-        logger.debug(f"[MIDDLEWARE] Request body length: {len(body)}")
-        
-        # Capture request body in span
-        if span and span.is_recording() and body:
-            try:
-                body_dict = json.loads(body)
-                span.set_attribute("http.request.body", json.dumps(body_dict))
-                logger.debug("[MIDDLEWARE] Set http.request.body attribute")
-            except Exception as e:
-                logger.warning(f"[MIDDLEWARE] Failed to parse request body as JSON: {e}")
-                body_str = body.decode()[:1000]
-                span.set_attribute("http.request.body", body_str)
-                logger.debug("[MIDDLEWARE] Set http.request.body as string")
-        
-        # Reconstruct request so FastAPI can still read the body
-        async def receive():
-            return {"type": "http.request", "body": body}
-        
-        request = Request(request.scope, receive)
-        
-        # Process request
-        response = await call_next(request)
-        logger.debug(f"[MIDDLEWARE] Response status: {response.status_code}")
-        
-        # Capture response headers and body
-        if span and span.is_recording():
-            logger.debug("[MIDDLEWARE] Capturing response data")
-            span.set_attribute("middleware.test.marker", "PAYLOAD_CAPTURE_ACTIVE")
-            span.set_attribute("middleware.request.method", request.method)
-            span.set_attribute("middleware.request.path", request.url.path)
-            for key in CAPTURE_RESPONSE_HEADERS:
-                if key in response.headers:
-                    span.set_attribute(f"http.response.header.{key}", response.headers[key])
-            
-            # Capture response body
-            response_body = b""
-            try:
-                async for chunk in response.body_iterator:
-                    response_body += chunk
-                logger.debug(f"[MIDDLEWARE] Captured response body length: {len(response_body)}")
-            except Exception as e:
-                logger.error(f"[MIDDLEWARE] Failed to read response body: {e}")
-                return response
-            
-            # Store response body in span (truncate if large)
-            if response_body:
-                try:
-                    body_json = json.loads(response_body)
-                    span.set_attribute("http.response.body", json.dumps(body_json))
-                    logger.debug("[MIDDLEWARE] Set http.response.body as JSON")
-                except Exception as e:
-                    logger.warning(f"[MIDDLEWARE] Response not JSON: {e}")
-                    try:
-                        span.set_attribute("http.response.body", response_body.decode()[:1000])
-                    except UnicodeDecodeError:
-                        # Binary response (image, etc.), skip or log differently
-                        span.set_attribute("http.response.body", f"<binary data, {len(response_body)} bytes>")
-                    logger.debug("[MIDDLEWARE] Set http.response.body as string")
-            
-            # Reconstruct response with captured body
-            return Response(
-                content=response_body,
-                status_code=response.status_code,
-                headers=dict(response.headers),
-                media_type=response.media_type
-            )
-        
-        logger.debug("[MIDDLEWARE] No span recording, returning original response")
-        return response
+
 
 else:
     tracer = None
     logger.info("Tracing is disabled.")
+
+FastAPIInstrumentor.instrument_app(app, server_request_hook=request_hook)
+#app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["cameras"])
+#app.include_router(config.router, prefix="/api/v1/config", tags=["config"])
+#app.include_router(status.router, prefix="/api/v2/status", tags=["status"])
+#app.include_router(health.router, prefix="/api/v2/health", tags=["health"])
+#app.include_router(pieces.router, prefix="/api/v2/pieces", tags=["pieces"])
+#app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
+#app.include_router(homeauto.router, prefix="/api/v2/homeauto", tags=["homeauto"])
+#app.include_router(ml.router) 
+"""----------------------"""
+app.include_router(config.router, prefix="/api/v2/config", tags=["config"])
+app.include_router(games.router, prefix="/api/v2/games", tags=["games"])
+app.include_router(pieces.router, prefix="/api/v2/pieces", tags=["pieces"])
+app.include_router(mlimages.router, prefix="/api/v2/mlimages", tags=["mlimages"])
+app.include_router(images.router, prefix="/api/v2/images", tags=["images"])
+app.include_router(notifications.router, prefix="/api/v2/notifications", tags=["notifications"])
+app.include_router(stream.router, prefix="/api/v2/stream", tags=["stream"])
+app.include_router(session.router, prefix="/api/v2/session", tags=["session"])
+app.include_router(session.router, prefix="/api/v2/sessions", tags=["session"])
+app.include_router(vision.router, prefix="/api/v2/vision", tags=["vision"])
+app.include_router(players.router, prefix="/api/v2/players", tags=["players"])
+app.include_router(plays.router, prefix="/api/v2/plays", tags=["plays"])
+@app.middleware("http")
+async def capture_headers_and_payloads(request, call_next):
+    span = trace.get_current_span()
+    logger.debug(f"[MIDDLEWARE] Processing {request.method} {request.url.path}")
+    logger.debug(f"[MIDDLEWARE] Span exists: {span is not None}, Recording: {span.is_recording() if span else 'N/A'}")
+    
+    # Read request body
+    body = await request.body()
+    logger.debug(f"[MIDDLEWARE] Request body length: {len(body)}")
+    
+    # Capture request body in span
+    if span and span.is_recording() and body:
+        try:
+            body_dict = json.loads(body)
+            span.set_attribute("http.request.body", json.dumps(body_dict))
+            logger.debug("[MIDDLEWARE] Set http.request.body attribute")
+        except Exception as e:
+            logger.warning(f"[MIDDLEWARE] Failed to parse request body as JSON: {e}")
+            body_str = body.decode()[:1000]
+            span.set_attribute("http.request.body", body_str)
+            logger.debug("[MIDDLEWARE] Set http.request.body as string")
+    
+    # Reconstruct request so FastAPI can still read the body
+    async def receive():
+        return {"type": "http.request", "body": body}
+    
+    request = Request(request.scope, receive)
+    
+    # Process request
+    response = await call_next(request)
+    logger.debug(f"[MIDDLEWARE] Response status: {response.status_code}")
+    
+    # Capture response headers and body
+    if span and span.is_recording():
+        logger.debug("[MIDDLEWARE] Capturing response data")
+        span.set_attribute("middleware.test.marker", "PAYLOAD_CAPTURE_ACTIVE")
+        span.set_attribute("middleware.request.method", request.method)
+        span.set_attribute("middleware.request.path", request.url.path)
+        for key in CAPTURE_RESPONSE_HEADERS:
+            if key in response.headers:
+                span.set_attribute(f"http.response.header.{key}", response.headers[key])
+        
+        # Capture response body
+        response_body = b""
+        try:
+            async for chunk in response.body_iterator:
+                response_body += chunk
+            logger.debug(f"[MIDDLEWARE] Captured response body length: {len(response_body)}")
+        except Exception as e:
+            logger.error(f"[MIDDLEWARE] Failed to read response body: {e}")
+            return response
+        
+        # Store response body in span (truncate if large)
+        if response_body:
+            try:
+                body_json = json.loads(response_body)
+                span.set_attribute("http.response.body", json.dumps(body_json))
+                logger.debug("[MIDDLEWARE] Set http.response.body as JSON")
+            except Exception as e:
+                logger.warning(f"[MIDDLEWARE] Response not JSON: {e}")
+                try:
+                    span.set_attribute("http.response.body", response_body.decode()[:1000])
+                except UnicodeDecodeError:
+                    # Binary response (image, etc.), skip or log differently
+                    span.set_attribute("http.response.body", f"<binary data, {len(response_body)} bytes>")
+                logger.debug("[MIDDLEWARE] Set http.response.body as string")
+        
+        # Reconstruct response with captured body
+        return Response(
+            content=response_body,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            media_type=response.media_type
+        )
+    
+    logger.debug("[MIDDLEWARE] No span recording, returning original response")
+    return response
 
 # CORS
 CORS_ORIGINS: List[str] = ["*"]

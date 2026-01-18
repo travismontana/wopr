@@ -23,8 +23,13 @@ from app import globals as woprvar
 from opentelemetry import trace
 from contextlib import nullcontext
 from app.directus_client import get_one, get_all, post, update, delete
-from app.lib.task_helper import queue_task, get_task_status
-
+from app.lib.task_helper import (
+    queue_task, 
+    get_task_status,
+    revoke_task,
+    wait_for_task,
+    get_task_info
+)
 logger = logging.getLogger(woprvar.APP_NAME)
 
 router = APIRouter(tags=["session"])
