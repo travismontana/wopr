@@ -37,8 +37,6 @@ logger = configure_logging(woprvar.APP_NAME)
 
 router = APIRouter(tags=["tasks"])
 
-
-
 # tasks
 # /session/{session_id}/archive - archives all images for session
 # 
