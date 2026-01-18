@@ -32,7 +32,7 @@ from app.lib.task_helper import (
 	get_all_active_tasks
 )
 from app.logging import configure_logging
-from app.tasks.archive import archive_session_images  # Import the task
+from app.tasks.sessions_tasks import archive_session_images  # Import the task
 
 logger = configure_logging(woprvar.LOGFILE)
 
@@ -46,7 +46,7 @@ async def archive_session_tasks(session_id: str):
 	logger.info(f"Archiving images for session ID: {session_id}")
 	try:
 		# Simulate archiving process
-		results = queue_task(archive_session_images, {"session_id": session_id})
+		results = queue_task(archive_session_images, session_id)
 		logger.info(f"Successfully archived images for session ID: {session_id}")
 		return {"status": "success", "message": f"Images for session {session_id} archived successfully."}
 	except Exception as e:
