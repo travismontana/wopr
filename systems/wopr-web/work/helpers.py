@@ -660,7 +660,7 @@ def copy_files_to_source(session_id: str) -> dict:
         result = copy_files_to_source("abc123")
         task_id = result.get('task_id')
     """
-    url = f"{API_BASE}/api/v2/tasks/session/{session_id}/copy_to_label_source"
+    url = f"{API_BASE}/api/v2/tasks/session/{session_id}/copy_files_to_label_source"
     try:
         response = httpx.get(url, timeout=10.0)
         response.raise_for_status()

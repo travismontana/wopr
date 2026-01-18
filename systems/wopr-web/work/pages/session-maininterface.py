@@ -134,6 +134,10 @@ def ml_prep():
     if task_id != "N/A":
         presence = wait_for_task(task_id)
     log.info(f"File status task completed with results: {presence}")
+    if st.button("Copy files to source"):
+        results = copy_files_to_source(st.session_state.selected_session_id)
+        st.success("Files copied to source.")
+        st.table(results)
     st.table(presence)
     
 
