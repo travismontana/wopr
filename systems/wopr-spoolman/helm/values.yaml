@@ -25,3 +25,5 @@ wopr-baseapp:
       - secretName: wopr-spoolman-tls
         hosts:
           - spoolman.wopr.tailandtraillabs.org
+
+  securityContext: {}
