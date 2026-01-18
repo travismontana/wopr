@@ -124,7 +124,6 @@ def session_management():
                 if st.button("✗ Cancel"):
                     st.session_state.confirm_archive = False
                     st.rerun()
-    
 
 def ml_prep():
     st.subheader("ML Preparation")
