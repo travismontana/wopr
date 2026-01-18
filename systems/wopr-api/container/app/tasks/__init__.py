@@ -9,6 +9,6 @@ from .session_tasks import *  # noqa
 __all__ = [
     'archive_session_images',
     'check_session_file_status_task',
-    'copy_session_files_task',
+    'copy_files_to_label_source_task',
 ]
 
