@@ -14,6 +14,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from helpers import *
+import pandas as pd
+from urllib.parse import urlparse, parse_qs, unquote
 
 
 
@@ -25,7 +27,10 @@ if "selected_session_id" not in st.session_state:
 	st.session_state.selected_session_id = None
 if "cache_loaded" not in st.session_state:
     st.session_state.cache_loaded = []
+if "debug" not in st.session_state:
+    st.session_state.debug = False
 
+debug = st.session_state.debug
 # -------------------------
 # Streamlit UI
 # -------------------------
@@ -236,13 +241,136 @@ def process_management():
 # 
 # 
 #
+def get_process_states(session_info):
+    log.info(f"Getting process states for session_id: {session_info['ID']}")
+    log.debug(f"Session Info: {session_info}")
+    if debug:
+        st.write(f"Session Info: {session_info}")
+    
+    # Get Label Studio projects
+    ls_projects = get_label_studio_projects()
+    log.info(f"Received: {ls_projects}")
+    if debug:
+        st.write("is_projects")
+        #st.json(ls_projects)
+    
+    num_proj = ls_projects.get("count", 0)
+    if debug:
+        st.write(f"Number of projects: {num_proj}")
+    
+    # Find project matching session's game ID
+    # Note: session_info doesn't have GameID, need to add it or get from session
+    # Assuming you'll add it to session_info dict
+    target_game_id = session_info.get("GameID")  # Add this to session_info creation
+    
+    if not target_game_id:
+        log.warning("No GameID in session_info")
+        return ls_projects
+    
+    matching_project = None
+    for project in ls_projects.get("results", []):
+        description = project.get("description", "")
+        # Extract gameId from description like "<gameId:4>"
+        match = re.search(r'<gameId:(\d+)>', description)
+        if match:
+            project_game_id = int(match.group(1))
+            log.debug(f"Project {project['id']} has gameId: {project_game_id}")
+            if project_game_id == target_game_id:
+                matching_project = project
+                log.info(f"Found matching project: {project['title']} (ID: {project['id']})")
+                break
+    
+    if debug and matching_project:
+        st.success(f"Matched Label Studio project: {matching_project['title']}")
+        st.json(matching_project)
+    elif debug:
+        st.warning(f"No Label Studio project found for gameId: {target_game_id}")
+    
+    return matching_project
 
-def get_process_states(session_id):
-    log.info(f"Getting process states for session_id: {session_id}")
-    # gonna use a job
+def process_proj_tasks(proj_tasks):
+    logger.info("Processing project tasks")
+    logger.debug(f"Project tasks data: {proj_tasks}")
+    if debug:
+        st.write("Processing project tasks")
+        #st.json(proj_tasks)
+    simplified_tasks= []
+    for task in proj_tasks:
+        task_id = task['id']
+        url = task['data']['image']
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
+        file_path = query_params['d'][0]  # 'labelstudio/source/game-...-play2.jpg'
+        filename = unquote(file_path.split('/')[-1])  
+        task_is_labeled = task['is_labeled']
+        simplified_tasks.append({
+            "task_id": task_id,
+            "filename": filename,
+            "is_labeled": task_is_labeled
+        })
+    return simplified_tasks
 
-def process_states_display(process_states):
-    st.json(process_states)
+def process_states_display(session_info,process_states, file_presence):
+    if debug:
+        st.write("in process_states_display")
+        #st.json(process_states)
+    proj_id = process_states.get("id") if process_states else None
+    proj_title = process_states.get("title") if process_states else None
+    proj_tasks_queue_total = process_states.get("queue_total") if process_states else None
+    proj_tasks_queue_done = process_states.get("queue_done") if process_states else None
+    proj_tasks_finished_tasks = process_states.get("finished_task_number") if process_states else None
+
+    proj_tasks = get_label_studio_projects_tasks(proj_id) if proj_id else None
+    #if debug:
+        #st.json(proj_tasks)
+    simplified_tasks = process_proj_tasks(proj_tasks)
+    if debug:
+        #st.json(simplified_tasks)
+        st.json(file_presence)
+    
+    st.success("Label Studio Project Found")
+    st.write(f":gray[**Project Title:**] {proj_title}")
+    st.write(f":gray[**Project Id:**] {proj_id}")
+
+def process_states_display2(process_states):
+    if debug:
+        st.write("in process_states_display")
+        #st.json(process_states)
+    proj_id = process_states.get("id") if process_states else None
+    proj_title = process_states.get("title") if process_states else None
+    proj_tasks_queue_total = process_states.get("queue_total") if process_states else None
+    proj_tasks_queue_done = process_states.get("queue_done") if process_states else None
+    proj_tasks_finished_tasks = process_states.get("finished_task_number") if process_states else None
+
+    st.success("Label Studio Project Found")
+    st.write(f":gray[**Project Title:**] {proj_title}")
+    st.write(f":gray[**Project Id:**] {proj_id}")
+    total = proj_tasks_queue_total or 0
+    done = proj_tasks_queue_done or 0
+    finished = proj_tasks_finished_tasks or 0
+
+    st.subheader("Label Studio Task Progress")
+
+    # Top row: metrics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Queue Total", total)
+    with col2:
+        pct = (done/total*100) if total > 0 else 0
+        st.metric("Queue Done", done, delta=f"{pct:.1f}%")
+    with col3:
+        st.metric("Finished", finished)
+
+    # Progress bar
+    if total > 0:
+        st.progress(done / total, text=f"{done} of {total} tasks completed")
+        
+        # Detailed chart
+        chart_data = pd.DataFrame({
+            "Count": [done, total - done, finished]
+        }, index=["Completed", "Pending", "Finished"])
+        st.bar_chart(chart_data)
+
     return 0
 
 def file_presence_display(file_presence):
@@ -267,8 +395,11 @@ def file_presence_display(file_presence):
                         if item['files']:
                             with st.expander("Files"):
                                 st.write(item['files'])
+            return 0
         else:
             st.write("No file presence data available.")
+            return 1
+
 def existing_session():
     session_uuid, session = sessions_selectbox()
     games = get_all("games")
@@ -288,11 +419,14 @@ def existing_session():
     session_status = get_session_status(st.session_state.selected_session_id)
     session_notes = session["notes"]
     session_name = session["name"]
-    sessioninfo = {
+    session_info = {
         "Name": session_name,
         "Status": session_status,
         "Game": gamename,
-        "Notes": session_notes
+        "GameID": session_game_id,
+        "Notes": session_notes,
+        "ID": session_id,
+        "UUID": session_uuid
         }
 
     with st.sidebar:
@@ -303,13 +437,14 @@ def existing_session():
 
     if session_status != "archived":
         file_presence = get_file_presence(session_id)
-        if not file_presence_display(file_presence):
-            st.error("Failed to display file presence data.")
+        file_presence_display(file_presence)
         st.divider()
-        process_states = get_process_states(session_id)
-        if not process_states_display(process_states):
-            st.error("Failed to display process states data.")
+
+        process_states = get_process_states(session_info)
+        log.info(f"Process states: {process_states}")
+        process_states_display(session_info, process_states, file_presence)
         st.divider()
+
         #sesstabs = {
         #    "Session Management": session_management,
         #    "Process Management": process_management,
@@ -327,7 +462,14 @@ def get_session_status(session_id):
 # -------------------------
 #  UI - Single Page - Interface
 # -------------------------
+on = st.toggle("Activate debugging")
 
+if on:
+    st.session_state.debug = True
+    
+else:
+    st.session_state.debug = False
+debug = st.session_state.debug
 tabs = {
     "New Session": new_session,
     "Existing Session": existing_session,

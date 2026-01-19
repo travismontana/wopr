@@ -48,6 +48,8 @@ LABEL_STUDIO_URL = woprvar.WOPR_CONFIG["vision"]["label_studio_url"]
 LABEL_STUDIO_TOKEN = os.getenv('LABEL_STUDIO_TOKEN', '')
 if not LABEL_STUDIO_TOKEN:
     logger.warning("LABEL_STUDIO_TOKEN not set - vision endpoints will fail")
+else:
+    logger.info("Label Studio token found - vision endpoints enabled")
 # Request/Response models
 class ProjectListResponse(BaseModel):
     """Label Studio projects list response"""

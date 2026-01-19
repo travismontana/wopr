@@ -28,6 +28,7 @@ from pathlib import Path
 
 # API configuration
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+API_VERSION = "v2"
 
 # Flavor text for play submissions
 PLAYPHRASES = [
@@ -75,6 +76,7 @@ def setup_logger() -> logging.Logger:
 
 
 log = setup_logger()
+logger = log
 
 # Image proxy and URL configurations
 imgproxy = "http://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300/plain/https://images.wopr.tailandtraillabs.org/ml/incoming"
@@ -671,3 +673,60 @@ def copy_files_to_source(session_id: str) -> dict:
         log.error(f"Failed to queue copy_to_label_source task for session {session_id}: {e}")
         st.error(f"Failed to queue task: {e}")
         return {}
+
+def do_api_things(action, base_url, route, path, headers, payload):
+    logger.info(
+        f"Doing API things - "
+        f"Action: {action}, "
+        f"Base URL: {base_url}, "
+        f"Route: {route}, "
+        f"Path: {path}, "
+        f"Headers: {headers}, "
+        f"Payload: {payload}"
+    )
+    
+    action_map = {
+        "get": httpx.get,
+        "post": httpx.post,
+        "put": httpx.put,
+        "delete": httpx.delete
+    }
+    
+    method = action_map[action.lower()]
+    logger.info(f"Using HTTP method: {method.__name__}")
+    
+    timeout = 30.0
+    url = f"{base_url}/api/{API_VERSION}/{route}/{path}"
+    logger.info(f"Constructed URL: {url}")
+    
+    # Build request kwargs based on HTTP method
+    kwargs = {"timeout": timeout, "headers": headers}
+    
+    if action.lower() in ["post", "put", "patch"] and payload:
+        kwargs["json"] = payload
+    elif action.lower() == "get" and payload:
+        # If payload exists for GET, treat as query params
+        kwargs["params"] = payload
+    
+    response = method(url, **kwargs)
+    response.raise_for_status()
+    result = response.json()
+    logger.info(f"Response status code: {response}")
+    logger.debug(response.text)
+    
+    return result
+
+
+def get_label_studio_projects():
+    logger.info("Fetching label studio projects")
+    response = do_api_things("get", API_BASE, "vision", "projects", headers={}, payload=None)
+    logger.info(f"Retrieved {response} label studio projects")
+    logger.debug(response)
+    return response
+
+def get_label_studio_projects_tasks(project_id):
+    logger.info(f"Fetching tasks for label studio project {project_id}")
+    response = do_api_things("get", API_BASE, "vision", f"projects/{project_id}/tasks", headers={}, payload=None)
+    logger.info(f"Retrieved tasks for project {project_id}: {response}")
+    logger.debug(response)
+    return response
