@@ -67,8 +67,6 @@ def get_status():
 
     return status
 
-# projects (each game)
-# datasets (the stuff)
 # models
 # tasks
 

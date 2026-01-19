@@ -23,6 +23,8 @@ from helpers import *
 # -------------------------
 # Streamlit UI
 # -------------------------
+st.set_page_config(layout="wide", page_title="WOPR Session Interface")
+
 st.title("WOPR Game Interface")
 st.write("Welcome to the WOPR Game Interface.")
 

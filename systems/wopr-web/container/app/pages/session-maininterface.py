@@ -23,10 +23,13 @@ if "selected_session" not in st.session_state:
 	st.session_state.selected_session = None
 if "selected_session_id" not in st.session_state:
 	st.session_state.selected_session_id = None
+if "cache_loaded" not in st.session_state:
+    st.session_state.cache_loaded = []
 
 # -------------------------
 # Streamlit UI
 # -------------------------
+st.set_page_config(layout="wide", page_title="WOPR Session Interface")
 st.title("WOPR Session Interface")
 st.write("Welcome to the WOPR Session Interface.")
 
@@ -125,45 +128,28 @@ def session_management():
                     st.session_state.confirm_archive = False
                     st.rerun()
 
-def ml_files():
-    st.subheader("ML Files")
-    presence = queue_session_task(st.session_state.selected_session_id, "file_status")
+def get_file_presence(session_id):
+    presence = queue_session_task(session_id, "file_status")
     task_id = presence.get("task_id", "N/A")
     log.info(f"Queued file status task with ID: {task_id}")
     if task_id != "N/A":
         presence = wait_for_task(task_id)
     log.info(f"File status task completed with results: {presence}")
-    formatted_data = []
-    if st.button("Copy files to source"):
-        results = copy_files_to_source(st.session_state.selected_session_id)
-        log.info(f"Copy files to source completed with results: {results}")
-        task_id = results.get("task_id", "N/A")
-        results2 = None
-        if task_id != "N/A":
-            results2 = wait_for_task(task_id)
-            log.info(f"File copy task completed with results: {results2}")
-            st.success("Files copied to source.")
-            formatted_data_files = handle_celery_output(results2)
-    status = presence['status']
-    if status == 'success':
-        for location in presence['result']:
-            formatted_data.append({
-                "loc": location,
-                "locname": location.replace('_', ' ').title(),
-                "count": len(presence['result'][location]),
-                "files": presence['result'][location]
-            })
-        log.info(f"Formatted file presence data: {formatted_data}")
-        if len(formatted_data) > 0:
-            st.divider()
-            st.subheader("File Presence Overview")
-            cols = st.columns(len(formatted_data))
-            for col, item in zip(cols, formatted_data):
-                with col:
-                    st.metric(item['locname'], item['count'])
-                    if item['files']:
-                        with st.expander("Files"):
-                            st.write(item['files'])
+    
+    return presence
+
+def copy_files_to_source(session_id):
+    results = copy_files_to_source(st.session_state.selected_session_id)
+    log.info(f"Copy files to source completed with results: {results}")
+    task_id = results.get("task_id", "N/A")
+    results2 = None
+    if task_id != "N/A":
+        results2 = wait_for_task(task_id)
+        log.info(f"File copy task completed with results: {results2}")
+        st.success("Files copied to source.")
+        formatted_data_files = handle_celery_output(results2)
+
+
     else:
         st.write("No files found")
 
@@ -204,8 +190,10 @@ def  handle_celery_output(output):
                 
     return 0
 
-def play_walkthrough(plays, players):
+def play_walkthrough():
     log.info(f"Starting Play Walkthrough with {len(plays)} plays Players: {len(players)}.")
+    players = get_all("players")
+    plays = get_all("plays", session_id)
     play_data_dict = []
     for play in plays:
         playername = next((player['name'] for player in players if player['id'] == play['playerid']), "Unknown Player")
@@ -234,31 +222,103 @@ def play_walkthrough(plays, players):
             st.image(playimagethumb, caption=playnote)
             st.markdown(f"[Full Image]({playimagefull})")
 
+def process_management():
+    log.info("Process management interface accessed.")
+    load_into_labeler_status = "workin on it"
+    load_into_project_dataset_status = "workin on it"
+    st.write(f":gray[Load into label studio status:] {load_into_labeler_status}")
+    st.write(f":gray[Load into project dataset status:] {load_into_project_dataset_status}")
+    pass
+
+# Jobs approach
+# 
+# status is stored in the db
+# 
+# 
+#
+
+def get_process_states(session_id):
+    log.info(f"Getting process states for session_id: {session_id}")
+    # gonna use a job
+
+def process_states_display(process_states):
+    st.json(process_states)
+    return 0
+
+def file_presence_display(file_presence):
+        status = file_presence['status']
+        if status == 'success':
+            formatted_data = []
+            for location in file_presence['result']:
+                formatted_data.append({
+                    "loc": location,
+                    "locname": location.replace('_', ' ').title(),
+                    "count": len(file_presence['result'][location]),
+                    "files": file_presence['result'][location]
+                })
+            log.info(f"Formatted file presence data: {formatted_data}")
+            if len(formatted_data) > 0:
+                st.divider()
+                st.subheader("File Presence Overview")
+                cols = st.columns(len(formatted_data))
+                for col, item in zip(cols, formatted_data):
+                    with col:
+                        st.metric(item['locname'], item['count'])
+                        if item['files']:
+                            with st.expander("Files"):
+                                st.write(item['files'])
+        else:
+            st.write("No file presence data available.")
 def existing_session():
-    st.subheader("Work an Existing Session")
-    games = get_all("games")
-    log.info(f"Fetched {len(games)} games from backend.")
-    players = get_all("players")
-    log.info(f"Fetched {len(players)} players from backend.")
-    
     session_uuid, session = sessions_selectbox()
-    log.info(f"Selected session from UI: {session_uuid}")
+    games = get_all("games")
     session_id = session['id']
-    log.info(f"Session ID resolved: {session_id}")
+    session_game_id = session['gameid']
     st.session_state.selected_session = session_uuid
     st.session_state.selected_session_id = session_id
+
+    log.info(f"Fetched {len(games)} games from backend.")
+    log.info(f"Selected session from UI: {session_uuid}")
+    log.info(f"Session ID resolved: {session_id}")
     log.info(f"Session selected in UI: {st.session_state.selected_session} with ID {st.session_state.selected_session_id}")
-    plays = get_session_plays(st.session_state.selected_session_id)
-    gamename = games[0]['name'] if games else "Unknown"
-    st.write(f"Session Game: {gamename}")
-    sessionstatus = get_session_status(st.session_state.selected_session_id)
-    st.write(f"Session Status: {sessionstatus}")
-    sesstabs = {
-        "Session Management": session_management,
-        "ML Files": ml_files,
-        "Play Walkthrough": lambda: play_walkthrough(plays, players)
-    }
-    lazy_tabs(sesstabs, key_prefix="session_tabs")
+    log.info(f"Session Game ID: {session_game_id}")
+
+    gamenamelist = [item for item in games if item["id"] == session_game_id]
+    gamename = gamenamelist[0]['name'] if gamenamelist else 'Unknown'
+    session_status = get_session_status(st.session_state.selected_session_id)
+    session_notes = session["notes"]
+    session_name = session["name"]
+    sessioninfo = {
+        "Name": session_name,
+        "Status": session_status,
+        "Game": gamename,
+        "Notes": session_notes
+        }
+
+    with st.sidebar:
+        st.write(f":blue[**Name:**]        {session_name}")
+        st.write(f":blue[**Status:**]     {session_status}")
+        st.write(f":blue[**Game:**]       {gamename}")
+        st.write(f":blue[**Notes:**]      {session_notes}")
+
+    if session_status != "archived":
+        file_presence = get_file_presence(session_id)
+        if not file_presence_display(file_presence):
+            st.error("Failed to display file presence data.")
+        st.divider()
+        process_states = get_process_states(session_id)
+        if not process_states_display(process_states):
+            st.error("Failed to display process states data.")
+        st.divider()
+        #sesstabs = {
+        #    "Session Management": session_management,
+        #    "Process Management": process_management,
+        #    "File Management": ml_files,
+        #    "Play Walkthrough": play_walkthrough
+        #}
+        #lazy_tabs(sesstabs, key_prefix="session_tabs")
+    else:
+        st.write("Session archived, click here to unarchive.")
 
 def get_session_status(session_id):
     log.info(f"Fetching status for session ID: {session_id}")
@@ -267,7 +327,7 @@ def get_session_status(session_id):
 # -------------------------
 #  UI - Single Page - Interface
 # -------------------------
- 
+
 tabs = {
     "New Session": new_session,
     "Existing Session": existing_session,
