@@ -325,12 +325,38 @@ def process_states_display(session_info,process_states, file_presence):
         #st.json(proj_tasks)
     simplified_tasks = process_proj_tasks(proj_tasks)
     if debug:
+        st.write("Simplified Tasks and File Presence")
         #st.json(simplified_tasks)
-        st.json(file_presence)
+        #st.json(file_presence)
     
-    st.success("Label Studio Project Found")
+    st.success("A Label Studio Project Found")
     st.write(f":gray[**Project Title:**] {proj_title}")
     st.write(f":gray[**Project Id:**] {proj_id}")
+
+    is_game_in_tasks = is_game_in_tasks_check(simplified_tasks, session_info.get("UUID"))
+    if debug:
+        st.write("is_game_in_tasks")
+        st.json(is_game_in_tasks)
+    num_session_in_tasks = len(is_game_in_tasks) if isinstance(is_game_in_tasks, list) else 0
+    st.write(f"Number of images from this session in the project tasks: {num_session_in_tasks}")
+
+    # are there files in the file_presence that match the game uuid
+
+def is_game_in_tasks_check(simplified_tasks,session_uuid):
+    logger.info(f"Checking if game UUID {session_uuid} is in tasks")
+    results = []
+    for task in simplified_tasks:
+        if session_uuid in task['filename']:
+            logger.info(f"Found game UUID {session_uuid} in task {task['task_id']}")
+            results.append({
+                "filename": task['filename'],
+                "task_id": task['task_id']
+            })
+    if results:
+        return results
+    else: 
+        logger.info(f"Session UUID {session_uuid} not found in any task")
+        return 1
 
 def process_states_display2(process_states):
     if debug:

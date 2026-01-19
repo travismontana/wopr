@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
-
-from helpers import *
-
-
-st.set_page_config(layout="wide", page_title="WOPR Session Interface")
-st.title("WOPR Back of House")
-
-# Projects 
+apiVersion: v2
+name: wopr-web
+version: 0.1.5-alpha
+description: WOPR Web
+dependencies:
+  - name: wopr-baseapp
+    version: "*"
+    repository: "oci://ghcr.io/travismontana/wopr/charts"

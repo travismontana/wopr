@@ -165,5 +165,19 @@
       5
     ],
     "opencv_change_threshold": 30
+  },
+
+  "project": {
+    "project_status": {
+      "idea": "Not started yet",
+      "staged": "Ready for development",
+      "pretraining": "Learning the game",
+      "training": "In progress",
+      "trained": "Completed"
+    },
+    "project_state": {
+      "open": "Currently active",
+      "archived": "No longer active"
+    }
   }
 }

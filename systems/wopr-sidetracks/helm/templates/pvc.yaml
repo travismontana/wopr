@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
-
-from helpers import *
-
-
-st.set_page_config(layout="wide", page_title="WOPR Session Interface")
-st.title("WOPR Back of House")
-
-# Projects 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wopr-web-nfs-pvc
+  namespace: wopr
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: ""
+  volumeName: wopr-web-nfs-pv

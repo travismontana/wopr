@@ -13,11 +13,7 @@
 # limitations under the License.
 
 import streamlit as st
+st.set_page_config(layout="wide", page_title="WOPR Side Tracks")
+st.title("WOPR Side Tracks")
+st.write("If you can read this, Streamlit is working.")
 
-from helpers import *
-
-
-st.set_page_config(layout="wide", page_title="WOPR Session Interface")
-st.title("WOPR Back of House")
-
-# Projects 

@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
-
-from helpers import *
-
-
-st.set_page_config(layout="wide", page_title="WOPR Session Interface")
-st.title("WOPR Back of House")
-
-# Projects 
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wopr-web-nfs-pv
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - intr
+    - noexec
+    - noatime
+    - vers=3
+  nfs:
+    server: danas.hangar.bpfx.org
+    path: /volume2/wopr
