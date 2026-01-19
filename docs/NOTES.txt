@@ -1,1 +1,36 @@
-when writing streamlit, I'm manually copying 
+
+    <Label value="mainboard" background="#FF0000"/>
+    <Label value="1_solari" background="#FFD700"/>
+    <Label value="5_solari" background="#FFA500"/>
+    <Label value="1_spice" background="#D2691E"/>
+    <Label value="5_spice" background="#8B4513"/>
+    <Label value="1_water" background="#1E90FF"/>
+    <Label value="blue_troopCube" background="#0000FF"/>
+    <Label value="red_troopCube" background="#FF0000"/>
+    <Label value="green_troopCube" background="#00FF00"/>
+    <Label value="yellow_troopCube" background="#FFFF00"/>
+    <Label value="blue_agentMeeple" background="#4169E1"/>
+    <Label value="red_agentMeeple" background="#DC143C"/>
+    <Label value="green_agentMeeple" background="#32CD32"/>
+    <Label value="yellow_agentMeeple" background="#FFD700"/>
+    <Label value="blue_combatMarker" background="#4682B4"/>
+    <Label value="red_combatMarker" background="#B22222"/>
+    <Label value="green_combatMarker" background="#228B22"/>
+    <Label value="yellow_combatMarker" background="#F0E68C"/>
+    <Label value="blue_spy" background="#191970"/>
+    <Label value="red_spy" background="#A52A2A"/>
+    <Label value="green_spy" background="#2F4F2F"/>
+    <Label value="yellow_spy" background="#BDB76B"/>
+    <Label value="wood_sandWorm" background="#8B4513"/>
+    <Label value="makerHook" background="#696969"/>
+    <Label value="shieldWall" background="#708090"/>
+    <Label value="firstPlayerToken" background="#FFD700"/>
+    <Label value="emperor_allianceToken" background="#4B0082"/>
+    <Label value="spacingGuild_allianceToken" background="#FF6347"/>
+    <Label value="beneGesserit_allianceToken" background="#9370DB"/>
+    <Label value="freemen_allianceToken" background="#F4A460"/>
+    <Label value="table_marker" background="#808080"/>
+blue_score_marker
+red_score_marker
+green_score_marker
+yellow_score_marker
