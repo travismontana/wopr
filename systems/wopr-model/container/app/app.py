@@ -67,6 +67,3 @@ def get_status():
 
     return status
 
-# models
-# tasks
-

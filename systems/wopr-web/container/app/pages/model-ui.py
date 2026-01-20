@@ -93,7 +93,6 @@ def create_model_family_page():
         logger.info(f"Form submitted: {submitted}")
         logger.info(f"Form data: {model_family}")
     if submitted:
-        st.write("Yes!")
         results = create_new_model_family(model_family, debug)
         logger.info(f"New model family created: {results}")
         st.session_state.debuggers['create_model_family_page'] = results
@@ -169,17 +168,10 @@ if model_family_count == 0:
 countCol,statusCol = st.columns(2)
 
 with countCol:
-    st.write(f":blue[Model Families:] {model_family_count}")
-    st.write(f":blue[Models:]         {model_count}")
+    st.write(f":blue[Status:] Green")
 
 with statusCol:
-    st.write(":blue[Model Families:]")
-    for item in st.session_state.model_families:
-        st.write(f"- {item['name']}")
-    st.write(":blue[Models:]")
-    for item in st.session_state.models:
-        st.write(f"- {item['name']}")
-
+    st.write(":blue[Health:]  Green")
 # -------
 st.divider()
 
@@ -193,6 +185,9 @@ with modTab:
     with st.expander("Create New Model"):
         create_model_page()
     list_model_page()
+    
+    #with st.expander("Model Download"):
+        #model_download()
 
 with traTab:
     st.write("Coming Soon")
