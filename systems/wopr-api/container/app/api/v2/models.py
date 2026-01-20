@@ -29,7 +29,7 @@ models_router = CRUDRouter(
     response_model=ModelResponse,
     create_model=ModelCreate,
     update_model=ModelUpdate,
-    prefix="/models",
+    prefix="",
     tags=["models"]
 ).router
 
