@@ -1,0 +1,39 @@
+Discovery Phase
+
+List all images in source/
+Map target directories to their annotation files
+Match annotations to images (probably by task ID in filename or directory number)
+
+
+Validation Phase
+
+Verify each image has corresponding label file
+Check label format (YOLO expects: class_id x_center y_center width height per line)
+Report orphans (images without labels, labels without images)
+
+
+Split Calculation
+
+Total valid pairs: N
+Train: floor(N * 0.7)
+Val: floor(N * 0.2)
+Test: remainder
+Shuffle list, then slice
+
+
+Structure Creation
+
+mkdir -p images/{train,val,test}
+mkdir -p labels/{train,val,test}
+
+
+File Distribution
+
+For each split, copy/symlink image and matching .txt to appropriate dirs
+Keep matching basenames (image.jpg → image.txt)
+
+
+Metadata Generation
+
+Create data.yaml with paths, class names, class count
+(Need to extract class info from labels or Label Studio config)
