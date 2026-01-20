@@ -88,12 +88,6 @@ imgurl = "https://images.wopr.tailandtraillabs.org/ml/incoming"
 # ------------------------
 
 def get_random_phrase() -> str:
-    """
-    Select a random phrase from PLAYPHRASES.
-    
-    Returns:
-        Random Dune/Terminator-themed phrase
-    """
     return random.choice(PLAYPHRASES)
 
 
@@ -715,14 +709,6 @@ def do_api_things(action, base_url, route, path, headers, payload):
     logger.debug(response.text)
     
     return result
-
-
-def get_label_studio_projects():
-    logger.info("Fetching label studio projects")
-    response = do_api_things("get", API_BASE, "vision", "projects", headers={}, payload=None)
-    logger.info(f"Retrieved {response} label studio projects")
-    logger.debug(response)
-    return response
 
 def get_label_studio_projects_tasks(project_id):
     logger.info(f"Fetching tasks for label studio project {project_id}")
