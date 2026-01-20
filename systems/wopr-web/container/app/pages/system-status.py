@@ -34,14 +34,14 @@ things = [
 
 def check_up(name):
     if name == "build-wopr-api":
-        return f"https://github.com/{GITHUB_REPO}/actions/workflows/{name}.yaml/badge.svg"
+        return f"https://github.com/travismontana/wopr/actions/workflows/{name}.yaml/badge.svg"
     else: 
         return "...."   # TODO: replace
 
 def check_func(name):
     if name == "build-wopr-api":
         try:
-            url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/.github/workflows/{name}.yaml"
+            url = f"https://raw.githubusercontent.com/travismontana/wopr/cmain/.github/workflows/{name}.yaml"
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 return response.text
