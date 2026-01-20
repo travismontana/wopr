@@ -19,23 +19,23 @@ from app.lib.task_helper import (
 )
 from app.logging import configure_logging
 
-from app.models.models import ModelResponse, ModelCreate, ModelUpdate
+from app.models.model_family import ModelFamilyResponse, ModelFamilyCreate, ModelFamilyUpdate
 
 logger = configure_logging(woprvar.LOGFILE)
 
 # Usage
-models_router = CRUDRouter(
-    table_name="models",
-    response_model=ModelResponse,
-    create_model=ModelCreate,
-    update_model=ModelUpdate,
+model_family_router = CRUDRouter(
+    table_name="model_family",
+    response_model=ModelFamilyResponse,
+    create_model=ModelFamilyCreate,
+    update_model=ModelFamilyUpdate,
     prefix="",
-    tags=["models"]
+    tags=["model_family"]
 ).router
 
 # Custom endpoint
-@models_router.get("/{model_id}/stats")
-async def get_model_stats(model_id: str):
+@models_router.get("/{model_family_id}/stats")
+async def get_model_stats(model_family_id: str):
     # Custom logic
     pass
 
