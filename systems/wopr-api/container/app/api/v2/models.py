@@ -19,7 +19,7 @@ from app.lib.task_helper import (
 )
 from app.logging import configure_logging
 
-from app.models.models import ModelResponse, ModelCreate, ModleUpdate
+from app.models.models import ModelResponse, ModelCreate, ModelUpdate
 
 logger = configure_logging(woprvar.LOGFILE)
 
