@@ -80,30 +80,37 @@ def get_random_phrase() -> str:
 # CRUD Operations
 # ------------------------
 
+@st.cache_data()
 def get_all(noun: str) -> list:
     url = f"{API_BASE}/api/v2/{noun}"
     response = do_api_things("get", API_BASE, noun, "", payload=None)
+    return response
 
+@st.cache_data()
 def get_one(noun: str, item_id: str) -> dict:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("get", API_BASE, noun, item_id, payload=None)
     return response
 
+@st.cache_data()
 def create_new(noun: str, payload: dict) -> dict:
     url = f"{API_BASE}/api/v2/{noun}"
     response = do_api_things("post", API_BASE, noun, "", payload)
     return response.get("data", {})
 
+@st.cache_data()
 def update_item(noun: str, item_id: str, payload: dict) -> dict:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("patch", API_BASE, noun, item_id, payload)
     return response
 
+@st.cache_data()
 def delete_item(noun: str, item_id: str) -> bool:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("delete", API_BASE, noun, item_id,payload=None)
     return response
 
+@st.cache_data()
 def do_api_things(action, base_url, route, path, payload):
     headers = ""
     logger.info(
@@ -115,7 +122,7 @@ def do_api_things(action, base_url, route, path, payload):
         f"Headers: {headers}, "
         f"Payload: {payload}"
     )
-    
+
     action_map = {
         "get": httpx.get,
         "post": httpx.post,
