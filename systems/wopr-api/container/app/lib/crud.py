@@ -2,6 +2,9 @@ from typing import TypeVar, Generic, Type, Callable, Optional
 from fastapi import APIRouter, status
 from pydantic import BaseModel
 
+from app.logging import configure_logging
+logger = configure_logging("wopr-api")
+
 T = TypeVar('T', bound=BaseModel)
 TCreate = TypeVar('TCreate', bound=BaseModel)
 TUpdate = TypeVar('TUpdate', bound=BaseModel)
