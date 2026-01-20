@@ -34,11 +34,11 @@ model_family_router = CRUDRouter(
 ).router
 
 # Custom endpoint
-@models_router.get("/{model_family_id}/stats")
+@model_family_router.get("/{model_family_id}/stats")
 async def get_model_stats(model_family_id: str):
     # Custom logic
     pass
 
-@models_router.get("/health")
+@model_family_router.get("/health")
 async def get_health():
     return "healthy"

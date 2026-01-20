@@ -29,13 +29,27 @@ API_BASE = "https://api.wopr.tailandtraillabs.org"
 # ---- dummy data ----
 things = [
     "example-service",
+    "build-wopr-api",
 ]
 
 def check_up(name):
-    return "...."   # TODO: replace
+    if name == "build-wopr-api":
+        return f"https://github.com/{GITHUB_REPO}/actions/workflows/{name}.yaml/badge.svg"
+    else: 
+        return "...."   # TODO: replace
 
 def check_func(name):
-    return "...."   # TODO: replace
+    if name == "build-wopr-api":
+        try:
+            url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/.github/workflows/{name}.yaml"
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                return response.text
+            return f"Failed to fetch: {response.status_code}"
+        except Exception as e:
+            return f"Error: {str(e)}"
+    else:
+        return "...."   # TODO: replace
 
 def render_row(name):
     col_thing, col_up, col_func, col_time, col_action = st.columns(
@@ -46,10 +60,13 @@ def render_row(name):
         st.text(name)
 
     with col_up:
-        st.text(f"[ {check_up(name)} ]")
+        badge_url = check_up(name)
+        st.markdown(f'<img src="{badge_url}" alt="status">', unsafe_allow_html=True)
 
     with col_func:
-        st.text(f"[ {check_func(name)} ]")
+        with st.expander("YAML"):
+            yaml_content = check_func(name)
+            st.code(yaml_content, language="yaml")
 
     with col_time:
         st.text("----")
