@@ -27,6 +27,7 @@ def init_session_state():
     
     defaults = {
         "selected_game": None,
+        "attempts": 0,
         "debug": False
     }
     
@@ -56,4 +57,18 @@ with st.sidebar:
         if st.button("Clear Cache"):
             clear_cache()
 
-models = get_models()
+try:
+    models = get_models()
+    st.session_state.attempts = 0
+except Exception as e:
+    if e.response.status_code == 503:
+        if st.session_state.attempts < 3:
+            st.session_state.attempts += 1
+            with st.spinner("Waiting for API to load...will retry 3 times every 60 seconds", show_time=True):
+                time.sleep(60)
+            st.rerun()
+        else:
+            st.error("Api Not loading")
+            st.session_state.attempts = 0  # reset for next time
+    else:
+        raise
