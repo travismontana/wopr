@@ -151,6 +151,7 @@ def do_api_things(action, base_url, route, path, payload):
     response.raise_for_status()
     result = response.json()
     logger.info(f"Response status code: {response}")
+    logger.info(f"Response result: {result}")
     logger.debug(response.text)
     
     return result

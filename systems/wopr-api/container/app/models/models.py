@@ -18,7 +18,7 @@ class ModelUpdate(BaseModel):
     # All fields optional for PATCH
 
 class ModelResponse(ModelBase):
-    id: str
+    id: int
     date_created: Optional[datetime] = None
     date_updated: Optional[datetime] = None
     # Fields that come back from Directus

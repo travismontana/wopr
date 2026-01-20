@@ -21,4 +21,5 @@ def create_new_model_family(data, debugin):
         st.write("In create_new_model_family")
         st.write(data)
     results = create_new("model_family", data)
+    logger.info(f"New model family created: {results}")
     return results

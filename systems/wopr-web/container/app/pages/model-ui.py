@@ -54,13 +54,23 @@ def init_session_state():
 # pages
 def create_model_page():
     st.title("Create Model")
+    model = {}
+    model_families = st.session_state.model_families
     with st.form("create_model_form"):
-        st.text_input("Model Name")
-        st.text_area("Model Description")
-        selected_family = st.selectbox("Model Family", st.session_state.model_families or [])
+        model['name'] = st.text_input("Model Name")
+        model['description'] = st.text_area("Model Description")
+        model['family'] = st.selectbox(
+            "Model Family", 
+            options=model_families,
+            format_func = lambda x: x["name"]
+            )
         submitted = st.form_submit_button("Create Model")
         if submitted:
-            create_new_model()
+            if debug:
+                st.write("Creating new model with data:")
+                st.json(model)
+            results = create_new_model(model,debug)
+            st.write(results)
 
 def create_model_family_page():
     st.title("Create Model Family")
@@ -83,6 +93,16 @@ def create_model_family_page():
             st.write(f"({st.session_state.debuggers['create_model_family_page']})<-shouldbedata")
             #t.json(results, expanded=False)
 
+def list_model_family_page():
+    logger.info("Working on model family listing")
+    
+    families = st.session_state.model_families
+    df = pd.DataFrame(
+        families,
+        columns=["name","description","note"]
+    )
+    st.table(df)
+
 # ============================================================================
 # MAIN UI
 # ============================================================================
@@ -102,7 +122,7 @@ with st.sidebar:
         debug = st.session_state.debug
         # Cache control
         if st.button("Clear Cache"):
-            clear_cache()
+            st.cache_data.clear()
 
 try:
     st.session_state.models = get_models()
@@ -133,11 +153,27 @@ if model_count == 0:
 if model_family_count == 0:
     st.warning("No model families found.")
 
+countCol,statusCol = st.columns(2)
+
+with countCol:
+    st.write(f"Model Families: {model_family_count}")
+    st.write(f"Models: {model_count}")
+
+with statusCol:
+    st.json(st.session_state.model_families, expanded=False)
+
 # -------
 st.divider()
 
-with st.expander("Create New Model Family"):
-    create_model_family_page()
+modFamTab, modTab, traTab = st.tabs(["Model Families", "Models", "Training"])
+with modFamTab:
+    with st.expander("Create New Model Family"):
+        create_model_family_page()
+    list_model_family_page()
 
-with st.expander("Create New Model"):
-    create_model_page()
+with modTab:
+    with st.expander("Create New Model"):
+        create_model_page()
+
+with traTab:
+    st.write("Coming Soon")
