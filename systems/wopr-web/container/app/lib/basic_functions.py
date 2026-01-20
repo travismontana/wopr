@@ -154,3 +154,6 @@ def do_api_things(action, base_url, route, path, payload):
     logger.debug(response.text)
     
     return result
+
+def get_config():
+    return get_all("config")

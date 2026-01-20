@@ -7,13 +7,22 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+import pandas as pd
+
+from lib.basic_functions import (
+    setup_logger, 
+    get_config
+)
+
 from lib.models_lib import (
     get_models,
-    get_model_family,
     create_new_model
 )
-from lib.basic_functions import setup_logger
-import pandas as pd
+
+from lib.model_family_lib import (
+    get_model_family,
+    create_new_model_family
+)
 
 # Setup some defaults
 
@@ -32,8 +41,10 @@ def init_session_state():
     defaults = {
         "selected_game": None,
         "attempts": 0,
-        "model_families": None,
-        "debug": False
+        "model_families": [],
+        "models": [],
+        "debug": False,
+        "debuggers": {}
     }
     
     for key, value in defaults.items():
@@ -41,7 +52,6 @@ def init_session_state():
             st.session_state[key] = value
 
 # pages
-
 def create_model_page():
     st.title("Create Model")
     with st.form("create_model_form"):
@@ -51,6 +61,27 @@ def create_model_page():
         submitted = st.form_submit_button("Create Model")
         if submitted:
             create_new_model()
+
+def create_model_family_page():
+    st.title("Create Model Family")
+    model_family = {}
+    with st.form("create_model_family_form", enter_to_submit=False):
+        model_family['name'] = st.text_input("Model Family Name")
+        model_family['description'] = st.text_area("Model Family Description")
+        model_family['note'] = st.text_area("Additional Information")
+        submitted = st.form_submit_button("Create Model Family", key="create_model_family_submit")
+        logger.info(f"Form submitted: {submitted}")
+        logger.info(f"Form data: {model_family}")
+    if submitted:
+        st.write("Yes!")
+        results = create_new_model_family(model_family, debug)
+        logger.info(f"New model family created: {results}")
+        st.session_state.debuggers['create_model_family_page'] = results
+        if st.session_state.debug:
+            st.write("new model family")
+            st.write(f"({results})<-shouldbedata")
+            st.write(f"({st.session_state.debuggers['create_model_family_page']})<-shouldbedata")
+            #t.json(results, expanded=False)
 
 # ============================================================================
 # MAIN UI
@@ -92,18 +123,21 @@ except Exception as e:
 
 if debug:
     st.write("Debugging is active.")
-    st.json(models)
+    st.json(st.session_state.models)
 
-model_count = len(models)
+model_count = len(st.session_state.models)
+model_family_count = len(st.session_state.model_families)
 
 if model_count == 0:
     st.warning("No models found.")
-
-with st.sidebar:
-    newmodel = st.button("Create New Model")
+if model_family_count == 0:
+    st.warning("No model families found.")
 
 # -------
 st.divider()
-    
-if newmodel:
-    results = create_model_page()
+
+with st.expander("Create New Model Family"):
+    create_model_family_page()
+
+with st.expander("Create New Model"):
+    create_model_page()

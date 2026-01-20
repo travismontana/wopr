@@ -3,14 +3,12 @@ from lib.basic_functions import setup_logger, get_all
 
 logger = setup_logger()
 
+debug = ""
+
 # General stuff
 @st.cache_data()
 def get_models():
     return get_all("models")
-
-@st.cache_data()
-def get_model_family():
-    return get_all("model_family")
 
 def create_new_model():
     logger.info("Creating a new model")
