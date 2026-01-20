@@ -24,7 +24,8 @@ st.write("Welcome to the WOPR ML Systems Status.")
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
-
+# https://github.com/travismontana/wopr/actions/workflows/build-wopr-api.yaml/badge.svg
+# https://github.com/travismontana/wopr/actions/workflows/build-wopr-api.yaml
 # ---- dummy data ----
 things = [
     "example-service",
