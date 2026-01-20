@@ -5,6 +5,7 @@ from datetime import datetime
 class ModelBase(BaseModel):
     name: str
     description: Optional[str] = None
+    note: Optional[str] = None
     version: Optional[str] = None
     # ... whatever fields Directus has for models table
 
@@ -14,6 +15,7 @@ class ModelCreate(ModelBase):
 class ModelUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    note: Optional[str] = None
     version: Optional[str] = None
     # All fields optional for PATCH
 

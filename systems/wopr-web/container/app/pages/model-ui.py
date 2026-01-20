@@ -72,6 +72,16 @@ def create_model_page():
             results = create_new_model(model,debug)
             st.write(results)
 
+def list_model_page():
+    logger.info("Working on model listing")
+    
+    models = st.session_state.models
+    df = pd.DataFrame(
+        models,
+        columns=["name","description","note"]
+    )
+    st.table(df)
+
 def create_model_family_page():
     st.title("Create Model Family")
     model_family = {}
@@ -143,7 +153,10 @@ except Exception as e:
 
 if debug:
     st.write("Debugging is active.")
+    st.write("Models: ")
     st.json(st.session_state.models)
+    st.write("Model Families: ")
+    st.json(st.session_state.model_families)
 
 model_count = len(st.session_state.models)
 model_family_count = len(st.session_state.model_families)
@@ -156,11 +169,16 @@ if model_family_count == 0:
 countCol,statusCol = st.columns(2)
 
 with countCol:
-    st.write(f"Model Families: {model_family_count}")
-    st.write(f"Models: {model_count}")
+    st.write(f":blue[Model Families:] {model_family_count}")
+    st.write(f":blue[Models:]         {model_count}")
 
 with statusCol:
-    st.json(st.session_state.model_families, expanded=False)
+    st.write(":blue[Model Families:]")
+    for item in st.session_state.model_families:
+        st.write(f"- {item['name']}")
+    st.write(":blue[Models:]")
+    for item in st.session_state.models:
+        st.write(f"- {item['name']}")
 
 # -------
 st.divider()
@@ -174,6 +192,7 @@ with modFamTab:
 with modTab:
     with st.expander("Create New Model"):
         create_model_page()
+    list_model_page()
 
 with traTab:
     st.write("Coming Soon")
