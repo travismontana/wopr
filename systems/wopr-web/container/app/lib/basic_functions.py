@@ -78,7 +78,8 @@ imgurl = "https://images.wopr.tailandtraillabs.org/ml/incoming"
 def get_random_phrase() -> str:
     return random.choice(PLAYPHRASES)
 
-def debugit(what,message,debug):
+def debugit(what,message):
+    debug = st.session_state['debug']
     if debug:
         caller = inspect.stack()[1].function
         logger.debug(f"{message}: {what}")

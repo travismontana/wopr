@@ -106,8 +106,8 @@ def list_model_page():
             "description" : st.column_config.TextColumn("Description"),
             "familyid" : st.column_config.SelectboxColumn(
                 "Model Family",
-                options = st.session_state.model_families,
-                format_func = lambda x: x["name"]
+                options = [f['id'] for f in st.session_state.model_families],
+                format_func = lambda x: next((f["name"] for f in st.session_state.model_families if f["id"] == x), ""),
             ),
             "shortname" : st.column_config.TextColumn("Short Name"),
             "note" : st.column_config.TextColumn("Note")
@@ -249,12 +249,13 @@ if model_count == 0:
 if model_family_count == 0:
     st.warning("No model families found.")
 
-countCol,statusCol = st.columns(2)
+modelsCol,modelFamilyCol = st.columns(2)
 
-with countCol:
+with modelsCol:
+    get_model_status()
     st.write(f":blue[Status:] Green")
 
-with statusCol:
+with modelFamilyCol:
     st.write(":blue[Health:]  Green")
 # -------
 st.divider()
