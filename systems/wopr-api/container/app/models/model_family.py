@@ -7,6 +7,7 @@ class ModelFamilyBase(BaseModel):
     description: Optional[str] = None
     note: Optional[str] = None
     version: Optional[str] = None
+    url: Optional[str] = None
     # ... whatever fields Directus has for models table
 
 class ModelFamilyCreate(ModelFamilyBase):
@@ -17,6 +18,7 @@ class ModelFamilyUpdate(BaseModel):
     description: Optional[str] = None
     note: Optional[str] = None
     version: Optional[str] = None
+    url: Optional[str] = None
     # All fields optional for PATCH
 
 class ModelFamilyResponse(ModelFamilyBase):
