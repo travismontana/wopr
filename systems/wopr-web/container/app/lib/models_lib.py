@@ -1,6 +1,7 @@
 import streamlit as st
 from lib.basic_functions import (
-    setup_logger, get_all, create_new
+    setup_logger, get_all, 
+    create_new, update_item
 )
 
 logger = setup_logger()
@@ -30,4 +31,9 @@ def update_model_info(edited_df, debug):
     if debug:
         st.write("Model information has been edited.")
         st.json(edited_df, expanded=False)
-    update_item("models",)
+    results = []
+    for item in edited_df:
+        id = item["id"]
+        results.append(update_item("models", id, item))
+    return results
+

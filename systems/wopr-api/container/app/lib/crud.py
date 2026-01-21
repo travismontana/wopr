@@ -43,7 +43,7 @@ class CRUDRouter(Generic[T, TCreate, TUpdate]):
         @self.router.patch("/{item_id}", response_model=response_model)
         async def update_item(item_id: str, payload: update_model):
             logger.info(f"Updating {self.table} {item_id}")
-            return update(self.table, item_id, payload.model_dump(exclude_unset=True))
+            return update(self.table, item_id, payload.model_dump(mode='json', exclude_unset=True))
         
         @self.router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
         async def delete_item(item_id: str):

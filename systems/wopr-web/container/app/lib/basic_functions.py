@@ -4,11 +4,13 @@ Utility functions for Streamlit UI interactions with WOPR API.
 """
 
 import streamlit as st
-import httpx
-import random
-import re
 import logging
+import inspect
+import random
+import httpx
 import sys
+import re
+
 from datetime import datetime
 from pathlib import Path
 
@@ -78,8 +80,9 @@ def get_random_phrase() -> str:
 
 def debugit(what,message,debug):
     if debug:
+        caller = inspect.stack()[1].function
         logger.debug(f"{message}: {what}")
-        st.write(message)
+        st.write(f"({caller}): {message}")
         st.write(what)
 
 # ------------------------
@@ -105,10 +108,10 @@ def create_new(noun: str, payload: dict) -> dict:
     return response.get("data", {})
 
 
-def update_item(noun: str, item_id: str, payload: dict) -> dict:
+def update_item(noun: str, item_id: int, payload: dict) -> dict:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("patch", API_BASE, noun, item_id, payload)
-    return response
+    return response.get("data", {})
 
 
 def delete_item(noun: str, item_id: str) -> bool:
@@ -119,6 +122,7 @@ def delete_item(noun: str, item_id: str) -> bool:
 
 def do_api_things(action, base_url, route, path, payload):
     headers = ""
+    result = []
     logger.info(
         f"Doing API things - "
         f"Action: {action}, "
@@ -133,6 +137,7 @@ def do_api_things(action, base_url, route, path, payload):
         "get": httpx.get,
         "post": httpx.post,
         "put": httpx.put,
+        "patch": httpx.patch,
         "delete": httpx.delete
     }
     
@@ -141,7 +146,7 @@ def do_api_things(action, base_url, route, path, payload):
     
     timeout = 30.0
     parts = [base_url, "api", API_VERSION, route, path]
-    url = "/".join(p.strip('/') for p in parts if p)
+    url = "/".join(str(p).strip('/') for p in parts if p)
     logger.info(f"Constructed URL: {url}")
     
     # Build request kwargs based on HTTP method
@@ -155,6 +160,8 @@ def do_api_things(action, base_url, route, path, payload):
     
     response = method(url, **kwargs)
     response.raise_for_status()
+    #for item in response:
+    #    result.append(item.json())
     result = response.json()
     logger.info(f"Response status code: {response}")
     logger.info(f"Response result: {result}")

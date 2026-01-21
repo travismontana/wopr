@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from datetime import timezone
 import pandas as pd
+import numpy as np
 
 from lib.basic_functions import (
     setup_logger, 
@@ -18,7 +19,8 @@ from lib.basic_functions import (
 
 from lib.models_lib import (
     get_models,
-    create_new_model
+    create_new_model,
+    update_model_info
 )
 
 from lib.model_family_lib import (
@@ -142,7 +144,7 @@ def list_model_page():
                 model_data = {k: v for k, v in row.to_dict().items() 
                     if k not in ('id', 'date_created', 'date_updated', 'model_state') 
                     and v is not None}
-                create_result = create_new_model(model_data, debug)
+                create_result = create_new_model(model_data.to_dict(orient="records"), debug)
                 results['created'].append(create_result)
     
         # Handle updates to existing models
@@ -153,7 +155,9 @@ def list_model_page():
                 and v is not None}
                 for row in updated_rows.to_dict(orient="records")
             ]
-            update_result = update_model_info(updated_rows.to_dict(orient="records"), debug)
+            sanitized = updated_rows.replace({np.nan: None}).to_dict(orient="records")
+            update_result = update_model_info(sanitized, debug)
+            debugit(update_result, "Updated model info", debug)
             results['updated'].append(update_result)
         
         debugit(results, "Model operation results", debug)
@@ -189,7 +193,7 @@ def list_model_family_page():
     edited_df = st.data_editor(df)
 
     if not edited_df.equals(df):
-        debugit(edited_df, "Model family data has been edited", debug)
+        debugit(edited_df, "list_model_family_page Model family data has been edited", debug)
         
         results = update_model_family_info(edited_df)
 
@@ -235,7 +239,7 @@ except Exception as e:
     else:
         raise
 
-debugit(st.session_state, "Session state", debug)
+debugit(st.session_state, "Step 1 - Session state", debug)
 
 model_count = len(st.session_state.models)
 model_family_count = len(st.session_state.model_families)
