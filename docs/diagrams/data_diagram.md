@@ -5,14 +5,40 @@ classDiagram
     %% Model and ModelFamily classes
     class ModelBase {
         +str name
-        +Optional~str~ description
+        +dict model_status
+        +dict version
         +Optional~str~ note
-        +Optional~int~ version
-        +Optional~str~ model_status
         +Optional~int~ familyid
         +Optional~str~ shortname
+        +Optional~dict~ operations
+        +Optional~str~ description
         +Optional~datetime~ date_updated
-        +Optional~str~ url
+    }
+
+    class ModelBase_StatusDict {
+        <<dict>>
+        +Optional~dict~ backup
+        +Optional~str~ checksum
+        +Optional~bool~ has_distfile
+        +Optional~bool~ filename
+        +Optional~bool~ active
+    }
+
+    class ModelBase_VersionDict {
+        <<dict>>
+        +int~ current_vesion
+        +Optional~str~ note
+        +Optional~str~ wopr_version
+        +Optional~dict~ previous_versions
+    }
+
+    class ModelBase_OperationsDict {
+        <<dict>>
+        +str task
+        +str data
+        +str note
+        +str extradata
+        +str status
     }
 
     class ModelCreate {
@@ -161,6 +187,10 @@ classDiagram
     ModelBase <|-- ModelResponse : inherits
     ModelBase <..  ModelUpdate : based on
 
+    ModelBase *-- ModelBase_StatusDict : contains
+    ModelBase *-- ModelBase_VersionDict : contains
+    ModelBase *-- ModelBase_OperationsDict : contains
+
     %% Relationships - ModelFamily hierarchy
     ModelFamilyBase <|-- ModelFamilyCreate : inherits
     ModelFamilyBase <|-- ModelFamilyResponse : inherits
@@ -168,6 +198,7 @@ classDiagram
 
     %% Relationships - Model to ModelFamily
     ModelBase --> ModelFamilyBase : familyid references
+
 
     %% Relationships - Usage by CRUDRouter
     CRUDRouter .. > ModelResponse : uses
