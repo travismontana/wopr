@@ -1,0 +1,3 @@
+# data diagrams
+
+```mermaid
