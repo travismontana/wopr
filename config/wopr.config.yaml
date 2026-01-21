@@ -6,6 +6,8 @@
     "ollama_url": "http://groth.abode.tailandtraillabs.org:11434",
     "internalUrl": "http://wopr-api.wopr.svc:8000",
     "externalUrl": "https://api.wopr.tailandtraillabs.org",
+    "models_url": "http://groth.abode.tailandtraillabs.org:8000",
+    "yolo_models": "http://groth.abode.tailandtraillabs.org:8001",
     "version": "v2"
   },
   "baseDomain": "wopr.tailandtraillabs.org",
@@ -102,6 +104,8 @@
     "label_subdir": "labelstudio",
     "label_source_subdir": "source",
     "label_target_subdir": "target",
+    "models_subdir": "models",
+    "models_backup_subdir": "backup",
     "default_extension": "jpg",
     "ensure_directories": true,
     "games_subdir": "games",

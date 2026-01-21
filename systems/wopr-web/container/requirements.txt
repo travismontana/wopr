@@ -1,3 +1,4 @@
 streamlit>=1.31,<2
 httpx>=0.28.1
 requests>=2.32.5
+pydantic

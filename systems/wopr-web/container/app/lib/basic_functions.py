@@ -171,4 +171,4 @@ def do_api_things(action, base_url, route, path, payload):
     return result
 
 def get_config():
-    return get_all("config")
+    return(do_api_things("get", API_BASE, "config", "all", payload=None))

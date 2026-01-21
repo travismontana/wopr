@@ -28,6 +28,10 @@ from lib.model_family_lib import (
     create_new_model_family
 )
 
+from model.display import (
+    model_main_display
+)
+
 # Setup some defaults
 
 logger = setup_logger()
@@ -58,7 +62,6 @@ def init_session_state():
 
 # pages
 def create_model_page():
-    st.title("Create Model")
     model = {}
     model_families = st.session_state.model_families
     with st.form("create_model_form"):
@@ -163,7 +166,6 @@ def list_model_page():
         debugit(results, "Model operation results")
 
 def create_model_family_page():
-    st.title("Create Model Family")
     model_family = {}
     with st.form("create_model_family_form", enter_to_submit=False):
         model_family['name'] = st.text_input("Model Family Name")
@@ -220,8 +222,8 @@ with st.sidebar:
             st.cache_data.clear()
 
 try:
-    #st.session_state.config = get_config()
-    #config = st.session_state.config
+    st.session_state.config = get_config()
+    config = st.session_state.config
     st.session_state.models = get_models()
     st.session_state.model_families = get_model_family()
     st.session_state.attempts = 0
@@ -263,12 +265,12 @@ modTab, modFamTab, traTab = st.tabs(["Models", "Model Families", "Training"])
 
 
 with modTab:
-    with st.expander("Create New Model"):
+    st.divider()
+    model_main_display()
+    st.divider()
+    with st.expander("Edit Models"):
+        list_model_page()
         create_model_page()
-    list_model_page()
-    
-    #with st.expander("Model Download"):
-        #model_download()
 with modFamTab:
     with st.expander("Create New Model Family"):
         create_model_family_page()

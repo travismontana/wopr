@@ -120,7 +120,6 @@ def get_one(noun: str, item_id: str) -> dict:
         return item
     except httpx.HTTPError as e:
         log.error(f"Failed to fetch {noun} {item_id}: {e}")
-        st.error(f"Failed to load {noun}: {e}")
         return {}
 
 
@@ -148,7 +147,6 @@ def create_new(noun: str, payload: dict) -> dict:
         return item
     except httpx.HTTPError as e:
         log.error(f"Failed to create item in {noun}: {e}")
-        st.error(f"Failed to create {noun}: {e}")
         return {}
 
 
@@ -176,7 +174,6 @@ def update_item(noun: str, item_id: str, payload: dict) -> dict:
         return item
     except httpx.HTTPError as e:
         log.error(f"Failed to update {noun} {item_id}: {e}")
-        st.error(f"Failed to update {noun}: {e}")
         return {}
 
 
@@ -202,14 +199,16 @@ def delete_item(noun: str, item_id: str) -> bool:
         return True
     except httpx.HTTPError as e:
         log.error(f"Failed to delete {noun} {item_id}: {e}")
-        st.error(f"Failed to delete {noun}: {e}")
         return False
 
 def get_config():
-    return get_all("config")
+    url = f"{API_BASE}/api/v2/config/all"
+    try:
+        response = httpx.get(url, timeout=10.0)
+        response.raise_for_status()
+        log.info(f"Config item {response.json()}")
+        return response.json()
+    except httpx.HTTPError as e:
+        log.error(f"Failed to confg: {e}")
+        return False
 
-def setorset(configvar, )
-try: 
-    base_storage_path = config['storage']['base_path'] or "/remote/wopr"
-except:
-    base_storage_path = "/remote/wopr"

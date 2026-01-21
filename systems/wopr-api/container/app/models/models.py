@@ -11,6 +11,7 @@ class ModelBase(BaseModel):
     familyid: Optional[int] = None
     shortname: Optional[str] = None
     date_updated: Optional[datetime] = None
+    url: Optional[str] = None
     # ... whatever fields Directus has for models table
 
 class ModelCreate(ModelBase):
@@ -25,6 +26,7 @@ class ModelUpdate(BaseModel):
     familyid: Optional[int] = None
     shortname: Optional[str] = None
     date_updated: Optional[datetime] = None
+    url: Optional[str] = None
     # All fields optional for PATCH
 
 class ModelResponse(ModelBase):
