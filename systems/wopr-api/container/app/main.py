@@ -120,7 +120,7 @@ if tracing_enabled:
     tracing_endpoint = woprvar.APP_OTEL_URL + "/v1/traces"
     logger.debug(f"Tracing endpoint: {tracing_endpoint}")
     
-    tracer = woprtracing.create_tracer(
+    tracer = create_tracer(
         tracer_name=woprvar.APP_NAME,
         tracer_version=woprvar.APP_VERSION,
         tracer_enabled=tracing_enabled,

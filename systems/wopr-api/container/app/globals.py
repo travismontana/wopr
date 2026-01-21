@@ -109,3 +109,29 @@ storage_paths = {
     "label_source_path": (LABEL_BASE_PATH/ LABEL_SOURCE_SUBDIR).resolve(),
     "label_target_path": (LABEL_BASE_PATH / LABEL_TARGET_SUBDIR).resolve(),
 }
+
+
+from opentelemetry import trace
+from opentelemetry.sdk.resources import (
+    Resource, 
+    SERVICE_NAME, 
+    SERVICE_VERSION, 
+    SERVICE_NAMESPACE,
+    DEPLOYMENT_ENVIRONMENT
+)
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+import os
+
+def create_tracer(
+    tracer_name: str, 
+    tracer_version: str, 
+    tracer_enabled: bool, 
+    tracer_endpoint: str,
+    service_namespace: str = "wopr",  # Add this parameter
+    deployment_env: str = "production"  # Add this parameter
+):
+    if not tracer_enabled:
+        return None
+    
