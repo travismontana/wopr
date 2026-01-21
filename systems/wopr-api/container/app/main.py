@@ -9,10 +9,6 @@ import base64
 from contextlib import nullcontext
 from typing import List
 
-from wopr import config as woprconfig
-from wopr import storage as woprstorage
-from wopr import logging as woprlogging
-from wopr import tracing as woprtracing
 from app import globals as woprvar
 from app.logging import configure_logging
 from . import logger
