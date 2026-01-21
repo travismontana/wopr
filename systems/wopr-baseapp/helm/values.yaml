@@ -213,9 +213,9 @@ celeryWorker:
   # Celery inspect ping probe
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    timeoutSeconds: 10
+    initialDelaySeconds: 120
+    periodSeconds: 120
+    timeoutSeconds: 60
     failureThreshold: 3
   
   resources:
