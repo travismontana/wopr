@@ -7,11 +7,13 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from datetime import timezone
 import pandas as pd
 
 from lib.basic_functions import (
     setup_logger, 
-    get_config
+    get_config,
+    debugit
 )
 
 from lib.models_lib import (
@@ -44,7 +46,8 @@ def init_session_state():
         "model_families": [],
         "models": [],
         "debug": False,
-        "debuggers": {}
+        "debuggers": {},
+        "model_df": None
     }
     
     for key, value in defaults.items():
@@ -66,9 +69,7 @@ def create_model_page():
             )
         submitted = st.form_submit_button("Create Model")
         if submitted:
-            if debug:
-                st.write("Creating new model with data:")
-                st.json(model)
+            debugit(model, "Creating new model with data", debug)
             results = create_new_model(model,debug)
             st.write(results)
 
@@ -77,10 +78,85 @@ def list_model_page():
     
     models = st.session_state.models
     df = pd.DataFrame(
-        models,
-        columns=["name","description","note"]
+        models
     )
-    st.table(df)
+    st.session_state.model_df = df
+    edited_df = st.data_editor(
+        df, 
+        num_rows="dynamic",
+        column_config = {
+            "id" : st.column_config.NumberColumn(disabled=True),
+            "name" : st.column_config.TextColumn(
+                "Name",
+                validate  = r"^[a-zA-Z0-9_ -]+$",
+                max_chars = "63",
+                required  = True,
+                help      = "Name of the model to be created."
+            ),
+            "version" : st.column_config.NumberColumn(
+                "Version",
+                min_value=1,
+                max_value=100,
+                step=1,
+                default=1,
+                format="%d"
+            ),
+            "description" : st.column_config.TextColumn("Description"),
+            "familyid" : st.column_config.SelectboxColumn(
+                "Model Family",
+                options = st.session_state.model_families,
+                format_func = lambda x: x["name"]
+            ),
+            "shortname" : st.column_config.TextColumn("Short Name"),
+            "note" : st.column_config.TextColumn("Note")
+        },
+        column_order = (
+            "id",
+            "name",
+            "version",
+            "description",
+            "familyid",
+            "shortname",
+            "note",
+            "date_updated",
+            "model_state",
+            "model_status",
+            "date_created"
+        )
+    )
+
+    debugit(edited_df, "Debug message", debug)
+    if not edited_df.equals(df):
+        new_rows = edited_df[edited_df['id'].isna()]
+        updated_rows = edited_df[edited_df['id'].notna()]
+        debugit(new_rows, "New rows detected", debug)
+        debugit(updated_rows, "Updated rows detected", debug)
+        debugit(edited_df, "Model data has been edited", debug)
+
+        logger.info("Model data has been edited")
+
+        results = {'created': [], 'updated': []}
+
+        if not new_rows.empty:
+            for _, row in new_rows.iterrows():
+                model_data = {k: v for k, v in row.to_dict().items() 
+                    if k not in ('id', 'date_created', 'date_updated', 'model_state') 
+                    and v is not None}
+                create_result = create_new_model(model_data, debug)
+                results['created'].append(create_result)
+    
+        # Handle updates to existing models
+        if not updated_rows.empty:
+            filtered_updates = [
+                {k: v for k, v in row.items() 
+                if k not in ('id', 'date_created', 'date_updated', 'model_state') 
+                and v is not None}
+                for row in updated_rows.to_dict(orient="records")
+            ]
+            update_result = update_model_info(updated_rows.to_dict(orient="records"), debug)
+            results['updated'].append(update_result)
+        
+        debugit(results, "Model operation results", debug)
 
 def create_model_family_page():
     st.title("Create Model Family")
@@ -107,10 +183,17 @@ def list_model_family_page():
     
     families = st.session_state.model_families
     df = pd.DataFrame(
-        families,
-        columns=["name","description","note"]
+        families
     )
-    st.table(df)
+
+    edited_df = st.data_editor(df)
+
+    if not edited_df.equals(df):
+        debugit(edited_df, "Model family data has been edited", debug)
+        
+        results = update_model_family_info(edited_df)
+
+        debugit(results, "Update model family results", debug)
 
 # ============================================================================
 # MAIN UI
@@ -134,6 +217,8 @@ with st.sidebar:
             st.cache_data.clear()
 
 try:
+    #st.session_state.config = get_config()
+    #config = st.session_state.config
     st.session_state.models = get_models()
     st.session_state.model_families = get_model_family()
     st.session_state.attempts = 0
@@ -150,12 +235,7 @@ except Exception as e:
     else:
         raise
 
-if debug:
-    st.write("Debugging is active.")
-    st.write("Models: ")
-    st.json(st.session_state.models)
-    st.write("Model Families: ")
-    st.json(st.session_state.model_families)
+debugit(st.session_state, "Session state", debug)
 
 model_count = len(st.session_state.models)
 model_family_count = len(st.session_state.model_families)
@@ -175,11 +255,8 @@ with statusCol:
 # -------
 st.divider()
 
-modFamTab, modTab, traTab = st.tabs(["Model Families", "Models", "Training"])
-with modFamTab:
-    with st.expander("Create New Model Family"):
-        create_model_family_page()
-    list_model_family_page()
+modTab, modFamTab, traTab = st.tabs(["Models", "Model Families", "Training"])
+
 
 with modTab:
     with st.expander("Create New Model"):
@@ -188,6 +265,9 @@ with modTab:
     
     #with st.expander("Model Download"):
         #model_download()
-
+with modFamTab:
+    with st.expander("Create New Model Family"):
+        create_model_family_page()
+    list_model_family_page()
 with traTab:
     st.write("Coming Soon")

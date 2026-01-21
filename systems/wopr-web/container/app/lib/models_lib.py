@@ -23,3 +23,11 @@ def create_new_model(model, debug):
         return results
     else:
         return 1
+
+def update_model_info(edited_df, debug):
+    logger.info("Updating model information")
+    logger.debug(f"Edited DataFrame: {edited_df}")
+    if debug:
+        st.write("Model information has been edited.")
+        st.json(edited_df, expanded=False)
+    update_item("models",)

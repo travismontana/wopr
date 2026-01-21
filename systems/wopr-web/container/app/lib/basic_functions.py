@@ -76,6 +76,12 @@ imgurl = "https://images.wopr.tailandtraillabs.org/ml/incoming"
 def get_random_phrase() -> str:
     return random.choice(PLAYPHRASES)
 
+def debugit(what,message,debug):
+    if debug:
+        logger.debug(f"{message}: {what}")
+        st.write(message)
+        st.write(what)
+
 # ------------------------
 # CRUD Operations
 # ------------------------
@@ -92,25 +98,25 @@ def get_one(noun: str, item_id: str) -> dict:
     response = do_api_things("get", API_BASE, noun, item_id, payload=None)
     return response
 
-@st.cache_data()
+
 def create_new(noun: str, payload: dict) -> dict:
     url = f"{API_BASE}/api/v2/{noun}"
     response = do_api_things("post", API_BASE, noun, "", payload)
     return response.get("data", {})
 
-@st.cache_data()
+
 def update_item(noun: str, item_id: str, payload: dict) -> dict:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("patch", API_BASE, noun, item_id, payload)
     return response
 
-@st.cache_data()
+
 def delete_item(noun: str, item_id: str) -> bool:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
     response = do_api_things("delete", API_BASE, noun, item_id,payload=None)
     return response
 
-@st.cache_data()
+
 def do_api_things(action, base_url, route, path, payload):
     headers = ""
     logger.info(
