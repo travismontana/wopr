@@ -1,6 +1,6 @@
 # WOPR - Wargaming Oversight & Position Recognition
 What is WOPR?
-WOPR tracks tabletop game state through computer vision.  Players use a web interface to capture overhead images of their game board. WOPR analyzes the images, detects game pieces, validates moves against rules, and maintains a complete game history.
+WOPR tracks tabletop game state through computer vision.  Players use a web interface to capture images of their game board. WOPR analyzes the images, detects game pieces, validates moves against rules, and maintains a complete game history.
 
 
 ## About the Name
@@ -17,8 +17,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, licensing inquiries, or collaboration:
 - **Email:** bob@bomar.us
-- **GitHub:** [Your GitHub handle]
+- **GitHub:** travismontana
 
 ## Contributing
 
-Contributions are welcome! By contributing to this project, you agree that your contributions will be licensed under the same MIT License.
+Contributions are welcome! By contributing to this project, you agree that your contributions will be licensed under the same license.
