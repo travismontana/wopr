@@ -73,7 +73,7 @@ classDiagram
     }
 
     class ModelFamilyCreate {
-        <<Pydantic>>
+        +str name
     }
 
     class ModelFamilyUpdate {
@@ -89,17 +89,6 @@ classDiagram
         +int id
         +Optional~datetime~ date_created
         +Optional~datetime~ date_updated
-    }
-
-    class ModelStatus {
-        <<Pydantic>>
-        +str model
-        +Optional~bool~ backedup
-        +Optional~str~ checksum
-        +Optional~bool~ downloaded
-        +Optional~bool~ distfile
-        +Optional~str~ filename
-        +Optional~dict~ last_operation
     }
 
     %% Game-related classes
