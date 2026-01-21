@@ -59,10 +59,6 @@ logger = configure_logging("/var/log/wopr-api.log")
 logger.info("WOPR API application: booting up...")
 logger.debug(f"WOPR API globals: {woprvar.WOPR_CONFIG}")
 
-# Initialize config
-woprconfig.init_config(service_url=os.getenv("APP_API_URL") or woprvar.APP_API_URL)
-logger.info("Configuration initialized")
-
 # -------------------------
 # Tracing Configuration
 # -------------------------
