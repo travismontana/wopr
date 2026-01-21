@@ -71,8 +71,8 @@ def create_model_page():
             )
         submitted = st.form_submit_button("Create Model")
         if submitted:
-            debugit(model, "Creating new model with data", debug)
-            results = create_new_model(model,debug)
+            debugit(model, "Creating new model with data")
+            results = create_new_model(model)
             st.write(results)
 
 def list_model_page():
@@ -127,13 +127,13 @@ def list_model_page():
         )
     )
 
-    debugit(edited_df, "Debug message", debug)
+    debugit(edited_df, "Debug message")
     if not edited_df.equals(df):
         new_rows = edited_df[edited_df['id'].isna()]
         updated_rows = edited_df[edited_df['id'].notna()]
-        debugit(new_rows, "New rows detected", debug)
-        debugit(updated_rows, "Updated rows detected", debug)
-        debugit(edited_df, "Model data has been edited", debug)
+        debugit(new_rows, "New rows detected")
+        debugit(updated_rows, "Updated rows detected")
+        debugit(edited_df, "Model data has been edited")
 
         logger.info("Model data has been edited")
 
@@ -156,11 +156,11 @@ def list_model_page():
                 for row in updated_rows.to_dict(orient="records")
             ]
             sanitized = updated_rows.replace({np.nan: None}).to_dict(orient="records")
-            update_result = update_model_info(sanitized, debug)
-            debugit(update_result, "Updated model info", debug)
+            update_result = update_model_info(sanitized)
+            debugit(update_result, "Updated model info")
             results['updated'].append(update_result)
         
-        debugit(results, "Model operation results", debug)
+        debugit(results, "Model operation results")
 
 def create_model_family_page():
     st.title("Create Model Family")
@@ -193,12 +193,11 @@ def list_model_family_page():
     edited_df = st.data_editor(df)
 
     if not edited_df.equals(df):
-        debugit(edited_df, "list_model_family_page Model family data has been edited", debug)
+        debugit(edited_df, "list_model_family_page Model family data has been edited")
         
         results = update_model_family_info(edited_df)
 
-        debugit(results, "Update model family results", debug)
-
+        debugit(results, "Update model family results")
 # ============================================================================
 # MAIN UI
 # ============================================================================
@@ -239,7 +238,7 @@ except Exception as e:
     else:
         raise
 
-debugit(st.session_state, "Step 1 - Session state", debug)
+debugit(st.session_state, "Step 1 - Session state")
 
 model_count = len(st.session_state.models)
 model_family_count = len(st.session_state.model_families)
@@ -252,7 +251,7 @@ if model_family_count == 0:
 modelsCol,modelFamilyCol = st.columns(2)
 
 with modelsCol:
-    get_model_status()
+    #get_model_status()
     st.write(f":blue[Status:] Green")
 
 with modelFamilyCol:

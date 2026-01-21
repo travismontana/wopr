@@ -45,4 +45,3 @@ def get_model_status(model):
         'filename'       : None
     }
 
-    model['']
