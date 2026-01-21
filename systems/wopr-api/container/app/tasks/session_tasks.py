@@ -1,10 +1,3 @@
-"""
-Session file archiving and status checking tasks.
-
-Provides Celery tasks for managing WOPR session image files across different
-storage locations (incoming, archive, label studio).
-"""
-
 from pathlib import Path
 
 from app import globals as woprvar

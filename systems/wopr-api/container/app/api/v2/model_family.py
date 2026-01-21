@@ -1,6 +1,3 @@
-"""
-WOPR Models service
-"""
 from fastapi import APIRouter, HTTPException, status
 import requests
 import logging

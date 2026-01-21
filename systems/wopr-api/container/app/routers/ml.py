@@ -1,11 +1,3 @@
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob <bob@bomar.us>
-# See git log for detailed authorship
-
-Brief description of what this file does.
-"""
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 import httpx

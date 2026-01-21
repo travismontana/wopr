@@ -1,26 +1,3 @@
-#!/usr/bin/env python3
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
-# See git log for detailed authorship
-
-WOPR API - notifications
-"""
-
-"""
-  Endpoint:
-  POST /
-  Needs:
-  {
-  "username": "WOPR",
-  "embeds": [
-    {
-      "title": "Game Over",
-      "description": "Game ID 1234 has ended.",
-      "color": 16711680
-    }]}
-  
-"""
 from . import router, logger
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field

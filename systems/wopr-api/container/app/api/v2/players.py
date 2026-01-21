@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2026 Bob Bomar
-# Licensed under the Apache License, Version 2.0
-
-"""
-WOPR Players API - Player management endpoints
-"""
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 import logging

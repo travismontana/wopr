@@ -1,6 +1,3 @@
-# Copyright 2026 Bob Bomar
-# Licensed under the Apache License, Version 2.0
-
 import os
 from celery import Celery
 

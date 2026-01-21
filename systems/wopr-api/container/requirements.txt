@@ -1,6 +1,3 @@
-# WOPR Core
-git+https://github.com/travismontana/wopr.git#subdirectory=pymods/wopr-core
-
 # Web Framework
 fastapi>=0.114.12
 uvicorn[standard]>=0.32.0

@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob <bob@example.com>
-# See git log for detailed authorship
-
-WOPR API - Home Automation integration.
-Proxies requests to Home Assistant REST API for controlling lights and other automation.
-"""
 
 from app import globals as woprvar
 import logging

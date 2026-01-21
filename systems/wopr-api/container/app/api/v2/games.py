@@ -1,24 +1,3 @@
-#!/usr/bin/env python3
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
-# See git log for detailed authorship
-
-WOPR API - games CRUD endpoints (Directus schema).
-"""
-
-"""
-  Endpoint:
-  GET /
-    - get all games (all info)
-      {DIRECTUS_API_URL}/items/games
-  GET /{game_id}
-    - get specific game (all info)
-      {DIRECTUS_API_URL}/items/games/{game_id}
-  
-  Both return json.
-  
-"""
 import requests
 
 from . import router, logger

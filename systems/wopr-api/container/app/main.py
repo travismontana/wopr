@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-# main.py
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2023-present Bob <bob@bomar.us>
-# See git log for detailed authorship
-
-WOPR API main application.
-"""
 
 import logging
 import sys

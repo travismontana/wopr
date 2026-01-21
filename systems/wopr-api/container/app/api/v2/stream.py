@@ -1,22 +1,3 @@
-#!/usr/bin/env python3
-#/api/v2/stream.py
-"""
-WOPR - Wargaming Oversight & Position Recognition
-# Copyright (c) 2025-present Bob Bomar <bob@bomar.us>
-# See git log for detailed authorship
-
-WOPR API - games CRUD endpoints (Directus schema)
-"""
-
-"""
-  Endpoint:
-  GET /gameid/{game_id}
-    - get all pieces for a specific game (all info)
-      {DIRECTUS_API_URL}/items/pieces?filter[game_id][_eq]={game
-  
-  Both return json.
-  
-"""
 from . import router, logger
 from fastapi import APIRouter, HTTPException, status, Response
 from pydantic import BaseModel, Field

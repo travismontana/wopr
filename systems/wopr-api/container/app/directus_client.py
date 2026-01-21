@@ -1,18 +1,3 @@
-#
-# get_one()
-# get_all()
-# post()
-# update()
-# delete()
-#
-# payload = {
-#  
-#}
-#
-#
-#
-# app/directus_client.py
-
 import httpx
 from typing import Optional, Dict, List, Any
 from fastapi import HTTPException

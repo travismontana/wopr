@@ -1,6 +1,3 @@
-# Copyright 2026 Bob Bomar
-# Licensed under the Apache License, Version 2.0
-
 import logging
 from app import globals as woprvar
 from .session_tasks import *  # noqa
