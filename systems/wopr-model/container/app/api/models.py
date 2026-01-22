@@ -18,10 +18,22 @@ from lib.helpers import (
 from lib.safe_file import (
     SafeFS
 )
+
+from wopr_api_client import Client
+
 logger = setup_logger()
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
 
+woprclient = Client(base_url=WOPR_API_URL)
+
 api_models = APIRouter(tags=["models"])
+
+# Data
+from wopr_api_client.models.model_response import ModelResponse
+from wopr_api_client.types import Response
+from wopr_api_client.api.models import (
+    get_item_api_v2_models_item_id_get
+)
 
 class ModelStatus(BaseModel):
     model: str
@@ -291,3 +303,4 @@ async def download_model(data: ModelStatus, request: Request):
     else:
         # download_file already set last_operation with error details
         return data
+

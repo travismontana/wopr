@@ -10,8 +10,10 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# API configuration
+from wopr_api_client import Client
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+client = Client(base_url=API_BASE)
+
 
 # Flavor text for play submissions
 PLAYPHRASES = [

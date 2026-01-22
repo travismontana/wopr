@@ -10,13 +10,19 @@ from lib.helpers import (
     setup_logger
 )
 
+from wopr_api_client import Client
+WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
+woprclient = Client(base_url=WOPR_API_URL)
+
 from api import models
 
 
 logger = setup_logger()
-WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
 
+
+# Here
 config = get_config()
+
 if len(config) == 0:
     logger.info("Configuration is empty or could not be loaded")
 
@@ -54,6 +60,7 @@ paths = {
 app.state.paths = paths
 app.state.config = config
 
+# Here
 app.state.models = get_all("models")
 
 # health page
