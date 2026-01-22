@@ -10,7 +10,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from wopr_api_client import Client
+from lib.wopr_api_client import Client
+
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 client = Client(base_url=API_BASE)
 
@@ -204,6 +205,7 @@ def delete_item(noun: str, item_id: str) -> bool:
         return False
 
 def get_config():
+
     url = f"{API_BASE}/api/v2/config/all"
     try:
         response = httpx.get(url, timeout=10.0)
@@ -214,3 +216,51 @@ def get_config():
         log.error(f"Failed to confg: {e}")
         return False
 
+#################################
+#
+# Start of the new openapi-pyton stuff
+#
+#################################
+
+
+def update_operations(data, note, extradata, status):
+    logger.info("Updating ops")
+    logger.debug(
+        f"Data: {data}, Note: {note}, ExtraData: {extradata}, Status: {status}"
+    )
+
+    caller = inspect.stack()[1].function
+    operation = {
+        "task": caller,
+        "data": data.model,
+        "note": note,
+        "extradata": extradata,
+        "status": status,
+    }
+
+    data.operations.append(operation)
+    return data
+
+
+def logit(note, data):
+    logger.info(f"({note})")
+    logger.debug(f"Data: ({data})")
+
+
+def list_files(protected_path, directory):
+    try:
+        return protected_path.listdir(directory)
+    except Exception as e:
+        logger.error(f"Failed to list files in {directory}: {e}")
+        return []
+
+
+def check_for_file_in_dir(filename, directory, protected_path):
+    loggit(
+        "Checking for file in directory", {"filename": filename, "directory": directory}
+    )
+    files = list_files(protected_path, directory)
+    for file in files:
+        if file == filename:
+            return True
+    return False

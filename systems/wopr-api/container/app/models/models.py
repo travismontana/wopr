@@ -42,8 +42,8 @@ class ModelBase(BaseModel):
     """Base model metadata - stored in Directus models table"""
     name: str
     familyid: int
-    model_status: ModelStatusDict
-    version: ModelVersionDict
+    model_status: Optional[ModelStatusDict] = None
+    version: Optional[ModelVersionDict] = None
     note: Optional[str] = None
     shortname: Optional[str] = None
     operations: Optional[ModelOperationsDict] = None

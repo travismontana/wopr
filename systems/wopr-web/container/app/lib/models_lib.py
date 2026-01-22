@@ -46,7 +46,7 @@ def talk_to_model_ctl(action, data):
     url = st.session_state['config']['api']['models_url']
     match action:
         case "status":
-            thing = do_api_things("post", url, "models", "status", data)
+            thing = do_api_things("post", url, "models", "model_status", data)
             return thing
         case "download":
             thing = do_api_things("post", url, "models", "download", data)

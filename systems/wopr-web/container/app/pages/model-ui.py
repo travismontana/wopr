@@ -210,7 +210,7 @@ st.write("Use as the template for control of models.")
 
 init_session_state()
 debug = st.session_state.debug
-
+debugit(st.session_state, "Initial session state")
 with st.sidebar:
     with st.expander("Settings"):
         # Debug toggle
@@ -220,12 +220,16 @@ with st.sidebar:
         # Cache control
         if st.button("Clear Cache"):
             st.cache_data.clear()
-
+debugit(st.session_state, "After sidebar, building session_state")
 try:
+    debugit("", "Getting config")
     st.session_state.config = get_config()
     config = st.session_state.config
+    debugit("", "Getting models")
     st.session_state.models = get_models()
+    debugit("", "Getting model families")
     st.session_state.model_families = get_model_family()
+    debugit("", "Setting attempts")
     st.session_state.attempts = 0
 except Exception as e:
     if e.response.status_code == 503:
