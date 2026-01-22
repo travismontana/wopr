@@ -4,12 +4,12 @@ from datetime import datetime
 
 class ModelBase(BaseModel):
     name: str
-    description: Optional[str] = None
+    familyid: int
+    version: dict = {}
+    model_status: dict = {}
     note: Optional[str] = None
-    version: Optional[int] = None
-    model_status: Optional[str] = None
-    familyid: Optional[int] = None
     shortname: Optional[str] = None
+    description: Optional[str] = None
     date_updated: Optional[datetime] = None
     url: Optional[str] = None
     # ... whatever fields Directus has for models table

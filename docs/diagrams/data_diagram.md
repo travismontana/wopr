@@ -5,10 +5,10 @@ classDiagram
     %% Model and ModelFamily classes
     class ModelBase {
         +str name
-        +dict model_status
+        +int familyid
         +dict version
+        +dict model_status
         +Optional~str~ note
-        +Optional~int~ familyid
         +Optional~str~ shortname
         +Optional~dict~ operations
         +Optional~str~ description
