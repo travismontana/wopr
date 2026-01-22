@@ -20,7 +20,6 @@ services:
       - 'ENABLE_API_KEYS=true'
     restart: unless-stopped
   ollama:
-    runtime: nvidia
     deploy:
       resources:
         limits:

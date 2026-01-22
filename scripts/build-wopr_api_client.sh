@@ -10,7 +10,7 @@ function debugit {
     fi
 }
 
-SYSTEMS=( "wopr-api" "wopr-web" "wopr-cam" "wopr-model" )
+SYSTEMS=( "wopr-api" "wopr-web" "wopr-cam" "wopr-model" "wopr-boh" )
 
 # grab the current directory the script lives in
 CURRENT_DIR=$(dirname "$(realpath "$0")")

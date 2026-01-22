@@ -11,26 +11,13 @@ from datetime import timezone
 import pandas as pd
 import numpy as np
 
-from lib.basic_functions import (
-    setup_logger, 
-    get_config,
-    debugit
-)
+from lib.basic_functions import setup_logger, get_config, debugit
 
-from lib.models_lib import (
-    get_models,
-    create_new_model,
-    update_model_info
-)
+from lib.models_lib import get_models, create_new_model, update_model_info
 
-from lib.model_family_lib import (
-    get_model_family,
-    create_new_model_family
-)
+from lib.model_family_lib import get_model_family, create_new_model_family
 
-from model.display import (
-    model_main_display
-)
+from model.display import model_main_display
 
 # Setup some defaults
 

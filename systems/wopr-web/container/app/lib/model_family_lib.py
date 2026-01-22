@@ -1,7 +1,5 @@
 import streamlit as st
-from lib.basic_functions import (
-    setup_logger, get_all, create_new
-)
+from lib.basic_functions import setup_logger, get_all, create_new
 
 logger = setup_logger()
 

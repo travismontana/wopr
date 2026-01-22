@@ -11,9 +11,9 @@ from dateutil.parser import isoparse
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.model_create_model_status import ModelCreateModelStatus
-    from ..models.model_create_operations_type_0 import ModelCreateOperationsType0
-    from ..models.model_create_version import ModelCreateVersion
+    from ..models.model_operations_dict import ModelOperationsDict
+    from ..models.model_status_dict import ModelStatusDict
+    from ..models.model_version_dict import ModelVersionDict
 
 
 T = TypeVar("T", bound="ModelCreate")
@@ -25,47 +25,57 @@ class ModelCreate:
 
     Attributes:
         name (str):
-        model_status (ModelCreateModelStatus):
-        version (ModelCreateVersion):
+        familyid (int):
+        model_status (ModelStatusDict | None | Unset):
+        version (ModelVersionDict | None | Unset):
         note (None | str | Unset):
-        familyid (int | None | Unset):
         shortname (None | str | Unset):
-        operations (ModelCreateOperationsType0 | None | Unset):
+        operations (ModelOperationsDict | None | Unset):
         description (None | str | Unset):
         date_updated (datetime.datetime | None | Unset):
     """
 
     name: str
-    model_status: ModelCreateModelStatus
-    version: ModelCreateVersion
+    familyid: int
+    model_status: ModelStatusDict | None | Unset = UNSET
+    version: ModelVersionDict | None | Unset = UNSET
     note: None | str | Unset = UNSET
-    familyid: int | None | Unset = UNSET
     shortname: None | str | Unset = UNSET
-    operations: ModelCreateOperationsType0 | None | Unset = UNSET
+    operations: ModelOperationsDict | None | Unset = UNSET
     description: None | str | Unset = UNSET
     date_updated: datetime.datetime | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.model_create_operations_type_0 import ModelCreateOperationsType0
+        from ..models.model_operations_dict import ModelOperationsDict
+        from ..models.model_status_dict import ModelStatusDict
+        from ..models.model_version_dict import ModelVersionDict
 
         name = self.name
 
-        model_status = self.model_status.to_dict()
+        familyid = self.familyid
 
-        version = self.version.to_dict()
+        model_status: dict[str, Any] | None | Unset
+        if isinstance(self.model_status, Unset):
+            model_status = UNSET
+        elif isinstance(self.model_status, ModelStatusDict):
+            model_status = self.model_status.to_dict()
+        else:
+            model_status = self.model_status
+
+        version: dict[str, Any] | None | Unset
+        if isinstance(self.version, Unset):
+            version = UNSET
+        elif isinstance(self.version, ModelVersionDict):
+            version = self.version.to_dict()
+        else:
+            version = self.version
 
         note: None | str | Unset
         if isinstance(self.note, Unset):
             note = UNSET
         else:
             note = self.note
-
-        familyid: int | None | Unset
-        if isinstance(self.familyid, Unset):
-            familyid = UNSET
-        else:
-            familyid = self.familyid
 
         shortname: None | str | Unset
         if isinstance(self.shortname, Unset):
@@ -76,7 +86,7 @@ class ModelCreate:
         operations: dict[str, Any] | None | Unset
         if isinstance(self.operations, Unset):
             operations = UNSET
-        elif isinstance(self.operations, ModelCreateOperationsType0):
+        elif isinstance(self.operations, ModelOperationsDict):
             operations = self.operations.to_dict()
         else:
             operations = self.operations
@@ -100,14 +110,15 @@ class ModelCreate:
         field_dict.update(
             {
                 "name": name,
-                "model_status": model_status,
-                "version": version,
+                "familyid": familyid,
             }
         )
+        if model_status is not UNSET:
+            field_dict["model_status"] = model_status
+        if version is not UNSET:
+            field_dict["version"] = version
         if note is not UNSET:
             field_dict["note"] = note
-        if familyid is not UNSET:
-            field_dict["familyid"] = familyid
         if shortname is not UNSET:
             field_dict["shortname"] = shortname
         if operations is not UNSET:
@@ -121,16 +132,48 @@ class ModelCreate:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.model_create_model_status import ModelCreateModelStatus
-        from ..models.model_create_operations_type_0 import ModelCreateOperationsType0
-        from ..models.model_create_version import ModelCreateVersion
+        from ..models.model_operations_dict import ModelOperationsDict
+        from ..models.model_status_dict import ModelStatusDict
+        from ..models.model_version_dict import ModelVersionDict
 
         d = dict(src_dict)
         name = d.pop("name")
 
-        model_status = ModelCreateModelStatus.from_dict(d.pop("model_status"))
+        familyid = d.pop("familyid")
 
-        version = ModelCreateVersion.from_dict(d.pop("version"))
+        def _parse_model_status(data: object) -> ModelStatusDict | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                model_status_type_0 = ModelStatusDict.from_dict(data)
+
+                return model_status_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(ModelStatusDict | None | Unset, data)
+
+        model_status = _parse_model_status(d.pop("model_status", UNSET))
+
+        def _parse_version(data: object) -> ModelVersionDict | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                version_type_0 = ModelVersionDict.from_dict(data)
+
+                return version_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(ModelVersionDict | None | Unset, data)
+
+        version = _parse_version(d.pop("version", UNSET))
 
         def _parse_note(data: object) -> None | str | Unset:
             if data is None:
@@ -141,15 +184,6 @@ class ModelCreate:
 
         note = _parse_note(d.pop("note", UNSET))
 
-        def _parse_familyid(data: object) -> int | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(int | None | Unset, data)
-
-        familyid = _parse_familyid(d.pop("familyid", UNSET))
-
         def _parse_shortname(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -159,7 +193,7 @@ class ModelCreate:
 
         shortname = _parse_shortname(d.pop("shortname", UNSET))
 
-        def _parse_operations(data: object) -> ModelCreateOperationsType0 | None | Unset:
+        def _parse_operations(data: object) -> ModelOperationsDict | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -167,12 +201,12 @@ class ModelCreate:
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                operations_type_0 = ModelCreateOperationsType0.from_dict(data)
+                operations_type_0 = ModelOperationsDict.from_dict(data)
 
                 return operations_type_0
             except (TypeError, ValueError, AttributeError, KeyError):
                 pass
-            return cast(ModelCreateOperationsType0 | None | Unset, data)
+            return cast(ModelOperationsDict | None | Unset, data)
 
         operations = _parse_operations(d.pop("operations", UNSET))
 
@@ -204,10 +238,10 @@ class ModelCreate:
 
         model_create = cls(
             name=name,
+            familyid=familyid,
             model_status=model_status,
             version=version,
             note=note,
-            familyid=familyid,
             shortname=shortname,
             operations=operations,
             description=description,

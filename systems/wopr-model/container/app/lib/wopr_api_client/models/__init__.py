@@ -42,17 +42,16 @@ from .list_tasks_api_v2_vision_projects_project_id_tasks_get_response_200_item i
     ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item,
 )
 from .model_create import ModelCreate
-from .model_create_model_status import ModelCreateModelStatus
-from .model_create_operations_type_0 import ModelCreateOperationsType0
-from .model_create_version import ModelCreateVersion
 from .model_family_create import ModelFamilyCreate
 from .model_family_response import ModelFamilyResponse
 from .model_family_update import ModelFamilyUpdate
+from .model_operations_dict import ModelOperationsDict
 from .model_response import ModelResponse
-from .model_response_model_status import ModelResponseModelStatus
-from .model_response_operations_type_0 import ModelResponseOperationsType0
-from .model_response_version import ModelResponseVersion
+from .model_status_dict import ModelStatusDict
+from .model_status_dict_backup_type_0 import ModelStatusDictBackupType0
 from .model_update import ModelUpdate
+from .model_version_dict import ModelVersionDict
+from .model_version_dict_previous_versions_type_0 import ModelVersionDictPreviousVersionsType0
 from .player_payload import PlayerPayload
 from .project_list_response import ProjectListResponse
 from .project_list_response_results_item import ProjectListResponseResultsItem
@@ -92,17 +91,16 @@ __all__ = (
     "HTTPValidationError",
     "ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item",
     "ModelCreate",
-    "ModelCreateModelStatus",
-    "ModelCreateOperationsType0",
-    "ModelCreateVersion",
     "ModelFamilyCreate",
     "ModelFamilyResponse",
     "ModelFamilyUpdate",
+    "ModelOperationsDict",
     "ModelResponse",
-    "ModelResponseModelStatus",
-    "ModelResponseOperationsType0",
-    "ModelResponseVersion",
+    "ModelStatusDict",
+    "ModelStatusDictBackupType0",
     "ModelUpdate",
+    "ModelVersionDict",
+    "ModelVersionDictPreviousVersionsType0",
     "PlayerPayload",
     "ProjectListResponse",
     "ProjectListResponseResultsItem",
