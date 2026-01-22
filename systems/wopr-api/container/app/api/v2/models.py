@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException, status
 import requests
 import logging
@@ -40,3 +39,10 @@ async def get_model_stats(model_id: str):
 @models_router.get("/health")
 async def get_health():
     return "healthy"
+
+
+@models_router.post("/status", response_model=ModelResponse)
+async def update_model_status(data: ModelUpdate):
+    logger.info("Updating model status")
+    logger.debug(f"Update data: {data}")
+    return data
