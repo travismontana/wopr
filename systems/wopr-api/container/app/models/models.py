@@ -13,13 +13,13 @@ class ModelStatusDict(BaseModel):
     backup: Optional[dict] = None
     checksum: Optional[str] = None
     has_distfile: Optional[bool] = None
-    filename: Optional[str] = None  # diagram shows bool, likely should be str
-    active: Optional[bool] = None
+    filename: Optional[str] = None
+    active: bool
 
 
 class ModelVersionDict(BaseModel):
     """Version tracking for models"""
-    current_version: int  # fixed typo from diagram's "current_vesion"
+    current_version: int
     note: Optional[str] = None
     wopr_version: Optional[str] = None
     previous_versions: Optional[dict] = None
@@ -41,12 +41,12 @@ class ModelOperationsDict(BaseModel):
 class ModelBase(BaseModel):
     """Base model metadata - stored in Directus models table"""
     name: str
-    model_status: dict  # or ModelStatusDict if you want typed validation
-    version: dict  # or ModelVersionDict if you want typed validation
+    familyid: int
+    model_status: ModelStatusDict
+    version: ModelVersionDict
     note: Optional[str] = None
-    familyid: Optional[int] = None
     shortname: Optional[str] = None
-    operations: Optional[dict] = None  # or ModelOperationsDict
+    operations: Optional[ModelOperationsDict] = None
     description: Optional[str] = None
     date_updated: Optional[datetime] = None
 
