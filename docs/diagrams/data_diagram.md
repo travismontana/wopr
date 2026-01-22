@@ -1,210 +1,170 @@
-# data diagrams
-
 ```mermaid
 classDiagram
-    %% Model and ModelFamily classes
-    class ModelBase {
-        +str name
-        +int familyid
-        +dict version
-        +dict model_status
-        +Optional~str~ note
-        +Optional~str~ shortname
-        +Optional~dict~ operations
-        +Optional~str~ description
-        +Optional~datetime~ date_updated
-    }
+  direction LR
 
-    class ModelBase_StatusDict {
-        <<dict>>
-        +Optional~dict~ backup
-        +Optional~str~ checksum
-        +Optional~bool~ has_distfile
-        +Optional~bool~ filename
-        +Optional~bool~ active
-    }
+  %% =========================
+  %% Nested dict-ish structures
+  %% =========================
+  class ModelStatusDict {
+    +dict? backup
+    +str? checksum
+    +bool? has_distfile
+    +str? filename
+    +bool active
+  }
 
-    class ModelBase_VersionDict {
-        <<dict>>
-        +int~ current_vesion
-        +Optional~str~ note
-        +Optional~str~ wopr_version
-        +Optional~dict~ previous_versions
-    }
+  class ModelVersionDict {
+    +int current_version
+    +str? note
+    +str? wopr_version
+    +dict? previous_versions
+  }
 
-    class ModelBase_OperationsDict {
-        <<dict>>
-        +str task
-        +str data
-        +str note
-        +str extradata
-        +str status
-    }
+  class ModelOperationsDict {
+    +str task
+    +str data
+    +str note
+    +str extradata
+    +str status
+  }
 
-    class ModelCreate {
-        <<Pydantic>>
-    }
+  %% =========================
+  %% Models
+  %% =========================
+  class ModelBase {
+    +str name
+    +int familyid
+    +ModelStatusDict model_status
+    +ModelVersionDict version
+    +str? note
+    +str? shortname
+    +ModelOperationsDict? operations
+    +str? description
+    +datetime? date_updated
+  }
 
-    class ModelUpdate {
-        +Optional~str~ name
-        +Optional~str~ description
-        +Optional~str~ note
-        +Optional~int~ version
-        +Optional~str~ model_status
-        +Optional~int~ familyid
-        +Optional~str~ shortname
-        +Optional~datetime~ date_updated
-        +Optional~str~ url
-    }
+  class ModelCreate {
+  }
 
-    class ModelResponse {
-        <<Pydantic>>
-        +int id
-        +Optional~datetime~ date_created
-        +Optional~datetime~ date_updated
-    }
+  class ModelUpdate {
+    +str? name
+    +str? description
+    +str? note
+    +int? version
+    +str? model_status
+    +int? familyid
+    +str? shortname
+    +datetime? date_updated
+    +str? url
+  }
 
-    class ModelFamilyBase {
-        +str name
-        +Optional~str~ description
-        +Optional~str~ note
-        +Optional~str~ version
-        +Optional~str~ url
-    }
+  class ModelResponse {
+    +int id
+    +datetime? date_created
+    +datetime? date_updated
+  }
 
-    class ModelFamilyCreate {
-        +str name
-    }
+  %% =========================
+  %% Model Families
+  %% =========================
+  class ModelFamilyBase {
+    +str name
+    +str? description
+    +str? note
+    +str? version
+    +str? url
+  }
 
-    class ModelFamilyUpdate {
-        +Optional~str~ name
-        +Optional~str~ description
-        +Optional~str~ note
-        +Optional~str~ version
-        +Optional~str~ url
-    }
+  class ModelFamilyCreate {
+  }
 
-    class ModelFamilyResponse {
-        <<Pydantic>>
-        +int id
-        +Optional~datetime~ date_created
-        +Optional~datetime~ date_updated
-    }
+  class ModelFamilyUpdate {
+    +str? name
+    +str? description
+    +str? note
+    +str? version
+    +str? url
+  }
 
-    %% Game-related classes
-    class GameCreate {
-        <<Pydantic>>
-        +str name
-        +Optional~str~ description
-        +Optional~int~ min_players
-        +Optional~int~ max_players
-        +Optional~str~ url
-        +str status
-        +Optional~UUID~ user_created
-    }
+  class ModelFamilyResponse {
+    +int id
+    +datetime? date_created
+    +datetime? date_updated
+  }
 
-    class GameUpdate {
-        <<Pydantic>>
-        +Optional~str~ name
-        +Optional~str~ description
-        +Optional~int~ min_players
-        +Optional~int~ max_players
-        +Optional~str~ url
-        +Optional~str~ status
-        +Optional~UUID~ user_updated
-    }
+  %% =========================
+  %% Games
+  %% =========================
+  class GameCreate {
+    +str name
+    +str? description
+    +int? min_players
+    +int? max_players
+    +str? url
+    +str status
+    +UUID? user_created
+  }
 
-    class GameResponse {
-        <<Pydantic>>
-        +int id
-        +UUID uuid
-        +str name
-        +Optional~str~ description
-        +Optional~int~ min_players
-        +Optional~int~ max_players
-        +Optional~str~ url
-        +str status
-        +Optional~UUID~ user_created
-        +datetime date_created
-        +Optional~UUID~ user_updated
-        +Optional~datetime~ date_updated
-    }
+  class GameUpdate {
+    +str? name
+    +str? description
+    +int? min_players
+    +int? max_players
+    +str? url
+    +str? status
+    +UUID? user_updated
+  }
 
-    %% Player classes
-    class PlayerPayload {
-        <<Pydantic>>
-        +str name
-        +Optional~bool~ isbot
-    }
+  class GameResponse {
+    +int id
+    +UUID uuid
+    +str name
+    +str? description
+    +int? min_players
+    +int? max_players
+    +str? url
+    +str status
+    +UUID? user_created
+    +datetime date_created
+    +UUID? user_updated
+    +datetime? date_updated
+  }
 
-    %% Play classes
-    class PlayPayload {
-        <<Pydantic>>
-        +int playerid
-        +int gameid
-        +int playid
-        +str note
-        +str filename
-    }
+  %% =========================
+  %% Players / Plays
+  %% =========================
+  class PlayerPayload {
+    +str name
+    +bool? isbot
+  }
 
-    %% Utility/Helper classes
-    class CRUDRouter {
-        <<Generic>>
-        +str table_name
-        +Type response_model
-        +Type create_model
-        +Type update_model
-        +str prefix
-        +list tags
-        +create()
-        +read()
-        +update()
-        +delete()
-    }
+  class PlayPayload {
+    +int playerid
+    +int gameid
+    +int playid
+    +str note
+    +str filename
+  }
 
-    class SafeFS {
-        <<File Operations>>
-        +Path base_path
-        +listdir(path)
-        +safe_read()
-        +safe_write()
-        +safe_delete()
-    }
+  %% =========================
+  %% Inheritance
+  %% =========================
+  ModelBase <|-- ModelCreate
+  ModelBase <|-- ModelResponse
 
-    %% Relationships - Model hierarchy
-    ModelBase <|-- ModelCreate :  inherits
-    ModelBase <|-- ModelResponse : inherits
-    ModelBase <..  ModelUpdate : based on
+  ModelFamilyBase <|-- ModelFamilyCreate
+  ModelFamilyBase <|-- ModelFamilyResponse
 
-    ModelBase *-- ModelBase_StatusDict : contains
-    ModelBase *-- ModelBase_VersionDict : contains
-    ModelBase *-- ModelBase_OperationsDict : contains
+  %% =========================
+  %% Composition (nesting)
+  %% =========================
+  ModelBase *-- ModelStatusDict : model_status
+  ModelBase *-- ModelVersionDict : version
+  ModelBase o-- ModelOperationsDict : operations
 
-    %% Relationships - ModelFamily hierarchy
-    ModelFamilyBase <|-- ModelFamilyCreate : inherits
-    ModelFamilyBase <|-- ModelFamilyResponse : inherits
-    ModelFamilyBase <.. ModelFamilyUpdate : based on
-
-    %% Relationships - Model to ModelFamily
-    ModelBase --> ModelFamilyBase : familyid references
-
-
-    %% Relationships - Usage by CRUDRouter
-    CRUDRouter .. > ModelResponse : uses
-    CRUDRouter ..> ModelCreate : uses
-    CRUDRouter ..> ModelUpdate : uses
-    CRUDRouter ..> GameResponse : uses
-    CRUDRouter ..> GameCreate : uses
-    CRUDRouter ..> GameUpdate : uses
-
-    %% Relationships - Domain associations
-    PlayPayload --> PlayerPayload : playerid references
-    PlayPayload --> GameResponse : gameid references
-
-    note for ModelBase "ML Model metadata\nStored in Directus models table"
-    note for ModelFamilyBase "Model family grouping\nStored in Directus model_family table"
-    note for ModelStatus "Runtime file status\nUsed by wopr-model service"
-    note for GameResponse "Game catalog\nStored in Directus games table"
-    note for PlayerPayload "Player information\nStored in Directus players table"
-    note for PlayPayload "Individual game plays/moves\nStored in Directus playtracker table"
+  %% =========================
+  %% Notes on oddities
+  %% =========================
+  %% ModelUpdate.version + ModelUpdate.model_status types don't match ModelBase's nested types;
+  %% diagram reflects your code as-written.
 ```
