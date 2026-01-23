@@ -59,14 +59,14 @@ class ModelCreate(ModelBase):
 class ModelUpdate(BaseModel):
     """Update existing model - all fields optional"""
     name: Optional[str] = None
-    description: Optional[str] = None
-    note: Optional[str] = None
-    version: Optional[int] = None
-    model_status: Optional[str] = None
     familyid: Optional[int] = None
+    model_status: Optional[ModelStatusDict] = None
+    version: Optional[ModelVersionDict] = None
+    note: Optional[str] = None
     shortname: Optional[str] = None
+    operations: Optional[ModelOperationsDict] = None
+    description: Optional[str] = None
     date_updated: Optional[datetime] = None
-    url: Optional[str] = None
 
 
 class ModelResponse(ModelBase):

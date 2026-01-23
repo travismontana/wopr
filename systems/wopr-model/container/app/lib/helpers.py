@@ -205,7 +205,11 @@ def delete_item(noun: str, item_id: str) -> bool:
         return False
 
 def get_config():
+    """_summary_
 
+    Returns:
+        _type_: _description_
+    """
     url = f"{API_BASE}/api/v2/config/all"
     try:
         response = httpx.get(url, timeout=10.0)
@@ -224,9 +228,20 @@ def get_config():
 
 
 def update_operations(data, note, extradata, status):
-    logger.info("Updating ops")
-    logger.debug(
-        f"Data: {data}, Note: {note}, ExtraData: {extradata}, Status: {status}"
+    """_summary_
+
+    Args:
+        data (_type_): _description_
+        note (_type_): _description_
+        extradata (_type_): _description_
+        status (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    logit(
+        "Updating ops",
+        f"Data: {data}, Note: {note}, ExtraData: {extradata}, Status: {status}",
     )
 
     caller = inspect.stack()[1].function
@@ -242,21 +257,49 @@ def update_operations(data, note, extradata, status):
     return data
 
 
-def logit(note, data):
+def logit(note, data=None):
+    """_summary_
+
+    Args:
+        note (_type_): _description_
+        data (_type_, optional): _description_. Defaults to None.
+    """
+    logger = setup_logger()
     logger.info(f"({note})")
+    if not data:
+        data = note
     logger.debug(f"Data: ({data})")
 
 
-def list_files(protected_path, directory):
+def list_files(potected_path, directory):
+    """_summary_
+
+    Args:
+        potected_path (_type_): _description_
+        directory (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     try:
         return protected_path.listdir(directory)
     except Exception as e:
-        logger.error(f"Failed to list files in {directory}: {e}")
+        logit(f"Failed to list files in {directory}: {e}")
         return []
 
 
 def check_for_file_in_dir(filename, directory, protected_path):
-    loggit(
+    """_summary_
+
+    Args:
+        filename (_type_): _description_
+        directory (_type_): _description_
+        protected_path (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    logit(
         "Checking for file in directory", {"filename": filename, "directory": directory}
     )
     files = list_files(protected_path, directory)

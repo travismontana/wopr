@@ -33,16 +33,26 @@ models_router = CRUDRouter(
 # Custom endpoint
 @models_router.get("/{model_id}/stats")
 async def get_model_stats(model_id: str):
+    """Get statistics for a specific model"""
     # Custom logic
     pass
 
 @models_router.get("/health")
 async def get_health():
+    """Return healthy"""
     return "healthy"
 
 
 @models_router.post("/status", response_model=ModelResponse)
 async def update_model_status(data: ModelUpdate):
+    """Update the status of a model"""
     logger.info("Updating model status")
     logger.debug(f"Update data: {data}")
     return data
+
+
+@models_router.post("/activate", response_model=ModelResponse)
+async def activate_model(data: ModelUpdate):
+    """Activate a model"""
+    logger.info("Activating model")
+    logger.debug(f"Activation data: {data}")

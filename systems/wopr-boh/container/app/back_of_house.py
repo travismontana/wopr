@@ -1,13 +1,9 @@
+import os
+
 import streamlit as st
 
-from wopr.logging import setup_logging
-
-from lib.wopr_api_client.api.models import (
-    get_all_items_api_v2_models_get,
-)
-
-
-logger = setup_logging("wopr-boh", log_file="/var/log/wopr-boh.log")
+if "debug" not in st.session_state:
+    st.session_state["debug"] = False
 
 st.set_page_config(
     page_title="WOPR Back of House", 
@@ -16,22 +12,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 st.title("WOPR Back of House")
-
 placeholder = st.empty()
 
 with placeholder.container():
     st.markdown("System Loading...")
 
-with st.spinner("Spinning the spinner..."):
-    models = get_all_items_api_v2_models_get()
-    if "models" not in st.session_state:
-        st.session_state["models"] = models
-
-    if "debug" not in st.session_state:
-        st.session_state["debug"] = False
-
 placeholder.empty()
 
+with st.sidebar:
+    with st.expander("Settings"):
+        # Debug toggle
+        debug_toggle = st.toggle("Activate debugging", value=st.session_state.debug)
+        st.session_state.debug = debug_toggle
+        debug = st.session_state.debug
+        # Cache control
+        if st.button("Clear Cache"):
+            st.cache_data.clear()
+
 dashboard = st.Page(
-    "displays/dashboard.py", title="Dashboard", icon=":material:dashboard", default=True
+    "displays/dashboard.py",
+    title="Dashboard",
+    icon=":material/dashboard:",
+    default=True,
 )
+
+pg = st.navigation([dashboard])
+pg.run()

@@ -100,3 +100,15 @@ async def model_status(data: Any, request: Request):
         )
         logit("Model update response received", response)
     return data
+
+
+@api_models.post("/activate", response_model=None)
+def activate_model(data: Any):
+    """Activate the model requested"""
+    logger.info("Activating model")
+    logger.debug(f"Activation data: {data}")
+
+    # if the model_family file hasnt been downloaded, download it.
+    model = data
+    model_family_id = data["familyid"]
+    model_family = convert_family_id(model_family_id)
