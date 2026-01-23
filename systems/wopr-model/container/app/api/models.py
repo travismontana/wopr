@@ -150,10 +150,11 @@ def activate_model(model_id: int, request: Request):
     download_path = f"{paths['models_path']}/{paths['models_download_path']}"
     protected_path = SafeFS(Path(paths["models_path"]))
 
+    logit("Checking if distfile exists for {filename}", filename)
     does_distfile_exist = check_for_file_in_dir(
         filename, paths["models_distfiles_path"], protected_path
     )
-
+    logit("Checking if download exists for {filename}", filename)
     does_download_exist = check_for_file_in_dir(
         filename, paths["models_download_path"], protected_path
     )
@@ -193,12 +194,19 @@ def activate_model(model_id: int, request: Request):
         return "unable to download file"
 
     model_filename = f"{model_info['name']}.pt"
+    logit(f"Checking if model distfile exists for {model_filename}", model_filename)
+    does_moddist_exist = check_for_file_in_dir(
+        model_filename, paths["models_distfiles_path"], protected_path
+    )
 
-    results = copy_modfam_to_model(filename, model_filename, paths, protected_path)
+    if not does_moddist_exist:
+        results = copy_modfam_to_model(filename, model_filename, paths, protected_path)
 
-    if not results:
-        logit(f"Failed to copy model family file to model file for {model_filename}")
-        return "unable to dist model file"
+        if not results:
+            logit(
+                f"Failed to copy model family file to model file for {model_filename}"
+            )
+            return "unable to dist model file"
 
     # backup the file
     results = backup_dist_file(model_filename, paths, protected_path)
