@@ -168,4 +168,30 @@ def activate_model(model_id: int, request: Request):
     else:
         logit(f"Distfile exists for {filename}", distfiles_path)
         results = True
+
+    does_distfile_exist = check_for_file_in_dir(
+        filename, paths["models_distfiles_path"], protected_path
+    )
+
+    does_download_exist = check_for_file_in_dir(
+        filename, paths["models_download_path"], protected_path
+    )
+
+    if not does_distfile_exist:
+        logit(
+            f"Distfile still does not exist for {filename} after attempted copy",
+            distfiles_path,
+        )
+        return "unable to copy distfile"
+    if not does_download_exist:
+        logit(
+            f"Download still does not exist for {filename} after attempted copy",
+            download_path,
+        )
+        return "unable to download file"
+
+    model_filename = f"{model_info['name']}.pt"
+
+    results = copy_modfam_to_model(filename, model_filename, paths, protected_path)
+
     return results
