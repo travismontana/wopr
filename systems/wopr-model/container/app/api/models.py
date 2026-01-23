@@ -14,6 +14,7 @@ from lib.helpers import (
     get_all,
     download_file,
     copy_file_to_dist,
+    copy_modfam_to_model,
 )
 
 from lib.safe_file import SafeFS
