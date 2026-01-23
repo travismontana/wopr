@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Request
 import requests
 import logging
-from 
 from app import globals as woprvar
 from opentelemetry import trace
 from contextlib import nullcontext
