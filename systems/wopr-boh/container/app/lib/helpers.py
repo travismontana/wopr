@@ -3,8 +3,22 @@ import httpx
 
 import streamlit as st
 
-logger = logging.getLogger(__name__)
 
+def configure_logging(logfile: str, level=logging.DEBUG):
+    logging.basicConfig(
+        filename=logfile,
+        level=level,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    )
+
+    root = logging.getLogger()
+    if not any(isinstance(h, logging.StreamHandler) for h in root.handlers):
+        root.addHandler(logging.StreamHandler(sys.stdout))
+
+    return root
+
+
+logger = configure_logging("/var/log/wopr-boh.log")
 DEBUG=st.session_state["debug"]
 
 def debugit(message,data):

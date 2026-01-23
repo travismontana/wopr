@@ -109,12 +109,13 @@ async def model_status(data: Any, request: Request):
 
 
 @api_models.post("/activate")
-def activate_model(model_id: int, request: Request):
+def activate_model(model_dict: dict, request: Request):
     """Activate the model requested"""
     logger.info("Activating model")
-    logger.debug(f"Activation data: {model_id}")
+    logger.debug(f"Activation data: {model_dict}")
     config = request.app.state.config
     paths = request.app.state.paths
+    model_id = model_dict.get("model_id")
     try:
         model_info = get_one("models", model_id)
     except Exception as e:

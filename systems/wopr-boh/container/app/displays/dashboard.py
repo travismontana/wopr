@@ -65,3 +65,4 @@ for model_in in models:
         if st.button("Activate"):
             st.write("Yes")
             results = activate_model(model)
+            st.write(results)

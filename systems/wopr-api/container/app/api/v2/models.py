@@ -55,16 +55,16 @@ async def update_model_status(data: ModelUpdate):
 
 
 @models_router.post("/activate")
-async def activate_model(model_id: int, request=Request):
+async def activate_model(model_id: dict, request=Request):
     """Activate a model"""
     logger.info("Activating model")
-    logger.debug(f"Activation data: {data}")
+    logger.debug(f"Activation data: {model_id}")
     models_url = woprvar.WOPR_CONFIG["api"]["models_url"]
-
+    mod_id = model_id.get("model_id")
     action = "post"
     base_url = models_url
     route = "/api/v2/models"
     path = "activate"
-    payload = {"model_id": model_id}
+    payload = {"model_id": mod_id}
     results = do_api_things(action, base_url, route, path, payload)
     return results
