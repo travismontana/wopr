@@ -19,6 +19,8 @@ from app.logging import configure_logging
 
 from app.models.models import ModelResponse, ModelCreate, ModelUpdate
 
+from app.lib.helpers import do_api_things
+
 logger = configure_logging(woprvar.LOGFILE)
 
 # Usage
@@ -63,6 +65,6 @@ async def activate_model(model_id: int, request=Request):
     base_url = models_url
     route = "/api/v2/models"
     path = "activate"
-    payload = 
+    payload = {"model_id": model_id}
     results = do_api_things(action, base_url, route, path, payload)
     return results
