@@ -1,5 +1,3 @@
-    """_summary_
-    """
 import httpx
 
 from app.logging import configure_logging
