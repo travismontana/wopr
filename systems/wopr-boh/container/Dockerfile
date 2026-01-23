@@ -14,6 +14,8 @@ WORKDIR /app
 # System deps (keep minimal). Add build tools ONLY if you hit wheels/build issues.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       curl \
+      git \
+      netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python deps first for better layer caching
@@ -33,4 +35,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
 
 # Run Streamlit
 
-CMD ["streamlit", "run", "back_of_house.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app/back_of_house.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wopr-boh"
+version = "0.1.5-beta"
+description = "WOPR - Back of House"
+authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
+dependencies = [
+  "streamlit",
+  "pandas",
+  "httpx",
+  "wopr-core @ git+https://github.com/travismontana/wopr.git@main#subdirectory=pymods/wopr-core"
+]
+
+[project.optional-dependencies]
+dev = ["black", "pytest"]
+
+[project.scripts]
+your-cli = "your_package.cli:main"
