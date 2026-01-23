@@ -15,6 +15,7 @@ from lib.helpers import (
     download_file,
     copy_file_to_dist,
     copy_modfam_to_model,
+    backup_dist_file,
 )
 
 from lib.safe_file import SafeFS
@@ -195,4 +196,10 @@ def activate_model(model_id: int, request: Request):
 
     results = copy_modfam_to_model(filename, model_filename, paths, protected_path)
 
+    if not results:
+        logit(f"Failed to copy model family file to model file for {model_filename}")
+        return "unable to dist model file"
+
+    # backup the file
+    results = backup_dist_file(model_filename, paths, protected_path)
     return results

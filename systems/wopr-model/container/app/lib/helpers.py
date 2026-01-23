@@ -381,3 +381,20 @@ def copy_modfam_to_model(filename, model_filename, paths, protected_path):
     model_file = f"{dist_sub}/{model_filename}"
     modfam_file = f"{dist_sub}/{filename}"
     return protected_path.copy_file(modfam_file, model_file)
+
+
+def backup_dist_file(filename, paths, protected_path):
+    """_summary_
+
+    Args:
+        filename (_type_): _description_
+        paths (_type_): _description_
+        protected_path (_type_): _description_
+    """
+    logit(f"Backing up file {filename}")
+    base_path = paths["models_path"]
+    dist_sub = paths["models_distfiles_path"]
+    down_sub = paths["models_download_path"]
+    source = f"{dist_sub}/{filename}"
+    dest = f"{down_sub}/{filename}"
+    return protected_path.copy_file(source, dest)
