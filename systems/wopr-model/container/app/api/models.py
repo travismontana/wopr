@@ -10,6 +10,10 @@ from lib.helpers import (
     update_operations,
     logit,
     check_for_file_in_dir,
+    get_one,
+    get_all,
+    download_file,
+    copy_file_to_dist,
 )
 
 from lib.safe_file import SafeFS
@@ -102,13 +106,66 @@ async def model_status(data: Any, request: Request):
     return data
 
 
-@api_models.post("/activate", response_model=None)
-def activate_model(data: Any):
+@api_models.post("/activate")
+def activate_model(model_id: int, request: Request):
     """Activate the model requested"""
     logger.info("Activating model")
-    logger.debug(f"Activation data: {data}")
+    logger.debug(f"Activation data: {model_id}")
+    config = request.app.state.config
+    paths = request.app.state.paths
+    try:
+        model_info = get_one("models", model_id)
+    except Exception as e:
+        logit(f"Error retrieving model info: {e}")
+        return False
 
-    # if the model_family file hasnt been downloaded, download it.
-    model = data
-    model_family_id = data["familyid"]
-    model_family = convert_family_id(model_family_id)
+    if model_info is None or not model_info:
+        message = f"Model id ({model_id}) not found"
+        logit(message, model_info)
+        return message
+    logit("Model info retrieved", model_info)
+
+    model_families = get_all("model_family")
+    logit("Model families retrieved", model_families)
+    if "familyid" in model_info:
+        family_id = model_info["familyid"]
+        logit("Family ID retrieved", family_id)
+        family = [m for m in model_families if m["id"] == family_id]
+        logit("Family name retrieved", family)
+    else:
+        logit("No family ID found in model info", model_info)
+
+    # Does the model_family exist?
+
+    if not family:
+        # Family doesnt exist
+        # Add logic to fix this.
+        logit("Family does not exist for family_id: %s", family_id)
+
+    filename = f"{family[0]['name']}.pt"
+    # Does the file exist?
+    distfiles_path = f"{paths['models_path']}/{paths['models_distfiles_path']}"
+    download_path = f"{paths['models_path']}/{paths['models_download_path']}"
+    protected_path = SafeFS(Path(paths["models_path"]))
+
+    does_distfile_exist = check_for_file_in_dir(
+        filename, paths["models_distfiles_path"], protected_path
+    )
+
+    does_download_exist = check_for_file_in_dir(
+        filename, paths["models_download_path"], protected_path
+    )
+
+    if not does_distfile_exist:
+        logit(f"Distfile does not exist for {filename}", distfiles_path)
+        if not does_download_exist:
+            logit(f"Download does not exist for {filename}", download_path)
+            url = family[0]["url"]
+            results = download_file(url, filename, paths)
+        else:
+            logit(f"Download exists for {filename}", download_path)
+            results = copy_file_to_dist(filename, paths, protected_path)
+    else:
+        logit(f"Distfile exists for {filename}", distfiles_path)
+        results = True
+    return results

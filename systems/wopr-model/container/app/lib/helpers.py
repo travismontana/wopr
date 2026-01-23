@@ -55,7 +55,7 @@ def setup_logger() -> logging.Logger:
     if logger.handlers:
         return logger  # Already configured
 
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     handler = logging.StreamHandler(sys.stdout)
     fmt = logging.Formatter(
@@ -271,7 +271,7 @@ def logit(note, data=None):
     logger.debug(f"Data: ({data})")
 
 
-def list_files(potected_path, directory):
+def list_files(protected_path, directory):
     """_summary_
 
     Args:
@@ -307,3 +307,60 @@ def check_for_file_in_dir(filename, directory, protected_path):
         if file == filename:
             return True
     return False
+
+
+async def download_file(url, filename, paths):
+    """_summary_
+
+    Args:
+        url (_type_): _description_
+        filename (_type_): _description_
+        paths (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    timeout = 30.0
+    try:
+        async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
+            async with client.stream("GET", url) as response:
+                # ← ADDED: Check response status
+                response.raise_for_status()
+
+                total_size = int(response.headers.get("content-length", 0))
+                downloaded = 0
+
+                with open(fullpath, "wb") as file:
+                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                        file.write(chunk)
+                        downloaded += len(chunk)
+
+                logger.info(f"Downloaded {downloaded} bytes to {fullpath}")
+                data.downloaded = True
+
+    except httpx.HTTPStatusError as e:
+        logit(f"HTTP error downloading {url}: {e}")
+        return e
+
+    except Exception as e:
+        logit(f"Error downloading {url}: {e}")
+        return e
+
+    return d
+
+
+def copy_file_to_dist(filename, paths, protected_path):
+    """_summary_
+
+    Args:
+        filename (_type_): _description_
+        paths (_type_): _description_
+    """
+    logit(f"Copying file {filename} to dist directory")
+    base_path = paths["models_path"]
+    dist_subdir = paths["models_distfiles_path"]
+    down_subdir = paths["models_download_path"]
+    distfile = f"{dist_subdir}/{filename}"
+    downfile = f"{down_subdir}/{filename}"
+    logit(f"Copying from {downfile} to {distfile}")
+    return protected_path.copy_file(downfile, distfile)

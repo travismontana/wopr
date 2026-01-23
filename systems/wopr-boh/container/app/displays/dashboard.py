@@ -61,7 +61,7 @@ for model_in in models:
                 else:
                     st.badge("Inactive", color="red")
     else:
-        st.write(f"Model {model['name']} is not active")
+        st.write(f"Model {model['name']} ID {model['id']} is not active")
         if st.button("Activate"):
             st.write("Yes")
             results = activate_model(model)
