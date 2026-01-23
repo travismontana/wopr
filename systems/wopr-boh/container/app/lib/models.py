@@ -5,7 +5,7 @@ from lib.helpers import logit, do_api_things
 
 def activate_model(model):
     """Tell model control to activate the given model"""
-    logit("Activating model: %s", model.get("name", "Unknown"))
+    logit(f"Activating model: {model.get('name', 'Unknown')}", "info")
     payload = {"model_id": model["id"]}
     action = "post"
     base_url = "https://api.wopr.tailandtraillabs.org"
@@ -17,7 +17,7 @@ def activate_model(model):
     )
     try:
         results = do_api_things(action, base_url, route, path, payload)
-        logit(f"do_api_things returned: {results}")
+        logit(f"do_api_things returned: {results}", "info")
         return "Activated"
     except Exception as e:
         return f"Unable to activate: {e}, sent: {payload}"
