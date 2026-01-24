@@ -37,7 +37,7 @@ api_models = APIRouter(tags=["models"])
 
 
 @api_models.post("/model_status")
-async def model_status(data: Any, request: Request):
+async def model_status(data, request: Request):
     """Get the status of the model, via post"""
     logger.info("Model status update received")
     logger.debug("Data: %s", data)
