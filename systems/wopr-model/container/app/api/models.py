@@ -36,7 +36,7 @@ woprclient = Client(base_url=WOPR_API_URL)
 api_models = APIRouter(tags=["models"])
 
 
-@api_models.post("/model_status", response_model=None)
+@api_models.post("/model_status")
 async def model_status(data: Any, request: Request):
     """Get the status of the model, via post"""
     logger.info("Model status update received")
