@@ -17,7 +17,7 @@ from lib.helpers import (
     backup_dist_file,
 )
 
-from lib.database_client import get_one, get_all
+from lib.directus_client import get_one, get_all
 from lib import globals as woprvar
 
 from lib.safe_file import SafeFS
