@@ -60,7 +60,7 @@ async def update_model_status(data: dict, request=Request):
     path = "model_status"
     payload = {"model_id": mod_id}
     results = do_api_things(action, base_url, route, path, payload)
-    return data
+    return results
 
 
 @models_router.post("/activate")
