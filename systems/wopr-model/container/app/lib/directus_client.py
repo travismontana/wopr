@@ -88,7 +88,7 @@ def post(collection: str, data: Dict[str, Any]) -> Dict[str, Any]:
     url = f"/items/{collection}"
 
     try:
-        response = client.post(url, json=data)
+        response = client.patch(url, json=data)
         response.raise_for_status()
         logger.info(f"POST {collection} succeeded")
         return response.json()["data"]
