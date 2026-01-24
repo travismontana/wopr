@@ -77,7 +77,8 @@ async def model_status(data: dict, request: Request):
     paths = request.app.state.paths
     try:
         logger.info(f"Retrieving model info for model ID: {model_id}")
-        model_info = await do_api_things("get", WOPR_API_URL, "models", model_id, None)
+        # model_info = await do_api_things("get", WOPR_API_URL, "models", model_id, None)
+        model_info = get_one("models", model_id)
     except Exception as e:
         logit(f"Error retrieving model info: {e}")
         return False
