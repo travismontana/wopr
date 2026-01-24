@@ -105,6 +105,7 @@ async def model_status(data: dict, request: Request):
             "has_distfile": does_distfile_exist,
         },
         "filename": model_filename,
+        "active": False,
     }
     # model_info.update(status_dict)
     model_info["model_status"] = status_dict
