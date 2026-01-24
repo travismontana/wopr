@@ -9,6 +9,7 @@ ENV PIP_NO_CACHE_DIR=1 \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
+    curl \
     libpq-dev \
     git \
     && pip install --upgrade pip setuptools wheel \
