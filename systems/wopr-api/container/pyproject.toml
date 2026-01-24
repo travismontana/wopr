@@ -8,8 +8,9 @@ version = "0.0.1"
 description = "WOPR API Service"
 authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
 dependencies = [
-    "fastapi
+    "fastapi",
     "httpx",
+    "uvicorn[standard]",
     "wopr-core @ git+https://github.com/travismontana/wopr.git@main#subdirectory=pymods/wopr-core"
 ]
 

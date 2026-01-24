@@ -29,6 +29,9 @@ USER wopr
 WORKDIR /app
 
 COPY --chown=wopr:wopr requirements.txt .
+COPY --chown=wopr:wopr pyproject.toml .
 RUN pip install --user -r requirements.txt
+RUN pip install --user -e .
 
-COPY --chown=wopr:wopr app/ ./app/
+COPY --chown=wopr:wopr app/ .
+CMD ["/home/wopr/.local/bin/uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8000"]
