@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 
+
 def init_session_defaults() -> None:
     """
     Initialize default session state variables.
@@ -16,8 +17,6 @@ def init_session_defaults() -> None:
         st.session_state["api_host"] = api_host
     else:
         api_host = st.session_state["api_host"]
-        
-    models = 
 
 
 def clear_ui_cache() -> None:
@@ -31,13 +30,15 @@ def clear_ui_cache() -> None:
         if key in st.session_state:
             del st.session_state[key]
 
+
 def debug_log(message: str) -> None:
     """
     Log a debug message if debugging is enabled in session state.
     """
     if st.session_state.get("debug", False):
         st.write(f"DEBUG: {message}")
-        
+
+
 def debug_json(message: dict) -> None:
     """
     Log a debug message if debugging is enabled in session state.

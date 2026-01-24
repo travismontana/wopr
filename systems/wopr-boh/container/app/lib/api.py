@@ -43,7 +43,7 @@ def parse_api_response(response: httpx.Response) -> dict:
         return response.json()
     except httpx.HTTPError as e:
         return handle_api_error(e)
-    
+
 def build_api_url(endpoint: str, base_url: str) -> str:
     """
     Build the full API URL for a given endpoint.
@@ -71,3 +71,106 @@ def api_get_models() -> dict:
         return parse_api_response(response)
     except httpx.HTTPError as e:
         return handle_api_error(e)
+
+
+def api_get_model_families() -> dict:
+    """
+    Fetch the list of ML model families from the API.
+
+    Args:
+        client (httpx.Client): The HTTPX client configured for the API.
+    Returns:
+        dict: API response containing the list of model families.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.get("/api/v3/ml_model_families")
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_get_model_by_id(model_id: str) -> dict:
+    """
+    Fetch a specific ML model by its ID from the API.
+
+    Args:
+        model_id (str): The ID of the ML model to fetch.
+    Returns:
+        dict: API response containing the model details.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.get(f"/api/v3/ml_models/{model_id}")
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_create_model(model_data: dict) -> dict:
+    """
+    Create a new ML model via the API.
+
+    Args:
+        model_data (dict): The data for the new ML model.
+    Returns:
+        dict: API response containing the created model details.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.post("/api/v3/ml_models", json=model_data)
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_update_model(model_id: str, model_data: dict) -> dict:
+    """
+    Update an existing ML model via the API.
+
+    Args:
+        model_id (str): The ID of the ML model to update.
+        model_data (dict): The updated data for the ML model.
+    Returns:
+        dict: API response containing the updated model details.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.patch(f"/api/v3/ml_models/{model_id}", json=model_data)
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_delete_model(model_id: str) -> dict:
+    """
+    Delete an existing ML model via the API.
+
+    Args:
+        model_id (str): The ID of the ML model to delete.
+    Returns:
+        dict: API response confirming deletion.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.delete(f"/api/v3/ml_models/{model_id}")
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_get_model_family_by_id(family_id: str) -> dict:
+    """
+    Fetch a specific ML model family by its ID from the API.
+
+    Args:
+        family_id (str): The ID of the ML model family to fetch.
+    Returns:
+        dict: API response containing the model family details.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.get(f"/api/v3/ml_model_families/{family_id}")
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+    return parse_api_response(response)
