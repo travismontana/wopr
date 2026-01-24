@@ -27,7 +27,7 @@ class CRUDRouter(Generic[T, TCreate, TUpdate]):
 
     def _register_routes(self, response_model, create_model, update_model):
 
-        @self.router.get("", response_model=any)
+        @self.router.get("")
         async def get_all_items():
             logger.info(f"Fetching all {self.table}")
             return get_all(self.table)
