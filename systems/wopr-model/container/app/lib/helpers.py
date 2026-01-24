@@ -115,6 +115,7 @@ def get_one(noun: str, item_id: str) -> dict:
         session = get_one("sessions", "abc-123-def")
     """
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
+    log.info(f"Fetching {noun} with ID {item_id} from {url}")
     try:
         response = httpx.get(url, timeout=10.0)
         response.raise_for_status()
