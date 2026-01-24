@@ -108,7 +108,7 @@ async def model_status(data: dict, request: Request):
     }
     # model_info.update(status_dict)
     model_info["model_status"] = status_dict
-    results = await update("models", model_id, model_info)
+    results = update("models", model_id, model_info)
     logit("Model info updated", results)
     return model_info
 
