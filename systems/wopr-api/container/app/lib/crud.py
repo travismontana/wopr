@@ -26,17 +26,18 @@ class CRUDRouter(Generic[T, TCreate, TUpdate]):
         self._register_routes(response_model, create_model, update_model)
 
     def _register_routes(self, response_model, create_model, update_model):
-        @self.router.get("", response_model=list[response_model])
+
+        @self.router.get("", response_model=any)
         async def get_all_items():
             logger.info(f"Fetching all {self.table}")
             return get_all(self.table)
 
-        @self.router.get("/{item_id}", response_model=response_model)
+        @self.router.get("/{item_id}", response_model=any)
         async def get_item(item_id: str):
             logger.info(f"Fetching {self.table}: {item_id}")
             return get_one(self.table, item_id)
 
-        @self.router.post("", response_model=response_model, status_code=status.HTTP_201_CREATED)
+        @self.router.post("", response_model=any, status_code=status.HTTP_201_CREATED)
         async def create_item(payload: create_model):
             logger.info(f"Creating {self.table}: {payload.model_dump()}")
             return post(self.table, payload.model_dump())

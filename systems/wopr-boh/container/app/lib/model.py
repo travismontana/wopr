@@ -98,6 +98,8 @@ def build_models_df() -> pd.DataFrame:
     Returns:
         DataFrame of models.
     """
+    debugit_message("Building models dataframe from session state")
+    debugit_message(st.session_state.get("models", []))
     modelsdf = pd.DataFrame(st.session_state.get("models", []))
     st.session_state["modelsdf"] = modelsdf
     return modelsdf
