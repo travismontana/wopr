@@ -4,7 +4,8 @@ from fastapi import FastAPI
 
 # Route imports
 from routers import config as config_router
-from routers import ml_models as ml_router_router
+from routers import ml_models as ml_model_router
+from routers import ml_model_families as ml_model_family_router
 
 
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
@@ -22,7 +23,12 @@ API_PREFIX = "/api/v3"
 # Include routers
 api.include_router(config_router.router, prefix=f"{API_PREFIX}/config", tags=["config"])
 api.include_router(
-    ml_router_router.router, prefix=f"{API_PREFIX}/ml_models", tags=["ml_models"]
+    ml_model_router.router, prefix=f"{API_PREFIX}/ml_models", tags=["ml_models"]
+)
+api.include_router(
+    ml_model_family_router.router,
+    prefix=f"{API_PREFIX}/ml_model_families",
+    tags=["ml_model_families"],
 )
 
 if config:
