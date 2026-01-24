@@ -102,7 +102,7 @@ def update(collection: str, item_id: str, data: Dict[str, Any]) -> Dict[str, Any
     url = f"/items/{collection}/{item_id}"
 
     try:
-        response = client.post(url, json=data)
+        response = client.patch(url, json=data)
         response.raise_for_status()
         logger.info(f"PATCH {collection}/{item_id} succeeded")
         return response.json()["data"]
