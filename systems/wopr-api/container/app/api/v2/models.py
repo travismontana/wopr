@@ -51,8 +51,9 @@ async def update_model_status(data: dict, request=Request):
     """Update the status of a model"""
     logger.info("Updating model status")
     logger.debug(f"Update data: {data}")
+    model_id = data.get("model")
     models_url = woprvar.WOPR_CONFIG["api"]["models_url"]
-    mod_id = model_id.get("model_id")
+    mod_id = model_id
     action = "post"
     base_url = models_url
     route = "/api/v2/models"
