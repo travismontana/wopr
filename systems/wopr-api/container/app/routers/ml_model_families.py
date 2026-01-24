@@ -15,23 +15,23 @@ router = APIRouter(
 async def get_ml_model_families():
     """Get ML Models configuration."""
     logger.info("Fetching ML Models configuration")
-    return get_all("model_families")
+    return get_all("model_family")
 
 
 @router.patch("/{model_family_id}", response_model=dict)
 async def update_ml_model_family(model_family_id: str, payload: dict):
     """Update ML Model configuration."""
     logger.info(f"Updating ML Model {model_family_id}")
-    return update("model_familys", model_family_id, payload)
+    return update("model_family", model_family_id, payload)
 
 @router.post("", response_model=dict)
 async def create_ml_model_family(payload: dict):
     """Create new ML Model configuration."""
     logger.info("Creating new ML Model")
-    return post("model_family_familys", payload)
+    return post("model_family", payload)
 
 @router.delete("/{model_family_id}", status_code=204)
 async def delete_ml_model_family(model_family_id: str):
     """Delete ML Model configuration."""
     logger.info(f"Deleting ML Model {model_family_id}")
-    return delete("model_familys", model_family_id)
+    return delete("model_family", model_family_id)
