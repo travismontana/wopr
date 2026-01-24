@@ -2,6 +2,7 @@ from typing import Any
 from pathlib import Path
 import hashlib
 import inspect
+import httpx
 from fastapi import APIRouter, Request
 
 
