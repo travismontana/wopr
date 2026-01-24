@@ -341,12 +341,16 @@ def force_reload_models() -> None:
                 client=c
             )
         st.session_state["models"] = [m.to_dict() for m in models]
-        
+
     except Exception as exc:
         capture_exception("Failed to reload models", exc)
         st.session_state["models"] = []
+
+
 API_BASE = os.environ.get("API_URL", "http://localhost:8000")
 API_VERSION = "v2"
+
+
 def talk_to_model_ctl(action, data):
     """router for talking to model ctl directly"""
     url = st.session_state["api_host"]
@@ -354,7 +358,9 @@ def talk_to_model_ctl(action, data):
     match action:
         case "status":
             # thing = do_api_things("post", url, "models", "model_status", data)
-            return create_new("models/status", data)
+            thing = create_new("models/status", data)
+            debugit_message({"model_status": thing})
+            return thing
         case "download":
             thing = do_api_things("post", url, "models", "download", data)
             return thing
@@ -438,9 +444,11 @@ def render_model_status() -> None:
         return
 
     status_df = build_model_status_table(models)
+    debugit_message(f"Model status table built with {len(status_df)} records.")
+    debugit_message(status_df)
 
     # Debug: proves what you actually have (delete later)
-    #st.caption(f"status_df shape={status_df.shape} cols={list(status_df.columns)}")
+    # st.caption(f"status_df shape={status_df.shape} cols={list(status_df.columns)}")
 
     st.dataframe(
         status_df,
