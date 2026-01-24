@@ -88,6 +88,45 @@ async def model_status(data: dict, request: Request):
         logit(message, model_info)
         return message
     logit("Model info retrieved", model_info)
+    model_families = get_all("model_family")
+    logit("Model families retrieved", model_families)
+    if "familyid" in model_info:
+        family_id = model_info["familyid"]
+        logit("Family ID retrieved", family_id)
+        family = [m for m in model_families if m["id"] == family_id]
+        logit("Family name retrieved", family)
+    else:
+        logit("No family ID found in model info", model_info)
+
+    # Does the model_family exist?
+
+    if not family:
+        # Family doesnt exist
+        # Add logic to fix this.
+        logit("Family does not exist for family_id: %s", family_id)
+
+    family_filename = f"{family[0]['name']}.pt"
+    model_filename = f"{model_info['name']}.pt"
+    # Does the file exist?
+    distfiles_path = f"{paths['models_path']}/{paths['models_distfiles_path']}"
+    download_path = f"{paths['models_path']}/{paths['models_download_path']}"
+    protected_path = SafeFS(Path(paths["models_path"]))
+
+    logit("Checking if distfile exists for {filename}", model_filename)
+    does_distfile_exist = check_for_file_in_dir(
+        model_filename, paths["models_distfiles_path"], protected_path
+    )
+    logit("Checking if download exists for {filename}", model_filename)
+    does_download_exist = check_for_file_in_dir(
+        model_filename, paths["models_download_path"], protected_path
+    )
+    status_dict = {
+        "has_distfile": does_distfile_exist,
+        "backup": {
+            "has_distfile": does_distfile_exist,
+        },
+        "filename": model_filename,
+    }
 
     return model_info
 
