@@ -20,7 +20,7 @@ ENVIRONMENT = os.getenv("WOPR_ENVIRONMENT", "production")
 if ENVIRONMENT != "production":
     DIRECTUS_HOST += f"-{ENVIRONMENT}"
 
-DIRECTUS_URL = f"{DIRECTUS_HOST}:8055"
+DIRECTUS_URL = f"{DIRECTUS_HOST}"
 
 # Get DIRECTUS_TOKEN from environment, no fallbacks.
 DIRECTUS_TOKEN = os.getenv("DIRECTUS_TOKEN")
