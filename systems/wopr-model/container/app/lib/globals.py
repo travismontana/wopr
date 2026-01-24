@@ -69,23 +69,6 @@ APP_OTEL_URL = f"{APP_OTEL_HOST}:{APP_OTEL_PORT}"
 APP_TRACING_ENABLED = WOPR_CONFIG.get("tracing.enabled", False)
 WOPR_API_URL = APP_API_URL + "/api/v1"
 LOGFILE = "/tmp/wopr-api.log"
-DATABASE_URL = (
-    "postgresql://"
-    + os.getenv("DBUSER")
-    + ":"
-    + os.getenv("DBPASSWORD")
-    + "@"
-    + os.getenv("DBHOST")
-    + ":"
-    + os.getenv("DBPORT")
-    + "/"
-    + os.getenv("DBNAME")
-)
-
-HOMEASSISTANT_URL = WOPR_CONFIG.get(
-    "homeAssistant.host", "http://homeassistant.local:8123"
-)
-HOMEASSISTANT_TOKEN = os.getenv("HOMEASSISTANT_TOKEN", "")
 
 APP_HOST = "0.0.0.0"
 APP_PORT = 8000
@@ -116,29 +99,3 @@ storage_paths = {
     "label_source_path": (LABEL_BASE_PATH / LABEL_SOURCE_SUBDIR).resolve(),
     "label_target_path": (LABEL_BASE_PATH / LABEL_TARGET_SUBDIR).resolve(),
 }
-
-
-from opentelemetry import trace
-from opentelemetry.sdk.resources import (
-    Resource,
-    SERVICE_NAME,
-    SERVICE_VERSION,
-    SERVICE_NAMESPACE,
-    DEPLOYMENT_ENVIRONMENT,
-)
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-import os
-
-
-def create_tracer(
-    tracer_name: str,
-    tracer_version: str,
-    tracer_enabled: bool,
-    tracer_endpoint: str,
-    service_namespace: str = "wopr",  # Add this parameter
-    deployment_env: str = "production",  # Add this parameter
-):
-    if not tracer_enabled:
-        return None
