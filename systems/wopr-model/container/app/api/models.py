@@ -128,7 +128,7 @@ async def model_status(data: dict, request: Request):
         "filename": model_filename,
     }
     model_info.update(status_dict)
-    results = await update("models", model_id, model_info)
+    results = await post("models", model_info)
     logit("Model info updated", model_info)
     return model_info
 
