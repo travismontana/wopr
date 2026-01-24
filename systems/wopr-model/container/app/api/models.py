@@ -37,44 +37,33 @@ woprclient = Client(base_url=WOPR_API_URL)
 api_models = APIRouter(tags=["models"])
 
 
-def do_api_things(action, base_url, route, path, payload):
-    headers = {"Content-Type": "application/json"}
-    result = []
+async def do_api_things(action, base_url, route, path, payload):
+    headers = {}  # Fix this too
 
     action_map = {
-        "get": httpx.get,
-        "post": httpx.post,
-        "put": httpx.put,
-        "patch": httpx.patch,
-        "delete": httpx.delete,
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "patch": "PATCH",
+        "delete": "DELETE",
     }
 
     method = action_map[action.lower()]
-
     timeout = 30.0
-    # base_url = f"{API_BASE}"
-    # debugit_message(
-    #    f"API call: {action.upper()} {WOPR_API_URL}/{route}/{path}"
-    # )
+
     parts = [WOPR_API_URL, route, path]
     url = "/".join(str(p).strip("/") for p in parts if p)
 
-    # Build request kwargs based on HTTP method
-    kwargs = {"timeout": timeout, "headers": headers}
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        if method in ["POST", "PUT", "PATCH"] and payload:
+            response = await client.request(method, url, json=payload, headers=headers)
+        else:
+            response = await client.request(
+                method, url, params=payload, headers=headers
+            )
 
-    if action.lower() in ["post", "put", "patch"] and payload:
-        kwargs["json"] = payload
-    elif action.lower() == "get" and payload:
-        # If payload exists for GET, treat as query params
-        kwargs["params"] = payload
-
-    response = method(url, **kwargs)
-    response.raise_for_status()
-    # for item in response:
-    #    result.append(item.json())
-    result = response.json()
-
-    return result
+        response.raise_for_status()
+        return response.json()
 
 
 @api_models.post("/model_status")
@@ -87,7 +76,7 @@ async def model_status(data: dict, request: Request):
     paths = request.app.state.paths
     try:
         logger.info(f"Retrieving model info for model ID: {model_id}")
-        model_info = do_api_things("get", WOPR_API_URL, "models", model_id, None)
+        model_info = await do_api_things("get", WOPR_API_URL, "models", model_id, None)
     except Exception as e:
         logit(f"Error retrieving model info: {e}")
         return False
