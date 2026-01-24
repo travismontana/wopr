@@ -10,7 +10,8 @@ from __future__ import annotations
 import streamlit as st
 
 from lib.helpers import init_session_defaults, clear_ui_cache
-from lib.model import render_models_editor, render_model_status
+
+from displays.ml_models_editor import render_models_editor
 
 
 def render_sidebar() -> None:
@@ -37,7 +38,7 @@ def main() -> None:
         page_title="WOPR Back of House",
         page_icon=":house:",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
     )
 
     init_session_defaults()
@@ -54,7 +55,7 @@ def main() -> None:
     # Models editor section
     st.subheader("Models")
     _results = render_models_editor()
-    _results = render_model_status()
+    # _results = render_model_status()
     # You can optionally show a summary when debug is on
     if st.session_state.get("debug", False):
         st.write("Operation results:", _results)

@@ -129,8 +129,12 @@ wopr-baseapp:
       - name: CELERY_RESULT_BACKEND
         value: "redis://wopr-api-valkey:6379/0"
 
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
 valkey:
-  enabled: true
+  enabled: false
   master:
     persistence:
       enabled: true
