@@ -15,7 +15,7 @@ logger.info("WOPR API - Pre Initialization Globals")
 # If not set, the app will exit during startup.
 
 DIRECTUS_HOST = os.getenv("DIRECTUS_HOST", "http://wopr-directus")
-ENVIRONMENT = os.getenv("WOPR_ENVIRONMENT", "development")
+ENVIRONMENT = os.getenv("WOPR_ENVIRONMENT", "production")
 
 if ENVIRONMENT != "production":
     DIRECTUS_HOST += f"-{ENVIRONMENT}"
