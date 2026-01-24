@@ -52,11 +52,11 @@ def do_api_things(action, base_url, route, path, payload):
     method = action_map[action.lower()]
 
     timeout = 30.0
-    base_url = f"{API_BASE}"
-    debugit_message(
-        f"API call: {action.upper()} {base_url}/api/{API_VERSION}/{route}/{path}"
+    #base_url = f"{API_BASE}"
+    #debugit_message(
+    #    f"API call: {action.upper()} {WOPR_API_URL}/{route}/{path}"
     )
-    parts = [base_url, "api", API_VERSION, route, path]
+    parts = [WOPR_API_URL, route, path]
     url = "/".join(str(p).strip("/") for p in parts if p)
 
     # Build request kwargs based on HTTP method
