@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wopr-api"
+version = "0.0.1"
+description = "WOPR API Service"
+authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
+dependencies = [
+    "fastapi
+    "httpx",
+    "wopr-core @ git+https://github.com/travismontana/wopr.git@main#subdirectory=pymods/wopr-core"
+]
+
+[project.optional-dependencies]
+dev = ["black", "pytest"]
