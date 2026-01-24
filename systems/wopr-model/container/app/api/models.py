@@ -129,7 +129,7 @@ async def model_status(data: dict, request: Request):
     }
     model_info.update(status_dict)
     results = await post("models", model_info)
-    logit("Model info updated", model_info)
+    logit("Model info updated", results)
     return model_info
 
 
