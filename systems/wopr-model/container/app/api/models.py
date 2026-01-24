@@ -36,6 +36,46 @@ woprclient = Client(base_url=WOPR_API_URL)
 api_models = APIRouter(tags=["models"])
 
 
+def do_api_things(action, base_url, route, path, payload):
+    headers = ""
+    result = []
+
+    action_map = {
+        "get": httpx.get,
+        "post": httpx.post,
+        "put": httpx.put,
+        "patch": httpx.patch,
+        "delete": httpx.delete,
+    }
+
+    method = action_map[action.lower()]
+
+    timeout = 30.0
+    base_url = f"{API_BASE}"
+    debugit_message(
+        f"API call: {action.upper()} {base_url}/api/{API_VERSION}/{route}/{path}"
+    )
+    parts = [base_url, "api", API_VERSION, route, path]
+    url = "/".join(str(p).strip("/") for p in parts if p)
+
+    # Build request kwargs based on HTTP method
+    kwargs = {"timeout": timeout, "headers": headers}
+
+    if action.lower() in ["post", "put", "patch"] and payload:
+        kwargs["json"] = payload
+    elif action.lower() == "get" and payload:
+        # If payload exists for GET, treat as query params
+        kwargs["params"] = payload
+
+    response = method(url, **kwargs)
+    response.raise_for_status()
+    # for item in response:
+    #    result.append(item.json())
+    result = response.json()
+
+    return result
+
+
 @api_models.post("/model_status")
 async def model_status(data: dict, request: Request):
     """Get the status of the model, via post"""
@@ -45,7 +85,7 @@ async def model_status(data: dict, request: Request):
     config = request.app.state.config
     paths = request.app.state.paths
     try:
-        model_info = get_one("models", model_id)
+        model_info = do_api_things("get", WOPR_API_URL, "models", model_id, None)
     except Exception as e:
         logit(f"Error retrieving model info: {e}")
         return False
