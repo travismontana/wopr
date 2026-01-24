@@ -11,13 +11,14 @@ from lib.helpers import (
     update_operations,
     logit,
     check_for_file_in_dir,
-    get_one,
-    get_all,
     download_file,
     copy_file_to_dist,
     copy_modfam_to_model,
     backup_dist_file,
 )
+
+from lib.database_client import get_one, get_all
+from lib import globals as woprvar
 
 from lib.safe_file import SafeFS
 
