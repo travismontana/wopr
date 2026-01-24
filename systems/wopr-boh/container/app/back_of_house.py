@@ -1,40 +1,64 @@
-import os
+"""
+WOPR Back of House - Main Page
+
+Streamlit main entry for Back of House UI.
+Currently focuses on WOPR ML Models admin.
+"""
+
+from __future__ import annotations
 
 import streamlit as st
 
-if "debug" not in st.session_state:
-    st.session_state["debug"] = False
+from lib.helpers import init_session_defaults, clear_ui_cache
+from lib.model import render_models_editor, render_model_status
 
-st.set_page_config(
-    page_title="WOPR Back of House", 
-    page_icon=":house:",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-st.title("WOPR Back of House")
-placeholder = st.empty()
 
-with placeholder.container():
-    st.markdown("System Loading...")
+def render_sidebar() -> None:
+    """
+    Render sidebar controls (settings, debug, cache).
+    """
+    with st.sidebar:
+        with st.expander("Settings"):
+            st.session_state["debug"] = st.toggle(
+                "Activate debugging",
+                value=st.session_state.get("debug", False),
+            )
 
-placeholder.empty()
+            if st.button("Clear Cache"):
+                clear_ui_cache()
+                st.toast("Cache cleared", icon="🧹")
 
-with st.sidebar:
-    with st.expander("Settings"):
-        # Debug toggle
-        debug_toggle = st.toggle("Activate debugging", value=st.session_state.debug)
-        st.session_state.debug = debug_toggle
-        debug = st.session_state.debug
-        # Cache control
-        if st.button("Clear Cache"):
-            st.cache_data.clear()
 
-dashboard = st.Page(
-    "displays/dashboard.py",
-    title="Dashboard",
-    icon=":material/dashboard:",
-    default=True,
-)
+def main() -> None:
+    """
+    Main Streamlit page renderer.
+    """
+    st.set_page_config(
+        page_title="WOPR Back of House",
+        page_icon=":house:",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
 
-pg = st.navigation([dashboard])
-pg.run()
+    init_session_defaults()
+
+    st.title("WOPR Back of House")
+
+    placeholder = st.empty()
+    with placeholder.container():
+        st.markdown("System Loading...")
+    placeholder.empty()
+
+    render_sidebar()
+
+    # Models editor section
+    st.subheader("Models")
+    _results = render_models_editor()
+    _results = render_model_status()
+    # You can optionally show a summary when debug is on
+    if st.session_state.get("debug", False):
+        st.write("Operation results:", _results)
+
+
+if __name__ == "__main__":
+    main()

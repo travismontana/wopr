@@ -46,8 +46,8 @@ async def get_health():
     return "healthy"
 
 
-@models_router.post("/status", response_model=ModelResponse)
-async def update_model_status(data: ModelUpdate):
+@models_router.post("/status")
+async def update_model_status(data: dict, request=Request):
     """Update the status of a model"""
     logger.info("Updating model status")
     logger.debug(f"Update data: {data}")
