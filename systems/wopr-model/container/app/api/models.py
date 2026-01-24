@@ -17,7 +17,7 @@ from lib.helpers import (
     backup_dist_file,
 )
 
-from lib.directus_client import get_one, get_all
+from lib.directus_client import get_one, get_all, post, update
 from lib import globals as woprvar
 
 from lib.safe_file import SafeFS
@@ -127,7 +127,8 @@ async def model_status(data: dict, request: Request):
         },
         "filename": model_filename,
     }
-
+    model_info.update(status_dict)
+    await update("models", model_id, model_info)
     return model_info
 
 
