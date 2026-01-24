@@ -52,10 +52,10 @@ def do_api_things(action, base_url, route, path, payload):
     method = action_map[action.lower()]
 
     timeout = 30.0
-    #base_url = f"{API_BASE}"
-    #debugit_message(
+    # base_url = f"{API_BASE}"
+    # debugit_message(
     #    f"API call: {action.upper()} {WOPR_API_URL}/{route}/{path}"
-    )
+    # )
     parts = [WOPR_API_URL, route, path]
     url = "/".join(str(p).strip("/") for p in parts if p)
 
