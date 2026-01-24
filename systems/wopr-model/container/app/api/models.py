@@ -37,15 +37,15 @@ api_models = APIRouter(tags=["models"])
 
 
 @api_models.post("/model_status")
-async def model_status(data, request: Request):
+async def model_status(data: dict, request: Request):
     """Get the status of the model, via post"""
     logger.info("Model status update received")
     logger.debug("Data: %s", data)
-
+    model_id = data.get("model_id")
     config = request.app.state.config
     paths = request.app.state.paths
     try:
-        model_name = data.name
+        model_name = data.get("name")
     except Exception as e:
         logger.error("Error retrieving model name: %s", e)
         logger.info("Existing due to data not having a name")
