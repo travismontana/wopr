@@ -38,7 +38,7 @@ api_models = APIRouter(tags=["models"])
 
 
 def do_api_things(action, base_url, route, path, payload):
-    headers = ""
+    headers = {"Content-Type": "application/json"}
     result = []
 
     action_map = {
