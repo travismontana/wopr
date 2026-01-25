@@ -51,7 +51,7 @@ else:
     if not st.session_state.get("game_session_uuid"):
         game_session_uuid = create_game_session()
         debug_log(f"Created game session UUID: {game_session_uuid}")
-        if games_session_uuid == "unknown-uuid":
+        if game_session_uuid == "unknown-uuid":
             st.error("Failed to create game session. Please try again.")
 
         else:
@@ -67,6 +67,7 @@ else:
         st.write(f"Number of Players: {len(players_dict)}")
         st.write("Player Details:")
         st.dataframe(players_dict)
+        st.write(f"Game Session UUID: {game_session_uuid}")
         st.divider()
         if st.button(f"Start of round {round_number}"):
             results = capture_move(

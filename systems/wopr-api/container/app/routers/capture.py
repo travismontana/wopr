@@ -15,8 +15,8 @@ router = APIRouter(
 async def create_capture(payload: dict):
     """Create new Capture."""
     logger.info("Creating new Capture")
-    host = woprvar.WOPRCONFIG["camera"]["camDict"][0]["host"]
-    port = woprvar.WOPRCONFIG["camera"]["camDict"][0]["port"]
+    host = woprvar.WOPR_CONFIG["camera"]["camDict"][0]["host"]
+    port = woprvar.WOPR_CONFIG["camera"]["camDict"][0]["port"]
     action = "post"
     base_url = f"http://{host}:{port}"
     path = "/api/v1"

@@ -11,8 +11,9 @@ def create_game_session() -> str:
     debug_log(f"Creating game session")
     # Call the API to create a new game session
     response = api_new_game_session()
+    debug_log("API response for new game session:")
     debug_log(response)
-    return response.get("game_session_uuid", "unknown-uuid")
+    return response.get("uuid", "unknown-uuid")
 
 
 def capture_move(player_name: str, move: str, game_session_uuid: str):
