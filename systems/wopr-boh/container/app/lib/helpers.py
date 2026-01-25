@@ -1,7 +1,6 @@
 import os
 import streamlit as st
 
-
 def init_session_defaults() -> None:
     """
     Initialize default session state variables.
@@ -45,3 +44,33 @@ def debug_json(message: dict) -> None:
     """
     if st.session_state.get("debug", False):
         st.json(message, expanded=False)
+
+
+def render_sidebar() -> None:
+    """
+    Render sidebar controls (settings, debug, cache).
+    """
+    with st.sidebar:
+        with st.expander("Settings"):
+            st.session_state["debug"] = st.toggle(
+                "Activate debugging",
+                value=st.session_state.get("debug", False),
+            )
+
+            if st.button("Clear Cache"):
+                clear_ui_cache()
+                st.toast("Cache cleared", icon="🧹")
+            system_controls()
+
+
+def system_controls():
+    if st.button("Clear UI Cache"):
+        st.session_state.clear()
+        init_session_defaults()
+        st.toast("UI cache cleared", icon="🧹")
+    if st.button("Reload Models from API"):
+        models = api_get_models()
+        st.session_state["models"] = models
+        st.toast("Models reloaded from API", icon="🔄")
+    if st.button("Refresh page"):
+        st.rerun()
