@@ -6,7 +6,8 @@ from fastapi import FastAPI
 from routers import config as config_router
 from routers import ml_models as ml_model_router
 from routers import ml_model_families as ml_model_family_router
-
+from routers import capture as capture_router
+from routers import game_sessions as game_sessions_router
 
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
 
@@ -30,6 +31,15 @@ api.include_router(
     prefix=f"{API_PREFIX}/ml_model_families",
     tags=["ml_model_families"],
 )
+api.include_router(
+    capture_router.router, prefix=f"{API_PREFIX}/capture", tags=["capture"]
+)
+api.include_router(
+    game_sessions_router.router,
+    prefix=f"{API_PREFIX}/game_sessions",
+    tags=["game_sessions"],
+)
+
 
 if config:
     api.state.config = config

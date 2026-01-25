@@ -34,7 +34,7 @@ def debug_log(message: str) -> None:
     """
     Log a debug message if debugging is enabled in session state.
     """
-    if st.session_state.get("debug", False):
+    if st.session_state.get("debug", True):
         st.write(f"DEBUG: {message}")
 
 
@@ -50,6 +50,8 @@ def render_sidebar() -> None:
     """
     Render sidebar controls (settings, debug, cache).
     """
+    if "api_host" not in st.session_state:
+        init_session_defaults()
     with st.sidebar:
         with st.expander("Settings"):
             st.session_state["debug"] = st.toggle(

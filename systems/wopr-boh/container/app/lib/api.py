@@ -2,6 +2,7 @@ import httpx
 
 import streamlit as st
 
+
 def get_api_client(base_url: str) -> httpx.Client:
     """
     Create and return an HTTPX client configured for the API.
@@ -193,7 +194,7 @@ def api_activate_model(model_id: int) -> dict:
         return handle_api_error(e)
 
 
-def api_new_game_session(note: str) -> dict:
+def api_new_game_session() -> dict:
     """
     Create a new game session via the API.
 
@@ -204,7 +205,7 @@ def api_new_game_session(note: str) -> dict:
     """
     client = get_api_client(st.session_state["api_host"])
     try:
-        response = client.post("/api/v3/game_sessions", json={"note": note})
+        response = client.post("/api/v3/game_sessions", json={})
         return parse_api_response(response)
     except httpx.HTTPError as e:
         return handle_api_error(e)
