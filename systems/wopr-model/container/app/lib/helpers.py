@@ -208,7 +208,7 @@ def get_config():
     Returns:
         _type_: _description_
     """
-    url = f"{API_BASE}/api/v2/config/all"
+    url = f"{API_BASE}/api/v3/config"
     try:
         response = httpx.get(url, timeout=10.0)
         response.raise_for_status()
@@ -216,7 +216,7 @@ def get_config():
         return response.json()
     except httpx.HTTPError as e:
         log.error(f"Failed to confg: {e}")
-        return False
+        return {}
 
 #################################
 #
