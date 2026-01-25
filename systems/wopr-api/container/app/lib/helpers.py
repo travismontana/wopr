@@ -64,8 +64,13 @@ def do_api_things(action, base_url, route, path, payload):
     elif action.lower() == "get" and payload:
         # If payload exists for GET, treat as query params
         kwargs["params"] = payload
-
-    response = method(url, **kwargs)
+    try: :
+        logger.info(f"Making {action.upper()} request to {url} with kwargs: {kwargs}")
+        response = method(url, **kwargs)
+    except httpx.ConnectTimeout:
+        logger.error(f"Connection to {url} timed out.")
+        return {}
+        raise
     response.raise_for_status()
     # for item in response:
     #    result.append(item.json())
