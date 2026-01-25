@@ -57,7 +57,7 @@ def do_api_things(action, base_url, route, path, payload):
     logger.info(f"Constructed URL: {url}")
 
     # Build request kwargs based on HTTP method
-    kwargs = {"timeout": timeout, "headers": headers}
+    kwargs = {"timeout": 10.0, "headers": headers}
 
     if action.lower() in ["post", "put", "patch"] and payload:
         kwargs["json"] = payload
