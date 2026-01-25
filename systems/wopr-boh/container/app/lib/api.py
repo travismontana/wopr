@@ -174,3 +174,20 @@ def api_get_model_family_by_id(family_id: str) -> dict:
     except httpx.HTTPError as e:
         return handle_api_error(e)
     return parse_api_response(response)
+
+
+def api_activate_model(model_id: int) -> dict:
+    """
+    Fetch the list of ML model families from the API.
+
+    Args:
+        client (httpx.Client): The HTTPX client configured for the API.
+    Returns:
+        dict: API response containing the list of model families.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.get(f"/api/v3/ml_models/activate/{model_id}")
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)

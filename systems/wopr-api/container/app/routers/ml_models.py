@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from lib import globals as worpvar
+from lib import globals as woprvar
 from lib.helpers import setup_logging, do_api_things
 from lib.directus_client import get_one, get_all, post, update, delete
 

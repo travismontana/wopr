@@ -9,6 +9,7 @@ from lib.api import (
     api_get_model_families,
     api_create_model,
     api_update_model,
+    api_activate_model,
 )
 
 
@@ -31,6 +32,9 @@ def render_models_controls():
         with c2:
             if st.button("Prep files", key=f"prep_{model['id']}"):
                 debug_log(f"Preparing files for model {model['id']}")
+                st.toast(
+                    "Preparing model files. This may take a few moments...", icon="⏳"
+                )
                 results = api_prep_model_files(model['id'])
                 debug_json(results)
         with c3:
@@ -42,3 +46,12 @@ def render_models_controls():
             if st.button("snow", key=f"snow_{model['id']}"):
                 st.snow()
         st.divider()
+
+
+def api_prep_model_files(model_id: str):
+    """
+    Call the API to prepare model files.
+    """
+    # Placeholder for actual API call
+    debug_log(f"API call to prepare files for model {model_id}")
+    return api_activate_model(model_id)
