@@ -10,7 +10,8 @@ router = APIRouter(
     tags=["capture"],
 )
 
-@router.post("", response_model=dict):
+
+@router.post("", response_model=dict)
 async def create_capture(payload: dict):
     """Create new Capture."""
     logger.info("Creating new Capture")
