@@ -69,7 +69,7 @@ def do_api_things(action, base_url, route, path, payload):
         response = method(url, **kwargs)
     except httpx.ConnectTimeout:
         logger.error(f"Connection to {url} timed out.")
-        return {}
+        return {"status": "timeout"}
         raise
     response.raise_for_status()
     # for item in response:
