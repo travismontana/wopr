@@ -36,7 +36,7 @@ async def delete_ml_model(model_id: str):
 
 
 @router.get("/activate/{model_id}", response_model=dict)
-async def activate_ml_model(model_id: str):
+def activate_ml_model(model_id: str):
     """Activate ML Model."""
     logger.info(f"Activating ML Model {model_id}")
     models_url = woprvar.WOPR_CONFIG["api"]["models_url"]
