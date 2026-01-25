@@ -10,8 +10,6 @@ from lib.helpers import (
     setup_logger
 )
 
-from lib.wopr_api_client import Client
-
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
 woprclient = Client(base_url=WOPR_API_URL)
 

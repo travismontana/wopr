@@ -11,7 +11,6 @@ from datetime import datetime
 from pathlib import Path
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
-client = Client(base_url=API_BASE)
 
 
 # Flavor text for play submissions
