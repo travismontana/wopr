@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from lib import globals as worpvar
-from lib.helpers import setup_logging
+from lib.helpers import setup_logging, do_api_things
 from lib.directus_client import get_one, get_all, post, update, delete
 
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
@@ -39,10 +39,6 @@ async def delete_ml_model(model_id: str):
 async def activate_ml_model(model_id: str):
     """Activate ML Model."""
     logger.info(f"Activating ML Model {model_id}")
-    
-        """Activate a model"""
-    logger.info("Activating model")
-    logger.debug(f"Activation data: {model_id}")
     models_url = woprvar.WOPR_CONFIG["api"]["models_url"]
     mod_id = model_id
     action = "post"
@@ -51,6 +47,6 @@ async def activate_ml_model(model_id: str):
     path = "activate"
     payload = {"model_id": mod_id}
     results = do_api_things(action, base_url, route, path, payload)
-    
+
     payload = {"status": "active"}
     return update("models", model_id, results)
