@@ -11,7 +11,6 @@ from lib.helpers import (
 )
 
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
-woprclient = Client(base_url=WOPR_API_URL)
 
 from api import models
 
