@@ -34,3 +34,23 @@ async def delete_ml_model(model_id: str):
     logger.info(f"Deleting ML Model {model_id}")
     return delete("models", model_id)
 
+
+@router.get("/activate/{model_id}", response_model=dict)
+async def activate_ml_model(model_id: str):
+    """Activate ML Model."""
+    logger.info(f"Activating ML Model {model_id}")
+    
+        """Activate a model"""
+    logger.info("Activating model")
+    logger.debug(f"Activation data: {model_id}")
+    models_url = woprvar.WOPR_CONFIG["api"]["models_url"]
+    mod_id = model_id
+    action = "post"
+    base_url = models_url
+    route = "/api/v2/models"
+    path = "activate"
+    payload = {"model_id": mod_id}
+    results = do_api_things(action, base_url, route, path, payload)
+    
+    payload = {"status": "active"}
+    return update("models", model_id, results)
