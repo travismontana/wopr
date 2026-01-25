@@ -22,18 +22,9 @@ from lib import globals as woprvar
 
 from lib.safe_file import SafeFS
 
-from lib.wopr_api_client import Client
-from lib.wopr_api_client.models.model_update import ModelUpdate
-from lib.wopr_api_client.api.models import (
-    update_item_api_v2_models_item_id_patch,
-)
-from lib.wopr_api_client.types import Response
-
-
 logger = setup_logger()
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
 
-woprclient = Client(base_url=WOPR_API_URL)
 
 api_models = APIRouter(tags=["models"])
 
