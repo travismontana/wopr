@@ -35,7 +35,12 @@ def render_models_controls():
                 st.toast(
                     "Preparing model files. This may take a few moments...", icon="⏳"
                 )
-                results = api_prep_model_files(model['id'])
+                try:
+                    results = api_prep_model_files(model["id"])
+                    if results == {}:
+                        st.error("Failed to prepare model files.")
+                except Exception as e:
+                    debug_log(f"Error preparing files for model {model['id']}: {e}")
                 debug_json(results)
         with c3:
             if st.button("Backup model", key=f"backup_{model['id']}"):
@@ -54,4 +59,10 @@ def api_prep_model_files(model_id: str):
     """
     # Placeholder for actual API call
     debug_log(f"API call to prepare files for model {model_id}")
-    return api_activate_model(model_id)
+    try:
+        results = api_activate_model(model_id)
+    except Exception as e:
+        debug_log(f"Error activating model {model_id}: {e}")
+        results = {}
+        return {"status": "error", "message": str(e)}
+    return results

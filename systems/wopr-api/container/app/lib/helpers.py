@@ -1,4 +1,5 @@
 import logging
+import httpx
 
 def setup_logging(name: str, level: str, file_path: str) -> logging.Logger:
     logger = logging.getLogger(name)
