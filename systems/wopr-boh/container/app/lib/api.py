@@ -191,3 +191,42 @@ def api_activate_model(model_id: int) -> dict:
         return parse_api_response(response)
     except httpx.HTTPError as e:
         return handle_api_error(e)
+
+
+def api_new_game_session(note: str) -> dict:
+    """
+    Create a new game session via the API.
+
+    Args:
+        note (str): The note for the new game session.
+    Returns:
+        dict: API response containing the created game session details.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.post("/api/v3/game_sessions", json={"note": note})
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
+
+
+def api_capture_move(filename: str) -> dict:
+    """
+    Capture a player's move in a game session via the API.
+
+    Args:
+        session_id (str): The ID of the game session.
+        player_name (str): The name of the player making the move.
+        move (str): The move made by the player.
+    Returns:
+        dict: API response confirming the captured move.
+    """
+    client = get_api_client(st.session_state["api_host"])
+    try:
+        response = client.post(
+            f"/api/v3/capture",
+            json={"filename": filename},
+        )
+        return parse_api_response(response)
+    except httpx.HTTPError as e:
+        return handle_api_error(e)
