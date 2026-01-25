@@ -64,7 +64,7 @@ def do_api_things(action, base_url, route, path, payload):
     elif action.lower() == "get" and payload:
         # If payload exists for GET, treat as query params
         kwargs["params"] = payload
-    try: :
+    try:
         logger.info(f"Making {action.upper()} request to {url} with kwargs: {kwargs}")
         response = method(url, **kwargs)
     except httpx.ConnectTimeout:
