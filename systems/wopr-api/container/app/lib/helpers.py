@@ -10,7 +10,7 @@ def setup_logging(name: str, level: str, file_path: str) -> logging.Logger:
     fh.setLevel(getattr(logging, level.upper(), logging.INFO))
 
     # Create console handler
-    ch = logging.StreamHandler()
+    ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(getattr(logging, level.upper(), logging.INFO))
 
     # Create formatter and add it to the handlers
