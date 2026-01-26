@@ -1,0 +1,48 @@
+# Copyright 2026 Bob Bomar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+wopr-baseapp:
+  app:
+    name: wopr-boh
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-boh
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8501
+
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: boh.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-boh-tls
+        hosts:
+          - boh.wopr.tailandtraillabs.org
+  
+  env:
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
