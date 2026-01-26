@@ -48,12 +48,13 @@ def setup_logger() -> logging.Logger:
     Note:
         Only configures once - subsequent calls return existing logger
     """
+    file_path = "/tmp/wopr.log"
     logger = logging.getLogger(LOGGER_NAME)
     if logger.handlers:
         return logger  # Already configured
 
     logger.setLevel(logging.DEBUG)
-
+    logging.FileHandler(file_path)
     handler = logging.StreamHandler(sys.stdout)
     fmt = logging.Formatter(
         fmt="%(asctime)s %(levelname)s %(name)s - %(message)s",
