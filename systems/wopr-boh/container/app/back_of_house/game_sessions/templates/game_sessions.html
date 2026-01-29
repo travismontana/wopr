@@ -1,11 +1,30 @@
 {% extends "base.html" %}
 
 {% block main_subheader %}
-
-<h1>Game Sessions</h1>
-
+<p>Game Sessions</p>
 {% endblock %}
 
 {% block content %}
-Content
-{% endblock %}
+{% if game_sessions %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Shortname</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game_session in game_sessions %}
+        <tr>
+            <td>{{ game_session.id }}</td>
+            <td>{{ game_session.name }}</td>
+            <td>{{ game_session.shortname }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else%}
+<p>No game sessions available.</p>
+{% endif %}
+{% endblock %}  

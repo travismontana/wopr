@@ -1,12 +1,30 @@
 {% extends "base.html" %}
 
 {% block main_subheader %}
-
-<h1>Training</h1>
-
+<p>Training</p>
 {% endblock %}
 
 {% block content %}
-content
-{}
-{% endblock %}
+{% if trainings %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Shortname</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for training in trainings %}
+        <tr>
+            <td>{{ training.id }}</td>
+            <td>{{ training.name }}</td>
+            <td>{{ training.shortname }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else%}
+<p>No trainings available.</p>
+{% endif %}
+{% endblock %}  

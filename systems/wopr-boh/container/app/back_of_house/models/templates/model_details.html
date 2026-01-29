@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<p>Models - <a href="{% url 'model_add'%}">Add New Model</a> - <a href="{% url 'model_family_add' %}">Add New Model Family</a></p>
+{% endblock %}
+
+{% block content %}
+
+    {% if model %}
+        <div class="main-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Shortname</th>
+                        <th>Description</th>
+                        <th>Note</th>
+                        <th>Created at</th>
+                        <th>Updated at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ model.id }}</td>
+                        <td>{{ model.name }}</td>
+                        <td>{{ model.shortname }}</td>
+                        <td>{{ model.description|default:"—" }}</td>
+                        <td>{{ model.note|default:"—" }}</td>
+                        <td>{{ model.created_at|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ model.updated_at|date:"Y-m-d H:i:s" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if model_status %}
+{{ model_status }}
+{% else %}
+<p>Run check status</p>
+{% endif %}
+{% endblock %}

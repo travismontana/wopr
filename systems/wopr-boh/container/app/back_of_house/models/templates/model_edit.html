@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<p>Models - <a href="{% url 'model_add'%}">Add New Model</a> - <a href="{% url 'model_family_add' %}">Add New Model Family</a></p>
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+    <h2>Edit Training Model</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="error">
+            <strong>Errors detected:</strong>
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">Save Model</button>
+            <a href="/models/" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

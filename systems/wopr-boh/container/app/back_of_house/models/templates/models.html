@@ -1,11 +1,66 @@
 {% extends "base.html" %}
 
 {% block main_subheader %}
-
-<h1>Models</h1>
-
+<p>Models - <a href="{% url 'model_add'%}">Add New Model</a> - <a href="{% url 'model_family_add' %}">Add New Model Family</a></p>
 {% endblock %}
 
 {% block content %}
-Content
-{% endblock %}  
+<p>Models List:</p>
+{% if models %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Shortname</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for model in models %}
+        <tr>
+            <td>{{ model.id }}</td>
+            <td>{{ model.name }}</td>
+            <td>{{ model.shortname }}</td>
+                    <td><a href="{% url 'model_details' id=model.id %}">Details</a> |
+                        <a href="{% url 'model_edit' id=model.id %}">Edit</a> | 
+                        <a href="{% url 'model_delete' id=model.id %}">Delete</a></td>
+                </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr>
+
+
+{% else%}
+<p>No models available.</p>
+{% endif %}
+<p>Model Families List:</p>
+{% if model_families %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Shortname</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for model_family in model_families %}
+        <tr>
+            <td>{{ model_family.id }}</td>
+            <td>{{ model_family.name }}</td>
+            <td>{{ model_family.shortname }}</td>
+            <td><a href="{% url 'model_family_details' id=model_family.id %}">Details</a> |
+                <a href="{% url 'model_family_edit' id=model_family.id %}">Edit</a> | 
+                <a href="{% url 'model_family_delete' id=model_family.id %}">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No model families available.</p>
+{% endif %}
+
+{% endblock %}

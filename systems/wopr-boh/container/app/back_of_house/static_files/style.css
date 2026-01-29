@@ -1,8 +1,8 @@
 .container {  
   display: grid;
-  height: 100vh;              /* or min-height: 100vh */
+  min-height: 100vh;               /*or min-height: 100vh */
   grid-template-columns: 280px 1fr;       /* fixed left, flexible main */
-  grid-template-rows: 80px auto 40px;      /* header/footer hug content, middle grows */
+  grid-template-rows: 80px auto .2fr;      /* header/footer hug content, middle grows */
   gap: 2px;
   background: gray;
 
@@ -50,11 +50,93 @@ border: 1px solid black;}
 .left_column_main { grid-area: left_column_main; 
 border: 1px solid black;}
 
-.left_column_subheader { grid-area: left_column_subheader; 
-border: 1px solid black;}
+.left_column_subheader { 
+  grid-area: left_column_subheader; 
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  }
 
 .main_footer { grid-area: main_footer; 
 border: 1px solid black;}
 
 .funky_box { grid-area: funky_box; 
 border: 1px solid black;}
+
+table {
+  table-layout: fixed;
+  width: 90%;
+  margin: 10px auto;
+  border-collapse: collapse;
+  text-align: left;
+  border-top: 1px solid #999999;
+  border-bottom: 1px solid #999999;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #eeeeee;
+}
+
+tfoot {
+  border-top: 1px solid #999999;
+}
+
+/* ---------- Input ------------ */
+
+
+
+/* ---------- Form Layout ------------ */
+.form-group {
+  margin: 15px 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-group label {
+  width: 150px;
+  text-align: right;
+  padding-right: 15px;
+  padding-top: 5px;
+  flex-shrink: 0;
+}
+
+.form-group input[type=text],
+.form-group textarea {
+  flex: 1;
+  max-width: 500px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.form-group input[type=text]:focus,
+.form-group textarea:focus {
+  background-color: lightblue;
+  outline: none;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* ---------- Buttons ------------ */
+.form-actions {
+  margin: 20px 0 20px 165px; /* Align with inputs */
+}
+
+button[type=submit],
+button[type=button] {
+  background-color: #00170e;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  margin: 0 5px 0 0;
+  cursor: pointer;
+}
+
+button[type=submit]:hover,
+button[type=button]:hover {
+  background-color: #003d26;
+}
