@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-d-mku7ye=8i3nigjh$a474lr1huy#^1=1sq85(8m3^=i+blsd3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["bob.geocities.com", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -54,7 +54,12 @@ ROOT_URLCONF = "back_of_house.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "templates",
+            BASE_DIR / "models/templates",
+            BASE_DIR / "game_sessions/templates",
+            BASE_DIR / "training/templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -116,6 +121,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATICFILES_DIRS = [BASE_DIR / "static_files", BASE_DIR / "images"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
