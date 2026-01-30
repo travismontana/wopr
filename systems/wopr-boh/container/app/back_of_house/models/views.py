@@ -31,8 +31,11 @@ def model_index(request):
 
 def model_details(request, id):
     model = get_object_or_404(ModelInfo, pk=id)
+    model_cur_version = (
+        ModelVersion.objects.filter(model=model).order_by("-created_at").first()
+    )
     model_status = (
-        ModelStatus.objects.filter(model_version__model=model)
+        ModelStatus.objects.filter(model_version=model_cur_version)
         .order_by("-observed_at")
         .first()
     )  # Returns None if not found

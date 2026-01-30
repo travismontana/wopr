@@ -35,9 +35,35 @@
         </div>
     {% endif %}
 
-    {% if model_status %}
-{{ model_status }}
-{% else %}
-<p>Run check status</p>
-{% endif %}
+<h4>Status</h4>
+<div class="status-table">
+    <table>
+        <thead>
+            <tr>
+                <th title="Meaning, is it ready to be trained, not is this the one we use currently.">Active 22</th>
+                <th title="">Backups</th>
+                <th title="The name of the file itself">Filename</th>
+                <th title="The files current checksum">Checksum</th>
+                <th title="Checks if the file is present in distfiles">Distfile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ model_status.active|yesno:"Yes,No,Unknown" }}</td>
+                <td>{{ model_status.backups|yesno:"Yes,No,Unknown" }}</td>
+                <td>{{ model_status.filename|default:"—" }}</td>
+                <td>{{ model_status.checksum|default:"—" }}</td>
+                <td>{% if model_status.distfile %}{{ model_status.distfile }}{% else %}<button class="action_button" type="submit" name="make_distfile" value="{{ model.id }}">Make Distfile</button>{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4>Version</h4>
+<div class="version_table">
+    <table>
+        <thead>
+            <tr>
+                <th>
+
 {% endblock %}

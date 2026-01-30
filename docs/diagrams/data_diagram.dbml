@@ -1,0 +1,99 @@
+Table model_families {
+  id integer [pk, increment]
+  uuid uuid [unique, not null]
+  name varchar(255) [unique, not null]
+  shortname varchar(32) [unique, not null]
+  description text
+  note text
+  url varchar(200)
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    name
+    shortname
+    created_at
+    updated_at
+  }
+}
+
+Table model_info {
+  id integer [pk, increment]
+  uuid uuid [unique, not null]
+  name varchar(255) [unique, not null]
+  shortname varchar(32) [unique, not null]
+  description text
+  note text
+  family_id integer [ref: > model_families.id, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    name
+    shortname
+    created_at
+    updated_at
+  }
+}
+
+Table model_version {
+  id integer [pk, increment]
+  uuid uuid [unique, not null]
+  version integer [not null]
+  artifact_uri varchar(1024) [unique, not null]
+  checksum varchar(128)
+  description text
+  note text
+  trained_at timestamp
+  is_current boolean [not null, default: false]
+  model_id integer [ref: > model_info.id, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    version
+    is_current
+    created_at
+    updated_at
+  }
+}
+
+Table model_status {
+  id integer [pk, increment]
+  uuid uuid [unique, not null]
+  observed_at timestamp [not null]
+  has_distfile boolean [not null, default: false]
+  has_backup boolean [not null, default: false]
+  model_version_id integer [ref: > model_version.id, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    observed_at
+    created_at
+    updated_at
+  }
+}
+
+Table model_backup {
+  id integer [pk, increment]
+  uuid uuid [unique, not null]
+  taken_at timestamp [not null]
+  was_successful boolean [not null, default: false]
+  artifact_uri varchar(1024) [unique, not null]
+  model_version_id integer [ref: > model_version.id, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    taken_at
+    was_successful
+    created_at
+    updated_at
+  }
+}
