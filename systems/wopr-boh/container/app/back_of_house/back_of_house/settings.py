@@ -187,3 +187,8 @@ else:
             "10.43.0.0/16",  # k3s service network (if needed)
         ],
     )
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://boh.wopr.tailandtraillabs.org",
+    "https://bob.geocities.com",
+]
