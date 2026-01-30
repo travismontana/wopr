@@ -8,14 +8,15 @@ version = "0.1.5-beta"
 description = "WOPR - Back of House"
 authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
 dependencies = [
-  "streamlit",
-  "pandas",
-  "httpx",
-  "wopr-core @ git+https://github.com/travismontana/wopr.git@main#subdirectory=pymods/wopr-core"
+  "django",
+  "gunicorn",
+  "psycopg2-binary"
 ]
 
 [project.optional-dependencies]
-dev = ["black", "pytest"]
-
-[project.scripts]
-your-cli = "your_package.cli:main"
+dev = ["black",
+  "django-stubs",
+  "ipdb",
+  "pip-tools",
+  "ruff",
+  "pytest"]

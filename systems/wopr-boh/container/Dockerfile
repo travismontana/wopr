@@ -2,35 +2,35 @@
 
 FROM python:3.14-slim
 
-# Avoid .pyc, keep logs unbuffered
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
+    PIP_NO_CACHE_DIR=1 
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    netcat-openbsd \
+    libpq-dev \
+    git \
+    && pip install --upgrade pip setuptools wheel \
+    && apt clean \
+    && apt autoclean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 2222 wopr
 
 WORKDIR /app
 
-# System deps (keep minimal). Add build tools ONLY if you hit wheels/build issues.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      curl \
-      git \
-      netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies as root
+COPY requirements.txt pyproject.toml ./
+RUN pip install -r requirements.txt && pip install -e .
 
-# Install python deps first for better layer caching
-COPY requirements.txt .
-COPY pyproject.toml .
-RUN python -m pip install --upgrade pip \
- && pip install -e . && pip install -r requirements.txt
+# Copy app code to /app (back_of_house/ will be at /app/back_of_house/)
+COPY --chown=wopr:wopr app/ ./
 
-# Copy the rest of the app
-COPY app/ ./app/
+# Switch to non-root user
+USER wopr
 
 EXPOSE 8000
 
-# Optional: basic container healthcheck (assumes Streamlit is responding)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:8000/ || exit 1
-# Run Streamlit
-
-CMD ["gunicorn", "app:boh", "--host", "0.0.0.0", "--port", "8000"]
+# Module path: back_of_house.wsgi (because /app is in PYTHONPATH)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "back_of_house.wsgi:application"]
