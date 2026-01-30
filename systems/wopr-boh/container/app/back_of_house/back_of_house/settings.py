@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+from ipaddress import ip_address, ip_network
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +26,7 @@ SECRET_KEY = "django-insecure-d-mku7ye=8i3nigjh$a474lr1huy#^1=1sq85(8m3^=i+blsd3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["bob.geocities.com", "localhost", "127.0.0.1", "10.42.0.242"]
+# ALLOWED_HOSTS = ["bob.geocities.com", "localhost", "127.0.0.1", "10.42.0.242"]
 
 
 # Application definition
@@ -137,3 +138,52 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 WHITENOISE_COMPRESSION = True
 WHITENOISE_MAX_AGE = 31536000 if not DEBUG else 0
+
+
+class CIDRAwareAllowedHosts(list):
+    """ALLOWED_HOSTS that supports CIDR notation"""
+
+    def __init__(self, hosts, cidrs=None):
+        super().__init__(hosts)
+        self.cidrs = [ip_network(cidr) for cidr in (cidrs or [])]
+
+    def __contains__(self, host):
+        # Check standard host list first
+        if super().__contains__(host) or super().__contains__("*"):
+            return True
+
+        # Strip port if present
+        host_only = host.split(":")[0]
+
+        # Check CIDR ranges
+        try:
+            host_ip = ip_address(host_only)
+            for network in self.cidrs:
+                if host_ip in network:
+                    return True
+        except ValueError:
+            # Not an IP address, doesn't match CIDR
+            pass
+
+        return False
+
+
+# Configuration
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = CIDRAwareAllowedHosts(
+        hosts=[
+            "bob.geocities.com",
+            "localhost",
+            "127.0.0.1",
+            "boh.wopr.tailandtraillabs.org",
+            ".svc.cluster.local",  # k8s service mesh
+        ],
+        cidrs=[
+            "10.42.0.0/16",  # k3s pod network
+            "10.43.0.0/16",  # k3s service network (if needed)
+        ],
+    )
