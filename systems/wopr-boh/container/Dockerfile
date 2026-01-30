@@ -26,7 +26,7 @@ RUN pip install -r requirements.txt && pip install -e .
 
 # Copy app code to /app (back_of_house/ will be at /app/back_of_house/)
 COPY --chown=wopr:wopr app/back_of_house/ ./
-COPY --chown=wopr:wopr app/back_of_house/entrypoint.sh /app/entrypoint.sh
+COPY --chown=wopr:wopr app/back_of_house/back_of_house/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 # Switch to non-root user
 USER wopr
