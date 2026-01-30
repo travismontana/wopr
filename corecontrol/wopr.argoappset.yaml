@@ -23,10 +23,6 @@ spec:
             path: systems/wopr-cnpg/helm
             namespace: wopr
             wave: "1"
-          - name: wopr-config-db
-            path: systems/wopr-config-db/helm
-            namespace: wopr
-            wave: "2"
           - name: wopr-api
             path: systems/wopr-api/helm
             namespace: wopr
@@ -41,10 +37,6 @@ spec:
             wave: "3"
           - name: wopr-imgproxy
             path: systems/wopr-imgproxy/helm
-            namespace: wopr
-            wave: "3"
-          - name: wopr-directus
-            path: systems/wopr-directus/helm
             namespace: wopr
             wave: "3"
           - name: wopr-luigi
