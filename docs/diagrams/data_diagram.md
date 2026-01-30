@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     model_families ||--o{ model_info : "has"
     model_info ||--o{ model_version : "has"
@@ -64,3 +65,4 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
+```
