@@ -140,3 +140,26 @@ button[type=submit]:hover,
 button[type=button]:hover {
   background-color: #003d26;
 }
+
+.scroll-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.scroll-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.scroll-table tbody {
+  display: block;
+  max-height: calc(10 * 2.2rem); /* ~10 rows */
+  overflow-y: auto;
+}
+
+.scroll-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
