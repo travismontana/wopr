@@ -169,7 +169,7 @@ class CIDRAwareAllowedHosts(list):
 
 
 # Configuration
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
