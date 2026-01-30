@@ -81,9 +81,9 @@ wopr-baseapp:
         hosts:
           - boh.wopr.tailandtraillabs.org
   readinessProbe:
-    enabled: true
+    enabled: false
   livenessProbe:
-    enabled: true
+    enabled: false
   env:
     - name: WOPR_API_URL
       valueFrom:
