@@ -10,7 +10,8 @@ authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
 dependencies = [
   "django",
   "gunicorn",
-  "psycopg2-binary"
+  "psycopg2-binary",
+  "whitenoise",
 ]
 
 [project.optional-dependencies]

@@ -25,7 +25,7 @@ COPY requirements.txt pyproject.toml ./
 RUN pip install -r requirements.txt && pip install -e .
 
 # Copy app code to /app (back_of_house/ will be at /app/back_of_house/)
-COPY --chown=wopr:wopr app/ ./
+COPY --chown=wopr:wopr app/back_of_house/ ./
 
 # Switch to non-root user
 USER wopr
@@ -33,4 +33,5 @@ USER wopr
 EXPOSE 8000
 
 # Module path: back_of_house.wsgi (because /app is in PYTHONPATH)
+CMD ["python", "manage.py", "collectstatic", "--noinput"]
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "back_of_house.wsgi:application"]
