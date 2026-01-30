@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-d-mku7ye=8i3nigjh$a474lr1huy#^1=1sq85(8m3^=i+blsd3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["bob.geocities.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["bob.geocities.com", "localhost", "127.0.0.1", "10.42.0.242"]
 
 
 # Application definition
