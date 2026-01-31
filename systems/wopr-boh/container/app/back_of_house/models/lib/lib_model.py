@@ -85,11 +85,7 @@ def build_vers(model):
     except Exception as e:
         logger.error(f"Error creating ModelBackup: {e}")
         results.append(
-            {
-                "status": "error",
-                "type": "Error creating ModelBackup" 
-                "data": e
-            }
+            {"status": "error", "type": "Error creating ModelBackup", "data": e}
         )
         return results
 

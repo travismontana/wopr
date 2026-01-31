@@ -12,9 +12,9 @@
   {% for result in results %}
       <strong>Status: </strong>{{ result.status }}<br>
       <strong>Code: </strong>{{ result.type }}<br>
-      {% if result.info %}
+      {% if result.data %}
       <ul>
-        {% for field, value in result.info.items %}
+        {% for field, value in result.data.items %}
           <li><strong>{{ field }}:</strong> {{ value }}</li>
         {% endfor %}
       </ul>
