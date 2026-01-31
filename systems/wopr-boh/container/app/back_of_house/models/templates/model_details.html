@@ -66,12 +66,12 @@
                 <td>
                     {% if model_version %}
                         <form method="post" 
-                              action="{% url 'model_version_spawn' %}" 
+                              action="{% url 'model_version_initial' model.id %}" 
                               style="display: inline;">
                             {% csrf_token %}
                             <button class="action_button" 
                                     type="submit" 
-                                    name="spawn" 
+                                    name="init" 
                                     value="{{ model_version.id }}">
                                 Spawn
                             </button>

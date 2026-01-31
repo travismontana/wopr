@@ -57,7 +57,7 @@ def initialize_model(filename: str, model_family: str):
             "status": "success",
             "type": "model_info",
             "data": {
-                "mod_info": mod.info(),
+                "mod_info": mod_fam.info(),
                 "checksum": checksum,
                 "fixed_filename": fixed_filename,
                 "fixed_backup_filename": fixed_backup_filename,

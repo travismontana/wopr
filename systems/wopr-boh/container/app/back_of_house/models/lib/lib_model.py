@@ -48,11 +48,12 @@ def build_vers(model):
     results.append(
         {"status": "success", "type": "Model Created", "data": filename_results}
     )
-    model_info = filename_results.get("mod_info", {})
-    model_artifact_uri = filename_results.get("fixed_filename", "")
-    model_backup_uri = filename_results.get("fixed_backup_filename", "")
-    checksum = filename_results.get("checksum", "")
-    backup_checksum = filename_results.get("backup_checksum", "")
+    data = filename_results.get("data", {})
+    model_info = data.get("mod_info", {})
+    model_artifact_uri = data["fixed_filename"]
+    model_backup_uri = data["fixed_backup_filename"]
+    checksum = data["checksum"]
+    backup_checksum = data["backup_checksum"]
     try:
         new_version = ModelVersion.objects.create(
             version=1,
@@ -60,7 +61,7 @@ def build_vers(model):
             checksum=checksum,
             description="Initial version",
             note="",
-            trained_at="",
+            trained_at=now(),
             is_current=True,
             model_id=model.id,
             created_at=now(),
@@ -93,7 +94,16 @@ def build_vers(model):
             {"status": "error", "type": "Error creating ModelBackup", "data": e}
         )
         return results
-
+    results.append(
+        {"status": "success", "type": "Version Created", "data": new_version.save()}
+    )
+    results.append(
+        {
+            "status": "success",
+            "type": "Initial Backup Created",
+            "data": initial_backup.save(),
+        }
+    )
     return results
 
 
