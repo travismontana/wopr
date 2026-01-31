@@ -46,6 +46,7 @@ def build_vers(model):
         return filename_results
 
     results.append(filename_results)
+
     new_version = ModelVersion.objects.create(
         version=1,
         artifact_uri=filename_results["file"],
