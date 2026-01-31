@@ -17,7 +17,7 @@ def initialize_model(filename: str, model_family: str):
     Args:
         model_name (str): Name of the model to initialize.
     """
-    logit("Filename: %s mod fam: %s" % (filename, model_family))
+    logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
 
     storage_paths = globals.storage_paths
     models_path = storage_paths["model_path"]
