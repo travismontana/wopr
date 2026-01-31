@@ -49,7 +49,7 @@ def build_vers(model):
 
     new_version = ModelVersion.objects.create(
         version=1,
-        artifact_uri=filename_results["file"],
+        artifact_uri=filename_results["fixed_filename"],
         checksum=filename_results["checksum"],
         description="Initial version",
         note="",
@@ -61,8 +61,8 @@ def build_vers(model):
     )
 
     initial_backup = ModelBackup.objects.create(
-        was_successful=False,
-        artifact_uri="",
+        was_successful=True,
+        artifact_uri=filename_results["fixed_backup_filename"],
         model_version_id=new_version.id,
         created_at=now(),
         updated_at=now(),

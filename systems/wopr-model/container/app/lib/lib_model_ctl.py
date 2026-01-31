@@ -30,7 +30,7 @@ def initialize_model(filename: str, model_family: str):
             "status": "success",
             "type": "model_exists",
             "info": {
-                "mod_info": mod.info(),
+                "mod_info": mod.info(detailed=True, verbose=True),
                 "fixed_filename": fixed_filename,
                 "fixed_backup_filename": fixed_backup_filename,
             },
@@ -58,7 +58,7 @@ def initialize_model(filename: str, model_family: str):
             "filepath": fixed_filename,
             "backup_filename": f"{timenow}_bak_{filename}",
             "backup_filepath": fixed_backup_filename,
-            "mod_info": mod_fam.info(),
+            "mod_info": mod_fam.info(detailed=True, verbose=True),
         },
     }
     return results
