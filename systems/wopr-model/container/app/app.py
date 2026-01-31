@@ -1,9 +1,12 @@
 import logging
 import httpx
+import torch
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from ultralytics.utils.torch_utils import select_device
 
 from lib.helpers import setup_logger
 
@@ -62,6 +65,19 @@ def get_status():
         "paths": app.state.paths,
         "config": app.state.config
     }
+    device = select_device(
+        device="", verbose=False
+    )  # "" = auto-select, same as default
+
+    gpu_status = {
+        "device_selected": str(device),  # e.g. "cuda:0" or "cpu"
+        "cuda_available": torch.cuda.is_available(),
+        "device_count": torch.cuda.device_count(),
+        "device_name": (
+            torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+        ),  # e.g. "NVIDIA GeForce RTX 3060"
+    }
     status.append({"variables": global_vars})
+    status.append({"gpu_status": gpu_status})
 
     return status
