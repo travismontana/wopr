@@ -22,6 +22,7 @@ def initialize_model(filename: str, model_family: str):
     fixed_filename = f"{globals.WEIGHTS_PATH}/{filename}"
     fixed_backup_filename = f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}"
     logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
+    logit(f"Checking if file {fixed_filename} exists", "initialize_model")
     if Path(f"/ultralytics/{fixed_filename}").exists():
         mod = ultralytics.YOLO(fixed_filename)
         logit(f"file {fixed_filename} exists, loading model", "initialize_model")
