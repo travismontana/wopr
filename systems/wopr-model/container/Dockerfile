@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.14-slim
 LABEL maintainer="Bob Bomar"
 LABEL description="WOPR Model - Wargaming Oversight & Position Recognition Model Service"
 
@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     curl \
     vim \
-    libpq-dev \
     git \
     && pip install --upgrade pip setuptools wheel \
     && apt clean \

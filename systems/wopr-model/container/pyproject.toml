@@ -8,7 +8,6 @@ version = "0.1.5-beta"
 description = "WOPR - Model Control"
 authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
 dependencies = [
-  "requests",
   "fastapi~=0.115.6",
   "uvicorn[standard]~=0.34.0",
   "PyYAML~=6.0.2",
