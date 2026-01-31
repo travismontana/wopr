@@ -45,7 +45,9 @@ def build_vers(model):
         logger.error(f"model_ctl failed: {filename_results}")
         return filename_results
 
-    results.append(filename_results)
+    results.append(
+        {"status": "success", "type": "Model Created", "data": filename_results}
+    )
     try:
         new_version = ModelVersion.objects.create(
             version=1,
@@ -61,18 +63,35 @@ def build_vers(model):
         )
     except Exception as e:
         logger.error(f"Error creating ModelVersion: {e}")
-        results.append(f"Error creating ModelVersion: {e}")
+        results.append(
+            {
+                "status": "error",
+                "type": "Error: ModelVersion Creation Failed",
+                "data": e
+            }
+        )
         return results
 
-    initial_backup = ModelBackup.objects.create(
-        was_successful=True,
-        artifact_uri=filename_results["fixed_backup_filename"],
-        model_version_id=new_version.id,
-        created_at=now(),
-        updated_at=now(),
-        note="Initial backup record",
-        taken_at=now(),
-    )
+    try:
+        initial_backup = ModelBackup.objects.create(
+            was_successful=True,
+            artifact_uri=filename_results["fixed_backup_filename"],
+            model_version_id=new_version.id,
+            created_at=now(),
+            updated_at=now(),
+            note="Initial backup record",
+            taken_at=now(),
+        )
+    except Exception as e:
+        logger.error(f"Error creating ModelBackup: {e}")
+        results.append(
+            {
+                "status": "error",
+                "type": "Error creating ModelBackup" 
+                "data": e
+            }
+        )
+        return results
 
     return results
 
