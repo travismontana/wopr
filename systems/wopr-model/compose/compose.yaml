@@ -17,3 +17,5 @@ services:
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
     ports:
       - "9000:9000"
+    volumes:
+      - /remote/wopr/models/ua:/ultralytics
