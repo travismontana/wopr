@@ -29,8 +29,8 @@ USER wopr
 
 WORKDIR /app
 
-COPY --chown=wopr:wopr requirements.txt .
-RUN pip install --user -r requirements.txt
+COPY --chown=wopr:wopr pyproject.toml .
+RUN pip install --user -e .
 
 COPY --chown=wopr:wopr app/ .
 
