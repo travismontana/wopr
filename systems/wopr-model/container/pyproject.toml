@@ -16,7 +16,7 @@ dependencies = [
   "attrs",
   "python-dateutil",
   "requests",
-  "ultralytics-opencv-headless",
+  "ultralytics",
   "opencv-python-headless",
 ]
 
