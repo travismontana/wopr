@@ -25,10 +25,8 @@ def initialize_model(filename: str, model_family: str):
     logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
     logit(f"Checking if file {fixed_filename} exists", "initialize_model")
     if Path(f"{fixed_filename}").exists():
-        checksum = SafeFS.generate_checksum(Path(filename), protected_path)
-        backup_checksum = SafeFS.generate_checksum(
-            Path(fixed_backup_filename), protected_path
-        )
+        checksum = protected_path.generate_checksum(filename)
+        backup_checksum = protected_path.generate_checksum(f"{timenow}_bak_{filename}")
         mod = ultralytics.YOLO(fixed_filename)
         logit(f"file {fixed_filename} exists, loading model", "initialize_model")
         results = {
@@ -56,10 +54,8 @@ def initialize_model(filename: str, model_family: str):
             mod_fam.save(fixed_filename)
         else:
             logit(f"File {fixed_filename} exists, not saving model", "initialize_model")
-        checksum = SafeFS.generate_checksum(Path(filename), protected_path)
-        backup_checksum = SafeFS.generate_checksum(
-            Path(fixed_backup_filename), protected_path
-        )
+        checksum = protected_path.generate_checksum(filename)
+        backup_checksum = protected_path.generate_checksum(f"{timenow}_bak_{filename}")
         results = {
             "status": "success",
             "type": "model_info",
