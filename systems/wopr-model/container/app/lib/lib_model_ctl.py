@@ -26,7 +26,6 @@ def initialize_model(filename: str, model_family: str):
     logit(f"Checking if file {fixed_filename} exists", "initialize_model")
     if Path(f"{fixed_filename}").exists():
         checksum = protected_path.generate_checksum(filename)
-        backup_checksum = protected_path.generate_checksum(f"{timenow}_bak_{filename}")
         mod = ultralytics.YOLO(fixed_filename)
         logit(f"file {fixed_filename} exists, loading model", "initialize_model")
         results = {
@@ -36,8 +35,6 @@ def initialize_model(filename: str, model_family: str):
                 "mod_info": mod.info(),
                 "checksum": checksum,
                 "fixed_filename": fixed_filename,
-                "fixed_backup_filename": fixed_backup_filename,
-                "backup_checksum": backup_checksum,
             },
         }
     else:
