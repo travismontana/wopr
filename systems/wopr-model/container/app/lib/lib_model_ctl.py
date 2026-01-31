@@ -19,50 +19,56 @@ def initialize_model(filename: str, model_family: str):
         model_family (str): The model family to initialize.
     """
     timenow = datetime.now().strftime("%Y%m%d%H%M%S")
+    protected_path = SafeFS("/weights")
     fixed_filename = f"{globals.WEIGHTS_PATH}/{filename}"
     fixed_backup_filename = f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}"
     logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
     logit(f"Checking if file {fixed_filename} exists", "initialize_model")
     if Path(f"{fixed_filename}").exists():
+        checksum = SafeFS.calculate_checksum(filename, protected_path)
+        backup_checksum = SafeFS.calculate_checksum(
+            fixed_backup_filename, protected_path
+        )
         mod = ultralytics.YOLO(fixed_filename)
         logit(f"file {fixed_filename} exists, loading model", "initialize_model")
         results = {
             "status": "success",
             "type": "model_exists",
             "data": {
-                "mod_info": {
-                    "names": mod.names,
-                    "transforms": mod.transforms,
-                    "task_map": mod.task_map,
-                },
+                "mod_info": mod.info(),
+                "checksum": checksum,
                 "fixed_filename": fixed_filename,
                 "fixed_backup_filename": fixed_backup_filename,
+                "backup_checksum": backup_checksum,
             },
         }
-        return results
-    # let ultralytics handle the download if not found locally
-
-    mod_fam = ultralytics.YOLO(model_family)
-    if not Path(fixed_backup_filename).exists():
-        logit(f"Backing up file to {fixed_backup_filename}", "initialize_model")
-        mod_fam.save(fixed_backup_filename)
     else:
-        logit(f"File {fixed_filename} exists, no backup created", "initialize_model")
-    if not Path(fixed_filename).exists():
-        logit(f"Saving model to {fixed_filename}", "initialize_model")
-        mod_fam.save(fixed_filename)
-    else:
-        logit(f"File {fixed_filename} exists, not saving model", "initialize_model")
-
-    results = {
-        "status": "success",
-        "type": "model_info",
-        "data": {
-            "filename": filename,
-            "filepath": fixed_filename,
-            "backup_filename": f"{timenow}_bak_{filename}",
-            "backup_filepath": fixed_backup_filename,
-            "mod_info": mod_fam.info(detailed=True, verbose=True),
-        },
-    }
+        mod_fam = ultralytics.YOLO(model_family)
+        if not Path(fixed_backup_filename).exists():
+            logit(f"Backing up file to {fixed_backup_filename}", "initialize_model")
+            mod_fam.save(fixed_backup_filename)
+        else:
+            logit(
+                f"File {fixed_filename} exists, no backup created", "initialize_model"
+            )
+        if not Path(fixed_filename).exists():
+            logit(f"Saving model to {fixed_filename}", "initialize_model")
+            mod_fam.save(fixed_filename)
+        else:
+            logit(f"File {fixed_filename} exists, not saving model", "initialize_model")
+        checksum = SafeFS.calculate_checksum(filename, protected_path)
+        backup_checksum = SafeFS.calculate_checksum(
+            fixed_backup_filename, protected_path
+        )
+        results = {
+            "status": "success",
+            "type": "model_info",
+            "data": {
+                "mod_info": mod.info(),
+                "checksum": checksum,
+                "fixed_filename": fixed_filename,
+                "fixed_backup_filename": fixed_backup_filename,
+                "backup_checksum": backup_checksum,
+            },
+        }
     return results
