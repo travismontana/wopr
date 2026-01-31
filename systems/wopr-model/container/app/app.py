@@ -45,7 +45,6 @@ paths = {
 app.state.paths = paths
 app.state.config = {"app_name": APP_NAME, "app_api_version": APP_API_VERSION}
 # Here
-app.state.models = get_all("models")
 
 # health page
 @app.get("/health")
