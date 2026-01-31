@@ -27,7 +27,7 @@ def initialize_model(filename: str, model_family: str):
         mod = ultralytics.YOLO(fixed_filename)
         logit(f"file {fixed_filename} exists, loading model", "initialize_model")
         results = {
-            "status": "error",
+            "status": "exists",
             "type": "model_exists",
             "info": {
                 "mod_info": mod.info(),
