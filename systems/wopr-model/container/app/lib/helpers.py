@@ -100,7 +100,7 @@ def list_files(protected_path, directory):
     try:
         return protected_path.listdir(directory)
     except Exception as e:
-        logit(f"Failed to list files in {directory}: {e}")
+        logit(f"Failed to list files in {directory}: {e}", "list_files")
         return []
 
 
