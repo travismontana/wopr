@@ -59,3 +59,4 @@ storage_paths = {
     "distfiles_path": (Path(BASE_PATH) / DISTFILES_SUBDIR).resolve(),
     "downloads_path": (Path(BASE_PATH) / DOWNLOADS_SUBDIR).resolve(),
 }
+WEIGHTS_PATH = "/ultralytics/weights"
