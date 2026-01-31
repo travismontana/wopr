@@ -19,7 +19,7 @@ def initialize_model(filename: str, model_family: str):
         model_family (str): The model family to initialize.
     """
     timenow = datetime.now().strftime("%Y%m%d%H%M%S")
-    protected_path = SafeFS("/weights")
+    protected_path = SafeFS(globals.WEIGHTS_PATH)
     fixed_filename = f"{globals.WEIGHTS_PATH}/{filename}"
     fixed_backup_filename = f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}"
     logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
