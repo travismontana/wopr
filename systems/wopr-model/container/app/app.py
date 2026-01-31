@@ -24,7 +24,7 @@ app = FastAPI(
     )
 
 # Load api's
-app.include_router(model_ctl.api_models, prefix=f"/api/v2/model_ctl", tags=["models"])
+app.include_router(model_ctl.model, prefix=f"/api/v2/model_ctl", tags=["models"])
 
 # Build defaults
 
