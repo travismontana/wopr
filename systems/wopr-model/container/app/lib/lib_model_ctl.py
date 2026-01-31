@@ -1,6 +1,6 @@
 import ultralytics
 from pathlib import Path
-from datetime import datetime as now
+from datetime import datetime
 import lib.globals as globals
 from lib.helpers import logit, setup_logger
 
@@ -18,7 +18,7 @@ def initialize_model(filename: str, model_family: str):
         filename (str): The filename to save the model to.
         model_family (str): The model family to initialize.
     """
-    timenow = now().strftime("%Y%m%d%H%M%S")
+    timenow = datetime.now().strftime("%Y%m%d%H%M%S")
     fixed_filename = f"{globals.WEIGHTS_PATH}/{filename}"
     fixed_backup_filename = f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}"
     logit("Filename: %s mod fam: %s" % (filename, model_family), "initialize_model")
