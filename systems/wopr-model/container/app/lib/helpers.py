@@ -75,7 +75,7 @@ log = setup_logger()
 #################################
 
 
-def logit(note, data=None):
+def logit(note, data):
     """_summary_
 
     Args:
@@ -83,9 +83,8 @@ def logit(note, data=None):
         data (_type_, optional): _description_. Defaults to None.
     """
     logger = setup_logger()
-    logger.info(f"({note})")
-    if data:
-        logger.debug(f"Data: ({data})")
+    logger.info(f"Note: ({note})")
+    logger.debug(f"Data: ({data})")
 
 
 def list_files(protected_path, directory):
