@@ -41,9 +41,13 @@ def initialize_model(filename: str, model_family: str):
     if not Path(fixed_filename).exists():
         logit(f"Backing up file to {fixed_backup_filename}", "initialize_model")
         mod_fam.save(fixed_backup_filename)
+    else:
+        logit(f"File {fixed_filename} exists, no backup created", "initialize_model")
     if not Path(fixed_filename).exists():
         logit(f"Saving model to {fixed_filename}", "initialize_model")
         mod_fam.save(fixed_filename)
+    else:
+        logit(f"File {fixed_filename} exists, not saving model", "initialize_model")
 
     results = {
         "status": "success",
