@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM ultralytics/ultralytics:latest
 LABEL maintainer="Bob Bomar"
 LABEL description="WOPR Model - Wargaming Oversight & Position Recognition Model Service"
 
@@ -29,11 +29,6 @@ USER wopr
 WORKDIR /app
 
 COPY --chown=wopr:wopr pyproject.toml .
-RUN pip install --user opencv-python-headless
-# Nuke any other opencv variants
-RUN pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless || true
-# Reinstall ONLY headless
-RUN pip install --user --no-cache-dir opencv-python-headless
 RUN pip install --user -e .
 
 COPY --chown=wopr:wopr app/ .
