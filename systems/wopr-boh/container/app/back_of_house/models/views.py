@@ -150,5 +150,5 @@ def model_version_initial(request, model_id):
         # version_data has all teh necessary initial data
         results = build_vers(model)
     else:
-        results = {}
+        results = {"status": "No action taken"}
     return render(request, "model_version_initial.html", {"results": results})

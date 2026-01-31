@@ -6,3 +6,15 @@
 
 {% block content %}
 <h2>Add Initial Model Version</h2>
+
+{% if results %}
+has
+<ul>
+  {% for field, value in results.items %}
+    <li><strong>{{ field }}:</strong> {{ value }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No results.</p>
+{% endif %}
+{% endblock %}

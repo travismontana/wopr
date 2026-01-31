@@ -3,10 +3,11 @@ import requests
 from django.utils.timezone import now
 
 from core.models import ModelVersion, ModelBackup, ModelFamily
-
+from django.forms.models import model_to_dict
 from lib.helpers import setup_logger
 
 logger = setup_logger()
+
 
 def build_vers(model):
     """
@@ -24,6 +25,7 @@ def build_vers(model):
         return None
     name = model.name
     filename = f"{name}_v1.pt"
+    results = []
 
     model_fam = ModelFamily.objects.get(id=model.family_id)
     logger.info(f"Model family: {model_fam}")
@@ -31,20 +33,22 @@ def build_vers(model):
         "action": "create_new_model_file",
         "filename": filename,
         "model_family": model_fam.shortname,
+        "model": model_to_dict(model),
     }
     logger.info(f"Payload for model ctl: {payload}")
-    try:
-        filename_results = call_model_ctl(model=name, payload=payload)
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error calling model ctl: {e}")
-        return None
-    logger.info(f"Filename results: {filename_results.json()}")
-    filename_results = filename_results.json()
-    # Create a new ModelVersion instance
+
+    filename_results = call_model_ctl(payload=payload)
+
+    logger.info(f"Filename results: {filename_results}")
+
+    if filename_results.get("status") and filename_results["status"] != "success":
+        logger.error(f"model_ctl failed: {filename_results}")
+        return filename_results
+    results.append(filename_results)
     new_version = ModelVersion.objects.create(
-        version = 1,
-        artifact_uri=filename_results.file,
-        checksum=filename_results.checksum,
+        version=1,
+        artifact_uri=filename_results["file"],
+        checksum=filename_results["checksum"],
         description="Initial version",
         note="",
         trained_at="",
@@ -54,7 +58,6 @@ def build_vers(model):
         updated_at=now(),
     )
 
-    # Create an initial ModelBackup for the new version
     initial_backup = ModelBackup.objects.create(
         was_successful=False,
         artifact_uri="",
@@ -65,22 +68,34 @@ def build_vers(model):
         taken_at=now(),
     )
 
-    # now save the to the db
-    results = {
-        "model_version": new_version,
-        "model_backup": initial_backup,
-    }
-
-    new_version.save()
-    initial_backup.save()
-
     return results
 
 
-def call_model_ctl(model, payload, url=None):
+def call_model_ctl(payload, url=None):
     url = url or os.getenv("MODEL_URL")
-    return requests.post(
-        f"{url}/api/model_ctl",
-        json={"model": model, "payload": payload},
-        timeout=5,  # Don't hang forever if the other side is down
-    )
+
+    try:
+        response = requests.post(
+            f"{url}/api/model_ctl",
+            json={"payload": payload},
+            timeout=5,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.Timeout:
+        logger.error("model_ctl timed out after 5s | payload=%s", payload)
+        return {"status": "timeout"}
+
+    except requests.exceptions.ConnectionError:
+        logger.error("model_ctl unreachable at %s | payload=%s", url, payload)
+        return {"status": "unreachable"}
+
+    except requests.exceptions.HTTPError as e:
+        logger.error(
+            "model_ctl returned %s | payload=%s | detail=%s",
+            e.response.status_code,
+            payload,
+            e.response.text,
+        )
+        return {"status": "http_error", "detail": e.response.text}
