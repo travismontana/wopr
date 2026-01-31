@@ -43,7 +43,6 @@ def model_control(request: Request, body: dict[str, Any]):
     match action:
         case "create_new_model_file":
             results = initialize_model(filename, model_family)
-            result = {"status": "success", "data": results}
         case _:
-            result = {"status": "error", "message": f"Unknown action: {action}"}
-    return result
+            results = {"status": "error", "message": f"Unknown action: {action}"}
+    return results
