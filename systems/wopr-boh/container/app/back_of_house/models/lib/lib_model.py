@@ -48,14 +48,16 @@ def build_vers(model):
     results.append(
         {"status": "success", "type": "Model Created", "data": filename_results}
     )
-    model_info = filename_results.get("model_info", {})
+    model_info = filename_results.get("mod_info", {})
     model_artifact_uri = filename_results.get("fixed_filename", "")
     model_backup_uri = filename_results.get("fixed_backup_filename", "")
+    checksum = filename_results.get("checksum", "")
+    backup_checksum = filename_results.get("backup_checksum", "")
     try:
         new_version = ModelVersion.objects.create(
             version=1,
             artifact_uri=model_artifact_uri,
-            checksum=filename_results["checksum"],
+            checksum=checksum,
             description="Initial version",
             note="",
             trained_at="",
