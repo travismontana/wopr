@@ -1,5 +1,6 @@
 services:
   wopr-model:
+    runtime: nvidia
     build:
       context: ../container
       dockerfile: Dockerfile
@@ -16,10 +17,3 @@ services:
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
     ports:
       - "9000:9000"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
