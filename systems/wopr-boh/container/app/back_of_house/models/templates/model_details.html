@@ -38,61 +38,80 @@
             </table>
         </div>
     {% endif %}
-
+<br>
+<hr>
 <h4>Version</h4>
 <div class="version_table">
-    <table>
-        <thead>
-            <tr>
-                <th>Version</th>
-                <th>Artifact URI</th>
-                <th>Checksum</th>
-                <th>Current Vers</th>
-                <th>Trained At</th>
-                <th>Description</th>
-                <th>Note</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ model_version.version }}</td>
-                <td>{{ model_version.artifact_uri }}</td>
-                <td>{{ model_version.checksum }}</td>
-                <td>{{ model_version.current_version }}</td>
-                <td>{{ model_version.trained_at }}</td>
-                <td>{{ model_version.description }}</td>
-                <td>{{ model_version.note }}</td>
-                <td>
-                    {% if model_version %}
-                        <form method="post" 
-                              action="{% url 'model_version_initial' model.id %}" 
-                              style="display: inline;">
-                            {% csrf_token %}
-                            <button class="action_button" 
-                                    type="submit" 
-                                    name="init" 
-                                    value="{{ model_version.id }}">
-                                Spawn
-                            </button>
-                        </form>
-                    {% else %}
-                        <form method="post" 
-                              action="{% url 'model_version_initial' model.id %}" 
-                              style="display: inline;">
-                            {% csrf_token %}
-                            <button class="action_button" 
-                                    type="submit" 
-                                    name="initialize" 
-                                    value="{{ model.id }}">
-                                Initialize
-                            </button>
-                        </form>
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+  <table>
+    <thead>
+      <tr>
+        <th>Version</th>
+        <th>Artifact URI</th>
+        <th>Checksum</th>
+        <th>Current Vers</th>
+        <th>Trained At</th>
+        <th>Description</th>
+        <th>Note</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for model_version in model_versions %}
+        <tr>
+          <td>{{ model_version.version }}</td>
+          <td>{{ model_version.artifact_uri }}</td>
+          <td>{{ model_version.checksum }}</td>
+          <td>{{ model_version.version }}</td>
+          <td>{{ model_version.trained_at }}</td>
+          <td>{{ model_version.description }}</td>
+          <td>{{ model_version.note }}</td>
+          <td>
+            {% if model_version %}
+              <p>No actions available</p>
+            {% else %}
+              <form method="post" 
+                  action="{% url 'model_version_initial' model.id %}" 
+                  style="display: inline;">
+                {% csrf_token %}
+                <button class="action_button" 
+                      type="submit" 
+                      name="initialize" 
+                      value="{{ model.id }}">
+                  Initialize
+                </button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<br>
+<hr>
+
+<h4>Backups</h4>
+<div class="version_table">
+  <table>
+    <thead>
+      <tr>
+        <th>Model ID</th>
+        <th>Artifact URI</th>
+        <th>Taken At</th>
+        <th>Was Sucessful</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for model_backup in model_backups %}
+        <tr>
+          <td>{{ model_backup.model_version.version }}</td>
+          <td>{{ model_backup.artifact_uri }}</td>
+          <td>{{ model_backup.taken_at }}</td>
+          <td>{{ model_backup.was_successful }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 <br>
 <hr>

@@ -34,16 +34,21 @@ def model_index(request):
 
 def model_details(request, id):
     model = get_object_or_404(ModelInfo, pk=id)
-    model_cur_version = (
-        ModelVersion.objects.filter(model=model).order_by("-created_at").first()
-    )
-    model_backups = ModelBackup.objects.filter(model_version=model_cur_version)
+    model_cur_version = ModelVersion.objects.filter(model=model).order_by("-created_at")
+    model_backups = []
+    for mod_ver in model_cur_version:
+        backups = ModelBackup.objects.filter(model_version=mod_ver).order_by(
+            "-created_at"
+        )
+        model_backups.extend(backups)
     context = {
         "model": model,
         "model_dict": model_to_dict(model) if model else {},
-        "model_version": model_cur_version,
-        "model_version_dict": (
-            model_to_dict(model_cur_version) if model_cur_version else {}
+        "model_versions": model_cur_version,
+        "model_versions_dict": (
+            [model_to_dict(version) for version in model_cur_version]
+            if model_cur_version
+            else []
         ),
         "model_backups": model_backups,
         "model_backups_dict": (

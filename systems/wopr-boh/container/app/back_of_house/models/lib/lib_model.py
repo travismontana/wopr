@@ -24,7 +24,8 @@ def build_vers(model):
     if model is None:
         return None
     name = model.name
-    filename = f"{name}_v1.pt"
+    shortname = model.shortname
+    filename = f"{shortname}_v1.pt"
     results = []
 
     model_fam = ModelFamily.objects.get(id=model.family_id)
