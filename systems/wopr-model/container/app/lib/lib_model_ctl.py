@@ -41,6 +41,7 @@ def initialize_model(filename: str, model_family: str):
         }
         return return_payload
     else:
+        # chec(file, dir, pr)
         has_download = check_for_file_in_dir(downloads_subdir, filename, protected_fs)
         if has_download:
             logit(

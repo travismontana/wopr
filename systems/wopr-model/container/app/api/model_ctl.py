@@ -37,7 +37,7 @@ def model_control(request: Request, body: dict[str, Any]):
     logit("model_control", f"body: {body}")
     payload = body.get("payload", {})
     action = payload.get("action", "")
-    filename = payload.get("model", "")
+    filename = payload.get("filename", "")
     model_family = payload.get("model_family", "")
 
     match action:
