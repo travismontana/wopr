@@ -91,7 +91,60 @@
         </tbody>
     </table>
 </div>
+<br>
+<hr>
 
-
+<!-- Model Dict Toggle -->
+<input type="checkbox" id="toggle-model" class="dict-toggle-input">
+<label for="toggle-model" class="dict-toggle-label">Model</label>
+<div class="dict-content">
+  <ul>
+    {% for field, value in model_dict.items %}
+      <li><strong>{{ field }}:</strong> {{ value }}</li>
+    {% endfor %}
+  </ul>
+</div>
+<br>
+<hr>
+<!-- Model Version Dict Toggle -->
+<input type="checkbox" id="toggle-model-version" class="dict-toggle-input">
+<label for="toggle-model-version" class="dict-toggle-label">Model Version</label>
+<div class="dict-content">
+  <ul>
+    {% for field, value in model_version_dict.items %}
+      <li><strong>{{ field }}:</strong> {{ value }}</li>
+    {% endfor %}
+  </ul>
+</div>
+<br>
+<hr>
+<!-- Model Status Dict Toggle -->
+<input type="checkbox" id="toggle-model-status" class="dict-toggle-input">
+<label for="toggle-model-status" class="dict-toggle-label">Model Status</label>
+<div class="dict-content">
+  <ul>
+    {% for field, value in model_status_dict.items %}
+      <li><strong>{{ field }}:</strong> {{ value }}</li>
+    {% endfor %}
+  </ul>
+</div>
+<br>
+<hr>
+<!-- Model Backups Dict Toggle -->
+<input type="checkbox" id="toggle-model-backups" class="dict-toggle-input">
+<label for="toggle-model-backups" class="dict-toggle-label">Model Backups</label>
+<div class="dict-content">
+  <ul>
+    {% for backup_dict in model_backups_dict %}
+      <li>
+        <ul>
+          {% for field, value in backup_dict.items %}
+            <li><strong>{{ field }}:</strong> {{ value }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
 
 {% endblock %}

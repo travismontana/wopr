@@ -14,6 +14,7 @@ class ModelFamily(models.Model):
     url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    mf_status = models.JSONField(blank=True, null=True)
 
     class Meta:
         db_table = "model_families"

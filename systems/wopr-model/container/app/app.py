@@ -5,9 +5,9 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from lib.helpers import get_all, setup_logger
+from lib.helpers import setup_logger
 
-from api import models
+from api import model_ctl
 
 logger = setup_logger()
 
@@ -24,7 +24,7 @@ app = FastAPI(
     )
 
 # Load api's
-app.include_router(models.api_models, prefix=f"/api/v2/models", tags=["models"])
+app.include_router(model_ctl.api_models, prefix=f"/api/v2/model_ctl", tags=["models"])
 
 # Build defaults
 

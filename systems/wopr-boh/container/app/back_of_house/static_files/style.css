@@ -163,3 +163,48 @@ button[type=button]:hover {
   width: 100%;
   table-layout: fixed;
 }
+
+/* ---------- Dictionary Toggle ------------ */
+/* Hide the actual checkbox */
+.dict-toggle-input {
+  display: none;
+}
+
+/* Default: hide the content */
+.dict-content {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Show content when checkbox is checked */
+.dict-toggle-input:checked + .dict-toggle-label + .dict-content {
+  display: block;
+}
+
+/* Style the label to look like a button */
+.dict-toggle-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.dict-toggle-label:hover {
+  background-color: #0056b3;
+}
+
+/* Optional: Change label text when checked */
+.dict-toggle-input:checked + .dict-toggle-label::after {
+  content: " ▲";
+}
+
+.dict-toggle-label::after {
+  content: " ▼";
+}

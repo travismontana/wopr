@@ -3,6 +3,7 @@ import threading
 from django.shortcuts import render, get_object_or_404, redirect
 
 from core.models import ModelFamily, ModelInfo, ModelVersion, ModelStatus, ModelBackup
+from django.forms.models import model_to_dict
 
 from .forms import (
     TrainingModelForm,
@@ -41,10 +42,20 @@ def model_details(request, id):
         .order_by("-observed_at")
         .first()
     )  # Returns None if not found
+    model_backups = ModelBackup.objects.filter(model_version=model_cur_version)
     context = {
         "model": model,
+        "model_dict": model_to_dict(model) if model else {},
         "model_status": model_status,
+        "model_status_dict": model_to_dict(model_status) if model_status else {},
         "model_version": model_cur_version,
+        "model_version_dict": (
+            model_to_dict(model_cur_version) if model_cur_version else {}
+        ),
+        "model_backups": model_backups,
+        "model_backups_dict": (
+            [model_to_dict(backup) for backup in model_backups] if model_backups else []
+        ),
     }
     return render(request, "model_details.html", context)
 
