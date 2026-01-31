@@ -30,7 +30,12 @@ def initialize_model(filename: str, model_family: str):
             "status": "success",
             "type": "model_exists",
             "data": {
-                "mod_info": mod.info(detailed=True, verbose=True),
+                "mod_info": {
+                    "names": mod.names,
+                    "device": mod.device,
+                    "transforms": mod.transforms,
+                    "task_map": mod.task_map,
+                },
                 "fixed_filename": fixed_filename,
                 "fixed_backup_filename": fixed_backup_filename,
             },
