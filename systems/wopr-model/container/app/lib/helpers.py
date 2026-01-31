@@ -84,9 +84,8 @@ def logit(note, data=None):
     """
     logger = setup_logger()
     logger.info(f"({note})")
-    if not data:
-        data = note
-    logger.debug(f"Data: ({data})")
+    if data:
+        logger.debug(f"Data: ({data})")
 
 
 def list_files(protected_path, directory):
