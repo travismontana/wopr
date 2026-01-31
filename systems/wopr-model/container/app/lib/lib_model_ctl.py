@@ -32,7 +32,6 @@ def initialize_model(filename: str, model_family: str):
             "data": {
                 "mod_info": {
                     "names": mod.names,
-                    "device": mod.device,
                     "transforms": mod.transforms,
                     "task_map": mod.task_map,
                 },
