@@ -1,7 +1,8 @@
 import ultralytics
 from pathlib import Path
+from datetime import datetime as now
 import lib.globals as globals
-from lib.helpers import logit, setup_logger, check_for_file_in_dir
+from lib.helpers import logit, setup_logger
 
 from lib.safe_file import SafeFS
 
@@ -22,6 +23,19 @@ def initialize_model(filename: str, model_family: str):
         logit(f"Model {filename} already exists", "initialize_model")
         return {"status": "skipped", "message": "Model already exists."}
     # let ultralytics handle the download if not found locally
+    timenow = now().strftime("%Y%m%d%H%M%S")
     mod_fam = ultralytics.YOLO(model_family)
+    mod_fam.save(f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}")
     mod_fam.save(f"{globals.WEIGHTS_PATH}/{filename}")
-    return {"status": "success", "message": "Model initialized successfully."}
+    results = {
+        "status": "success",
+        "type": "model_info",
+        "file_info": {
+            "filename": filename,
+            "filepath": f"{globals.WEIGHTS_PATH}/{filename}",
+            "backup_filename": f"{timenow}_bak_{filename}",
+            "backup_filepath": f"{globals.WEIGHTS_PATH}/{timenow}_bak_{filename}",
+            "mod_info": mod_fam.info(),
+        },
+    }
+    return results

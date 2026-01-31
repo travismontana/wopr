@@ -79,7 +79,7 @@ def call_model_ctl(payload, url=None):
         response = requests.post(
             f"{url}/api/model_ctl",
             json={"payload": payload},
-            timeout=5,
+            timeout=300,
         )
         response.raise_for_status()
         return response.json()
