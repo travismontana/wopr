@@ -35,10 +35,10 @@ def model_control(request: Request, body: dict[str, Any]):
         body (dict[str, Any]): _description_
     """
     logit("model_control", f"body: {body}")
-
-    action = body.get("action", "")
-    filename = body.get("model", "")
-    model_family = body.get("model_family", "")
+    payload = body.get("payload", {})
+    action = payload.get("action", "")
+    filename = payload.get("model", "")
+    model_family = payload.get("model_family", "")
 
     match action:
         case "create_new_model_file":
