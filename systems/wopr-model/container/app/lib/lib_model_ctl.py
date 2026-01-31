@@ -22,20 +22,53 @@ def initialize_model(filename: str, model_family: str):
     storage_paths = globals.storage_paths
     models_path = storage_paths["model_path"]
     distfiles_path = storage_paths["distfiles_path"]
+    distfiles_subdir = "distfiles"
     downloads_path = storage_paths["downloads_path"]
+    downloads_subdir = "downloads"
     protected_fs = SafeFS(models_path)
-    has_dist = check_for_file_in_dir(distfiles_path, filename, protected_fs)
+    has_dist = check_for_file_in_dir(distfiles_subdir, filename, protected_fs)
 
     if has_dist:
         logit(
             "initialize_model",
             f"Model file {filename} already found in distfiles.",
         )
-        checksum = protected_fs.generate_checksum("distfiles" / filename)
+        checksum = protected_fs.generate_checksum(Path(distfiles_subdir) / filename)
         return_payload = {
             "status": "exists",
             "location": "distfiles",
             "checksum": checksum,
         }
-        return
-        payload = {"status": "exists", "location": "distfiles"}
+        return return_payload
+    else:
+        has_download = check_for_file_in_dir(downloads_subdir, filename, protected_fs)
+        if has_download:
+            logit(
+                "initialize_model",
+                f"Model file {filename} found in downloads. Copying to distfiles.",
+            )
+            protected_fs.copy_file(
+                str(Path(downloads_subdir) / filename),
+                str(Path(distfiles_subdir) / filename),
+            )
+            checksum = protected_fs.generate_checksum(Path(distfiles_subdir) / filename)
+            return_payload = {
+                "status": "copied",
+                "location": "distfiles",
+                "checksum": checksum,
+            }
+            return return_payload
+        else:
+            logit(
+                "initialize_model",
+                f"Model file {filename} not found locally. Downloading using ultralytics.",
+            )
+            model = ultralytics.YOLO(model_family)
+            model.download(weights=filename, dir=str(models_path))
+            checksum = protected_fs.generate_checksum(Path(distfiles_subdir) / filename)
+            return_payload = {
+                "status": "downloaded",
+                "location": "distfiles",
+                "checksum": checksum,
+            }
+            return return_payload
