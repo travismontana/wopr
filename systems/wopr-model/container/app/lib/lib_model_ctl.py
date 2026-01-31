@@ -64,8 +64,11 @@ def initialize_model(filename: str, model_family: str):
                 "initialize_model",
                 f"Model file {filename} not found locally. Downloading using ultralytics.",
             )
+            logit(
+                f"Settings {ultralytics.settings}",
+                f"WEIGHTS: {ultralytics.settings['weights_dir']}",
+            )
             model = ultralytics.YOLO(model_family)
-            model.download(weights=filename, dir=str(models_path))
             checksum = protected_fs.generate_checksum(Path(distfiles_subdir) / filename)
             return_payload = {
                 "status": "downloaded",
