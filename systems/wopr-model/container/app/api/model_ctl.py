@@ -46,3 +46,4 @@ def model_control(request: Request, body: dict[str, Any]):
             result = {"status": "success", "data": results}
         case _:
             result = {"status": "error", "message": f"Unknown action: {action}"}
+    return result

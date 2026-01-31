@@ -41,9 +41,10 @@ def build_vers(model):
 
     logger.info(f"Filename results: {filename_results}")
 
-    if filename_results.get("status") and filename_results["status"] != "success":
+    if not filename_results or filename_results.get("status") != "success":
         logger.error(f"model_ctl failed: {filename_results}")
         return filename_results
+
     results.append(filename_results)
     new_version = ModelVersion.objects.create(
         version=1,
