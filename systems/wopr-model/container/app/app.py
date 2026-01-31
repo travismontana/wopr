@@ -5,24 +5,11 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from lib.helpers import (
-    get_config, get_all,
-    setup_logger
-)
-
-WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2"
+from lib.helpers import get_all, setup_logger
 
 from api import models
 
-
 logger = setup_logger()
-
-
-# Here
-config = get_config()
-
-if len(config) == 0:
-    logger.info("Configuration is empty or could not be loaded")
 
 APP_NAME = "wopr-model"
 APP_API_VERSION = "v1"
@@ -41,11 +28,11 @@ app.include_router(models.api_models, prefix=f"/api/v2/models", tags=["models"])
 
 # Build defaults
 
-base_path = config['storage']['base_path']
-models_path = f"{base_path}/{config['storage']['models_subdir']}"
-models_backup_path = f"{config['storage']['models_backup_subdir']}"
-models_download_path = f"downloads"
-models_distfiles_path = f"distfiles"
+base_path = "/remote/wopr"
+models_path = f"{base_path}/models"
+models_backup_path = f"{base_path}/backups"
+models_download_path = f"{base_path}/downloads"
+models_distfiles_path = f"{base_path}/distfiles"
 
 paths = {
     "base_path": base_path,
@@ -56,8 +43,7 @@ paths = {
 }
 
 app.state.paths = paths
-app.state.config = config
-
+app.state.config = {"app_name": APP_NAME, "app_api_version": APP_API_VERSION}
 # Here
 app.state.models = get_all("models")
 

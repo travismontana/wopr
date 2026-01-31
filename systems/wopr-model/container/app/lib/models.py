@@ -1,6 +1,6 @@
 """Models model library"""
 
-from lib.helpers import get_config, get_all, setup_logger, logit
+from lib.helpers import get_all, setup_logger, logit
 
 logger = setup_logger()
 

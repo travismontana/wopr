@@ -8,53 +8,6 @@ logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info("WOPR API - Pre Initialization Globals")
 
-# These env variables are required:
-#   WOPR_VERSION: "v0.1.5-alpha"
-#   WOPR_ENVIRONMENT: "production"
-#
-# If not set, the app will exit during startup.
-
-DIRECTUS_HOST = os.getenv("DIRECTUS_HOST", "http://wopr-directus")
-ENVIRONMENT = os.getenv("WOPR_ENVIRONMENT", "production")
-
-if ENVIRONMENT != "production":
-    DIRECTUS_HOST += f"-{ENVIRONMENT}"
-
-DIRECTUS_URL = f"{DIRECTUS_HOST}"
-
-# Get DIRECTUS_TOKEN from environment, no fallbacks.
-DIRECTUS_TOKEN = os.getenv("DIRECTUS_TOKEN")
-
-# Set up Directus authentication headers
-if DIRECTUS_TOKEN:
-    DIRECTUS_HEADERS = {"Authorization": f"Bearer {DIRECTUS_TOKEN}"}
-else:
-    DIRECTUS_HEADERS = {}
-
-DIRECTUS_CONFIG_ENDPOINT = f"{DIRECTUS_URL}/items/woprconfig?environment={ENVIRONMENT}"
-
-
-def get_directus_config():
-    """Fetch configuration from Directus CMS."""
-    import requests
-
-    try:
-        response = requests.get(DIRECTUS_CONFIG_ENDPOINT, headers=DIRECTUS_HEADERS)
-        response.raise_for_status()
-        config_data = response.json()
-        return config_data.get("data", [])
-    except requests.RequestException as e:
-        print(f"Error fetching config from Directus: {e}")
-        exit(1)
-
-
-WOPR_CONFIG = get_directus_config()[0]["data"]
-logger.info("WOPR_CONFIG: %s", WOPR_CONFIG)
-
-if WOPR_CONFIG["nelson"] != "haha":
-    logger.info("WOPR_CONFIG fetch failed or is invalid. Exiting.")
-    exit(1)
-
 APP_NAME = "wopr-api"
 APP_TITLE = "WOPR API"
 APP_VERSION = "0.1.5-alpha"
@@ -71,7 +24,7 @@ WOPR_API_URL = APP_API_URL + "/api/v1"
 LOGFILE = "/tmp/wopr-api.log"
 
 APP_HOST = "0.0.0.0"
-APP_PORT = 8000
+APP_PORT = 9000
 
 # Service Configuration
 SERVICE_NAME = APP_NAME
