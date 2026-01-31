@@ -27,4 +27,9 @@ urlpatterns = [
         views.model_family_bulk_add,
         name="model_family_bulk_add",
     ),
+    path(
+        "model_version_initial/<int:model_id>",
+        views.model_version_initial,
+        name="model_version_initial",
+    ),
 ]

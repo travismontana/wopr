@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<p>Models - <a href="{% url 'model_add'%}">Add New Model</a> - <a href="{% url 'model_family_add' %}">Add New Model Family</a></p>
+{% endblock %}
+
+{% block content %}
+<h2>Add Initial Model Version</h2>

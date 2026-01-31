@@ -5,7 +5,10 @@ from lib.helpers import logit, setup_logger, check_for_file_in_dir
 
 from lib.safe_file import SafeFS
 
-def initialize_model(model: dict) -> dict:
+logger = setup_logger()
+
+
+def initialize_model(filename: str, model_family: str):
     """Initialize Model
     Check if the model file exists in distfiles_path.
     If not, check downloads_path.
@@ -14,18 +17,25 @@ def initialize_model(model: dict) -> dict:
     Args:
         model_name (str): Name of the model to initialize.
     """
-    
-    paths = globals.storage_paths
-    
-    protected_path = SafeFS(Path(paths["models_path"]))
-    
-    filename = f"{model['name']}.pt"
+    logit("Filename: %s mod fam: %s" % (filename, model_family))
 
-    distfile_results = check_for_file_in_dir(filename, paths["models_distfiles_path"], protected_path)
-    
-    if ! distfile_results:
-        
-        downloadfile_results = check_for_file_in_dir(filename, paths["downloads_path"], protected_path)
-        
-        if ! downloadfile_results:
-            results = download_model_file(model)
+    storage_paths = globals.storage_paths
+    models_path = storage_paths["model_path"]
+    distfiles_path = storage_paths["distfiles_path"]
+    downloads_path = storage_paths["downloads_path"]
+    protected_fs = SafeFS(models_path)
+    has_dist = check_for_file_in_dir(distfiles_path, filename, protected_fs)
+
+    if has_dist:
+        logit(
+            "initialize_model",
+            f"Model file {filename} already found in distfiles.",
+        )
+        checksum = protected_fs.generate_checksum("distfiles" / filename)
+        return_payload = {
+            "status": "exists",
+            "location": "distfiles",
+            "checksum": checksum,
+        }
+        return
+        payload = {"status": "exists", "location": "distfiles"}

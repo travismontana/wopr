@@ -213,3 +213,54 @@ class SafeFS:
                     tmp.unlink()
                 except Exception:
                     pass
+
+    def generate_checksum(self, rel_file: str, algorithm: str = "sha256") -> str:
+        """
+        Generate cryptographic checksum of a file.
+
+        Args:
+            rel_file: Relative path to file within base_dir
+            algorithm: Hash algorithm (sha256, sha512, blake2b, md5)
+                    Default sha256 balances security and universality.
+
+        Returns:
+            Hex string of the hash digest
+
+        Raises:
+            NotFoundError: If file doesn't exist
+            SafeFSError: If path is directory or other issues
+        """
+        import hashlib
+
+        p = self._resolve_rel(rel_file, must_exist=True)
+
+        if p.is_dir():
+            raise SafeFSError(f"Expected file, got directory: {rel_file}")
+
+        # Map algorithm names to hashlib constructors
+        # Note: md5 included for legacy compat, but sha256+ preferred
+        algo_map = {
+            "md5": hashlib.md5,
+            "sha1": hashlib.sha1,
+            "sha256": hashlib.sha256,
+            "sha512": hashlib.sha512,
+            "blake2b": hashlib.blake2b,
+            "blake2s": hashlib.blake2s,
+        }
+
+        if algorithm not in algo_map:
+            raise SafeFSError(
+                f"Unknown algorithm: {algorithm}. "
+                f"Supported: {', '.join(algo_map.keys())}"
+            )
+
+        hasher = algo_map[algorithm]()
+
+        # Stream file in chunks to handle large files without blowing memory
+        # Open once and hash - minimizes TOCTOU window
+        with open(p, "rb") as f:
+            # 64KB chunks - good balance for most file systems
+            for chunk in iter(lambda: f.read(65536), b""):
+                hasher.update(chunk)
+
+        return hasher.hexdigest()

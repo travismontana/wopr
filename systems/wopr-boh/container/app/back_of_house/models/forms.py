@@ -1,5 +1,5 @@
 from django import forms
-from core.models import ModelInfo, ModelFamily, ModelVersion, ModelStatus, ModelBackup
+from core.models import ModelInfo, ModelFamily, ModelVersion, ModelBackup
 
 
 class TrainingModelForm(forms.ModelForm):
@@ -38,15 +38,6 @@ class TrainingModelVersionForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 3}),
             "note": forms.Textarea(attrs={"rows": 3}),
             "trained_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-        }
-
-
-class TrainingModelStatusForm(forms.ModelForm):
-    class Meta:
-        model = ModelStatus
-        fields = ["model_version", "observed_at", "has_distfile", "has_backup"]
-        widgets = {
-            "observed_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
 
 

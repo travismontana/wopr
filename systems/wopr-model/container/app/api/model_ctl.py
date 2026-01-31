@@ -35,12 +35,14 @@ def model_control(request: Request, body: dict[str, Any]):
         body (dict[str, Any]): _description_
     """
     logit(logger, "model_control", f"body: {body}")
-    
+
     action = body.get("action", "")
-    model = body.get("model", "")
-    
+    filename = body.get("model", "")
+    model_family = body.get("model_family", "")
+
     match action:
-        case "initialize":
-            result = initialize_model(model)
+        case "create_new_model_file":
+            results = create_new_model_file(filename, model_family)
+            result = {"status": "success", "data": results}
         case _:
             result = {"status": "error", "message": f"Unknown action: {action}"}

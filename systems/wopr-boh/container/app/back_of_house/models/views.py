@@ -2,20 +2,20 @@ import threading
 
 from django.shortcuts import render, get_object_or_404, redirect
 
-from core.models import ModelFamily, ModelInfo, ModelVersion, ModelStatus, ModelBackup
+from core.models import ModelFamily, ModelInfo, ModelVersion, ModelBackup
 from django.forms.models import model_to_dict
 
 from .forms import (
     TrainingModelForm,
     TrainingModelFamilyForm,
     TrainingModelVersionForm,
-    TrainingModelStatusForm,
     TrainingModelBackupForm,
     ModelFamilyBulkForm,
 )
 
 from .lib.helpers import handle_mf_bulk
 
+from .lib.lib_model import build_vers
 
 # Create your views here.
 def model_index(request):
@@ -37,17 +37,10 @@ def model_details(request, id):
     model_cur_version = (
         ModelVersion.objects.filter(model=model).order_by("-created_at").first()
     )
-    model_status = (
-        ModelStatus.objects.filter(model_version=model_cur_version)
-        .order_by("-observed_at")
-        .first()
-    )  # Returns None if not found
     model_backups = ModelBackup.objects.filter(model_version=model_cur_version)
     context = {
         "model": model,
         "model_dict": model_to_dict(model) if model else {},
-        "model_status": model_status,
-        "model_status_dict": model_to_dict(model_status) if model_status else {},
         "model_version": model_cur_version,
         "model_version_dict": (
             model_to_dict(model_cur_version) if model_cur_version else {}
@@ -151,13 +144,11 @@ def model_family_bulk_add(request):
     return render(request, "model_family_bulk_add.html", {"form": form})
 
 
-# receiving from a button, name= key=
-def version_initialize(request, data):
-    model = get_object_or_404(Model, id=model_id)
-
-    # Fire and forget
-    thread = threading.Thread(target=call_model_ctl, args=(model, "initialize"))
-    thread.daemon = True
-    thread.start()
-
-    return JsonResponse({"status": "initiated"})
+def model_version_initial(request, model_id):
+    model = get_object_or_404(ModelInfo, pk=model_id)
+    if request.method == "POST":
+        # version_data has all teh necessary initial data
+        results = build_vers(model)
+    else:
+        results = {}
+    return render(request, "model_version_initial.html", {"results": results})
