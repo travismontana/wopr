@@ -46,19 +46,23 @@ def build_vers(model):
         return filename_results
 
     results.append(filename_results)
-
-    new_version = ModelVersion.objects.create(
-        version=1,
-        artifact_uri=filename_results["fixed_filename"],
-        checksum=filename_results["checksum"],
-        description="Initial version",
-        note="",
-        trained_at="",
-        is_current=True,
-        model_id=model.id,
-        created_at=now(),
-        updated_at=now(),
-    )
+    try:
+        new_version = ModelVersion.objects.create(
+            version=1,
+            artifact_uri=filename_results["fixed_filename"],
+            checksum=filename_results["checksum"],
+            description="Initial version",
+            note="",
+            trained_at="",
+            is_current=True,
+            model_id=model.id,
+            created_at=now(),
+            updated_at=now(),
+        )
+    except Exception as e:
+        logger.error(f"Error creating ModelVersion: {e}")
+        results.append(f"Error creating ModelVersion: {e}")
+        return results
 
     initial_backup = ModelBackup.objects.create(
         was_successful=True,
