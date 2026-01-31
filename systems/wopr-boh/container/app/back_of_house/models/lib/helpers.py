@@ -1,8 +1,11 @@
+import os
 import csv
+import requests
 from django.core.management.base import BaseCommand
 
 from core.models import ModelFamily, ModelInfo
 
+MODEL_URL = os.getenv("MODEL_URL")
 
 def handle_mf_bulk(uploaded_file):
     mf_to_create = []
@@ -24,3 +27,11 @@ def handle_mf_bulk(uploaded_file):
 
     ModelFamily.objects.bulk_create(mf_to_create, batch_size=100)
     return len(mf_to_create)
+
+
+def call_model_ctl(model, action):
+    requests.post(
+        f"{MODEL_URL}/api/model-ctl",
+        json={"model": model, "action": action},
+        timeout=5,  # Don't hang forever if the other side is down
+    )

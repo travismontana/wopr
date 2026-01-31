@@ -12,12 +12,15 @@ dependencies = [
   "gunicorn",
   "psycopg2-binary",
   "whitenoise",
+  "requests",
 ]
 
 [project.optional-dependencies]
-dev = ["black",
+dev = [
+  "black",
   "django-stubs",
   "ipdb",
   "pip-tools",
   "ruff",
-  "pytest"]
+  "pytest",
+  ]

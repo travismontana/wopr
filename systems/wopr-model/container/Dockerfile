@@ -34,4 +34,4 @@ RUN pip install --user -r requirements.txt
 
 COPY --chown=wopr:wopr app/ .
 
-CMD ["/home/wopr/.local/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/home/wopr/.local/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9000"]

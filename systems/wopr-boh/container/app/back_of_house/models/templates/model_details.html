@@ -35,6 +35,39 @@
         </div>
     {% endif %}
 
+<h4>Version</h4>
+<div class="version_table">
+    <table>
+        <thead>
+            <tr>
+                <th>Version</th>
+                <th>Artifact URI</th>
+                <th>Checksum</th>
+                <th>Current Vers</th>
+                <th>Trained At</th>
+                <th>Description</th>
+                <th>Note</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ model_version.version }}</td>
+                <td>{{ model_version.artifact_uri }}</td>
+                <td>{{ model_version.checksum }}</td>
+                <td>{{ model_version.current_version }}</td>
+                <td>{{ model_version.trained_at }}</td>
+                <td>{{ model_version.description }}</td>
+                <td>{{ model_version.note }}</td>
+                <td>{% if model_version %}
+                    <button class="action_button" type="submit" name="spawn" key="{{ model_version.id }}">Spawn</button>
+                    {% else %}
+                    <button class="action_button" type="submit" name="initialize" key="{{ model.id }}">Initialize</button>
+                {% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <h4>Status</h4>
 <div class="status-table">
     <table>
@@ -59,11 +92,6 @@
     </table>
 </div>
 
-<h4>Version</h4>
-<div class="version_table">
-    <table>
-        <thead>
-            <tr>
-                <th>
+
 
 {% endblock %}

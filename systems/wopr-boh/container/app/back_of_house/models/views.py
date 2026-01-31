@@ -1,3 +1,5 @@
+import threading
+
 from django.shortcuts import render, get_object_or_404, redirect
 
 from core.models import ModelFamily, ModelInfo, ModelVersion, ModelStatus, ModelBackup
@@ -39,7 +41,11 @@ def model_details(request, id):
         .order_by("-observed_at")
         .first()
     )  # Returns None if not found
-    context = {"model": model, "model_status": model_status}
+    context = {
+        "model": model,
+        "model_status": model_status,
+        "model_version": model_cur_version,
+    }
     return render(request, "model_details.html", context)
 
 
@@ -132,3 +138,15 @@ def model_family_bulk_add(request):
     else:
         form = ModelFamilyBulkForm()
     return render(request, "model_family_bulk_add.html", {"form": form})
+
+
+# receiving from a button, name= key=
+def version_initialize(request, data):
+    model = get_object_or_404(Model, id=model_id)
+
+    # Fire and forget
+    thread = threading.Thread(target=call_model_ctl, args=(model, "initialize"))
+    thread.daemon = True
+    thread.start()
+
+    return JsonResponse({"status": "initiated"})

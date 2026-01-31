@@ -1,8 +1,5 @@
-volumes:
-  postgres:
-
 services:
-  wopr-boh:
+  wopr-model:
     build:
       context: ../container
       dockerfile: Dockerfile
@@ -18,19 +15,4 @@ services:
       DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
     ports:
-      - "8000:8000"
-
-  postgres:
-    container_name: wopr-boh_postgres
-    image: "postgres:latest"
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: "${DB_USER}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      PGDATA: "/data/postgres"
-    volumes:
-      - postgres:/data/postgres
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
+      - "9000:9000"
