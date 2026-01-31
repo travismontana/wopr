@@ -38,8 +38,13 @@ def initialize_model(filename: str, model_family: str):
     # let ultralytics handle the download if not found locally
 
     mod_fam = ultralytics.YOLO(model_family)
-    mod_fam.save(fixed_backup_filename)
-    mod_fam.save(fixed_filename)
+    if not Path(fixed_filename).exists():
+        logit(f"Backing up file to {fixed_backup_filename}", "initialize_model")
+        mod_fam.save(fixed_backup_filename)
+    if not Path(fixed_filename).exists():
+        logit(f"Saving model to {fixed_filename}", "initialize_model")
+        mod_fam.save(fixed_filename)
+
     results = {
         "status": "success",
         "type": "model_info",
