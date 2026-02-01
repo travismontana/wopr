@@ -1,5 +1,7 @@
 import logging
 import sys
+import json
+from pathlib import Path
 
 LOGGER_NAME = "wopr_boh"
 
@@ -31,7 +33,7 @@ def setup_logger() -> logging.Logger:
     return logger
 
 
-log = setup_logger()
+logger = setup_logger()
 
 
 def get_config() -> dict:
