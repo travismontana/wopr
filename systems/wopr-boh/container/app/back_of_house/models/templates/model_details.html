@@ -65,10 +65,9 @@
           <td>{{ model_version.trained_at }}</td>
           <td>{{ model_version.description }}</td>
           <td>{{ model_version.note }}</td>
+      {% endfor %}
           <td>
-            {% if model_version %}
-              <p>No actions available</p>
-            {% else %}
+            {% if not model_version %}
               <form method="post" 
                   action="{% url 'model_version_initial' model.id %}" 
                   style="display: inline;">
@@ -83,7 +82,6 @@
             {% endif %}
           </td>
         </tr>
-      {% endfor %}
     </tbody>
   </table>
 </div>
