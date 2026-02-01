@@ -67,7 +67,7 @@
           <td>{{ model_version.note }}</td>
       {% endfor %}
           <td>
-            {% if not model_version %}
+            {% if not model_versions %}
               <form method="post" 
                   action="{% url 'model_version_initial' model.id %}" 
                   style="display: inline;">

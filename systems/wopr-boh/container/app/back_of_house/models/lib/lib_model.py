@@ -1,10 +1,12 @@
 import os
 import requests
+import json
+from pathlib import Path
 from django.utils.timezone import now
 
 from core.models import ModelVersion, ModelBackup, ModelFamily
 from django.forms.models import model_to_dict
-from lib.helpers import setup_logger
+from lib.helpers import setup_logger, get_config
 
 logger = setup_logger()
 
@@ -109,7 +111,7 @@ def build_vers(model):
 
 
 def call_model_ctl(payload, url=None):
-    url = url or os.getenv("MODEL_URL")
+    url = (os.getenv("MODEL_URL"), get_config()["api"]["model_url"])
 
     try:
         response = requests.post(
