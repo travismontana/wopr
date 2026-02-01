@@ -1,0 +1,47 @@
+from fastapi import APIRouter, HTTPException, status
+import logging
+import httpx
+from pydantic import BaseModel
+from app import globals as woprvar
+from app.directus_client import get_one, get_all, post, update, delete
+from app.logging import configure_logging
+
+logger = configure_logging(woprvar.LOGFILE)
+logger.info("Initializing Plays API router")
+router = APIRouter(tags=["plays"])
+logger.info("Plays API router initialized")
+class PlayPayload(BaseModel):
+	playerid: int
+	gameid: int
+	playid: int
+	note: str
+	filename: str
+
+# GET / - GETS ALL
+# POST / - creates a new entry
+# UPDATE / - updates entry
+
+@router.get("")
+async def get_plays():
+    logger.info("Fetching all plays")
+    return get_all("playtracker")
+
+@router.get("/{play_id}")
+async def get_play(play_id: str):
+    logger.info(f"Fetching play with ID: {play_id}")
+    return get_one("playtracker", play_id)
+
+@router.post("")
+async def create_play(payload: dict):
+	logger.info(f"Creating a new play with payload: {payload}")
+	return post("playtracker", payload)
+
+@router.patch("/{play_id}")
+async def update_play(play_id: str, payload: dict):
+    logger.info(f"Updating play {play_id} with payload: {payload}")
+    return update("playtracker", play_id, payload)
+
+@router.delete("/{play_id}")
+async def delete_play(play_id: str):
+    logger.info(f"Deleting play with ID: {play_id}")
+    return delete("playtracker", play_id)

@@ -1,0 +1,280 @@
+/* ============================================================================
+   CSS Organization:
+   1. Layout - Grid system
+   2. Tables - Standard and scrollable tables with word-wrap
+   3. Forms - Input fields and form layout
+   4. Buttons - Submit and action buttons
+   5. Dictionary Toggle - Collapsible content sections
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   LAYOUT - Grid System
+   Main container uses CSS Grid for responsive layout:
+   - Fixed 280px left sidebar
+   - Flexible main content area
+   - Header/footer auto-size, middle expands
+   ---------------------------------------------------------------------------- */
+.container {  
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 280px 1fr;       /* Fixed left, flexible main */
+  grid-template-rows: 80px auto .2fr;      /* Header/footer hug content, middle grows */
+  gap: 2px;
+  background: gray;
+  grid-template-areas:
+    "corner_box main_header"
+    "left_column main_panel"
+    "funky_box main_footer";
+}
+
+/* Main panel - nested grid for subheader and content */
+.main_panel {  
+  display: grid;
+  grid-template-rows: auto 90%;
+  grid-template-areas:
+    "main_subheader"
+    "main_panel_panel";
+  grid-area: main_panel;
+  border: 1px solid black;
+  gap: 2px;
+}
+
+.main_subheader { 
+  grid-area: main_subheader; 
+  border: 1px solid black;
+}
+
+.main_panel_panel { 
+  grid-area: main_panel_panel; 
+  border: 1px solid black;
+}
+
+.main_header { 
+  grid-area: main_header; 
+  border: 1px solid black;
+}
+
+.corner_box { 
+  grid-area: corner_box; 
+  border: 1px solid black;
+}
+
+/* Left sidebar - nested grid for navigation */
+.left_column {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 60px 40px auto;
+  gap: 2px;
+  grid-template-areas:
+    "left_column_spacer"
+    "left_column_subheader"
+    "left_column_main";
+  grid-area: left_column;
+}
+
+.left_column_main { 
+  grid-area: left_column_main; 
+  border: 1px solid black;
+}
+
+.left_column_subheader { 
+  grid-area: left_column_subheader; 
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+
+.main_footer { 
+  grid-area: main_footer; 
+  border: 1px solid black;
+}
+
+.funky_box { 
+  grid-area: funky_box; 
+  border: 1px solid black;
+}
+
+/* ----------------------------------------------------------------------------
+   TABLES - Standard and scrollable tables
+   - Fixed layout prevents overflow issues
+   - Word-wrap handles long strings (checksums, URIs, etc.)
+   - Zebra striping for readability
+   ---------------------------------------------------------------------------- */
+table {
+  table-layout: fixed;              /* Columns respect width settings */
+  width: 90%;
+  margin: 10px auto;
+  border-collapse: collapse;
+  text-align: left;
+  border-top: 1px solid #999999;
+  border-bottom: 1px solid #999999;
+}
+
+/* Word-wrap for all table cells - handles long strings */
+table th,
+table td {
+  word-wrap: break-word;            /* Legacy support */
+  overflow-wrap: break-word;        /* Modern standard */
+  word-break: break-word;           /* Break long words */
+  white-space: normal;              /* Allow wrapping */
+  padding: 8px;
+  vertical-align: top;
+}
+
+/* Zebra striping for row readability */
+tbody tr:nth-child(odd) {
+  background-color: #eeeeee;
+}
+
+tfoot {
+  border-top: 1px solid #999999;
+}
+
+table td.artifact-uri,
+table td.checksum {
+  max-width: 300px;                 /* Limit width for long URIs */
+  word-break: normal;           /* Don't break words arbitrarily */
+  overflow-wrap: anywhere;      /* Allow breaks when constrained */
+  hyphens: none;  
+}
+
+/* Scrollable table variant - fixed header, scrollable body (~10 rows visible) */
+.scroll-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.scroll-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.scroll-table tbody {
+  display: block;
+  max-height: calc(10 * 2.2rem);    /* Approximately 10 rows */
+  overflow-y: auto;
+}
+
+.scroll-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* ----------------------------------------------------------------------------
+   FORMS - Input fields and layout
+   - Horizontal layout with right-aligned labels
+   - Fixed label width for alignment
+   - Focus states for accessibility
+   ---------------------------------------------------------------------------- */
+.form-group {
+  margin: 15px 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-group label {
+  width: 150px;
+  text-align: right;
+  padding-right: 15px;
+  padding-top: 5px;
+  flex-shrink: 0;                   /* Prevent label from shrinking */
+}
+
+.form-group input[type=text],
+.form-group textarea {
+  flex: 1;
+  max-width: 500px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+/* Focus state - visual feedback for active input */
+.form-group input[type=text]:focus,
+.form-group textarea:focus {
+  background-color: lightblue;
+  outline: none;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;                 /* Allow vertical resize only */
+}
+
+/* ----------------------------------------------------------------------------
+   BUTTONS - Submit and action buttons
+   - Consistent styling across button types
+   - Hover states for interactivity feedback
+   ---------------------------------------------------------------------------- */
+.form-actions {
+  margin: 20px 0 20px 165px;        /* Align with form inputs */
+}
+
+button[type=submit],
+button[type=button] {
+  background-color: #00170e;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  margin: 0 5px 0 0;
+  cursor: pointer;
+}
+
+button[type=submit]:hover,
+button[type=button]:hover {
+  background-color: #003d26;
+}
+
+/* ----------------------------------------------------------------------------
+   DICTIONARY TOGGLE - Collapsible content sections
+   - Uses checkbox hack for pure CSS toggle
+   - Label acts as clickable button
+   - Content hidden by default, shows when checkbox checked
+   ---------------------------------------------------------------------------- */
+
+/* Hide actual checkbox - we only need its checked state */
+.dict-toggle-input {
+  display: none;
+}
+
+/* Content hidden by default */
+.dict-content {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Show content when checkbox is checked */
+.dict-toggle-input:checked + .dict-toggle-label + .dict-content {
+  display: block;
+}
+
+/* Label styled as button */
+.dict-toggle-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  user-select: none;                /* Prevent text selection on click */
+}
+
+.dict-toggle-label:hover {
+  background-color: #0056b3;
+}
+
+/* Visual indicators - arrows show expand/collapse state */
+.dict-toggle-label::after {
+  content: " ▼";                    /* Collapsed state */
+}
+
+.dict-toggle-input:checked + .dict-toggle-label::after {
+  content: " ▲";                    /* Expanded state */
+}

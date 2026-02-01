@@ -1,3 +1,17 @@
+# Copyright 2026 Bob Bomar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 wopr-baseapp:
   app:
     name: wopr-directus
@@ -16,14 +30,14 @@ wopr-baseapp:
   ingress:
     enabled: true
     hosts:
-      - host: directus.studio.abode.tailandtraillabs.org
+      - host: directus.wopr.tailandtraillabs.org
         paths:
           - path: /
             pathType: Prefix
     tls: 
       - secretName: directus-tls
         hosts:
-          - directus.studio.abode.tailandtraillabs.orgs
+          - directus.wopr.tailandtraillabs.orgs
   pvc:
     - name: directus-uploads
       enabled: true
@@ -53,12 +67,12 @@ wopr-baseapp:
     - name: DB_HOST
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: host
     - name: DB_PORT
       valueFrom:
         secretKeyRef:
-          name: wopr-config-db-cluster-app
+          name: wopr-db-cluster-app
           key: port
     - name: DB_DATABASE
       valueFrom:
@@ -81,4 +95,9 @@ wopr-baseapp:
           name: wopr-db-user-credentials
           key: password
     - name: PUBLIC_URL
-      value: https://directus.studio.abode.tailandtraillabs.org
+      value: https://directus.wopr.tailandtraillabs.org
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000

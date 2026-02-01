@@ -1,0 +1,34 @@
+services:
+  open-webui:
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8g
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports: 
+      - "3000:8080"
+    volumes:
+      - /data/openwebui:/app/backend/data
+    depends_on:
+      - ollama
+    environment:
+      - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
+      - 'ENABLE_API=true'
+      - 'ENABLE_OLLAMA_API=true'
+      - 'ENABLE_API_KEYS=true'
+    restart: unless-stopped
+  ollama:
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8g
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - /data/ollama:/root/.ollama
+    restart: unless-stopped

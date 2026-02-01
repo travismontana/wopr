@@ -1,3 +1,4 @@
+
 from wopr.config import init_config, get_str, get_int
 from wopr.storage import imagefilename
 from wopr.logging import setup_logging

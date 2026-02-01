@@ -1,6 +1,0 @@
-apiVersion: v2
-name: wopr-images
-description: Thumbor image processing service
-type: application
-version: 0.1.0
-appVersion: "latest"

@@ -1,3 +1,17 @@
+# Copyright 2026 Bob Bomar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Minimal - just structure, ApplicationSet provides real values
 # Required
 app:
@@ -58,7 +72,7 @@ resources:
 
 ingress:
   enabled: false
-  className: "studio-traefik"
+  className: "wopr-traefik"
   annotations: {}
   hosts: 
     - host: chart-example.local
@@ -126,3 +140,120 @@ readinessProbe:
 #         some: config
 #     data:
 #       binary-blob: U29tZSBiaW5hcnk=
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 2222
+  runAsGroup: 2222
+  fsGroup: 2222
+# PersistentVolume array (optional)
+# pv:
+#   - name: my-nfs-pv
+#     enabled: true
+#     size: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     reclaimPolicy: Retain  # Default: Retain
+#     storageClass: ""       # Empty string for no storage class
+#     mountOptions:
+#       - hard
+#       - intr
+#       - noatime
+#       - vers=3
+#     nfs:
+#       server: storage.example.com
+#       path: /exports/data
+#     extraLabels: {}
+#
+#   - name: my-local-pv
+#     enabled: true
+#     size: 10Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     hostPath:
+#       path: /mnt/data
+#       type: DirectoryOrCreate
+#     storageClass: local-storage
+
+# PersistentVolumeClaim array (optional)
+# pvc:
+#   - name: my-app-data
+#     enabled: true
+#     size: 10Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     storageClass: "rook-cephfs"
+#     extraLabels: {}
+#
+#   - name: my-shared-data
+#     enabled: true
+#     size: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     storageClass: ""        # Empty for binding to PV by selector/label
+#     extraLabels:
+#       storage-type: nfs
+
+celeryWorker:
+  enabled: false
+  replicaCount: 1
+  
+  # Override command/args if needed
+  command: ["/home/wopr/.local/bin/celery"]
+  args:
+    - "-A"
+    - "app.celery_app"
+    - "worker"
+    - "--loglevel=info"
+  
+  # Worker-specific env vars (merged with global env)
+  env: []
+  #  - name: CELERY_WORKER_PREFETCH_MULTIPLIER
+  #    value: "4"
+  
+  # Celery inspect ping probe
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 120
+    periodSeconds: 120
+    timeoutSeconds: 60
+    failureThreshold: 3
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+luigiWorker:
+  enabled: false
+  replicaCount: 1
+  
+  # Override command/args if needed
+  command: ["/home/wopr/.local/bin/celery"]
+  args:
+    - "-A"
+    - "app.celery_app"
+    - "worker"
+    - "--loglevel=info"
+  
+  # Worker-specific env vars (merged with global env)
+  env: []
+  #  - name: CELERY_WORKER_PREFETCH_MULTIPLIER
+  #    value: "4"
+  
+  # Celery inspect ping probe
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m

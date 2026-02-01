@@ -1,27 +1,36 @@
-#buildplease5
-# build stage
-FROM node:20-alpine AS build
+# syntax=docker/dockerfile:1
 
-ENV HOME=/app
+FROM python:3.11-slim
+
+# Avoid .pyc, keep logs unbuffered
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    STREAMLIT_SERVER_PORT=8501 \
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
 WORKDIR /app
 
-COPY package.json package-lock.json* tsconfig.json ./
-RUN npm install -g npm@latest
-RUN npm install
-COPY src ./src
-#COPY public ./public
-COPY web/index.html ./index.html
-COPY vite.config.ts ./vite.config.ts
-RUN npm run build
+# System deps (keep minimal). Add build tools ONLY if you hit wheels/build issues.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# runtime stage
-FROM nginxinc/nginx-unprivileged:alpine
-WORKDIR /app
-COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /app/dist /usr/share/nginx/html
-#RUN touch /run/nginx.pid && chown nginx:nginx /run/nginx.pid 
-#RUN chgrp -R 1000 /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d && \
-#    chmod -R 770 /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d
-#RUN chown -R 1000 /etc/nginx/conf.d
+# Install python deps first for better layer caching
+COPY requirements.txt .
+COPY pyproject.toml .
+RUN python -m pip install --upgrade pip \
+ && pip install -e . && pip install -r requirements.txt
 
-EXPOSE 8080
+# Copy the rest of the app
+COPY app/ ./app/
+
+EXPOSE 8501
+
+# Optional: basic container healthcheck (assumes Streamlit is responding)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8501/_stcore/health || exit 1
+
+# Run Streamlit
+
+CMD ["streamlit", "run", "app/site.py", "--server.port=8501", "--server.address=0.0.0.0"]

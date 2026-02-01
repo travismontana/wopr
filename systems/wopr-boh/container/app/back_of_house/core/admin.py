@@ -1,0 +1,10 @@
+from django.contrib import admin
+
+from .models import ModelFamily
+from .models import ModelInfo
+from .models import ModelVersion
+
+# Register your models here.
+admin.site.register(ModelFamily)
+admin.site.register(ModelInfo)
+admin.site.register(ModelVersion)

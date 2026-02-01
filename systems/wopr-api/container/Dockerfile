@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt autoclean \
     && rm -rf /var/lib/apt/lists/* 
 
-RUN useradd -m wopr && \
+RUN useradd -m -u 2222 wopr && \
     mkdir -p /app /var/log/wopr && \
     chown -R wopr:wopr /app /var/log/wopr
 
@@ -29,13 +29,9 @@ USER wopr
 WORKDIR /app
 
 COPY --chown=wopr:wopr requirements.txt .
+COPY --chown=wopr:wopr pyproject.toml .
 RUN pip install --user -r requirements.txt
+RUN pip install --user -e .
 
-COPY --chown=wopr:wopr app/ ./app/
-
-
-ENV OTEL_SERVICE_NAME=wopr-api
-
-EXPOSE 8000
-
-CMD ["/home/wopr/.local/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY --chown=wopr:wopr app/ .
+CMD ["/home/wopr/.local/bin/uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8000"]

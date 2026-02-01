@@ -1,0 +1,9 @@
+{
+  "filename": ${filename},
+  "object_rotation": ${object_rotation},
+  "object_position": ${object_position},
+  "color_temp": ${color_temp},
+  "light_intensity": ${light_intensity},
+  "piece_id": ${piece_id},
+  "game_catalog_uuid": "${game_catalog_uuid}
+}

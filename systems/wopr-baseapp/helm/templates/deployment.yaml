@@ -11,6 +11,9 @@ spec:
   selector:
     matchLabels:
       {{- include "wopr-baseapp.selectorLabels" . | nindent 6 }}
+      {{- if .Values.componentLabel }}
+      app.kubernetes.io/component: {{ .Values.componentLabel }}
+      {{- end }}
   template:
     metadata:
       {{- if .Values.podAnnotations }}
@@ -19,14 +22,28 @@ spec:
       {{- end }}
       labels:
         {{- include "wopr-baseapp.selectorLabels" . | nindent 8 }}
+        {{- if .Values.componentLabel }}
+        app.kubernetes.io/component: {{ .Values.componentLabel }}
+        {{- end }}
     spec:
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: {{ include "wopr-baseapp.fullname" . }}
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.command }}
+        command: {{ .Values.command }}
+        {{- end }}
+        {{- if .Values.args }}
+        args:
+          {{- toYaml .Values.args | nindent 8 }}
+        {{- end }}
         {{- if .Values.service }}
         ports:
-        - name: {{ include "wopr-baseapp.fullName" . }}
+        - name: {{ include "wopr-baseapp.fullname" . }}
           containerPort: {{ .Values.service.port }}
           protocol: {{ include "wopr-baseapp.serviceProtocol" . }}
         {{- end }}
@@ -40,31 +57,44 @@ spec:
         volumeMounts:
           {{- toYaml .Values.volumeMounts | nindent 10 }}
         {{- end }}
-        {{- if .Values.service.port}}
+        {{- if and .Values.service .Values.service.port}}
         {{- if ne .Values.livenessProbe.enabled false }}
         livenessProbe:
-          tcpSocket:
+          httpGet:
+            path: /
             port: {{ .Values.service.port }}
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 30 }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 5 }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+          {{- if .Values.livenessProbe.successThreshold }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          {{- end }}
         {{- end}}
         {{- if ne .Values.readinessProbe.enabled false }}
         readinessProbe:
-          tcpSocket:
+          httpGet:
+            path: /
             port: {{ .Values.service.port }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 5 }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 3 }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+          {{- if .Values.readinessProbe.successThreshold }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          {{- end }}
         {{- end}}
         {{- end}}
         {{- if .Values.resources }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         {{- end }}
-        {{- if .Values.volumes}}
+      {{- with .Values.sidecarContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if .Values.volumes}}
       volumes:
         {{- toYaml .Values.volumes | nindent 8 }}
       {{- end }}

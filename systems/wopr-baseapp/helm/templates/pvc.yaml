@@ -1,3 +1,4 @@
+{{- if .Values.pvc }}
 {{- range .Values.pvc }}
 {{- if .enabled }}
 ---
@@ -13,11 +14,13 @@ metadata:
 spec:
   accessModes: 
   {{- toYaml .accessModes | nindent 2 }}
-  {{- if .storageClass }} 
-  storageClassName: {{ .storageClass }}
+  storageClassName: {{ .storageClass | quote }}
+  {{- if .volumeName }}
+  volumeName: {{ .volumeName }}
   {{- end }}
   resources:
     requests:
       storage: {{ .size }}
+{{- end }}
 {{- end }}
 {{- end }}

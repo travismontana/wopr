@@ -1,111 +1,141 @@
-woprConfig:
-  WOPR_VERSION: "v0.1.4-alpha"
-  WOPR_METADATA_DB: "wopr-db"
+# Copyright 2026 Bob Bomar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-replicaCount: 1
+wopr-baseapp:
+  app:
+    name: wopr-api
+  replicaCount: 1
+  componentLabel: api
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-api
+    tag: latest
+    pullPolicy: Always
 
-image:
-  repository: ghcr.io/travismontana/wopr/wopr-api
-  pullPolicy: Always
-  tag: "latest"
-  #tag: "001630b"
+  service:
+    type: ClusterIP
+    port: 8000
+    
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: api.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-api-tls
+        hosts:
+          - api.wopr.tailandtraillabs.org
+  
+  env:
+    - name: WOPR_ENVIRONMENT
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_ENVIRONMENT
+    - name: DBUSER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: username
+    - name: DBPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: password
+    - name: DBHOST
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-cluster-app
+          key: host
+    - name: DBPORT
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-cluster-app
+          key: port
+    - name: DBNAME
+      value: "wopr-db-database"
+    - name: CONFDBNAME
+      value: "wopr-config-db-database"
+    - name: CONFDBUSER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: username
+    - name: CONFDBPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-config-db-user-credentials
+          key: password
+    - name: HOMEASSISTANT_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: wopr-homeassistant-token
+          key: HOMEASSISTANT_TOKEN
+    - name: LABEL_STUDIO_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: labelstudio-token-secret
+          key: labelstudio-token
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
+  woprConfig:
+    WOPR_VERSION: "v0.1.5-alpha"
+    WOPR_ENVIRONMENT: "production"
+    WOPR_METADATA_DB: "wopr-db-database"
+    WOPR_API_URL: "http://wopr-api.wopr.svc:8000"
 
-service:
-  type: ClusterIP
-  port: 8000
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 2222
+    runAsGroup: 2222
+    fsGroup: 2222
+  volumeMounts:
+    - name: wopr-data
+      mountPath: /remote/wopr
+      readOnly: false
+  volumes:
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-api-nfs-pvc
 
-ingress:
-  enabled: true
-  className: "studio-traefik"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: wopr-api.studio.abode.tailandtraillabs.org
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: wopr-web-tls
-      hosts:
-        - wopr-api.studio.abode.tailandtraillabs.org
+  #args:
+  #  - "/home/wopr/.local/bin/uvicorn"
+  #  - "app.main:app"
+  #    - "--host"
+  #    - "0.0.0.0"
+  #    - "--port"
+  #    - "8000"
 
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+  celeryWorker:
+    enabled: false
+    replicaCount: 1
+    env:
+      - name: CELERY_BROKER_URL
+        value: "redis://wopr-api-valkey:6379/0"
+      - name: CELERY_RESULT_BACKEND
+        value: "redis://wopr-api-valkey:6379/0"
 
-autoscaling:
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+valkey:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
-
-env:
-  - name: WOPR_ENVIRONMENT
-    value: "production"
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-postgresql:
-  uriSecretName: wopr-config-db-cluster-app
-  uriKey: uri
-
-# Default values for WOPR services
-
-config:
-  API_URL: "http://wopr-api.wopr.svc:8000"
-  API_VERSION: "v1"
-  WOPR_VERSION: "v0.1.4-alpha"
-
-env:
-  - name: WOPR_API_URL
-    valueFrom:
-      configMapKeyRef:
-        name: wopr-api-config
-        key: API_URL
-  - name: WOPR_DB_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: wopr-db-user-credentials
-        key: password
-  - name: WOPR_DB_USER
-    valueFrom:
-      secretKeyRef:
-        name: wopr-db-user-credentials
-        key: username
-  - name: HOMEASSISTANT_URL
-    valueFrom:
-      configMapKeyRef:
-        name: wopr-homeassistant-config
-        key: HOMEASSISTANT_URL
-  - name: HOMEASSISTANT_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: wopr-homeassistant-token
-        key: HOMEASSISTANT_TOKEN
-# Optional: Environment-specific overrides
-# environments:
-#   dev:
-#     config:
-#       environment: "development"
-#       logging:
-#         level: "DEBUG"
-#   staging:
-#     config:
-#       environment: "staging"
+  master:
+    persistence:
+      enabled: true
+      size: 1Gi

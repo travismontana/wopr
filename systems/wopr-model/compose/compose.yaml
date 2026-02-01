@@ -1,0 +1,23 @@
+services:
+  wopr-model:
+    runtime: nvidia
+    build:
+      context: ../container
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_USER: "${DB_USER}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DJANGO_SUPERUSER_USERNAME: "${DJANGO_SUPERUSER_USERNAME}"
+      DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
+      DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
+    ports:
+      - "9000:9000"
+    volumes:
+      - /remote/wopr/models/ua/weights:/ultralytics/weights
+      - /remote/wopr/models/ua/runs:/ultralytics/runs
+      - /remote/wopr/models/ua/datasets:/ultralytics/datasets

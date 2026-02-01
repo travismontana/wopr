@@ -1,0 +1,73 @@
+# Copyright 2026 Bob Bomar
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: wopr-db-cluster
+spec:
+  instances: 1
+  storage:
+    size: 1Gi
+  enableSuperuserAccess: true
+  managed:
+    roles:
+      - name: wopr-config-db-user
+        comment: wopr config database user
+        ensure: present
+        login: true
+        passwordSecret:
+          name: wopr-config-db-user-credentials
+        createdb: false
+        createrole: false
+      - name: wopr-db-user
+        comment: wopr database user
+        ensure: present
+        login: true
+        passwordSecret:
+          name: wopr-db-user-credentials
+        createdb: true
+        createrole: true
+      - name: wopr-labelstudio-db-user
+        comment: wopr label studio database user
+        ensure: present
+        login: true
+        passwordSecret:
+          name: wopr-labelstudio-db-user-credentials
+        createdb: false
+        createrole: false
+
+---
+apiVersion: v1
+stringData:
+  username: wopr-db-user
+  password: '<change to something S3c7e7!>'
+kind: Secret
+metadata:
+  name: wopr-db-user-credentials
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+---
+apiVersion: v1
+stringData:
+  username: wopr-labelstudio-db-user
+  password: '<change to something S3c7e7!>'
+kind: Secret
+metadata:
+  name: wopr-labelstudio-db-user-credentials
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth

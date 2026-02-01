@@ -1,0 +1,36 @@
+volumes:
+  postgres:
+
+services:
+  wopr-boh:
+    build:
+      context: ../container
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_USER: "${DB_USER}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DJANGO_SUPERUSER_USERNAME: "${DJANGO_SUPERUSER_USERNAME}"
+      DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
+      DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
+    ports:
+      - "8000:8000"
+
+  postgres:
+    container_name: wopr-boh_postgres
+    image: "postgres:latest"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      PGDATA: "/data/postgres"
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

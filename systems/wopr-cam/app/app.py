@@ -17,11 +17,15 @@ import sys
 from enum import Enum
 from typing import Optional
 from pathlib import Path
+import io
+from PIL import Image
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from picamera2 import Picamera2
+from libcamera import Transform
 
 # OTel imports
 from opentelemetry import metrics
@@ -32,7 +36,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
 from opentelemetry.trace.status import Status, StatusCode
 
-from wopr.config import init_config, get_str, get_int, get_bool
+#from wopr.config import init_config, get_str, get_int, get_bool
 from wopr.logging import setup_logging
 from wopr.tracing import create_tracer
 from wopr.storage import imagefilename
@@ -41,16 +45,18 @@ from wopr.storage import imagefilename
 import globals as g
 
 # Initialize config first
-init_config()
+WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2/config"
+#init_config(service_url=WOPR_API_URL)
 
 logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logger.info(f"Starting {g.APP_TITLE} v{g.APP_VERSION}")
+logger.info(f"WOPR API URL: {g.WOPR_API_URL}")
 # Initialize tracer using centralized setup with globals
 tracer = create_tracer(
     tracer_name=g.APP_NAME,
     tracer_version=g.APP_VERSION,
-    tracer_enabled=True,
+    tracer_enabled=False,
     tracer_endpoint=g.APP_OTEL_URL+"/v1/traces"
 )
 
@@ -62,7 +68,7 @@ resource = Resource(attributes={
 
 metric_reader = PeriodicExportingMetricReader(
     OTLPMetricExporter(
-        endpoint=get_str("otel.metrics.endpoint", f"{g.APP_OTEL_URL}/v1/metrics"),
+        endpoint=f"{g.APP_OTEL_URL}/v1/metrics",
     )
 )
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
@@ -100,17 +106,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 class Subject(str, Enum):
     setup = "setup"
     capture = "capture"
     move = "move"
     thumbnail = "thumbnail"
 
-
 class CaptureRequest(BaseModel):
     filename: Optional[str] = Field(None, description="Optional filename override")
-
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request, exc: ValueError):
@@ -121,7 +124,6 @@ async def value_error_handler(request, exc: ValueError):
             "message": str(exc),
         },
     )
-
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request, exc: Exception):
@@ -161,9 +163,9 @@ def capture(req: CaptureRequest):
                 span.set_attribute("camera.filepath", str(filepath))
                 span.set_attribute("camera.filename_override", bool(req.filename))
 
-            resolution = get_str("camera.default_resolution")
-            width = get_int(f"camera.resolutions.{resolution}.width")
-            height = get_int(f"camera.resolutions.{resolution}.height")
+            resolution = "4k"
+            width = "4056"
+            height = "3040"
             
             if span:
                 span.set_attribute("camera.resolution", resolution)
@@ -213,11 +215,12 @@ def capture(req: CaptureRequest):
 def capture_ml(req: CaptureRequest):
     with _trace_if_enabled("camera.capture_ml") as span:
         start_time = time.time()
+        camera_id = 0
         
         try:
             # Generate filepath
             filename = req.filename if req.filename else "noname.jpg"
-            base_path = get_str('storage.base_path')
+            base_path = "/remote/wopr"
             ml_subdir = "ml"
             ml_dir = Path(base_path) / ml_subdir / 'incoming'
             filepath = ml_dir / f"{filename}"
@@ -227,10 +230,10 @@ def capture_ml(req: CaptureRequest):
                 span.set_attribute("camera.filepath", str(filepath))
                 span.set_attribute("camera.ml_mode", True)
 
-            resolution = get_str("camera.default_resolution")
-            width = get_int(f"camera.resolutions.{resolution}.width")
-            height = get_int(f"camera.resolutions.{resolution}.height")
-            
+            resolution = "4k"
+            width = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["width"]
+            height = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["height"]
+            camType = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["type"]
             if span:
                 span.set_attribute("camera.resolution", resolution)
                 span.set_attribute("camera.width", width)
@@ -238,25 +241,42 @@ def capture_ml(req: CaptureRequest):
             
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
-            # Camera initialization and capture
-            with _trace_if_enabled("camera.device_init"):
-                cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-                if not cap.isOpened():
-                    raise RuntimeError("Camera device could not be opened")
+            if camType == "usb":
+                # Camera initialization and capture
+                with _trace_if_enabled("camera.device_init"):
+                    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+                    if not cap.isOpened():
+                        raise RuntimeError("Camera device could not be opened")
 
-                cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
-                cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+                    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+                    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-            with _trace_if_enabled("camera.frame_capture"):
-                ret, frame = cap.read()
-                cap.release()
+                with _trace_if_enabled("camera.frame_capture"):
+                    ret, frame = cap.read()
+                    cap.release()
+                    if not ret:
+                        raise RuntimeError("Camera capture failed (no frame read)")
 
-                if not ret:
-                    raise RuntimeError("Camera capture failed (no frame read)")
-
-            with _trace_if_enabled("camera.image_write"):
-                cv2.imwrite(str(filepath), frame)
+                with _trace_if_enabled("camera.image_write"):
+                    cv2.imwrite(str(filepath), frame)
+            elif camType == "imx477":
+                picam2 = Picamera2()
+                camera_config = picam2.create_preview_configuration(
+                    main={"size": (width, height), "format": "RGB888"},
+                    transform=Transform(hflip=1,vflip=1)
+                )
+                picam2.options["quality"] = 95
+                picam2.options["compress_level"] = 1
+                picam2.configure(camera_config)
+                picam2.start()
+                time.sleep(2)
+                picam2.capture_file(
+                    str(filepath),
+                    format='jpeg'
+                )
+                picam2.stop()
+                picam2.close()
 
             duration_ms = (time.time() - start_time) * 1000
             capture_duration.record(duration_ms, {"endpoint": "capture_ml"})
@@ -281,38 +301,53 @@ def status():
     with _trace_if_enabled("camera.status"):
         return {"status": "ready"}
 
-
-@app.get("/images/{game_id}")
-def list_images(game_id: str):
-    with _trace_if_enabled("camera.list_images") as span:
+@app.get("/grab/{camera_id}")
+@app.get("/grab/{camera_id}/")
+def grab_camera(camera_id: int):
+    with _trace_if_enabled("camera.grab") as span:
         if span:
-            span.set_attribute("game.id", game_id)
-        
-        # Use storage.base_path from config
-        wopr_root = Path(get_str('storage.base_path'))
-        game_dir = wopr_root / "games" / game_id
+            span.set_attribute("camera.id", camera_id)
+    camType = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["type"]
+    if camType == "blank":
+        return "no id"
+    width = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["width"]
+    height = g.WOPR_CONFIG["camera"]["camDict"][str(camera_id)]["height"]
+    if camType == "imx477":
+        picam2 = Picamera2()
+        camera_config = picam2.create_preview_configuration(
+                    main={"size": (width, height), "format": "RGB888"},
+                    transform=Transform(hflip=1,vflip=1)
+                )
+        picam2.configure(camera_config)
+        picam2.start()
+        time.sleep(2)
+        image_array = picam2.capture_array("main")
+        picam2.stop()
+        picam2.close()
+        image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(image_array)
+        buf = io.BytesIO()
+        img.save(buf, format='JPEG')
+        return PlainTextResponse(content=buf.getvalue(), media_type="image/jpeg")
+    else:
+        try:
+            cap = cv2.VideoCapture(camera_id, cv2.CAP_V4L2)
+            if not cap.isOpened():
+                raise RuntimeError("Camera device could not be opened")
 
-        if not game_dir.exists():
+            ret, frame = cap.read()
+            cap.release()
+
+            if not ret:
+                raise RuntimeError("Camera capture failed (no frame read)")
+
+            _, img_encoded = cv2.imencode('.jpg', frame)
             if span:
-                span.set_status(Status(StatusCode.ERROR, "Game not found"))
-            raise HTTPException(status_code=404, detail="Game not found")
-
-        images = sorted(
-            p for p in game_dir.rglob("*.jpg")
-            if p.is_file()
-        )
-
-        result = [
-            f"/wopr/{p.relative_to(wopr_root)}"
-            for p in images
-        ]
-
-        if span:
-            span.set_attribute("images.count", len(result))
-            span.set_status(Status(StatusCode.OK))
+                span.set_status(Status(StatusCode.OK))
+            return PlainTextResponse(content=img_encoded.tobytes(), media_type="image/jpeg")
         
-        return {
-            "game_id": game_id,
-            "count": len(result),
-            "images": result,
-        }
+        except Exception as e:
+            if span:
+                span.set_status(Status(StatusCode.ERROR, str(e)))
+                span.record_exception(e)
+            raise HTTPException(status_code=500, detail="Camera stream failed")
