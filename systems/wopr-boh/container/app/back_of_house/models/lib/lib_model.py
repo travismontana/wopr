@@ -111,7 +111,7 @@ def build_vers(model):
 
 
 def call_model_ctl(payload, url=None):
-    url = (os.getenv("MODEL_URL"), get_config()["api"]["model_url"])
+    url = (os.getenv("MODEL_URL"), get_config()["api"]["models_url"])
 
     try:
         response = requests.post(
