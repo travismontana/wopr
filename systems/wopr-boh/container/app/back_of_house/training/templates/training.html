@@ -5,26 +5,24 @@
 {% endblock %}
 
 {% block content %}
-{% if trainings %}
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Shortname</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for training in trainings %}
-        <tr>
-            <td>{{ training.id }}</td>
-            <td>{{ training.name }}</td>
-            <td>{{ training.shortname }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% if models %}
+<h2>Available Models</h2>
+<ul>
+    {% for model in models %}
+    <li>{{ model.name }}</li>
+    {% endfor %}
+</ul>
 {% else%}
-<p>No trainings available.</p>
+<p>No models available.</p>
+{% endif %}
+{% if projects %}
+<h2>Training Projects</h2>
+<ul>
+    {% for project in projects %}
+    <li>{{ project.title }} - {{ project.description }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No training projects available.</p>
 {% endif %}
 {% endblock %}  

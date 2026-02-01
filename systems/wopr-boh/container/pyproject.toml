@@ -13,6 +13,7 @@ dependencies = [
   "psycopg2-binary",
   "whitenoise",
   "requests",
+  "label-studio-sdk",
 ]
 
 [project.optional-dependencies]

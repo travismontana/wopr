@@ -54,6 +54,7 @@ class ModelInfo(models.Model):
             models.Index(fields=["shortname"]),
             models.Index(fields=["created_at"]),
             models.Index(fields=["updated_at"]),
+            models.Index(fields=["family"]),  # ADDED: FK index for query performance
         ]
         verbose_name_plural = "Model Info"
 
@@ -87,6 +88,7 @@ class ModelVersion(models.Model):
             models.Index(fields=["is_current"]),
             models.Index(fields=["created_at"]),
             models.Index(fields=["updated_at"]),
+            models.Index(fields=["model"]),  # ADDED: FK index for query performance
         ]
         verbose_name_plural = "Model Versions"
 
@@ -117,8 +119,103 @@ class ModelBackup(models.Model):
             models.Index(fields=["was_successful"]),
             models.Index(fields=["created_at"]),
             models.Index(fields=["updated_at"]),
+            models.Index(
+                fields=["model_version"]
+            ),  # ADDED: FK index for query performance
         ]
         verbose_name_plural = "Model Backups"
 
     def __str__(self):
         return f"Backup for {self.model_version} at {self.taken_at}"
+
+
+class Dataset(models.Model):
+    """Dataset artifact storage"""
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    artifact_uri = models.CharField(max_length=1024, unique=True)
+    description = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "datasets"
+        indexes = [
+            models.Index(fields=["uuid"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+        ]
+        verbose_name_plural = "Datasets"
+
+    def __str__(self):
+        return f"Dataset {self.uuid}"
+
+
+class Result(models.Model):
+    """Training run results and metrics"""
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    accuracy = models.FloatField(blank=True, null=True)
+    loss = models.FloatField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    artifact_uri = models.CharField(max_length=1024, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "results"
+        indexes = [
+            models.Index(fields=["uuid"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+        ]
+        verbose_name_plural = "Results"
+
+    def __str__(self):
+        return f"Result {self.uuid} - Acc: {self.accuracy}, Loss: {self.loss}"
+
+
+class TrainingRun(models.Model):
+    """Training run orchestration linking datasets, models, and results"""
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    description = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    training_parameters = models.JSONField(blank=True, null=True, default=dict)
+    dataset = models.ForeignKey(
+        Dataset, on_delete=models.CASCADE, related_name="training_runs"
+    )
+    result = models.ForeignKey(
+        Result,
+        on_delete=models.SET_NULL,
+        related_name="training_runs",
+        blank=True,
+        null=True,
+    )
+    model_version = models.ForeignKey(
+        ModelVersion, on_delete=models.CASCADE, related_name="training_runs"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    run_timestamp = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = "training_run"
+        indexes = [
+            models.Index(fields=["uuid"]),
+            models.Index(fields=["dataset"]),
+            models.Index(fields=["result"]),
+            models.Index(fields=["model_version"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+            models.Index(fields=["run_timestamp"]),
+        ]
+        verbose_name_plural = "Training Runs"
+
+    def __str__(self):
+        return f"TrainingRun {self.uuid} - {self.run_timestamp}"

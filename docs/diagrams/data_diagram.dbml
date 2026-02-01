@@ -1,13 +1,17 @@
+// WOPR Model Registry Schema v0.1.6-alpha
+// Generated from Django models
+
 Table model_families {
-  id integer [pk, increment]
+  id int [pk, increment]
   uuid uuid [unique, not null]
   name varchar(255) [unique, not null]
   shortname varchar(32) [unique, not null]
-  description text
-  note text
-  url varchar(200)
+  description text [null]
+  note text [null]
+  url varchar [null]
   created_at timestamp [not null]
   updated_at timestamp [not null]
+  mf_status jsonb [null]
   
   indexes {
     uuid
@@ -19,13 +23,13 @@ Table model_families {
 }
 
 Table model_info {
-  id integer [pk, increment]
+  id int [pk, increment]
   uuid uuid [unique, not null]
   name varchar(255) [unique, not null]
   shortname varchar(32) [unique, not null]
-  description text
-  note text
-  family_id integer [ref: > model_families.id, not null]
+  description text [null]
+  note text [null]
+  family_id int [not null, ref: > model_families.id]
   created_at timestamp [not null]
   updated_at timestamp [not null]
   
@@ -35,20 +39,21 @@ Table model_info {
     shortname
     created_at
     updated_at
+    family_id
   }
 }
 
 Table model_version {
-  id integer [pk, increment]
+  id int [pk, increment]
   uuid uuid [unique, not null]
-  version integer [not null]
-  artifact_uri varchar(1024) [unique, not null]
-  checksum varchar(128)
-  description text
-  note text
-  trained_at timestamp
+  version int [not null]
+  artifact_uri varchar(1024) [not null]
+  checksum varchar(128) [null]
+  description text [null]
+  note text [null]
+  trained_at timestamp [null]
   is_current boolean [not null, default: false]
-  model_id integer [ref: > model_info.id, not null]
+  model_id int [not null, ref: > model_info.id]
   created_at timestamp [not null]
   updated_at timestamp [not null]
   
@@ -58,36 +63,22 @@ Table model_version {
     is_current
     created_at
     updated_at
+    model_id
   }
-}
-
-Table model_status {
-  id integer [pk, increment]
-  uuid uuid [unique, not null]
-  observed_at timestamp [not null]
-  has_distfile boolean [not null, default: false]
-  has_backup boolean [not null, default: false]
-  model_version_id integer [ref: > model_version.id, not null]
-  created_at timestamp [not null]
-  updated_at timestamp [not null]
   
-  indexes {
-    uuid
-    observed_at
-    created_at
-    updated_at
-  }
+  Note: 'Needs constraint: only one is_current=true per model_id'
 }
 
 Table model_backup {
-  id integer [pk, increment]
+  id int [pk, increment]
   uuid uuid [unique, not null]
   taken_at timestamp [not null]
   was_successful boolean [not null, default: false]
   artifact_uri varchar(1024) [unique, not null]
-  model_version_id integer [ref: > model_version.id, not null]
+  model_version_id int [not null, ref: > model_version.id]
   created_at timestamp [not null]
   updated_at timestamp [not null]
+  note text [null]
   
   indexes {
     uuid
@@ -95,5 +86,72 @@ Table model_backup {
     was_successful
     created_at
     updated_at
+    model_version_id
   }
 }
+
+Table training_run {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  description text [null]
+  note text [null]
+  training_parameters jsonb [null]
+  dataset_id int [not null, ref: > datasets.id]
+  result_id int [null, ref: > results.id]
+  model_version_id int [not null, ref: > model_version.id]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  run_timestamp timestamp [null]
+  
+  indexes {
+    uuid
+    dataset_id
+    result_id
+    model_version_id
+    created_at
+    updated_at
+    run_timestamp
+  }
+}
+
+Table datasets {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  artifact_uri varchar(1024) [unique, not null]
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    created_at
+    updated_at
+  }
+}
+
+Table results {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  accuracy float [null]
+  loss float [null]
+  description text [null]
+  note text [null]
+  artifact_uri varchar(1024) [unique, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  
+  indexes {
+    uuid
+    created_at
+    updated_at
+  }
+}
+
+// Relationships
+// ModelFamily (1) --< ModelInfo (N)
+// ModelInfo (1) --< ModelVersion (N)
+// ModelVersion (1) --< ModelBackup (N)
+// ModelVersion (1) --< TrainingRun (N)
+// Dataset (1) --< TrainingRun (N)
+// Result (1) <-- TrainingRun (1)
