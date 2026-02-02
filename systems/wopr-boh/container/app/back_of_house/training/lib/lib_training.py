@@ -5,6 +5,7 @@ from django.forms.models import model_to_dict
 from label_studio_sdk import LabelStudio
 
 from core.models import TrainingRun, Dataset, Result
+from models.lib.lib_model import call_model_ctl
 
 logger = setup_logger()
 config = get_config()

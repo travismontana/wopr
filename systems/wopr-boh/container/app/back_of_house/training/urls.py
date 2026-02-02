@@ -8,4 +8,6 @@ urlpatterns = [
     path("training_detail/", views.training_detail, name="training_detail"),
     path("new_training/", views.new_training, name="new_training"),
     path("generate_dataset/", views.generate_dataset, name="generate_dataset"),
+    path("training_setup/", views.training_setup, name="training_setup"),
+    path("training_results/", views.training_results, name="training_results"),
 ]

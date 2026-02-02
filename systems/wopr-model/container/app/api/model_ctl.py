@@ -16,6 +16,7 @@ from lib.helpers import (
 )
 
 from lib.lib_model_ctl import initialize_model, generate_dataset
+from lib.lib_training import train_yolo_model
 
 from lib.safe_file import SafeFS
 
@@ -23,17 +24,11 @@ logger = setup_logger()
 
 model_ctl = APIRouter(tags=["models"])
 
+
+# FastAPI endpoint
 @model_ctl.post("")
-def model_control(request: Request, body: dict[str, Any]):
-    """Model Control
-    initalize:
-      does the file exist in storage_paths["distfiles_path"]
-      if not then check if it's in storage_paths["downloads_path"]
-      if it's not there then download it using ultralytics.
-    Args:
-        request (Request): _description_
-        body (dict[str, Any]): _description_
-    """
+def model_control(body: dict[str, Any]):  # Removed unused Request
+    """Model Control endpoint for model operations."""
     logit("model_control", f"body: {body}")
     payload = body.get("payload", {})
     action = payload.get("action", "")
@@ -47,6 +42,14 @@ def model_control(request: Request, body: dict[str, Any]):
             dataset = payload.get("dataset", "")
             dataset_uuid = payload.get("dataset_uuid", "")
             results = generate_dataset(dataset_uuid, dataset)
+        case "train":
+            results = train_yolo_model(
+                model_version=payload.get("model_version", {}),
+                dataset=payload.get("dataset", {}),
+                training_params=payload.get("training_params", {}),
+                training_run=payload.get("training_run", {}),
+            )
         case _:
             results = {"status": "error", "message": f"Unknown action: {action}"}
+
     return results

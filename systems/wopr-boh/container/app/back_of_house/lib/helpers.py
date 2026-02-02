@@ -51,31 +51,39 @@ def get_config() -> dict:
         PermissionError: Cannot read config file
     """
     logger = logging.getLogger(__name__)
-    config_path = Path("/config/wopr.config.yaml")
+    ls = os.getenv("LABEL_STUDIO_URL")
+    if not ls:
+        config_path = Path("/config/wopr.config.yaml")
 
-    if not config_path.exists():
-        logger.error(f"Config file not found: {config_path}")
-        raise FileNotFoundError(f"Config file not found: {config_path}")
+        if not config_path.exists():
+            logger.error(f"Config file not found: {config_path}")
+            raise FileNotFoundError(f"Config file not found: {config_path}")
 
-    if not config_path.is_file():
-        logger.error(f"Config path is not a file: {config_path}")
-        raise ValueError(f"Config path is not a file: {config_path}")
+        if not config_path.is_file():
+            logger.error(f"Config path is not a file: {config_path}")
+            raise ValueError(f"Config path is not a file: {config_path}")
 
-    try:
-        with config_path.open("r") as f:
-            config = json.load(f)
-    except json.JSONDecodeError as e:
-        logger.error(f"Invalid JSON in config file: {e}")
-        raise
-    except PermissionError as e:
-        logger.error(f"Permission denied reading config file: {e}")
-        raise
+        try:
+            with config_path.open("r") as f:
+                config = json.load(f)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in config file: {e}")
+            raise
+        except PermissionError as e:
+            logger.error(f"Permission denied reading config file: {e}")
+            raise
 
-    if not isinstance(config, dict):
-        logger.error(f"Config is not a dict, got {type(config)}")
-        raise ValueError(f"Config must be a dict, got {type(config)}")
+        if not isinstance(config, dict):
+            logger.error(f"Config is not a dict, got {type(config)}")
+            raise ValueError(f"Config must be a dict, got {type(config)}")
 
-    logger.info(f"Loaded config from {config_path}")
+        logger.info(f"Loaded config from {config_path}")
+    else:
+        config = {
+            "vision": {
+                "label_studio_url": ls,
+            },
+        }
     return config
 
 

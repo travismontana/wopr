@@ -24,6 +24,12 @@
                 <li>The {{ need.needs }} for dataset is not set, so there are no datasets to be had.</li>
             {% elif need.set == "result" %}
                 <li>The {{ need.needs }} for result is not set, so there are no results to be had.</li>
+                <form name="training_setup" method="post" action="{% url 'training_setup' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="training_run_id" value="{{ training_run.id }}">
+                    <input type="hidden" name="dataset_id" value="{{ dataset.id }}">
+                    <button type="submit" name="training_run_id" value="{{ training_run.id }}">Set Up Training</button>
+                </form>
             {% endif %}
         {% endfor %}
     </ul>
