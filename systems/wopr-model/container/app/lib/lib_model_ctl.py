@@ -217,7 +217,8 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
                     )
 
                     # Extract filename and copy to images dir
-                    name = os.path.basename(local_image_path).split("__", 1)[-1]
+                    # name = os.path.basename(local_image_path).split("__", 1)[-1]
+                    name = os.path.basename(local_image_path)
                     destination_path = images_dir / name
                     shutil.copy2(local_image_path, destination_path)
 
