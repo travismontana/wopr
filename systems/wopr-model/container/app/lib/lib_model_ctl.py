@@ -238,6 +238,8 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
                         failed_count += 1
 
         logger.info(f"Downloaded {downloaded_count} images, {failed_count} failed")
+        logger.info("Creating data.yaml for YOLO training")
+        data_yaml_path = create_data_yaml(str(dataset_path))
 
         # Return results
         return {
@@ -247,6 +249,7 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
                 "dataset_path": str(dataset_path),
                 "yolo_path": str(yolo_output_dir),
                 "images_path": str(images_dir),
+                "data_yaml": data_yaml_path,
                 "total_tasks": len(exported_tasks),
                 "images_downloaded": downloaded_count,
                 "images_failed": failed_count,
@@ -259,3 +262,40 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
             "status": "error",
             "message": f"Dataset generation failed: {str(e)}",
         }
+
+
+def create_data_yaml(dataset_path: str):
+    """Create data.yaml for YOLO training.
+
+    Args:
+        dataset_path (str): Path to the dataset directory
+
+    Returns:
+        str: Path to created data.yaml file
+    """
+    dataset_path = Path(dataset_path)
+    yolo_path = dataset_path / "yolo"
+    classes_file = yolo_path / "classes.txt"
+
+    # Read class names
+    with open(classes_file, "r") as f:
+        class_names = [line.strip() for line in f.readlines()]
+
+    # Create data.yaml structure
+    data_yaml = {
+        "path": str(yolo_path.absolute()),
+        "train": "images",  # relative to path
+        "val": "images",  # using same for now, could split later
+        "nc": len(class_names),
+        "names": {i: name for i, name in enumerate(class_names)},
+    }
+
+    # Write data.yaml
+    yaml_file = yolo_path / "data.yaml"
+    with open(yaml_file, "w") as f:
+        yaml.dump(data_yaml, f, default_flow_style=False)
+
+    logger.info(f"Created data.yaml at {yaml_file}")
+    logger.debug(f"Classes: {class_names}")
+
+    return str(yaml_file)

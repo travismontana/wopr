@@ -1,3 +1,5 @@
+import threading
+
 from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from core.models import ModelVersion, ModelInfo, TrainingRun, Dataset, Result
@@ -124,40 +126,48 @@ def training_detail(request):
 
 
 def generate_dataset(request):
-    # Placeholder for dataset generation logic
+
+    """Generate dataset from Label Studio project."""
     logger.info("Dataset generation requested")
     results = []
+
     if request.method == "POST":
-        # Implement dataset generation logic here
         dataset_uuid = request.POST.get("dataset_uuid")
+
         try:
             dataset = Dataset.objects.get(uuid=dataset_uuid)
             logger.info(f"Generating dataset with UUID: {dataset_uuid}")
+
             payload = {
                 "action": "generate_dataset",
                 "dataset_uuid": str(dataset.uuid),
                 "dataset": model_to_dict(dataset),
             }
-            dataz = call_model_control(payload)
-            logger.info(f"Dataset generation response: {dataz}")
-            if dataz.get("status") != "success":
-                logger.error(f"Dataset generation failed: {dataz.get('message')}")
-                results.append(
-                    {
-                        "status": "error",
-                        "type": "dataset_generation",
-                        "message": f"Dataset generation failed: {dataz.get('message')}",
-                    }
-                )
-            else:
-                logger.info(f"Dataset generation initiated for UUID: {dataset_uuid}")
-                results.append(
-                    {
-                        "status": "success",
-                        "type": "dataset_generation",
-                        "message": f"Dataset generation initiated for UUID: {dataset_uuid}",
-                    }
-                )
+
+            # Fire and forget - don't wait for response
+
+            def async_call():
+                try:
+                    logger.info(
+                        f"Background: Starting dataset generation for {dataset_uuid}"
+                    )
+                    dataz = call_model_control(payload)
+                    logger.info(f"Background: Dataset generation response: {dataz}")
+                except Exception as e:
+                    logger.error(f"Background: Dataset generation failed: {e}")
+
+            thread = threading.Thread(target=async_call)
+            thread.daemon = True
+            thread.start()
+
+            results.append(
+                {
+                    "status": "success",
+                    "type": "dataset_generation",
+                    "message": f"Dataset generation started for UUID: {dataset_uuid}. Check logs for completion.",
+                }
+            )
+
         except Dataset.DoesNotExist:
             logger.error(f"Dataset with UUID {dataset_uuid} not found")
             results.append(
