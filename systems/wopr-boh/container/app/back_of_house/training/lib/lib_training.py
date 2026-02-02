@@ -11,7 +11,7 @@ config = get_config()
 logger.info("lib_training.py loaded.")
 logger.info(f"Configuration: {config}")
 
-LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "config["vision"]["label_studio_url"])
+LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", config["vision"]["label_studio_url"])
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN", "changeme")
 
 try:
