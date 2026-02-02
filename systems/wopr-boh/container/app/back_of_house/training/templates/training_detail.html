@@ -17,18 +17,18 @@
     <br>
     <hr>
     {% if needs %}
-    <h3>Training Needs</h3>
+    <h3>Training Status</h3>
     <ul>
         {% for need in needs %}
             {% if need.set == "dataset" %}
-                <li>Dataset needs: {{ need.needs }}</li>
+                <li>The {{ need.needs }} for dataset is not set, so there are no datasets to be had.</li>
             {% elif need.set == "result" %}
-                <li>Result needs: {{ need.needs }}</li>
+                <li>The {{ need.needs }} for result is not set, so there are no results to be had.</li>
             {% endif %}
         {% endfor %}
     </ul>
     {% else %}
-    <p>No training needs recorded.</p>
+    <p>Done been trained.</p>
     {% endif %}
     <br>
     {% if dataset %}
