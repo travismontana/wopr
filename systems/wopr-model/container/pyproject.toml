@@ -17,6 +17,7 @@ dependencies = [
   "requests",
   "ultralytics",
   "opencv-python-headless",
+  "label-studio-sdk",
 ]
 
 [project.optional-dependencies]
