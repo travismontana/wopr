@@ -135,6 +135,7 @@ def generate_dataset(request):
             logger.info(f"Generating dataset with UUID: {dataset_uuid}")
             payload = {
                 "action": "generate_dataset",
+                "dataset_uuid": str(dataset.uuid),
                 "dataset": model_to_dict(dataset),
             }
             dataz = call_model_control(payload)

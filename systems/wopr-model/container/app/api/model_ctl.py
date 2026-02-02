@@ -45,7 +45,8 @@ def model_control(request: Request, body: dict[str, Any]):
             results = initialize_model(filename, model_family)
         case "generate_dataset":
             dataset = payload.get("dataset", "")
-            results = generate_dataset(dataset)
+            dataset_uuid = payload.get("dataset_uuid", "")
+            results = generate_dataset(dataset_uuid, dataset)
         case _:
             results = {"status": "error", "message": f"Unknown action: {action}"}
     return results
