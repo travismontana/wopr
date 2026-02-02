@@ -134,7 +134,7 @@ class Dataset(models.Model):
 
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    artifact_uri = models.CharField(max_length=1024, unique=True)
+    artifact_uri = models.CharField(max_length=1024)
     description = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -162,7 +162,7 @@ class Result(models.Model):
     loss = models.FloatField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
-    artifact_uri = models.CharField(max_length=1024, unique=True)
+    artifact_uri = models.CharField(max_length=1024)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

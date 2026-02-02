@@ -1,7 +1,10 @@
 import os
 import requests
 from lib.helpers import setup_logger
+from django.forms.models import model_to_dict
 from label_studio_sdk import LabelStudio
+
+from core.models import TrainingRun, Dataset, Result
 
 logger = setup_logger()
 LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "http://label-studio:8080")
@@ -19,6 +22,9 @@ def list_all_projects():
     results = []
     projects = None
     if client is None:
+        logger.error(
+            " list_all_projects - if client is None - No connection to Label Studio."
+        )
         results.append(
             {
                 "status": "error",
@@ -28,6 +34,7 @@ def list_all_projects():
         )
         return results, projects
     try:
+        logger.info(f"Fetching projects from Label Studio...{LABEL_STUDIO_URL}...")
         projects = list(client.projects.list())  # Convert to list
         logger.info(f"Fetched {len(projects)} projects from Label Studio.")
         logger.debug(f"Projects details: {projects}")
@@ -36,6 +43,17 @@ def list_all_projects():
                 "status": "success",
                 "type": "fetch",
                 "message": f"Successfully fetched {len(projects)} projects",
+            }
+        )
+        return results, projects
+    # catch the timeout
+    except requests.exceptions.Timeout as e:
+        logger.error(f"Timeout error fetching projects: {e}")
+        results.append(
+            {
+                "status": "error",
+                "type": "timeout",
+                "message": f"Timeout error fetching projects: {str(e)}",
             }
         )
         return results, projects
@@ -49,3 +67,22 @@ def list_all_projects():
             }
         )
         return results, projects
+
+
+def get_training_uuid(version, project_id, description="", notes=""):
+    """Create a TrainingRun entry and return its UUID."""
+    logger.info("Creating TrainingRun entry...")
+    logger.info(f"Version ID: {version.id}, Project ID: {project_id}")
+    dataset, creates = Dataset.objects.get_or_create(artifact_uri="/dev/null")
+    result = Result.objects.create(artifact_uri="/dev/null")
+    training_run = TrainingRun.objects.create(
+        model_version=version,
+        description=description,
+        note=notes,
+        dataset=dataset,
+        result=result,
+    )
+    logger.info(
+        f"Created TrainingRun with UUID: {training_run.uuid} for version ID: {version.id} and project ID: {project_id}"
+    )
+    return training_run.uuid
