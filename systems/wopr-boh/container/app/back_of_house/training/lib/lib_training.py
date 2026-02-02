@@ -1,13 +1,17 @@
 import os
 import requests
-from lib.helpers import setup_logger
+from lib.helpers import setup_logger,get_config
 from django.forms.models import model_to_dict
 from label_studio_sdk import LabelStudio
 
 from core.models import TrainingRun, Dataset, Result
 
 logger = setup_logger()
-LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "http://label-studio:8080")
+config = get_config()
+logger.info("lib_training.py loaded.")
+logger.info(f"Configuration: {config}")
+
+LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "config["vision"]["label_studio_url"])
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN", "changeme")
 
 try:

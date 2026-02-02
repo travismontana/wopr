@@ -37,6 +37,11 @@ wopr-baseapp:
       configMap:
         name: wopr-json
   env:
+    - name: LABEL_STUDIO_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: labelstudio-token-secret
+          key: labelstudio-token
     - name: WOPR_API_URL
       valueFrom:
         configMapKeyRef:
