@@ -1,8 +1,9 @@
 import os
 import time
 import json
-import shutil
 import yaml
+import shutil
+import random
 import ultralytics
 from pathlib import Path
 from datetime import datetime
@@ -240,8 +241,14 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
                         failed_count += 1
 
         logger.info(f"Downloaded {downloaded_count} images, {failed_count} failed")
-        logger.info("Creating data.yaml for YOLO training")
-        data_yaml_path = create_data_yaml(str(dataset_path))
+
+        # Split into train/val
+        stats = split_yolo_train_val(yolo_output_dir, val_ratio=0.2, seed=42)
+        logger.info(f"Dataset split stats: {stats}")
+
+        # Write data.yaml for split
+        data_yaml_path = write_data_yaml_for_split(yolo_output_dir)
+        logger.info(f"Updated data.yaml at {data_yaml_path}")
 
         # Return results
         return {
@@ -301,3 +308,141 @@ def create_data_yaml(dataset_path: str):
     logger.debug(f"Classes: {class_names}")
 
     return str(yaml_file)
+
+
+def split_yolo_train_val(
+    yolo_dir: Path,
+    val_ratio: float = 0.2,
+    seed: int = 42,
+    image_exts: tuple[str, ...] = (".jpg", ".jpeg", ".png", ".webp"),
+) -> dict:
+    """
+    Split YOLO dataset into train/val by moving files:
+      yolo/images/*.jpg  -> yolo/images/train|val/
+      yolo/labels/*.txt  -> yolo/labels/train|val/
+
+    Assumes label filename stem matches image filename stem (YOLO convention).
+    Creates empty label files if missing (valid for "no objects").
+
+    Returns counts and any mismatches.
+    """
+    yolo_dir = Path(yolo_dir)
+    images_root = yolo_dir / "images"
+    labels_root = yolo_dir / "labels"
+
+    if not images_root.exists():
+        raise FileNotFoundError(f"Missing images dir: {images_root}")
+    if not labels_root.exists():
+        raise FileNotFoundError(f"Missing labels dir: {labels_root}")
+
+    train_images = images_root / "train"
+    val_images = images_root / "val"
+    train_labels = labels_root / "train"
+    val_labels = labels_root / "val"
+
+    for d in (train_images, val_images, train_labels, val_labels):
+        d.mkdir(parents=True, exist_ok=True)
+
+    # Only take images that are currently in the root (not already split)
+    images = [
+        p
+        for p in images_root.iterdir()
+        if p.is_file() and p.suffix.lower() in image_exts
+    ]
+    images.sort(key=lambda p: p.name)  # stable before shuffle
+
+    rng = random.Random(seed)
+    rng.shuffle(images)
+
+    n_val = int(round(len(images) * val_ratio))
+    val_set = set(images[:n_val])
+
+    stats = {
+        "total_images_seen": len(images),
+        "val_ratio": val_ratio,
+        "seed": seed,
+        "moved_train": 0,
+        "moved_val": 0,
+        "missing_label_created": 0,
+        "orphan_labels_remaining_in_root": 0,
+    }
+
+    for img in images:
+        stem = img.stem
+        lbl = labels_root / f"{stem}.txt"
+
+        if img in val_set:
+            img_dst = val_images / img.name
+            lbl_dst = val_labels / f"{stem}.txt"
+            bucket = "val"
+        else:
+            img_dst = train_images / img.name
+            lbl_dst = train_labels / f"{stem}.txt"
+            bucket = "train"
+
+        img.rename(img_dst)
+
+        if lbl.exists():
+            lbl.rename(lbl_dst)
+        else:
+            # Valid YOLO: empty file = no objects
+            lbl_dst.write_text("")
+            stats["missing_label_created"] += 1
+
+        if bucket == "val":
+            stats["moved_val"] += 1
+        else:
+            stats["moved_train"] += 1
+
+    # Count any leftover label files still sitting in labels_root (usually means mismatch)
+    leftover_labels = [
+        p for p in labels_root.iterdir() if p.is_file() and p.suffix.lower() == ".txt"
+    ]
+    stats["orphan_labels_remaining_in_root"] = len(leftover_labels)
+
+    return stats
+
+
+def write_data_yaml_for_split(yolo_dir: Path) -> str:
+    """
+    Writes/overwrites yolo/data.yaml to use images/train and images/val.
+    Preserves existing names if present; otherwise derives from classes.txt.
+    """
+    yolo_dir = Path(yolo_dir)
+    yaml_path = yolo_dir / "data.yaml"
+
+    # Try to preserve any existing YAML content
+    existing = {}
+    if yaml_path.exists():
+        try:
+            existing = yaml.safe_load(yaml_path.read_text()) or {}
+        except Exception:
+            existing = {}
+
+    classes_file = yolo_dir / "classes.txt"
+    class_names = []
+    if classes_file.exists():
+        class_names = [
+            line.strip()
+            for line in classes_file.read_text().splitlines()
+            if line.strip()
+        ]
+
+    # Prefer existing names mapping if present
+    names = existing.get("names")
+    if not names:
+        names = {i: n for i, n in enumerate(class_names)}
+
+    data_yaml = {
+        "path": str(yolo_dir.absolute()),
+        "train": "images/train",
+        "val": "images/val",
+        "names": names,
+    }
+
+    # Optional but harmless
+    if class_names:
+        data_yaml["nc"] = len(class_names)
+
+    yaml_path.write_text(yaml.safe_dump(data_yaml, sort_keys=False))
+    return str(yaml_path)
