@@ -1,33 +1,39 @@
 {% extends "base.html" %}
 
 {% block main_subheader %}
-<p>Training</p>
+<p>Training</p><br>
+<a href="{% url 'new_training' %}">Create a new training</a>
 {% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'start_training' %}">
-    {% csrf_token %}
-    
-    <label for="version_select"><strong>Model Version:</strong></label>
-    <select name="version_id" id="version_select" required>
-        <option value="">Select a model version</option>
-        {% for version in model_vers %}
-        <option value="{{ version.id }}">{{ version.model.name }} - {{ version.artifact_uri }}</option>
-        {% endfor %}
-    </select>
-    <br>
-    <label for="project_select"><strong>Project:</strong></label>
-    <select name="project_id" id="project_select" required>
-        <option value="">Select a project</option>
-        {% for project in projects %}
-        <option value="{{ project.id }}">{{ project.title }}</option>
-        {% endfor %}
-    </select>
-    <br>
-    <strong>Description:</strong><input type="text" name="description">
-    <br>
-    <strong>Notes:</strong><input type="text" name="notes">
-    <br>
-    <input type="submit" value="Start Training">
-</form>
+
+{% if training_runs %}
+<br>
+<hr>
+<h2>Training Runs</h2>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>UUID</th>
+        <th>Model</th>
+        <th>Model Version</th>
+        <th>Dataset</th>
+        <th>Result</th>
+    </tr>
+    {% for run in training_runs %}
+    <tr>
+        <td><form name="run_id" method="post" action ="{% url 'training_detail' %}">
+            {% csrf_token %}
+            <button type="submit" name="run_id" value="{{ run.id }}">{{ run.id }}</button>
+        </form></td>
+        <td>{{ run.uuid }}</td>
+        <td>{{ run.model_version.model.name }}</td>
+        <td>{{ run.model_version.model.name }} - {{ run.model_version.artifact_uri }}</td>
+        <td>{{ run.dataset.id }}</td>
+        <td>{{ run.result.id }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
 {% endblock %}

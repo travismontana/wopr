@@ -73,6 +73,7 @@ def get_training_uuid(version, project_id, description="", notes=""):
     """Create a TrainingRun entry and return its UUID."""
     logger.info("Creating TrainingRun entry...")
     logger.info(f"Version ID: {version.id}, Project ID: {project_id}")
+    results = []
     dataset, creates = Dataset.objects.get_or_create(artifact_uri="/dev/null")
     result = Result.objects.create(artifact_uri="/dev/null")
     training_run = TrainingRun.objects.create(
@@ -85,4 +86,11 @@ def get_training_uuid(version, project_id, description="", notes=""):
     logger.info(
         f"Created TrainingRun with UUID: {training_run.uuid} for version ID: {version.id} and project ID: {project_id}"
     )
-    return training_run.uuid
+    results.append(
+        {
+            "status": "success",
+            "type": "creation",
+            "message": f"Created TrainingRun with UUID: {training_run.uuid}",
+        }
+    )
+    return training_run, results

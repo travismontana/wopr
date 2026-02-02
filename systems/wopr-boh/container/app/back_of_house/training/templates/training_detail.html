@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<h1>Training Details</h1>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{% if training_run %}
+    <h2>Training Run ID: {{ training_run.id }}</h2>
+    <p><strong>UUID:</strong> {{ training_run.uuid }}</p>
+    <p><strong>Model:</strong> {{ training_run.model_version.model.name }}</p>
+    <p><strong>Model Version:</strong> {{ training_run.model_version.model.name }}
+    <p><strong>Description:</strong> {{ training_run.description }}</p>
+    <p><strong>Notes:</strong> {{ training_run.notes }}</p>
+    <p><strong>Dataset ID:</strong> {{ training_run.dataset.id }}</p>
+    <br>
+    <hr>
+    {% if needs %}
+    <h3>Training Needs</h3>
+    <ul>
+        {% for need in needs %}
+            {% if need.set == "dataset" %}
+                <li>Dataset needs: {{ need.needs }}</li>
+            {% elif need.set == "result" %}
+                <li>Result needs: {{ need.needs }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No training needs recorded.</p>
+    {% endif %}
+    <br>
+{% else %}
+    <p>No training run details available.</p>
+{% endif %}
+{% endblock %}
