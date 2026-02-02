@@ -106,6 +106,11 @@ def generate_dataset(dataset: dict):
         # Setup paths
         project_id = dataset.get("project_id", "")
         dataset_uuid = dataset.get("dataset_uuid", "")
+        if dataset_uuid == "":
+            return {
+                "status": "error",
+                "message": "Dataset UUID is required",
+            }
         view_id: int = None
         dataset_path = Path(globals.DATASETS_PATH) / str(dataset_uuid)
         logit(
