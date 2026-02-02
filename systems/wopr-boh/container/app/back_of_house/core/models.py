@@ -139,6 +139,7 @@ class Dataset(models.Model):
     note = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    project_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = "datasets"

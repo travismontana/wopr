@@ -15,7 +15,7 @@ from lib.helpers import (
     backup_dist_file,
 )
 
-from lib.lib_model_ctl import initialize_model
+from lib.lib_model_ctl import initialize_model, generate_dataset
 
 from lib.safe_file import SafeFS
 
@@ -37,12 +37,15 @@ def model_control(request: Request, body: dict[str, Any]):
     logit("model_control", f"body: {body}")
     payload = body.get("payload", {})
     action = payload.get("action", "")
-    filename = payload.get("filename", "")
-    model_family = payload.get("model_family", "")
 
     match action:
         case "create_new_model_file":
+            filename = payload.get("filename", "")
+            model_family = payload.get("model_family", "")
             results = initialize_model(filename, model_family)
+        case "generate_dataset":
+            dataset = payload.get("dataset", "")
+            results = generate_dataset(dataset)
         case _:
             results = {"status": "error", "message": f"Unknown action: {action}"}
     return results

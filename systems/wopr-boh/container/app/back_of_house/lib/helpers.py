@@ -1,6 +1,8 @@
-import logging
+import os
 import sys
 import json
+import logging
+import requests
 from pathlib import Path
 
 LOGGER_NAME = "wopr_boh"
@@ -75,3 +77,33 @@ def get_config() -> dict:
 
     logger.info(f"Loaded config from {config_path}")
     return config
+
+
+def call_model_control(payload, url=None):
+    url = os.getenv("MODEL_URL") or get_config()["api"]["models_url"]
+    logger.info(f"Calling model_ctl at {url} with payload: {payload}")
+    try:
+        response = requests.post(
+            f"{url}/api/model_ctl",
+            json={"payload": payload},
+            timeout=300,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.Timeout:
+        logger.error("model_ctl timed out after 5s | payload=%s", payload)
+        return {"status": "timeout"}
+
+    except requests.exceptions.ConnectionError:
+        logger.error("model_ctl unreachable at %s | payload=%s", url, payload)
+        return {"status": "unreachable"}
+
+    except requests.exceptions.HTTPError as e:
+        logger.error(
+            "model_ctl returned %s | payload=%s | detail=%s",
+            e.response.status_code,
+            payload,
+            e.response.text,
+        )
+        return {"status": "http_error", "detail": e.response.text}

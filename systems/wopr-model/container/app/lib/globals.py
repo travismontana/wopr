@@ -60,3 +60,4 @@ storage_paths = {
     "downloads_path": (Path(BASE_PATH) / DOWNLOADS_SUBDIR).resolve(),
 }
 WEIGHTS_PATH = "/ultralytics/weights"
+DATASETS_PATH = "/ultralytics/datasets"

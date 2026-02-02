@@ -74,12 +74,14 @@ def get_training_uuid(version, project_id, description="", notes=""):
     logger.info("Creating TrainingRun entry...")
     logger.info(f"Version ID: {version.id}, Project ID: {project_id}")
     results = []
-    dataset, creates = Dataset.objects.get_or_create(artifact_uri="/dev/null")
+    dataset, creates = Dataset.objects.get_or_create(
+        artifact_uri="/dev/null", project_id=project_id
+    )
     result = Result.objects.create(artifact_uri="/dev/null")
     training_run = TrainingRun.objects.create(
         model_version=version,
         description=description,
-        note=notes,
+        note=project_id,
         dataset=dataset,
         result=result,
     )

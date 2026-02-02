@@ -1,12 +1,13 @@
-from django.shortcuts import render
-
+from django.shortcuts import render, redirect
+from django.forms.models import model_to_dict
 from core.models import ModelVersion, ModelInfo, TrainingRun, Dataset, Result
 
 from .lib.lib_training import list_all_projects, get_training_uuid
 
-from lib.helpers import setup_logger
+from lib.helpers import setup_logger, call_model_control
 
 logger = setup_logger()
+
 
 # Create your views here.
 def index(request):
@@ -120,3 +121,68 @@ def training_detail(request):
                 request, "training.html", {"error": "Invalid training run ID"}
             )
     return render(request, "training.html", {"error": "Invalid training run ID"})
+
+
+def generate_dataset(request):
+    # Placeholder for dataset generation logic
+    logger.info("Dataset generation requested")
+    results = []
+    if request.method == "POST":
+        # Implement dataset generation logic here
+        dataset_uuid = request.POST.get("dataset_uuid")
+        try:
+            dataset = Dataset.objects.get(uuid=dataset_uuid)
+            logger.info(f"Generating dataset with UUID: {dataset_uuid}")
+            payload = {
+                "action": "generate_dataset",
+                "dataset": model_to_dict(dataset),
+            }
+            dataz = call_model_control(payload)
+            logger.info(f"Dataset generation response: {dataz}")
+            if dataz.get("status") != "success":
+                logger.error(f"Dataset generation failed: {dataz.get('message')}")
+                results.append(
+                    {
+                        "status": "error",
+                        "type": "dataset_generation",
+                        "message": f"Dataset generation failed: {dataz.get('message')}",
+                    }
+                )
+            else:
+                logger.info(f"Dataset generation initiated for UUID: {dataset_uuid}")
+                results.append(
+                    {
+                        "status": "success",
+                        "type": "dataset_generation",
+                        "message": f"Dataset generation initiated for UUID: {dataset_uuid}",
+                    }
+                )
+        except Dataset.DoesNotExist:
+            logger.error(f"Dataset with UUID {dataset_uuid} not found")
+            results.append(
+                {
+                    "status": "error",
+                    "type": "dataset_generation",
+                    "message": f"Dataset with UUID {dataset_uuid} not found",
+                }
+            )
+        except Exception as e:
+            logger.error(f"Dataset generation failed: {e}")
+            results.append(
+                {
+                    "status": "error",
+                    "type": "dataset_generation",
+                    "message": f"Dataset generation failed: {str(e)}",
+                }
+            )
+    else:
+        logger.error("Invalid request method for dataset generation")
+        results.append(
+            {
+                "status": "error",
+                "type": "dataset_generation",
+                "message": "Invalid request method",
+            }
+        )
+
+    return render(request, "training_return.html", {"results": results})

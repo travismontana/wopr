@@ -10,7 +10,7 @@
     <h2>Training Run ID: {{ training_run.id }}</h2>
     <p><strong>UUID:</strong> {{ training_run.uuid }}</p>
     <p><strong>Model:</strong> {{ training_run.model_version.model.name }}</p>
-    <p><strong>Model Version:</strong> {{ training_run.model_version.model.name }}
+    <p><strong>Model Version:</strong> {{ training_run.model_version.model.name }}</p>
     <p><strong>Description:</strong> {{ training_run.description }}</p>
     <p><strong>Notes:</strong> {{ training_run.notes }}</p>
     <p><strong>Dataset ID:</strong> {{ training_run.dataset.id }}</p>
@@ -31,7 +31,21 @@
     <p>No training needs recorded.</p>
     {% endif %}
     <br>
+    {% if dataset %}
+    <hr>
+    <h3>Dataset Details</h3>
+    <p><strong>Dataset ID:</strong> {{ dataset.id }}</p>
+    <p><strong>UUID:</strong> {{ dataset.uuid }}</p>
+    <p><strong>Artifact URI:</strong> {{ dataset.artifact_uri }}</p>
+        {% if dataset.artifact_uri == "/dev/null" %}
+            <p><em>This dataset has an artifact URI of /dev/null, indicating no actual data is associated.</em></p>
+            <form name="generate_dataset" method="post" action="{% url 'generate_dataset' %}">
+                {% csrf_token %}
+                <button type="submit" name="dataset_uuid" value="{{ dataset.uuid }}">Generate Dataset</button>
+            </form>
+        {% endif %}
 {% else %}
     <p>No training run details available.</p>
+{% endif %}
 {% endif %}
 {% endblock %}
