@@ -13,6 +13,10 @@ logger.info(f"Configuration: {config}")
 
 LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", config["vision"]["label_studio_url"])
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN", "changeme")
+if LABEL_STUDIO_TOKEN == "changeme":
+    logger.warning(
+        "LABEL_STUDIO_TOKEN is set to default 'changeme'. This is insecure for production environments."
+    )
 
 try:
     client = LabelStudio(base_url=LABEL_STUDIO_URL, api_key=LABEL_STUDIO_TOKEN)
