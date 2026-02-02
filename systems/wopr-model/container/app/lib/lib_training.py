@@ -2,10 +2,9 @@
 import os
 from pathlib import Path
 from ultralytics import YOLO
-from .helpers import setup_logger, get_config
+from .helpers import setup_logger
 
 logger = setup_logger()
-config = get_config()
 logger.info("In lib_training.py")
 
 
