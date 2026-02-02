@@ -1,5 +1,6 @@
 services:
   wopr-model:
+    shm_size: '4gb'
     runtime: nvidia
     build:
       context: ../container
