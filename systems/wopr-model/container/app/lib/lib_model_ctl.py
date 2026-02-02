@@ -19,6 +19,7 @@ LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "http://label-studio:8080")
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN", "changeme")
 
 try:
+    logger.info(f"Connecting to Label Studio at {LABEL_STUDIO_URL}")
     client = LabelStudio(base_url=LABEL_STUDIO_URL, api_key=LABEL_STUDIO_TOKEN)
 except Exception as e:
     logger.error(f"Failed to connect to Label Studio: {e}")
@@ -104,6 +105,8 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
 
     try:
         # Setup paths
+        logger.info("Starting dataset generation process")
+        logger.debug(f"Dataset UUID: {dataset_uuid}, Dataset info: {dataset}")
         project_id = dataset.get("project_id", "")
         if dataset_uuid == "":
             return {
