@@ -5,7 +5,7 @@ from django.forms.models import model_to_dict
 from core.models import ModelVersion, ModelInfo, TrainingRun, Dataset, Result
 
 from .lib.lib_training import list_all_projects, get_training_uuid
-
+from django.utils.timezone import now
 from lib.helpers import setup_logger, call_model_control
 
 logger = setup_logger()
@@ -126,7 +126,6 @@ def training_detail(request):
 
 
 def generate_dataset(request):
-
     """Generate dataset from Label Studio project."""
     logger.info("Dataset generation requested")
     results = []
@@ -144,18 +143,60 @@ def generate_dataset(request):
                 "dataset": model_to_dict(dataset),
             }
 
-            # Fire and forget - don't wait for response
-
             def async_call():
                 try:
                     logger.info(
                         f"Background: Starting dataset generation for {dataset_uuid}"
                     )
+
                     dataz = call_model_control(payload)
                     logger.info(f"Background: Dataset generation response: {dataz}")
+
+                    dataset_obj = Dataset.objects.get(uuid=dataset_uuid)
+
+                    if dataz.get("status") == "success" and "data" in dataz:
+                        data = dataz["data"]
+
+                        import json
+
+                        metadata = {
+                            "total_tasks": data.get("total_tasks", 0),
+                            "images_downloaded": data.get("images_downloaded", 0),
+                            "images_failed": data.get("images_failed", 0),
+                            "data_yaml": data.get("data_yaml", ""),
+                            "dataset_path": data.get("dataset_path", ""),
+                            "images_path": data.get("images_path", ""),
+                            "yolo_path": data.get("yolo_path", ""),
+                        }
+
+                        # Update with YOLO path (the training directory)
+                        dataset_obj.artifact_uri = data.get("yolo_path", "")
+                        dataset_obj.note = json.dumps(metadata)
+                        dataset_obj.save()  # auto_now handles updated_at
+
+                        logger.info(
+                            f"Dataset {dataset_uuid} updated: {dataset_obj.artifact_uri}"
+                        )
+                    else:
+                        error_msg = dataz.get("message", "Unknown error")
+                        logger.error(f"Dataset generation failed: {error_msg}")
+                        import json
+
+                        dataset_obj.note = json.dumps({"error": error_msg})
+                        dataset_obj.save()
+
                 except Exception as e:
                     logger.error(f"Background: Dataset generation failed: {e}")
+                    try:
+                        import json
 
+                        dataset_obj = Dataset.objects.get(uuid=dataset_uuid)
+                        dataset_obj.note = json.dumps({"error": str(e)})
+                        dataset_obj.save()
+                    except Exception as db_error:
+                        logger.error(f"Could not update dataset: {db_error}")
+
+            # Actually start the thread
             thread = threading.Thread(target=async_call)
             thread.daemon = True
             thread.start()
