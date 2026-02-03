@@ -12,9 +12,9 @@ DATASETS_PATH = "/ultralytics/datasets"
 YOLO_EXPORTS_PATH = "/ultralytics/yolo_exports"
 
 # Find all .pt files recursively
-os.chdir(RUNS_PATH)
+# os.chdir(RUNS_PATH)
 pt_files = []
-for root, dirs, files in os.walk("/mydir"):
+for root, dirs, files in os.walk(RUNS_PATH):
     for file in files:
         if file.endswith(".pt"):
             full_path = os.path.join(root, file)
