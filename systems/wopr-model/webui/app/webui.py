@@ -56,4 +56,6 @@ else:
     conf_threshold = st.slider("Confidence", 0.0, 1.0, 0.25)
     iou_threshold = st.slider("IoU", 0.0, 1.0, 0.45)
 
-    # ... rest of inference code ...
+    inf = solutions.Inference(
+        model=model, source=source, conf=conf_threshold, iou=iou_threshold
+    )
