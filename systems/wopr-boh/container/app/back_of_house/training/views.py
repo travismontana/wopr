@@ -248,6 +248,9 @@ def training_setup(request):
             )
 
             model_id = training_run_obj.model_version.model.id
+            logger.info(
+                f"training_setup - Retrieving ModelVersion for Model ID: {model_id}"
+            )
             model_vers = ModelVersion.objects.get(model=model_id)
 
             logger.info(
