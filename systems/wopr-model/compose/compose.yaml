@@ -30,4 +30,3 @@ services:
 networks:
   default:
     external: true
-    enable_ipv4: true
