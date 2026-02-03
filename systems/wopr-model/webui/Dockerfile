@@ -10,9 +10,6 @@ RUN ping -c 1 8.8.8.8 -w 1 && echo "Network OK" || echo "Network unreachable, ch
 RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     curl \
-    vim \
-    git \
-    dnsutils \
     net-tools \
     && pip install --upgrade pip setuptools wheel \
     && apt clean \
