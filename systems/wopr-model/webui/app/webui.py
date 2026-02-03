@@ -1,62 +1,59 @@
 import streamlit as st
-import glob, os
-from ultralytics import YOLO, solutions
+from ultralytics import YOLO
+import cv2
+from PIL import Image
+import tempfile
 
-st.set_page_config(layout="wide", page_title="WOPR Model Interface")
-st.title("WOPR Models")
+st.title("WOPR Object Detection")
 
-RUNS_PATH = "/ultralytics/runs"
 
-# Initialize session state
-if "selected_model_path" not in st.session_state:
-    st.session_state["selected_model_path"] = None
+# Model selection (with caching)
+@st.cache_resource
+def load_model(model_path):
+    return YOLO(model_path)
 
-# MODEL SELECTION SECTION - only show if no model selected
-if st.session_state["selected_model_path"] is None:
-    pt_files = []
-    for root, dirs, files in os.walk(RUNS_PATH):
-        for file in files:
-            if file.endswith(".pt"):
-                pt_files.append(os.path.join(root, file))
 
-    if len(pt_files) == 0:
-        st.warning("No model files found in runs directory.")
-    else:
-        selected_path = st.selectbox("Select model file", options=sorted(pt_files))
-        st.code(selected_path, language="text")
+# Session state for model path
+if "model_path" not in st.session_state:
+    st.session_state.model_path = None
 
-        if st.button("Select this model"):
-            st.session_state["selected_model_path"] = selected_path
-            st.rerun()  # Force immediate rerun to show inference UI
-
-# INFERENCE SECTION - only show if model selected
+# Model selection section
+if st.session_state.model_path is None:
+    # ... your model file picker code ...
+    if st.button("Select Model"):
+        st.session_state.model_path = selected_path
+        st.rerun()
 else:
-    model_path = st.session_state["selected_model_path"]
+    # Model loaded - show inference controls
+    model = load_model(st.session_state.model_path)
 
-    # Show what's loaded with option to change
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.info(f"Model: {model_path}")
-    with col2:
-        if st.button("Change Model"):
-            st.session_state["selected_model_path"] = None
-            st.rerun()
+    # Confidence/IoU sliders
+    conf = st.slider("Confidence", 0.0, 1.0, 0.25)
+    iou = st.slider("IoU", 0.0, 1.0, 0.45)
 
-    # Load model (cache it so it doesn't reload on every interaction)
-    @st.cache_resource
-    def load_model(path):
-        return YOLO(path)
+    # Source selection
+    source_type = st.radio("Source", ["Image Upload", "Video Upload", "Webcam"])
 
-    model = load_model(model_path)
+    if source_type == "Image Upload":
+        uploaded = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
+        if uploaded:
+            img = Image.open(uploaded)
 
-    # NOW do inference UI here
-    st.subheader("Inference Configuration")
+            # Run detection
+            results = model.predict(source=img, conf=conf, iou=iou)
 
-    source = st.selectbox("Source", ["webcam", "image", "video"])
-    conf_threshold = st.slider("Confidence", 0.0, 1.0, 0.25)
-    iou_threshold = st.slider("IoU", 0.0, 1.0, 0.45)
+            # Display annotated image
+            annotated = results[0].plot()
+            st.image(annotated, caption="Detections")
 
-    inf = solutions.Inference(
-        model=model_path, source=source, conf=conf_threshold, iou=iou_threshold
-    )
-    inf.inference()
+            # Show detection details
+            st.write(f"Detected {len(results[0].boxes)} objects")
+            for box in results[0].boxes:
+                cls = model.names[int(box.cls[0])]
+                conf_score = float(box.conf[0])
+                st.write(f"- {cls}: {conf_score:.2f}")
+
+    # Change model button
+    if st.button("Change Model"):
+        st.session_state.model_path = None
+        st.rerun()
