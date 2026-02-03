@@ -6,7 +6,7 @@ ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
-
+RUN ping -c 1 8.8.8.8 -w 1 && echo "Network OK" || echo "Network unreachable, check your network settings."
 RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     curl \
