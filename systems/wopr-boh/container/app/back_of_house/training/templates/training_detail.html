@@ -36,7 +36,14 @@
     {% else %}
     <p>Done been trained.</p>
     {% endif %}
-    <br>
+    {% if results.artifact_uri != "/dev/null" %}
+    <hr>
+    <h3>Training Results</h3>
+    <p><strong>Result ID:</strong> {{ results.id }}</p>
+    <p><strong>UUID:</strong> {{ results.uuid }}</p>
+    <p><strong>Artifact URI:</strong> {{ results.artifact_uri }}</p>
+    <p><strong>Metrics:</strong> {{ results.metrics }}</p>
+    {% endif %}
     {% if dataset %}
     <hr>
     <h3>Dataset Details</h3>
