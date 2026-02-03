@@ -41,3 +41,24 @@ else:
     if st.button("Select this model"):
         st.session_state["selected_model_path"] = selected_path
         st.success(f"Selected: {selected_path}")
+
+    if st.session_state.get("selected_model_path"):
+        model_path = st.session_state["selected_model_path"]
+        st.write(f"Loading model from: {model_path}")
+
+        # Load the model
+        model = ua.YOLO(model_path)
+
+        st.success("Model loaded successfully!")
+
+        # Display model info
+        st.subheader("Model Information")
+        st.text(str(model))
+
+        # Example inference on a sample image
+        st.subheader("Example Inference")
+        sample_image = ua.data.load_image("https://ultralytics.com/images/zidane.jpg")
+        results = model(sample_image)
+
+        # Display results
+        st.image(results.render()[0], caption="Inference Result", use_column_width=True)
