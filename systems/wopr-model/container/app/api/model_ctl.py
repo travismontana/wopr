@@ -24,6 +24,10 @@ logger = setup_logger()
 
 model_ctl = APIRouter(tags=["models"])
 
+# Track active training
+_training_active = False  # Simple flag for single-worker deployments
+_active_training_id = None
+
 
 # FastAPI endpoint
 @model_ctl.post("")
@@ -57,6 +61,8 @@ def model_control(body: dict[str, Any]):  # Removed unused Request
 
 def perform_training(payload: dict, callback_url: str):
     """Background task - actually does the training"""
+    global _training_active, _active_training_id
+
     try:
         dataset = payload.get("dataset", {})
         model_version = payload.get("model_version", {})
@@ -85,16 +91,14 @@ def perform_training(payload: dict, callback_url: str):
 
         try:
             callback_response = requests.post(
-                callback_url, json=callback_payload, timeout=30
+                callback_url, json=callback_payload, timeout=300
             )
             logger.info(f"Callback sent: {callback_response.status_code}")
         except Exception as e:
             logger.error(f"Callback failed: {e}")
-            # Training succeeded but callback failed - should we retry?
 
     except Exception as e:
         logger.error(f"Background training failed: {e}")
-        # Attempt to notify Django of failure
         try:
             requests.post(
                 callback_url,
@@ -103,10 +107,14 @@ def perform_training(payload: dict, callback_url: str):
                     "status": "error",
                     "error": str(e),
                 },
-                timeout=30,
+                timeout=300,
             )
         except:
             logger.error("Failed to send error callback")
+    finally:
+        # Always clear the flag when done
+        _training_active = False
+        _active_training_id = None
 
 
 @model_ctl.post("/api/model_ctl")
@@ -116,14 +124,29 @@ async def model_control(body: dict, background_tasks: BackgroundTasks):
     For training: returns immediately, runs in background, calls back when done.
     For other actions: runs synchronously.
     """
+    global _training_active, _active_training_id
+
     payload = body.get("payload", {})
     action = payload.get("action")
 
     logger.info(f"Note: (model_control)")
     logger.debug(f"Data: (body: {body})")
+
     match action:
         case "train":
-            # Get callback URL from payload or construct it
+            # Check if training already running
+            if _training_active:
+                logger.warning(
+                    f"Training already in progress (run ID: {_active_training_id})"
+                )
+                return {
+                    "status": "error",
+                    "type": "training",
+                    "message": "Training already in progress",
+                    "active_training_run_id": _active_training_id,
+                }
+
+            # Get callback URL from payload
             callback_url = payload.get("callback_url")
             if not callback_url:
                 logger.error("No callback_url provided for training")
@@ -132,6 +155,10 @@ async def model_control(body: dict, background_tasks: BackgroundTasks):
                     "message": "callback_url required for training",
                 }
 
+            # Mark training as active
+            _training_active = True
+            _active_training_id = payload.get("training_run", {}).get("id")
+
             # Queue training in background
             background_tasks.add_task(perform_training, payload, callback_url)
 
@@ -139,14 +166,19 @@ async def model_control(body: dict, background_tasks: BackgroundTasks):
                 "status": "started",
                 "type": "training",
                 "message": "Training started in background",
-                "training_run_id": payload.get("training_run", {}).get("id"),
+                "training_run_id": _active_training_id,
             }
+
         case "create_new_model_file":
             filename = payload.get("filename", "")
             model_family = payload.get("model_family", "")
             results = initialize_model(filename, model_family)
+
         case "generate_dataset":
             dataset = payload.get("dataset", "")
             results = generate_dataset(dataset)
+
         case _:
             results = {"status": "error", "message": f"Unknown action: {action}"}
+
+    return results
