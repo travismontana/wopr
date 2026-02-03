@@ -25,8 +25,9 @@ services:
       - /remote/wopr/models/ua/runs:/ultralytics/runs
       - /remote/wopr/models/ua/datasets:/ultralytics/datasets
     networks:
-      - wopr-network
+      - default
 
 networks:
-  wopr-network:
+  default:
     external: true
+    enable_ipv4: true
