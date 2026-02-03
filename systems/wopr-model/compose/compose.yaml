@@ -24,3 +24,26 @@ services:
       - /remote/wopr/models/ua/weights:/ultralytics/weights
       - /remote/wopr/models/ua/runs:/ultralytics/runs
       - /remote/wopr/models/ua/datasets:/ultralytics/datasets
+  wopr-model-webui:
+    build:
+      context: ../webui
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_USER: "${DB_USER}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DJANGO_SUPERUSER_USERNAME: "${DJANGO_SUPERUSER_USERNAME}"
+      DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
+      DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
+      LABEL_STUDIO_URL: "${LABEL_STUDIO_URL}"
+      LABEL_STUDIO_TOKEN: "${LABEL_STUDIO_TOKEN}"
+    ports:
+      - "8888:8888"
+    volumes:
+      - /remote/wopr/models/ua/weights:/ultralytics/weights
+      - /remote/wopr/models/ua/runs:/ultralytics/runs
+      - /remote/wopr/models/ua/datasets:/ultralytics/datasets
