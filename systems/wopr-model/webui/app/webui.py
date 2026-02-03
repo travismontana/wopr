@@ -1,4 +1,5 @@
 import streamlit as st
+import glob, os
 import ultralytics as ua
 from ultralytics import solutions
 
@@ -11,7 +12,7 @@ DATASETS_PATH = "/ultralytics/datasets"
 YOLO_EXPORTS_PATH = "/ultralytics/yolo_exports"
 
 # Find all .pt files recursively
-pt_files = list(RUNS_PATH.rglob("*.pt"))
+pt_files = glob.glob(os.path.join(RUNS_PATH, "**", "*.pt"), recursive=True)
 
 if not pt_files:
     st.warning(f"No .pt files found in {RUNS_PATH}")
