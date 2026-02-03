@@ -13,8 +13,12 @@ YOLO_EXPORTS_PATH = "/ultralytics/yolo_exports"
 
 # Find all .pt files recursively
 os.chdir(RUNS_PATH)
-pt_files = [f for f in glob.glob("**/*.pt", recursive=True)]
-
+pt_files = []
+for root, dirs, files in os.walk("/mydir"):
+    for file in files:
+        if file.endswith(".pt"):
+            full_path = os.path.join(root, file)
+            pt_files.append(full_path)
 if not pt_files:
     st.warning(f"No .pt files found in {RUNS_PATH}")
 else:
