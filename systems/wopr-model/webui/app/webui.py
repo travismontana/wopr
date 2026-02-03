@@ -26,20 +26,7 @@ else:
     # Build display names with parent/grandparent context
     file_options = {}
     for pt_file in sorted(pt_files):
-        relative_path = pt_file.relative_to(RUNS_PATH)
-
-        # Build display string: "grandparent/parent/filename.pt"
-        parts = relative_path.parts
-        if len(parts) >= 3:
-            display_name = f"{parts[-3]}/{parts[-2]}/{parts[-1]}"
-        elif len(parts) == 2:
-            display_name = f"{parts[-2]}/{parts[-1]}"
-        else:
-            display_name = str(relative_path)
-
-        # Store mapping: display name -> relative path
-        file_options[display_name] = f"/{relative_path}"
-
+        file_options[pt_file] = pt_file
     # Selectbox with descriptive names
     selected_display = st.selectbox(
         "Select model file", options=sorted(file_options.keys())
