@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     vim \
     git \
+    dnsutils\
+    net-tools\
+
     && pip install --upgrade pip setuptools wheel \
     && apt clean \
     && apt autoclean \
