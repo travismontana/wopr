@@ -34,5 +34,5 @@ COPY --chown=wopr:wopr pyproject.toml .
 RUN pip install --user -e .
 
 COPY --chown=wopr:wopr app/ .
+CMD ["streamlit", "run", "app/webui.py", "--server.port=8888", "--server.address=0.0.0.0"]
 
-CMD ["/home/wopr/.local/bin/uvicorn", "app:webui", "--host", "0.0.0.0", "--port", "9000"]
