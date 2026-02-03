@@ -109,7 +109,7 @@ def perform_training(payload: dict, callback_url: str):
             logger.error("Failed to send error callback")
 
 
-@app.post("/api/model_ctl")
+@model_ctl.post("/api/model_ctl")
 async def model_control(body: dict, background_tasks: BackgroundTasks):
     """
     Model control endpoint.
