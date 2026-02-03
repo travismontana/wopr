@@ -55,12 +55,14 @@ if st.session_state.get("selected_model_path"):
     st.subheader("Model Information")
     st.json(model, expanded=False)
 
+    inf = solutions.Inference(model=model)
+    inf.inference()
     # Example inference on a sample image
-    st.subheader("Example Inference")
-    sample_image = ua.data.load_image(
-        "https://images.wopr.tailandtraillabs.org/ml/incoming/game-e5c50e50-37a1-4c43-82dc-5a2fbb7f2866-round1-bpfx-play1.jpg"
-    )
-    results = model(sample_image)
+    # st.subheader("Example Inference")
+    # sample_image = ua.data.load_image(
+    #    "https://images.wopr.tailandtraillabs.org/ml/incoming/game-e5c50e50-37a1-4c43-82dc-5a2fbb7f2866-round1-bpfx-play1.jpg"
+    # )
+    # results = model(sample_image)
 
     # Display results
-    st.image(results.render()[0], caption="Inference Result", use_column_width=True)
+    # st.image(results.render()[0], caption="Inference Result", use_column_width=True)
