@@ -19,8 +19,9 @@ for root, dirs, files in os.walk("/mydir"):
         if file.endswith(".pt"):
             full_path = os.path.join(root, file)
             pt_files.append(full_path)
-if not pt_files:
-    st.warning(f"No .pt files found in {RUNS_PATH}")
+if len(pt_files) == 0:
+    st.warning("No model files found in runs directory.")
+
 else:
     # Build display names with parent/grandparent context
     file_options = {}
