@@ -24,9 +24,9 @@ WORKDIR /app
 COPY requirements.txt pyproject.toml ./
 RUN pip install -r requirements.txt && pip install -e .
 
-# Copy app code to /app (back_of_house/ will be at /app/back_of_house/)
-COPY --chown=wopr:wopr app/back_of_house/ ./
-COPY --chown=wopr:wopr app/back_of_house/back_of_house/entrypoint.sh /app/entrypoint.sh
+# Copy app code to /app (wopr_web/ will be at /app/wopr_web/)
+COPY --chown=wopr:wopr wopr_web ./
+COPY --chown=wopr:wopr wopr_web/wopr_web/scripts/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 # Switch to non-root user
 USER wopr
