@@ -284,7 +284,7 @@ def training_results(request):
 
         # Extract form data
         dataset_id = request.POST.get("dataset_id")
-        model_ver_id = request.POST.get("model_ver_id")
+        model_ver_id = request.POST.get("model_version_id")
         training_run_id = request.POST.get("training_run_id")
 
         # Get training parameters from form
