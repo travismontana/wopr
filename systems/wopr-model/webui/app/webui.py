@@ -57,6 +57,6 @@ else:
     iou_threshold = st.slider("IoU", 0.0, 1.0, 0.45)
 
     inf = solutions.Inference(
-        model=model, source=source, conf=conf_threshold, iou=iou_threshold
+        model=model_path, source=source, conf=conf_threshold, iou=iou_threshold
     )
     inf.inference()
