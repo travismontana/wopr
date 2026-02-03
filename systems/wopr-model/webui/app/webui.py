@@ -53,7 +53,7 @@ else:
         st.subheader("Model Information")
         st.json(model, expanded=False)
 
-        inf = solutions.Inference(model=model)
+        inf = solutions.Inference(model=model_path)
         inf.inference()
         # Example inference on a sample image
         # st.subheader("Example Inference")
