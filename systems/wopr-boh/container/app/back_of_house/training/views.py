@@ -234,25 +234,30 @@ def generate_dataset(request):
 def training_setup(request):
     """Display training parameter form"""
     logger.info("Training setup requested")
+    results = []
     if request.method == "POST":
         logger.info("Processing training setup POST request")
         training_run_id = request.POST.get("training_run_id")
+        results.append({"training_run_id": training_run_id})  # For debugging purposes
         dataset_id = request.POST.get("dataset_id")
-
+        results.append({"dataset_id": dataset_id})  # For debugging purposes
         try:
             logger.info("Trying to retrieve training setup details")
             training_run_obj = TrainingRun.objects.get(id=training_run_id)
+            results.append({"training_run_obj": str(training_run_obj)})  # Debug
             dataset_obj = Dataset.objects.get(id=dataset_id)
+            results.append({"dataset_obj": str(dataset_obj)})  # Debug
             logger.info(
                 f"Retrieved TrainingRun ID: {training_run_id}, Dataset ID: {dataset_id}"
             )
 
             model_id = training_run_obj.model_version.model.id
+            results.append({"model_id": model_id})  # Debug
             logger.info(
                 f"training_setup - Retrieving ModelVersion for Model ID: {model_id}"
             )
             model_vers = ModelVersion.objects.get(model=model_id)
-
+            results.append({"model_vers": str(model_vers)})  # Debug
             logger.info(
                 f"Preparing training setup for Model ID: {model_id}, Dataset ID: {dataset_id}"
             )
@@ -262,12 +267,14 @@ def training_setup(request):
                 "dataset": dataset_obj,
                 "training_run": training_run_obj,
             }
+            results.append({"context": str(context)})  # Debug
             logger.debug(f"Training setup context: {context}")
             return render(request, "training_setup.html", context)
         except Exception as e:
             logger.error(f"Training setup failed: {e}")
-            return render(request, "training.html", {"error": str(e)})
-    return redirect("index")
+            results.append({"error": str(e)})  # Debug
+            render(request, "training_return.html", {"results": results})
+    return render(request, "training_return.html", {"results": results})
 
 
 def training_results(request):
