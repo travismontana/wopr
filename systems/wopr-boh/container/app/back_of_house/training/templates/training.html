@@ -22,7 +22,7 @@
     </tr>
     {% for run in training_runs %}
     <tr>
-        <td><form name="run_id" method="post" action ="{% url 'training_detail' %}">
+        <td><form name="run_id" method="get" action ="{% url 'training_detail' pk=run.id %}">
             {% csrf_token %}
             <button type="submit" name="run_id" value="{{ run.id }}">{{ run.id }}</button>
         </form></td>
