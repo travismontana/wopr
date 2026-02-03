@@ -1,22 +1,23 @@
+import json
 import threading
 
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from core.models import ModelVersion, ModelInfo, TrainingRun, Dataset, Result
 
 from .lib.lib_training import list_all_projects, get_training_uuid
 from django.utils.timezone import now
-from lib.helpers import setup_logger, call_model_control
-from models.lib.lib_model import call_model_ctl
+from lib.helpers import setup_logger
+from models.lib.lib_model import call_model_ctl  # Single consistent import
 
 logger = setup_logger()
 
 
-# Create your views here.
 def index(request):
     models = ModelInfo.objects.all()
     model_vers = ModelVersion.objects.all()
@@ -89,35 +90,36 @@ def start_training(request):
     return redirect("index")
 
 
-def training_detail(request):
-    if request.method == "POST":
-        run_id = request.POST.get("run_id")
-        try:
-            needs = []
-            training_run = TrainingRun.objects.get(id=run_id)
-            dataset = Dataset.objects.get(id=training_run.dataset.id)
-            result = Result.objects.get(id=training_run.result.id)
-            if "/dev/null" in dataset.artifact_uri:
-                needs.append({"set": "dataset", "needs": "artifact_uri"})
-            if "/dev/null" in result.artifact_uri:
-                needs.append({"set": "result", "needs": "artifact_uri"})
-            logger.info(f"Retrieved details for TrainingRun ID: {run_id}")
-            logger.debug(
-                f"TrainingRun: {training_run}, Dataset: {dataset}, Result: {result}, Needs: {needs}"
-            )
-            context = {
-                "training_run": training_run,
-                "dataset": dataset,
-                "result": result,
-                "needs": needs,
-            }
-            return render(request, "training_detail.html", context)
-        except TrainingRun.DoesNotExist:
-            logger.error(f"TrainingRun {run_id} not found")
-            return render(
-                request, "training.html", {"error": "Invalid training run ID"}
-            )
-    return render(request, "training.html", {"error": "Invalid training run ID"})
+def training_detail(request, pk):  # FIXED: Added pk parameter
+    """Display details for a specific training run"""
+    try:
+        training_run = TrainingRun.objects.get(id=pk)
+        dataset = training_run.dataset
+        result = training_run.result
+
+        needs = []
+        if "/dev/null" in dataset.artifact_uri:
+            needs.append({"set": "dataset", "needs": "artifact_uri"})
+        if "/dev/null" in result.artifact_uri:
+            needs.append({"set": "result", "needs": "artifact_uri"})
+
+        logger.info(f"Retrieved details for TrainingRun ID: {pk}")
+        logger.debug(
+            f"TrainingRun: {training_run}, Dataset: {dataset}, Result: {result}, Needs: {needs}"
+        )
+
+        context = {
+            "training_run": training_run,
+            "dataset": dataset,
+            "result": result,
+            "needs": needs,
+        }
+        return render(request, "training_detail.html", context)
+
+    except TrainingRun.DoesNotExist:
+        logger.error(f"TrainingRun {pk} not found")
+        messages.error(request, f"Training run {pk} not found")
+        return redirect("index")
 
 
 def generate_dataset(request):
@@ -144,15 +146,13 @@ def generate_dataset(request):
                         f"Background: Starting dataset generation for {dataset_uuid}"
                     )
 
-                    dataz = call_model_control(payload)
+                    dataz = call_model_ctl(payload)  # FIXED: consistent function name
                     logger.info(f"Background: Dataset generation response: {dataz}")
 
                     dataset_obj = Dataset.objects.get(uuid=dataset_uuid)
 
                     if dataz.get("status") == "success" and "data" in dataz:
                         data = dataz["data"]
-
-                        import json
 
                         metadata = {
                             "total_tasks": data.get("total_tasks", 0),
@@ -175,16 +175,12 @@ def generate_dataset(request):
                     else:
                         error_msg = dataz.get("message", "Unknown error")
                         logger.error(f"Dataset generation failed: {error_msg}")
-                        import json
-
                         dataset_obj.note = json.dumps({"error": error_msg})
                         dataset_obj.save()
 
                 except Exception as e:
                     logger.error(f"Background: Dataset generation failed: {e}")
                     try:
-                        import json
-
                         dataset_obj = Dataset.objects.get(uuid=dataset_uuid)
                         dataset_obj.note = json.dumps({"error": str(e)})
                         dataset_obj.save()
@@ -236,15 +232,17 @@ def generate_dataset(request):
 
 
 def training_setup(request):
+    """Display training parameter form"""
     logger.info("Training setup requested")
     if request.method == "POST":
         logger.info("Processing training setup POST request")
         training_run_id = request.POST.get("training_run_id")
-        dataset_id = request.POST.get("dataset_id")  # Match form field name
+        dataset_id = request.POST.get("dataset_id")
+
         try:
             logger.info("Trying to retrieve training setup details")
             training_run_obj = TrainingRun.objects.get(id=training_run_id)
-            dataset_obj = Dataset.objects.get(id=dataset_id)  # Actually fetch it
+            dataset_obj = Dataset.objects.get(id=dataset_id)
             logger.info(
                 f"Retrieved TrainingRun ID: {training_run_id}, Dataset ID: {dataset_id}"
             )
@@ -258,7 +256,7 @@ def training_setup(request):
             context = {
                 "model": model_vers.model,
                 "model_ver": model_vers,
-                "dataset": dataset_obj,  # Pass actual objects
+                "dataset": dataset_obj,
                 "training_run": training_run_obj,
             }
             logger.debug(f"Training setup context: {context}")
@@ -272,62 +270,113 @@ def training_setup(request):
 def training_results(request):
     """Process training parameters and kick off training"""
     if request.method == "POST":
-        # ... existing validation code ...
+        logger.info("Processing training results POST request")
 
-        # Build callback URL that model_ctl will call when done
-        callback_url = request.build_absolute_uri(reverse("training_callback"))
+        # Extract form data
+        dataset_id = request.POST.get("dataset_id")
+        model_ver_id = request.POST.get("model_ver_id")
+        training_run_id = request.POST.get("training_run_id")
 
-        payload = {
-            "action": "train",
-            "dataset": {
-                "id": dataset_obj.id,
-                "uuid": str(dataset_obj.uuid),
-                "artifact_uri": dataset_obj.artifact_uri,
-                "project_id": dataset_obj.project_id,
-            },
-            "model_version": {
-                "id": model_ver_obj.id,
-                "version": model_ver_obj.version,
-                "artifact_uri": model_ver_obj.artifact_uri,
-                "model_id": model_ver_obj.model.id,
-                "model_name": model_ver_obj.model.name,
-            },
-            "training_run": {
-                "id": training_run.id,
-                "uuid": str(training_run.uuid),
-            },
-            "training_params": training_params,
-            "callback_url": callback_url,  # NEW
-        }
+        # Get training parameters from form
+        epochs = int(request.POST.get("epochs", 100))
+        batch_size = int(request.POST.get("batch_size", 16))
+        imgsz = int(request.POST.get("imgsz", 640))
+        patience = int(request.POST.get("patience", 50))
 
-        def async_call():
-            try:
-                logger.info(
-                    f"Background: Starting training for TrainingRun ID: {training_run.id}"
-                )
-                training_response = call_model_ctl(payload)
-
-                # Just check that training was started
-                if training_response.get("status") == "started":
-                    logger.info(
-                        f"Training started successfully for run {training_run.id}"
-                    )
-                    # Results will come via callback - nothing more to do here
-                else:
-                    logger.error(f"Failed to start training: {training_response}")
-
-            except Exception as e:
-                logger.error(f"Background: Training failed to start: {e}")
-
-        thread = threading.Thread(target=async_call)
-        thread.daemon = True
-        thread.start()
-
-        messages.success(
-            request,
-            "Training started! Results will update automatically when complete.",
+        logger.info(
+            f"Received IDs - Dataset: {dataset_id}, ModelVersion: {model_ver_id}, TrainingRun: {training_run_id}"
         )
-        return redirect("training_detail", pk=training_run.id)
+
+        if not all([dataset_id, model_ver_id, training_run_id]):
+            logger.error("Missing required IDs")
+            messages.error(request, "Missing required fields")
+            return redirect("index")
+
+        try:
+            # Fetch objects
+            dataset_obj = Dataset.objects.get(id=dataset_id)
+            model_ver_obj = ModelVersion.objects.get(id=model_ver_id)
+            training_run = TrainingRun.objects.get(id=training_run_id)
+
+            # Build training parameters
+            training_params = {
+                "epochs": epochs,
+                "batch_size": batch_size,
+                "imgsz": imgsz,
+                "patience": patience,
+            }
+
+            logger.info(f"Starting training for TrainingRun ID: {training_run.id}")
+
+            # Build callback URL that model_ctl will call when done
+            callback_url = request.build_absolute_uri(reverse("training_callback"))
+
+            payload = {
+                "action": "train",
+                "dataset": {
+                    "id": dataset_obj.id,
+                    "uuid": str(dataset_obj.uuid),
+                    "artifact_uri": dataset_obj.artifact_uri,
+                    "project_id": dataset_obj.project_id,
+                },
+                "model_version": {
+                    "id": model_ver_obj.id,
+                    "version": model_ver_obj.version,
+                    "artifact_uri": model_ver_obj.artifact_uri,
+                    "model_id": model_ver_obj.model.id,
+                    "model_name": model_ver_obj.model.name,
+                },
+                "training_run": {
+                    "id": training_run.id,
+                    "uuid": str(training_run.uuid),
+                },
+                "training_params": training_params,
+                "callback_url": callback_url,
+            }
+
+            def async_call():
+                try:
+                    logger.info(
+                        f"Background: Starting training for TrainingRun ID: {training_run.id}"
+                    )
+                    training_response = call_model_ctl(payload)
+
+                    # Just check that training was started
+                    if training_response.get("status") == "started":
+                        logger.info(
+                            f"Training started successfully for run {training_run.id}"
+                        )
+                        # Results will come via callback - nothing more to do here
+                    else:
+                        logger.error(f"Failed to start training: {training_response}")
+
+                except Exception as e:
+                    logger.error(f"Background: Training failed to start: {e}")
+
+            thread = threading.Thread(target=async_call)
+            thread.daemon = True
+            thread.start()
+
+            messages.success(
+                request,
+                "Training started! Results will update automatically when complete.",
+            )
+            return redirect("training_detail", pk=training_run.id)
+
+        except (
+            Dataset.DoesNotExist,
+            ModelVersion.DoesNotExist,
+            TrainingRun.DoesNotExist,
+        ) as e:
+            logger.error(f"Object not found: {e}")
+            messages.error(request, "Invalid dataset, model version, or training run")
+            return redirect("index")
+        except Exception as e:
+            logger.error(f"Training start failed: {e}")
+            messages.error(request, f"Training start failed: {str(e)}")
+            return redirect("index")
+
+    return redirect("index")
 
 
 @csrf_exempt  # External service calling this
