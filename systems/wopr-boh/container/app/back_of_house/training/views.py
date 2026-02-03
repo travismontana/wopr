@@ -358,6 +358,16 @@ def training_results(request):
                         )
                         # Results will come via callback - nothing more to do here
                     else:
+                        if "already" in training_response.get("message", "").lower():
+                            render(
+                                request,
+                                "training_return.html",
+                                {
+                                    "status": "in progress",
+                                    "type": "training",
+                                    "message": f"Training already in progress for run {training_run.id}",
+                                },
+                            )
                         logger.error(f"Failed to start training: {training_response}")
 
                 except Exception as e:

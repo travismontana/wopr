@@ -24,4 +24,3 @@ services:
       - /remote/wopr/models/ua/weights:/ultralytics/weights
       - /remote/wopr/models/ua/runs:/ultralytics/runs
       - /remote/wopr/models/ua/datasets:/ultralytics/datasets
-    network_mode: "bridge"
