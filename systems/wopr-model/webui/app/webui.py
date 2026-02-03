@@ -56,7 +56,7 @@ else:
             results = model.predict(source=img, conf=conf, iou=iou)
 
             # Display annotated image
-            annotated = results[0].plot()
+            annotated = results[0].plot(pil=True)
             st.image(annotated, caption="Detections")
 
             # Show detection details
