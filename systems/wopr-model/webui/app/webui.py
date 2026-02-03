@@ -1,66 +1,59 @@
 import streamlit as st
 import glob, os
-import ultralytics as ua
-from ultralytics import solutions
+from ultralytics import YOLO
 
 st.set_page_config(layout="wide", page_title="WOPR Model Interface")
 st.title("WOPR Models")
 
-WEIGHTS_PATH = "/ultralytics/weights"
 RUNS_PATH = "/ultralytics/runs"
-DATASETS_PATH = "/ultralytics/datasets"
-YOLO_EXPORTS_PATH = "/ultralytics/yolo_exports"
 
-st.session_state["selected_model_path"] = None
-# Find all .pt files recursively
-# os.chdir(RUNS_PATH)
-pt_files = []
-for root, dirs, files in os.walk(RUNS_PATH):
-    for file in files:
-        if file.endswith(".pt"):
-            full_path = os.path.join(root, file)
-            pt_files.append(full_path)
-if len(pt_files) == 0:
-    st.warning("No model files found in runs directory.")
+# Initialize session state
+if "selected_model_path" not in st.session_state:
+    st.session_state["selected_model_path"] = None
+
+# MODEL SELECTION SECTION - only show if no model selected
+if st.session_state["selected_model_path"] is None:
+    pt_files = []
+    for root, dirs, files in os.walk(RUNS_PATH):
+        for file in files:
+            if file.endswith(".pt"):
+                pt_files.append(os.path.join(root, file))
+
+    if len(pt_files) == 0:
+        st.warning("No model files found in runs directory.")
+    else:
+        selected_path = st.selectbox("Select model file", options=sorted(pt_files))
+        st.code(selected_path, language="text")
+
+        if st.button("Select this model"):
+            st.session_state["selected_model_path"] = selected_path
+            st.rerun()  # Force immediate rerun to show inference UI
+
+# INFERENCE SECTION - only show if model selected
 else:
-    # Build display names with parent/grandparent context
-    file_options = {}
-    for pt_file in sorted(pt_files):
-        file_options[pt_file] = pt_file
-    # Selectbox with descriptive names
-    selected_display = st.selectbox(
-        "Select model file", options=sorted(file_options.keys())
-    )
+    model_path = st.session_state["selected_model_path"]
 
-    # Get the actual relative path
-    selected_path = file_options[selected_display]
+    # Show what's loaded with option to change
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.info(f"Model: {model_path}")
+    with col2:
+        if st.button("Change Model"):
+            st.session_state["selected_model_path"] = None
+            st.rerun()
 
-    st.code(selected_path, language="text")
+    # Load model (cache it so it doesn't reload on every interaction)
+    @st.cache_resource
+    def load_model(path):
+        return YOLO(path)
 
-    # Store in session state or variable
-    if st.button("Select this model"):
-        st.session_state["selected_model_path"] = selected_path
-        st.success(f"Selected: {selected_path}")
-        model_path = st.session_state["selected_model_path"]
-        st.write(f"Loading model from: {model_path}")
+    model = load_model(model_path)
 
-        # Load the model
-        model = ua.YOLO(model_path)
+    # NOW do inference UI here
+    st.subheader("Inference Configuration")
 
-        st.success("Model loaded successfully!")
+    source = st.selectbox("Source", ["webcam", "image", "video"])
+    conf_threshold = st.slider("Confidence", 0.0, 1.0, 0.25)
+    iou_threshold = st.slider("IoU", 0.0, 1.0, 0.45)
 
-        # Display model info
-        st.subheader("Model Information")
-        st.json(model, expanded=False)
-
-        inf = solutions.Inference(model=model_path)
-        inf.inference()
-        # Example inference on a sample image
-        # st.subheader("Example Inference")
-        # sample_image = ua.data.load_image(
-        #    "https://images.wopr.tailandtraillabs.org/ml/incoming/game-e5c50e50-37a1-4c43-82dc-5a2fbb7f2866-round1-bpfx-play1.jpg"
-        # )
-        # results = model(sample_image)
-
-        # Display results
-        # st.image(results.render()[0], caption="Inference Result", use_column_width=True)
+    # ... rest of inference code ...
