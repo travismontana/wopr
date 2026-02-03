@@ -42,23 +42,25 @@ else:
         st.session_state["selected_model_path"] = selected_path
         st.success(f"Selected: {selected_path}")
 
-    if st.session_state.get("selected_model_path"):
-        model_path = st.session_state["selected_model_path"]
-        st.write(f"Loading model from: {model_path}")
+if st.session_state.get("selected_model_path"):
+    model_path = st.session_state["selected_model_path"]
+    st.write(f"Loading model from: {model_path}")
 
-        # Load the model
-        model = ua.YOLO(model_path)
+    # Load the model
+    model = ua.YOLO(model_path)
 
-        st.success("Model loaded successfully!")
+    st.success("Model loaded successfully!")
 
-        # Display model info
-        st.subheader("Model Information")
-        st.text(str(model))
+    # Display model info
+    st.subheader("Model Information")
+    st.json(model, expanded=False)
 
-        # Example inference on a sample image
-        st.subheader("Example Inference")
-        sample_image = ua.data.load_image("https://ultralytics.com/images/zidane.jpg")
-        results = model(sample_image)
+    # Example inference on a sample image
+    st.subheader("Example Inference")
+    sample_image = ua.data.load_image(
+        "https://images.wopr.tailandtraillabs.org/ml/incoming/game-e5c50e50-37a1-4c43-82dc-5a2fbb7f2866-round1-bpfx-play1.jpg"
+    )
+    results = model(sample_image)
 
-        # Display results
-        st.image(results.render()[0], caption="Inference Result", use_column_width=True)
+    # Display results
+    st.image(results.render()[0], caption="Inference Result", use_column_width=True)
