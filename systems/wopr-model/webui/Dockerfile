@@ -26,13 +26,11 @@ RUN useradd -m -u 2222 wopr && \
 RUN touch /var/log/wopr.log
 RUN chown wopr:wopr /var/log/wopr.log
 
-USER wopr
-
 WORKDIR /app
 
 COPY --chown=wopr:wopr pyproject.toml .
-RUN pip install --user -e .
-
+RUN pip install -e .
+USER wopr
 COPY --chown=wopr:wopr app/ .
 CMD ["streamlit", "run", "app/webui.py", "--server.port=8888", "--server.address=0.0.0.0"]
 
