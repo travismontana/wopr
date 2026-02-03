@@ -1,5 +1,4 @@
-// WOPR Model Registry Schema v0.1.6-alpha
-// Generated from Django models
+// WOPR Model Registry + Gameplay Capture (clean DBML)
 
 Table model_families {
   id int [pk, increment]
@@ -8,11 +7,11 @@ Table model_families {
   shortname varchar(32) [unique, not null]
   description text [null]
   note text [null]
-  url varchar [null]
+  url varchar(200) [null]
   created_at timestamp [not null]
   updated_at timestamp [not null]
-  mf_status jsonb [null]
-  
+  mf_status jsonb [not null]
+
   indexes {
     uuid
     name
@@ -32,7 +31,7 @@ Table model_info {
   family_id int [not null, ref: > model_families.id]
   created_at timestamp [not null]
   updated_at timestamp [not null]
-  
+
   indexes {
     uuid
     name
@@ -56,7 +55,7 @@ Table model_version {
   model_id int [not null, ref: > model_info.id]
   created_at timestamp [not null]
   updated_at timestamp [not null]
-  
+
   indexes {
     uuid
     version
@@ -65,8 +64,6 @@ Table model_version {
     updated_at
     model_id
   }
-  
-  Note: 'Needs constraint: only one is_current=true per model_id'
 }
 
 Table model_backup {
@@ -79,7 +76,7 @@ Table model_backup {
   created_at timestamp [not null]
   updated_at timestamp [not null]
   note text [null]
-  
+
   indexes {
     uuid
     taken_at
@@ -90,39 +87,16 @@ Table model_backup {
   }
 }
 
-Table training_run {
-  id int [pk, increment]
-  uuid uuid [unique, not null]
-  description text [null]
-  note text [null]
-  training_parameters jsonb [null]
-  dataset_id int [not null, ref: > datasets.id]
-  result_id int [null, ref: > results.id]
-  model_version_id int [not null, ref: > model_version.id]
-  created_at timestamp [not null]
-  updated_at timestamp [not null]
-  run_timestamp timestamp [null]
-  
-  indexes {
-    uuid
-    dataset_id
-    result_id
-    model_version_id
-    created_at
-    updated_at
-    run_timestamp
-  }
-}
-
 Table datasets {
   id int [pk, increment]
   uuid uuid [unique, not null]
-  artifact_uri varchar(1024) [unique, not null]
+  artifact_uri varchar(1024) [not null]
   description text [null]
   note text [null]
   created_at timestamp [not null]
   updated_at timestamp [not null]
-  
+  project_id int [null]
+
   indexes {
     uuid
     created_at
@@ -137,10 +111,10 @@ Table results {
   loss float [null]
   description text [null]
   note text [null]
-  artifact_uri varchar(1024) [unique, not null]
+  artifact_uri varchar(1024) [not null]
   created_at timestamp [not null]
   updated_at timestamp [not null]
-  
+
   indexes {
     uuid
     created_at
@@ -148,10 +122,159 @@ Table results {
   }
 }
 
-// Relationships
-// ModelFamily (1) --< ModelInfo (N)
-// ModelInfo (1) --< ModelVersion (N)
-// ModelVersion (1) --< ModelBackup (N)
-// ModelVersion (1) --< TrainingRun (N)
-// Dataset (1) --< TrainingRun (N)
-// Result (1) <-- TrainingRun (1)
+Table training_run {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  description text [null]
+  note text [null]
+  training_parameters jsonb [not null]
+  dataset_id int [not null, ref: > datasets.id]
+  result_id int [null, ref: > results.id]
+  model_version_id int [not null, ref: > model_version.id]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  run_timestamp timestamp [null]
+
+  indexes {
+    uuid
+    dataset_id
+    result_id
+    model_version_id
+    created_at
+    updated_at
+    run_timestamp
+  }
+}
+
+/* ---------------------------
+   Gameplay capture additions
+   --------------------------- */
+
+Table game {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  short_id varchar(5) [unique, not null] // first 5 of uuid (store it, don't compute in SQL)
+  name varchar(255) [unique, not null]
+  shortname varchar(64) [unique, not null]
+  min_players int [not null]
+  max_players int [not null] // you had "man_players"
+
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+
+  indexes {
+    uuid
+    short_id
+    created_at
+    updated_at
+    name
+    shortname
+  }
+}
+
+Table player {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  short_id varchar(5) [unique, not null] // first 5 of uuid
+  irl_name varchar(255) [unique, not null]
+  handle varchar(64) [unique, not null]
+
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+
+  indexes {
+    uuid
+    short_id
+    created_at
+    updated_at
+    irl_name
+    handle
+  }
+}
+
+Table session {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  short_id varchar(5) [unique, not null] // first 5 of uuid
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  game_id int [not null, ref: > game.id]
+
+  indexes {
+    uuid
+    short_id
+    created_at
+    updated_at
+    game_id
+  }
+}
+
+/*
+  IMPORTANT: "player_list" should NOT be a list-of-ids column if you want
+  sane querying + integrity. Use a join table.
+*/
+Table session_players {
+  session_id int [not null, ref: > session.id]
+  player_id int [not null, ref: > player.id]
+  seat int [null] // optional: turn order / seat position
+
+  indexes {
+    session_id
+    player_id
+  }
+
+  Note: 'Composite PK recommended: (session_id, player_id)'
+}
+
+Table image {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  short_id varchar(5) [unique, not null] // first 5 of uuid
+  artifact_uri varchar(1024) [unique, not null]
+
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+
+  indexes {
+    uuid
+    short_id
+    created_at
+    updated_at
+    artifact_uri
+  }
+}
+
+Table move {
+  id int [pk, increment]
+  uuid uuid [unique, not null]
+  short_id varchar(5) [unique, not null] // first 5 of uuid
+  description text [null]
+  note text [null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+
+  session_id int [not null, ref: > session.id]
+  player_id int [not null, ref: > player.id]
+
+  previous_move_id int [null, ref: > move.id] // linked list
+  image_at_end_id int [null, ref: > image.id]  // snapshot after move
+
+  indexes {
+    uuid
+    short_id
+    created_at
+    updated_at
+    session_id
+    player_id
+    previous_move_id
+    image_at_end_id
+  }
+}
