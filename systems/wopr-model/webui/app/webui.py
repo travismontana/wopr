@@ -5,7 +5,9 @@ from PIL import Image
 import tempfile
 
 st.title("WOPR Object Detection")
+st.set_page_config(layout="wide")
 
+RUNS_PATH = "/ultralytics/runs"
 
 # Model selection (with caching)
 @st.cache_resource
@@ -19,7 +21,17 @@ if "model_path" not in st.session_state:
 
 # Model selection section
 if st.session_state.model_path is None:
-    # ... your model file picker code ...
+    pt_files = []
+    for root, dirs, files in os.walk(RUNS_PATH):
+        for file in files:
+            if file.endswith(".pt"):
+                pt_files.append(os.path.join(root, file))
+
+    if len(pt_files) == 0:
+        st.warning("No model files found in runs directory.")
+    else:
+        selected_path = st.selectbox("Select model file", options=sorted(pt_files))
+        st.code(selected_path, language="text")
     if st.button("Select Model"):
         st.session_state.model_path = selected_path
         st.rerun()
