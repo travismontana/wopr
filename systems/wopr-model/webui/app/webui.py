@@ -1,6 +1,6 @@
 import streamlit as st
 import glob, os
-from ultralytics import YOLO
+from ultralytics import YOLO, solutions
 
 st.set_page_config(layout="wide", page_title="WOPR Model Interface")
 st.title("WOPR Models")
