@@ -59,3 +59,4 @@ else:
     inf = solutions.Inference(
         model=model, source=source, conf=conf_threshold, iou=iou_threshold
     )
+    inf.inference()
