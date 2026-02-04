@@ -96,7 +96,19 @@ def images_ondisk(request):
                     "extra": get_images_ondisk_results,
                 }
             )
+            for res in get_images_ondisk_results[0]["extra"]:
+                logger.info(f"Result: {res['status']} - {res['message']}")
+                if "retrieved directory listing" in res["message"]:
+                    dirs = res["extra"]
+                    debug_vars.append(("dirs", dirs))
+            context = {
+                "image_dir": image_dir,
+                "dirs": dirs,
+                "images_url": config["api"]["images_url"],
+                "thumbs_url": config["api"]["thumbs_url"],
+            }
             logger.debug(f"Debug vars: {debug_vars}")
+            return render(request, "images_ondisk.html", context)
     else:
         logger.warning("No image directory selected")
         results.append(
@@ -107,6 +119,7 @@ def images_ondisk(request):
             }
         )
         logger.debug(f"Debug vars: {debug_vars}")
+
     return render(request, "images_results.html", {"results": results})
 
 

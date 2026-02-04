@@ -2,6 +2,18 @@
 
 {% block main_content %}
 
-These are the images that live in /remote/wopr
+These are the images that live in /remote/wopr/{{ image_dir }} on disk.
 
+{% if dirs %}
+    <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
+
+    {% for d in dirs %}
+        <li><a href="{{images_url}}/{{image_dir}}/{{ d.name }}">
+            <img src="{{thumbs_url}}/insecure/resize:fill:300:200/plain/{{images_url}}/{{image_dir}}/{{ d.name }}" alt="{{ d.name }}"><br>{{d.name}}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No images found.</p>
+{% endif %}
 {% endblock %}

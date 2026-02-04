@@ -100,7 +100,7 @@ def get_config() -> dict:
             },
             "api": {
                 "images_url": "https://images.wopr.tailandtraillabs.org",
-                "thumb_url": "https://imgproxy.wopr.tailandtraillabs.org",
+                "thumbs_url": "https://imgproxy.wopr.tailandtraillabs.org",
                 "labels_url": "https://labelstudio.wopr.tailandtraillabs.org",
             },
         }
