@@ -1,0 +1,22 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+
+{% if dir_selector %}
+    <div class="image-dir-selector">
+        <h2>Select Image Directory</h2>
+        <form method="post" action="{% url 'images_ondisk' %}">
+        {% csrf_token %}
+        <label for="image_dir">Image Directory:</label>
+        <select id="image_dir" name="image_dir">
+            {% for dir in dir_selector %}
+            <option value="{{ dir.path }}">{{ dir.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Select</button>
+        </form>
+    </div>
+    {% else %}
+    <p>No image directories available.</p>
+    {% endif %}
+{% endblock %}

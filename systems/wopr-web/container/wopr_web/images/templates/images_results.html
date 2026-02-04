@@ -1,0 +1,27 @@
+{% extends "images_base.html" %}
+
+{% block content %}
+<h2>Operation Results</h2>
+
+{% if results %}
+    <ul>
+    {% for result in results %}
+        <li>
+            <strong>Status:</strong> {{ result.status }}<br>
+            <strong>Message:</strong> {{ result.message }}
+            {% if result.extra and result.extra|length != 0 %}
+                <br><strong>Extra Information:</strong>
+                <ul>
+                {% for key, value in result.extra.items() %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No results to display.</p>
+{% endif %}
+
+{% endblock %}
