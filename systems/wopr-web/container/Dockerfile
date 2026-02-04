@@ -21,12 +21,12 @@ RUN useradd -m -u 2222 wopr
 WORKDIR /app
 
 # Install dependencies as root
-COPY requirements.txt pyproject.toml ./
-RUN pip install -r requirements.txt && pip install -e .
+COPY pyproject.toml ./
+RUN pip install -e .
 
 # Copy app code to /app (wopr_web/ will be at /app/wopr_web/)
 COPY --chown=wopr:wopr wopr_web ./
-COPY --chown=wopr:wopr wopr_web/wopr_web/scripts/entrypoint.sh /app/entrypoint.sh
+COPY --chown=wopr:wopr wopr_web/scripts/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 # Switch to non-root user
 USER wopr

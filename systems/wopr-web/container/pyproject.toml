@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wopr-web"
+version = "0.2.0"
+description = "WOPR - Web Frontend"
+authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
+dependencies = [
+  "django",
+  "gunicorn",
+  "psycopg2-binary",
+  "whitenoise",
+  "requests",
+  "label-studio-sdk",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "django-stubs",
+  "ipdb",
+  "pip-tools",
+  "ruff",
+  "pytest",
+  ]

@@ -19,6 +19,9 @@ services:
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
       LABEL_STUDIO_URL: "${LABEL_STUDIO_URL}"
       LABEL_STUDIO_TOKEN: "${LABEL_STUDIO_TOKEN}"
+    volumes:
+      - /remote/wopr/models:/remote/wopr/models
+      - /remote/wopr/ml:/remote/wopr/ml
     ports:
       - "8000:8000"
 

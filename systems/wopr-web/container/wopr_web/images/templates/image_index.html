@@ -1,0 +1,17 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+<p>
+Welcome to the WOPR images page.
+
+The general idea is that all images will need a db entry.
+
+Camera -> /remote/wopr/ml/incoming (ondisk)
+(ondisk) -> ui to add them to the db (addtodb)
+(addtodb) -> files moved to /remote/wopr/images and db entry created (indb)
+</p>
+<ul>
+    <li>Browse images by file</li>
+    <li>Browse images in the db</li>
+</ul>
+{% endblock %}

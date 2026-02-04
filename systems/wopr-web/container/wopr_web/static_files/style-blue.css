@@ -1,0 +1,99 @@
+:root {
+  /* Brand */
+  --color-brand-primary:   #001440; /* main authority */
+  --color-brand-secondary: #002880; /* hover / links */
+  --color-brand-tertiary:  #879AAD; /* subtle accents */
+
+  /* Neutrals */
+  --color-bg-page:    #F6F8FB; /* app background */
+  --color-bg-surface: #FFFFFF; /* cards / panels */
+  --color-bg-muted:   #E2E8F0; /* dividers / soft fills */
+
+  /* Text */
+  --color-text-primary:   #0F172A; /* near-black, not blue */
+  --color-text-secondary: #334155; /* labels, hints */
+  --color-text-inverse:   #FFFFFF; /* on dark brand */
+
+  /* Navigation / Structure */
+  --color-bg-header:  var(--color-brand-primary);
+  --color-bg-rail:    #0B1D3A; /* darker than header */
+  --color-bg-nav:     #122B55;
+
+  /* Status */
+  --color-success: #2E7D32;
+  --color-warning: #C77700;
+  --color-error:   #B3261E;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 160px auto 1fr;
+  grid-template-areas:
+    "logo    header"
+    "nav     main"
+    "sidebar main";
+  height: 100vh;
+  gap: 0;
+
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: "Noto Serif", serif;
+
+  min-width: 0; /* prevents weird overflow */
+}
+
+.logo {
+  grid-area: logo;
+  padding: 10px;
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-bg-muted);
+}
+
+.logo img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.nav {
+  grid-area: nav;
+  background-color: var(--color-bg-nav);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-bg-muted);
+  padding: 10px;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: var(--color-bg-rail);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-bg-muted);
+  padding: 10px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.header {
+  grid-area: header;
+  background-color: var(--color-bg-header);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-bg-muted);
+  padding: 10px;
+  text-align: center;
+}
+
+.main {
+  grid-area: main;
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-muted);
+  padding: 10px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Optional: links that look like links */
+a { color: var(--color-brand-secondary); }
+a:hover { color: var(--color-brand-primary); }

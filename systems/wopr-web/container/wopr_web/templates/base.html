@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}WOPR - Web Frontend{% endblock %}</title>
+    <link href="{% static 'style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+        <div class="logo">
+            {% include 'logo.html' %}
+        </div>
+        <div class="nav">
+            <a href="{% url 'images_index' %}">Images</a>
+        </div>
+        <div class="sidebar">
+            {% block sidebar %}
+            {% endblock %}
+        </div>
+        <div class="header">
+            {% include 'header.html' %}
+        </div>
+        <div class="main">
+            {% block main_content %}
+            {% endblock %}
+        </div>
+    </div>
+
+  </body>
+</html>
