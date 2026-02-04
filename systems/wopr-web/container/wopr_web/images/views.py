@@ -40,11 +40,14 @@ def show_dir_selector(request):
 
     dir_selector = []
     for dir_key in dirs["WOPRS"]["images"]:
+        d = dirs["WOPRS"]["images"][dir_key].split(
+            f"{config['storage']['base_path']}/"
+        )[-1]
         dir_selector.append(
             {
-                "name": f"images_{dir_key} - {dirs['WOPRS']['images'][dir_key]}",
+                "name": f"images_{d}",
                 "dir_key": dir_key,
-                "path": dirs["WOPRS"]["images"][dir_key],
+                "path": d,
             }
         )
     context = {"dir_selector": dir_selector}
@@ -54,7 +57,7 @@ def show_dir_selector(request):
 
 
 def images_ondisk(request):
-    logger.info("Rendering images on disk page")
+    logger.info("Starting images_ondisk view")
     context = []
     results = []
     debug_vars = []
@@ -65,14 +68,46 @@ def images_ondisk(request):
         logger.debug(f"Debug vars: {debug_vars}")
 
         get_images_ondisk_results = get_images_ondisk(image_dir)
+        logger.info("Back to images_ondisk after get_images_ondisk()")
         debug_vars.append(("get_images_ondisk_results", get_images_ondisk_results))
         logger.debug(f"Debug vars: {debug_vars}")
 
-        if get_images_ondisk_results["status"] != "success":
-            results.append(get_images_ondisk_results)
-            render(request, "images_results.html", {"results": results})
+        if (
+            get_images_ondisk_results is None
+            or get_images_ondisk_results[0]["status"] != "success"
+        ):
+            logger.error("Error retrieving images on disk")
+            logger.debug(f"Debug vars: {debug_vars}")
+            results.append(
+                {
+                    "status": "error",
+                    "message": "get_images_ondisk_results = get_images_ondisk(image_dir) - failed.",
+                    "extra": {"debug_vars": debug_vars},
+                }
+            )
+            return render(request, "images_results.html", {"results": results})
 
-    return render(request, "images_ondisk.html", context)
+        else:
+            logger.info("Successfully retrieved images on disk")
+            results.append(
+                {
+                    "status": "success",
+                    "message": "retrieved images on disk",
+                    "extra": get_images_ondisk_results,
+                }
+            )
+            logger.debug(f"Debug vars: {debug_vars}")
+    else:
+        logger.warning("No image directory selected")
+        results.append(
+            {
+                "status": "warning",
+                "message": "no image directory selected",
+                "extra": {"debug_vars": debug_vars},
+            }
+        )
+        logger.debug(f"Debug vars: {debug_vars}")
+    return render(request, "images_results.html", {"results": results})
 
 
 def images_indb(request):

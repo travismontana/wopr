@@ -1,6 +1,6 @@
 {% extends "images_base.html" %}
 
-{% block content %}
+{% block main_content %}
 <h2>Operation Results</h2>
 
 {% if results %}
@@ -12,7 +12,7 @@
             {% if result.extra and result.extra|length != 0 %}
                 <br><strong>Extra Information:</strong>
                 <ul>
-                {% for key, value in result.extra.items() %}
+                {% for key, value in result.extra.items %}
                     <li>{{ key }}: {{ value }}</li>
                 {% endfor %}
                 </ul>
