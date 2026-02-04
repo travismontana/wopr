@@ -15,7 +15,7 @@ def grab_dir_list(path: str) -> list:
     logger.info("Starting grab_dir_list()")
     logger.debug(f"Debug vars: {debug_vars}")
 
-    url = f"{config["api"]["images_url"]}"
+    url = f"{config['api']['images_url']}/{path}"
     debug_vars.append(f"url: {url}")
     logger.info(f"Grabbing directory listing from URL: {url}")
     try:
@@ -79,5 +79,4 @@ def get_images_ondisk(image_dir: str) -> list:
             }
         )
         logger.debug(f"Debug vars: {debug_vars}")
-        for 
     return results
