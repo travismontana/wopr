@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "core",
+    "images",
+    "game_sessions",
 ]
 
 MIDDLEWARE = [
@@ -59,7 +62,7 @@ TEMPLATES = [
         "DIRS": [
             BASE_DIR / "templates",
             BASE_DIR / "images/templates",
-            BASE_DIR / "sessions/templates",
+            BASE_DIR / "game_sessions/templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {

@@ -12,6 +12,8 @@
             {% include 'logo.html' %}
         </div>
         <div class="nav">
+            <a href="{% url 'home' %}">Home</a> |
+            <a href="{% url 'admin:index' %}">Admin</a> |
             <a href="{% url 'images_index' %}">Images</a>
         </div>
         <div class="sidebar">
