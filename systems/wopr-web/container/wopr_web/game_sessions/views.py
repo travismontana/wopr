@@ -5,7 +5,7 @@ from core.models import Game, Session, SessionPlayer, Player, SessionImage
 
 from .lib.captures import grab_preview, grab_capture
 
-from .lib.helpers import get_config, setup_logger
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()

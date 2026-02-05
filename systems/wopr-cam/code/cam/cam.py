@@ -69,7 +69,7 @@ def capture_preview():
     return preview_image
 
 
-@app.get("/api/capture")
+@app.post("/api/capture")
 def capture(payload: dict):
     logger.info("Received request for capture preview")
     width = payload.get("width", 3840)

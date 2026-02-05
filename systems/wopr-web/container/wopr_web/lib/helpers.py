@@ -93,6 +93,8 @@ def get_config() -> dict:
                     "0": {
                         "host": os.getenv("CAMERA_HOST", "localhost"),
                         "port": os.getenv("CAMERA_PORT", 8000),
+                        "width": int(os.getenv("CAMERA_WIDTH", 3840)),
+                        "height": int(os.getenv("CAMERA_HEIGHT", 2160)),
                     }
                 }
             },
