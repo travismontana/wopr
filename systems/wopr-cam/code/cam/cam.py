@@ -86,6 +86,7 @@ def capture(payload: dict):
     time.sleep(2)  # Allow camera to warm up
     cam.capture_file(filepath, "main")
     cam.stop()
+    cam.close()
     checksum = hashlib.sha256(open(filepath, "rb").read()).hexdigest()
     logger.info(f"Captured image saved to {filepath} with checksum {checksum}")
     results = {

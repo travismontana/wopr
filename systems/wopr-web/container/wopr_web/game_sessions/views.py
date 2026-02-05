@@ -1,7 +1,14 @@
 from django.shortcuts import render, redirect
-from .forms import GameForm, GameSessionForm, PlayerForm, SessionPlayerForm
+from pathlib import Path
+from .forms import (
+    GameForm,
+    GameSessionForm,
+    PlayerForm,
+    SessionPlayerForm,
+    SessionImageForm,
+)
 
-from core.models import Game, Session, SessionPlayer, Player, SessionImage
+from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image
 
 from .lib.captures import grab_preview, grab_capture
 
@@ -123,7 +130,17 @@ def take_captures(request):
 
     if request.method == "POST":
         gsession_id = request.POST.get("gsession_id")
-        gsession = Session.objects.get(id=gsession_id)
+        try:
+            gsession = Session.objects.get(id=gsession_id)
+        except Session.DoesNotExist:
+            results = [
+                {
+                    "status": "error",
+                    "message": f"Session with ID {gsession_id} does not exist.",
+                    "extra": [],
+                }
+            ]
+            return render(request, "gs_results.html", {"results": results})
         context["gsession"] = gsession
         # filename: gsession[uuid].jpg
         # path: configbas/{image_dir}/filename
@@ -132,8 +149,8 @@ def take_captures(request):
         base = config["storage"]["base_path"]
         images = config["storage"]["images_subdir"]
         incoming = config["storage"]["incoming_subdir"]
-        path = f"{base}/{images}/{incoming}/{filename}"
-        filepath = path
+        path = Path(base) / images / incoming / filename
+        filepath = str(path)
 
         width = config["camera"]["camDict"]["0"]["width"]
         height = config["camera"]["camDict"]["0"]["height"]
@@ -144,8 +161,31 @@ def take_captures(request):
             "height": height,
         }
         grab_capture_results = grab_capture(payload)
+        logger.info(f"Grab capture results: {grab_capture_results}")
         if grab_capture_results is not None:
             context["capture_results"] = grab_capture_results
+            data = grab_capture_results.json()
+            filepath = data.get("filepath", None)
+            checksum = data.get("checksum", None)
+            imageform = ImageForm(
+                initial={
+                    "artifact_uri": filepath,
+                    "checksum": checksum,
+                    "filename": filename,
+                }
+            )
+            imageinfo = Image(
+                filename=filename, artifact_uri=filepath, checksum=checksum
+            )
+            imageform.save()
+            sessionimageform = SessionImageForm(
+                initial={
+                    "session": gsession,
+                    "image": imageinfo,
+                }
+            )
+            if sessionimageform.is_valid():
+                sessionimageform.save()
         else:
             results = [
                 {
