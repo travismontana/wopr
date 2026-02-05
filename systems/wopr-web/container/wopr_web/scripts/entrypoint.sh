@@ -4,7 +4,7 @@
 set -e
 
 echo "Waiting for postgres..."
-while ! nc -z ${DB_HOST:-localhost} ${DB_PORT:-5432}; do
+while ! nc -z ${DB_HOST:-postgres} ${DB_PORT:-5432}; do
   sleep 0.1
 done
 echo "PostgreSQL started"
