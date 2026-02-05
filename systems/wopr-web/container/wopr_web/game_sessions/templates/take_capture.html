@@ -38,6 +38,16 @@ For the notes.  If there's something special, note it there.
     <br>
     <input type="submit" value="Take Capture">
 </form>
+<br>
+<hr>
+<h2 id="preview">Preview Capture</h2>
+
+<form method="post" action="{% url 'capture_preview' %}">
+    {% csrf_token %}
+    <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
+    <input type="submit" value="Preview Capture">
+</form>
+
 {% else %}
 <p>No game session specified for taking captures.</p>
 {% endif %}

@@ -84,9 +84,17 @@ def get_config() -> dict:
                 "distfiles_subdir": "distfiles",
             },
             "api": {
-                "images_url": "https://images.wopr.tailandtraillabs.org",
-                "thumbs_url": "https://imgproxy.wopr.tailandtraillabs.org",
-                "labels_url": "https://labelstudio.wopr.tailandtraillabs.org",
+                "images_url": os.getenv("IMAGES_URL", "https://images"),
+                "thumbs_url": os.getenv("THUMB_URL", "https://imgproxy"),
+                "labels_url": os.getenv("LABEL_STUDIO_URL", "http://localhost:8080"),
+            },
+            "camera": {
+                "camDict": {
+                    "0": {
+                        "host": os.getenv("CAMERA_HOST", "localhost"),
+                        "port": os.getenv("CAMERA_PORT", 8000),
+                    }
+                }
             },
         }
     return config

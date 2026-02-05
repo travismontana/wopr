@@ -3,6 +3,7 @@ from .forms import GameForm, GameSessionForm, PlayerForm, SessionPlayerForm
 
 from core.models import Game, Session, SessionPlayer, Player, SessionImage
 
+from .lib.captures import grab_preview
 
 # Create your views here.
 def gs_index(request):
@@ -119,5 +120,33 @@ def take_captures(request):
         gsession_id = request.POST.get("gsession_id")
         gsession = Session.objects.get(id=gsession_id)
         context["gsession"] = gsession
+
+    return render(request, "take_capture.html", context)
+
+
+def capture_preview(request):
+    context = {}
+
+    if request.method == "POST":
+        gsession_id = request.POST.get("gsession_id")
+        gsession = Session.objects.get(id=gsession_id)
+        context["gsession"] = gsession
+
+        grab_preview_results = grab_preview()
+        if grab_preview_results is not None:
+            context["preview_results"] = grab_preview_results
+        else:
+            results = [
+                {
+                    "status": "error",
+                    "message": "Failed to fetch capture preview.",
+                    "extra": [],
+                }
+            ]
+            context["results"] = results
+            return render(request, "gs_results.html", context)
+    else:
+        context = {"error": "No session ID provided."}
+        return render(request, "gs_results.html", context)
 
     return render(request, "take_capture.html", context)

@@ -23,4 +23,5 @@ urlpatterns = [
         name="add_player_to_session",
     ),
     path("take_captures", views.take_captures, name="take_captures"),
+    path("capture_preview", views.capture_preview, name="capture_preview"),
 ]

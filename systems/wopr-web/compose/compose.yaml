@@ -19,6 +19,8 @@ services:
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
       LABEL_STUDIO_URL: "${LABEL_STUDIO_URL}"
       LABEL_STUDIO_TOKEN: "${LABEL_STUDIO_TOKEN}"
+      CAMERA_HOST: "${CAMERA_HOST}"
+      CAMERA_PORT: "${CAMERA_PORT}"
     volumes:
       - /remote/wopr/labelstudio:/remote/wopr/labelstudio
       - /remote/wopr/images:/remote/wopr/images
