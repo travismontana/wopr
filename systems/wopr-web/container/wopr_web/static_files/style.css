@@ -1,29 +1,99 @@
+/*
+OG Colors, dont have to use.
 :root {
-  /* Brand */
-  --color-brand-primary:   #001440; /* main authority */
-  --color-brand-secondary: #2A4FA3; /* hover / links */
-  --color-brand-tertiary:  #9AA7C2; /* subtle accents */
+  --color-brand-primary:   #001440;
+  --color-brand-secondary: #2A4FA3;
+  --color-brand-tertiary:  #9AA7C2;
 
-  /* Neutrals */
-  --color-bg-page:    #FAF9F7; /* app background */
-  --color-bg-surface: #8c8c8c; /* cards / panels */
-  --color-bg-muted:   #E2E8F0; /* dividers / soft fills */
+  --color-bg-page:    #F6F8FB;
+  --color-bg-surface: #8c8c8c;
+  --color-bg-muted:   #E2E8F0;
 
-  /* Text */
-  --color-text-primary:   #1C2430; /* near-black, not blue */
-  --color-text-secondary: #4A5568; /* labels, hints */
-  --color-text-inverse:   #FFFFFF; /* on dark brand */
+  --color-text-primary:   #1C2430;
+  --color-text-secondary: #4A5568;
+  --color-text-inverse:   #FFFFFF;
 
-  /* Navigation / Structure */
   --color-bg-header:  var(--color-brand-primary);
-  --color-bg-rail:    #0E2348; /* darker than header */
+  --color-bg-rail:    #0E2348;
   --color-bg-nav:     #1A3566;
 
-  /* Status */
   --color-success: #2E7D32;
   --color-warning: #C77700;
   --color-error:   #B3261E;
 }
+*/
+
+/* Dark command center */
+:root {
+  --color-brand-primary:   #001440;
+  --color-brand-secondary: #4A7BA7;
+  --color-brand-tertiary:  #7B8FA3;
+
+  --color-bg-page:    #1a1d24;
+  --color-bg-surface: #2d3139;
+  --color-bg-muted:   #3d4450;
+
+  --color-text-primary:   #e8e9ed;
+  --color-text-secondary: #a8adb7;
+  --color-text-inverse:   #FFFFFF;
+
+  --color-bg-header:  var(--color-brand-primary);
+  --color-bg-rail:    #0E2348;
+  --color-bg-nav:     #1A3566;
+
+  --color-success: #4CAF50;
+  --color-warning: #FFA726;
+  --color-error:   #EF5350;
+}
+
+
+/* Tacticool
+:root {
+  --color-brand-primary:   #001440;
+  --color-brand-secondary: #3D6BA3;
+  --color-brand-tertiary:  #6B7FA3;
+
+  --color-bg-page:    #2b2f38;
+  --color-bg-surface: #3f4451;
+  --color-bg-muted:   #4a5160;
+
+  --color-text-primary:   #dfe1e6;
+  --color-text-secondary: #9ca3af;
+  --color-text-inverse:   #FFFFFF;
+
+  --color-bg-header:  var(--color-brand-primary);
+  --color-bg-rail:    #0E2348;
+  --color-bg-nav:     #1A3566;
+
+  --color-success: #48A14D;
+  --color-warning: #D8860B;
+  --color-error:   #DC4446;
+}
+*/
+
+/* Navy 
+:root {
+  --color-brand-primary:   #001440;
+  --color-brand-secondary: #4472A3;
+  --color-brand-tertiary:  #6987B3;
+
+  --color-bg-page:    #1b1f2e;
+  --color-bg-surface: #252c3d;
+  --color-bg-muted:   #2f3847;
+
+  --color-text-primary:   #e3e6ef;
+  --color-text-secondary: #9da5b8;
+  --color-text-inverse:   #FFFFFF;
+
+  --color-bg-header:  var(--color-brand-primary);
+  --color-bg-rail:    #0E2348;
+  --color-bg-nav:     #1A3566;
+
+  --color-success: #42A047;
+  --color-warning: #E89614;
+  --color-error:   #E53935;
+}
+*/
 
 .container {
   display: grid;
@@ -97,3 +167,39 @@
 /* Optional: links that look like links */
 a { color: var(--color-brand-secondary); }
 a:hover { color: var(--color-brand-primary); }
+
+textarea {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-muted);
+  padding: 5px;
+  width: 80ch;
+  height: 24ch;
+  box-sizing: border-box;
+}
+
+input[type="text"], input[type="number"], select {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-muted);
+  padding: 5px;
+  width: 80ch;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: var(--color-brand-secondary);
+  color: var(--color-text-inverse);
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+table.nav-table td:nth-child(2) {
+  text-align: right;
+}

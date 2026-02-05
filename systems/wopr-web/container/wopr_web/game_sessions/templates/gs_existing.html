@@ -1,0 +1,17 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+{% if gs_list %}
+    <h2>Existing Game Sessions</h2>
+    <ul>
+    {% for gs in gs_list %}
+        <li>
+            <a href="{% url 'gs_view_specific' gs.id %}">Session {{ gs.id }} - {{ gs.name }}</a>
+            (Created on {{ gs.created_at }})
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No existing game sessions found.</p>
+{% endif %}
+{% endblock %}

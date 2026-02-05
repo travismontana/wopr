@@ -106,6 +106,18 @@ class SessionPlayer(models.Model):
         return f"{self.player.handle} in {self.session.short_id}{seat_info}"
 
 
+class SessionImage(models.Model):
+    """Join table for sessions and images"""
+
+    session = models.ForeignKey("Session", on_delete=models.CASCADE, db_index=True)
+    image = models.ForeignKey("Image", on_delete=models.CASCADE, db_index=True)
+
+    class Meta:
+        db_table = "session_images"
+        unique_together = [["session", "image"]]
+        ordering = ["session", "image"]
+
+
 class Image(models.Model):
     """Image artifact captured during gameplay."""
 

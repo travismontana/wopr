@@ -12,14 +12,14 @@
             {% include 'logo.html' %}
         </div>
         <div class="nav">
-          <table>
+          <table class="nav-table">
             <tr>
               <td><a href="{% url 'index' %}">Home</a></td>
               <td><a href="{% url 'admin:index' %}">Admin</a></td>
             </tr>
             <tr>
               <td><a href="{% url 'images_index' %}">Images</a></td>
-              <td><a href="{% url 'game_sessions_index' %}">Game Sessions</a></td>
+              <td><a href="{% url 'gs_index' %}">Game Sessions</a></td>
             </tr>
             <tr>
               <td>Players</td>

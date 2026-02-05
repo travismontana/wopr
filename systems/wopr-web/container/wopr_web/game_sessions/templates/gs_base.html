@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<h2>Game Sessions</h2>
+<ul>
+    <li><a href="{% url 'gs_existing' %}">Browse Existing</a></li>
+    <li><a href="{% url 'gs_new' %}">Create New</a></li>
+</ul>
+<h2>Games</h2>
+<ul>
+    <li><a href="{% url 'game_list' %}">Browse Games</a></li>
+    <li><a href="{% url 'game_new_form' %}">Create New</a></li>
+</ul>
+<h2>Players</h2>
+<ul>
+    <li><a href="{% url 'player_list' %}">Browse Players</a></li>
+    <li><a href="{% url 'player_new_form' %}">Create New</a></li>
+</ul>
+{% endblock %}

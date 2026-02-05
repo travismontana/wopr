@@ -1,0 +1,12 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+<h2>Create a New Game</h2>
+<form method="post" action="{% url 'game_new_form' %}">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Create Game">
+</form>
+{% endblock %}

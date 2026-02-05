@@ -1,0 +1,41 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+
+{% if gsession %}
+<h2>Game Session: {{ gsession.game.shortname }} - {{ gsession.short_id }}</h2>
+<h3>Add Player:</h3>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Player</button>
+</form>
+<hr>
+<h3>Current Players:</h3>
+{% if gsession.sessionplayer_set.all %}
+    <ul>
+    {% for sp in gsession.sessionplayer_set.all %}
+        <li>{{ sp.player.handle }}{% if sp.seat %} - Seat {{ sp.seat }}{% endif %}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No players in this session yet.</p>
+{% endif %}
+<hr>
+<h3>Session Details:</h3>
+<p>Session ID: <br>{{ gsession.short_id }}</p>
+<p>Game: <br>{{ gsession.game.shortname }}</p>
+<p>Created At: <br>{{ gsession.created_at }}</p>
+<br>
+<h3>Actions:</h3>
+<ul>
+    <li><form method="post" action="{% url 'take_captures' %}">
+        {% csrf_token %}
+        <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
+        <button type="submit">Take Captures for this Session</button>
+    </form></li>
+</ul>
+{% else %}
+<p>No game session found.</p>
+{% endif %}
+{% endblock %}

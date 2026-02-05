@@ -1,0 +1,44 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+{% if gsession.id %}
+<h2>Take Capture</h2>
+<p>
+Take a capture.
+
+For the notes.  If there's something special, note it there.
+
+</p>
+<p><strong>Game Session:</strong> {{ gsession.short_id }}</p>
+<p><strong>Game: </strong> {{ gsession.game.shortname }}</p>
+<hr>
+<form method="post" action="">
+    {% csrf_token %}
+    <label for="player">Player:</label>
+    <select name="player" id="player">
+        {% for sp in gsession.sessionplayer_set.all %}
+        <option value="{{ sp.player.id }}">{{ sp.player.handle }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="round">Round:</label>
+    <input type="number" name="round" id="round" min="1">
+    <br>
+    <label for="turn">Turn:</label>
+    <input type="number" name="turn" id="turn" min="1">
+    <br>
+    <label for="turn_type">Turn Type:</label>
+    <select name="turn_type" id="turn_type">
+        <option value="agent">Agent</option>
+        <option value="reveal">Reveal</option>
+    </select>
+    <br>
+    <label for="notes">Notes:</label><br>
+    <textarea name="notes" id="notes" cols="80" rows="24"  placeholder="Enter any notes about this capture here..."></textarea>
+    <br>
+    <input type="submit" value="Take Capture">
+</form>
+{% else %}
+<p>No game session specified for taking captures.</p>
+{% endif %}
+{% endblock %}

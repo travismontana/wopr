@@ -1,0 +1,11 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+<p>
+Welcome to the Game Session page.
+</p>
+<ul>
+    <li><a href="{% url 'gs_existing' %}">Browse existing game sessions</a></li>
+    <li><a href="{% url 'gs_new' %}">Create a new game session</a></li>
+</ul>
+{% endblock %}

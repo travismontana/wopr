@@ -1,0 +1,14 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+<h2>Players</h2>
+{% if players %}
+<ul>
+    {% for player in players %}
+    <li>{{ player.name }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No players available.</p>
+{% endif %}
+{% endblock %}
