@@ -3,7 +3,12 @@ from .forms import GameForm, GameSessionForm, PlayerForm, SessionPlayerForm
 
 from core.models import Game, Session, SessionPlayer, Player, SessionImage
 
-from .lib.captures import grab_preview
+from .lib.captures import grab_preview, grab_capture
+
+from .lib.helpers import get_config, setup_logger
+
+logger = setup_logger()
+config = get_config()
 
 # Create your views here.
 def gs_index(request):
@@ -120,7 +125,39 @@ def take_captures(request):
         gsession_id = request.POST.get("gsession_id")
         gsession = Session.objects.get(id=gsession_id)
         context["gsession"] = gsession
+        # filename: gsession[uuid].jpg
+        # path: configbas/{image_dir}/filename
 
+        filename = f"{gsession.uuid}.jpg"
+        base = config["storage"]["base_path"]
+        images = config["storage"]["images_subdir"]
+        incoming = config["storage"]["incoming_subdir"]
+        path = f"{base}/{images}/{incoming}/{filename}"
+        filepath = path
+
+        width = config["camera"]["camDict"]["0"]["width"]
+        height = config["camera"]["camDict"]["0"]["height"]
+
+        payload = {
+            "filepath": filepath,
+            "width": width,
+            "height": height,
+        }
+        grab_capture_results = grab_capture(payload)
+        if grab_capture_results is not None:
+            context["capture_results"] = grab_capture_results
+        else:
+            results = [
+                {
+                    "status": "error",
+                    "message": "Failed to fetch capture preview.",
+                    "extra": [],
+                }
+            ]
+            context["results"] = results
+            return render(request, "gs_results.html", context)
+    else:
+        context = {"error": "No session ID provided."}
     return render(request, "take_capture.html", context)
 
 
@@ -150,3 +187,16 @@ def capture_preview(request):
         return render(request, "gs_results.html", context)
 
     return render(request, "take_capture.html", context)
+
+
+def capture_results(request):
+    context = {}
+
+    if request.method == "POST":
+        gsession_id = request.POST.get("gsession_id")
+        gsession = Session.objects.get(id=gsession_id)
+        context["gsession"] = gsession
+
+        return render(request, "gs_results.html", context)
+
+    return render(request, "gs_results.html", context)
