@@ -1,6 +1,7 @@
 import logging
 import httpx
 import time
+import hashlib
 
 from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -66,3 +67,30 @@ def capture_preview():
         cam.stop()
 
     return preview_image
+
+
+@app.get("/api/capture")
+def capture(payload: dict):
+    logger.info("Received request for capture preview")
+    width = payload.get("width", 3840)
+    height = payload.get("height", 2160)
+    filepath = payload.get("filepath", f"/dev/null")
+
+    cam = Picamera2()
+    camera_config = cam.create_preview_configuration(
+        main={"size": (width, height), "format": "RGB888"},
+        transform=Transform(hflip=1, vflip=1),
+    )
+    cam.configure(camera_config)
+    cam.start()
+    time.sleep(2)  # Allow camera to warm up
+    cam.capture_file(filepath, "main")
+    cam.stop()
+    checksum = hashlib.sha256(open(filepath, "rb").read()).hexdigest()
+    logger.info(f"Captured image saved to {filepath} with checksum {checksum}")
+    results = {
+        "status": "success",
+        "message": f"Image captured and saved to {filepath} checksum {checksum}",
+        "extra": {"filepath": filepath, "checksum": checksum},
+    }
+    return JSONResponse(content=results)
