@@ -1,6 +1,5 @@
 import logging
 import httpx
-import torch
 import time
 
 from fastapi import FastAPI, HTTPException, APIRouter
