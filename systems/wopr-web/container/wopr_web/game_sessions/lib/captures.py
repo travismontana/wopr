@@ -6,7 +6,7 @@ logger = setup_logger()
 config = get_config()
 
 def grab_preview():
-    url = f"{config["camera"]["camDict"]["0"]["host"]}:{config["camera"]["camDict"]["0"]["port"]}/api/capture_preview"
+    url = f"http://{config["camera"]["camDict"]["0"]["host"]}:{config["camera"]["camDict"]["0"]["port"]}/api/capture_preview"
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors

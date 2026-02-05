@@ -23,8 +23,6 @@ app = FastAPI(
     title=APP_NAME,
 )
 
-cam_router = APIRouter()
-
 # health page
 @app.get("/health")
 def get_health():
@@ -42,7 +40,8 @@ def get_status():
 
     return status
 
-@cam_router.get("/api/capture_preview")
+
+@app.get("/api/capture_preview")
 def capture_preview():
     logger.info("Received request for capture preview")
     cam = Picamera2()
