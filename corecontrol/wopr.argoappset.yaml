@@ -27,8 +27,8 @@ spec:
             path: systems/wopr-api/helm
             namespace: wopr
             wave: "3"
-          - name: wopr-boh
-            path: systems/wopr-boh/helm
+          - name: wopr-web
+            path: systems/wopr-web/helm
             namespace: wopr
             wave: "3"
           - name: wopr-images
@@ -37,10 +37,6 @@ spec:
             wave: "3"
           - name: wopr-imgproxy
             path: systems/wopr-imgproxy/helm
-            namespace: wopr
-            wave: "3"
-          - name: wopr-luigi
-            path: systems/wopr-luigi/helm
             namespace: wopr
             wave: "3"
           - name: wopr-monitoring
