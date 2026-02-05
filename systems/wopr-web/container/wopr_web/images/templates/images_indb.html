@@ -1,5 +1,20 @@
 {% extends "images_base.html" %}
 
 {% block main_content %}
-These are the images, as pulled from the database.
+{% if results %}
+    {% if images %}
+        <ul>
+        {% for image in results %}
+            <li>
+                <strong>{{ image.name }}</strong> - {{ image.description }}
+                {% if image.url %}
+                    - <a href="{{ image.url }}">Link</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No images found in the database.</p>
+    {% endif %}
+{% endif %}
 {% endblock %}

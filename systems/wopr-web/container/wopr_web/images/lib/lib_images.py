@@ -80,3 +80,34 @@ def get_images_ondisk(image_dir: str) -> list:
         )
         logger.debug(f"Debug vars: {debug_vars}")
     return results
+
+
+def image_sort(images_db, images_disk):
+    """Compare disk images against DB records."""
+    logger.info("Starting image_sort()")
+    images_both = []
+    images_disk_list = []
+
+    # Build set of filenames from DB for fast lookup
+    db_filenames = {img.filename for img in images_db}
+
+    logger.debug(f"DB filenames: {db_filenames}")
+    logger.debug(f"Images on Disk: {images_disk}")
+
+    for disk_image in images_disk:
+        name = disk_image["name"]
+        logger.debug(f"Checking disk image: {name}")
+        if name in db_filenames:
+            logger.debug(f"Image {name} found in both DB and Disk")
+            images_both.append(disk_image)
+        else:
+            images_disk_list.append(disk_image)
+
+    results = [
+        {
+            "status": "success",
+            "message": "sorted images",
+            "extra": {"images_both": images_both, "images_disk": images_disk_list},
+        }
+    ]
+    return results

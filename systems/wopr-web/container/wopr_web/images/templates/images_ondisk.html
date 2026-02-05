@@ -2,7 +2,42 @@
 
 {% block main_content %}
 
-These are the images that live in /remote/wopr/{{ image_dir }} on disk.
+{% if images_on_disk or images_in_both %}
+    <form method="post" action="{% url 'add_images_to_db' %}">
+        {% csrf_token %}
+        <input type="hidden" name="image_dir" value="{{ image_dir }}">
+
+        <h2>Images on disk but not in the DB</h2>
+        <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
+        {% for image in images_on_disk %}
+            <li><a href="{{image.url}}">
+                <img src="{{image.thumb_url}}" alt="{{ image.name }}"><br>
+                <input type="checkbox" name="selected_images" value="{{image.name}}">{{image.name}}</a>
+            </li>
+        {% endfor %}
+        </ul>
+
+    <button type="submit">Add Selected to DB</button>
+        </form>
+    <hr>
+            <h2>Images in DB and disk</h2>
+        <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
+
+        {% for image in images_in_both %}
+            <li><a href="{{image.url}}">
+                <img src="{{image.thumb_url}}" alt="{{ image.name }}"><br>{{image.name}}</a>
+            </li>
+        {% endfor %}
+        </ul>
+
+{% else %}
+    <h2>No Images on Disk</h2>
+{% endif %}
+
+
+
+<hr>
+<h2>These are the images that live in /remote/wopr/{{ image_dir }} on disk.</h2>
 
 {% if dirs %}
     <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">

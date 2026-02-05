@@ -12,10 +12,20 @@
             {% include 'logo.html' %}
         </div>
         <div class="nav">
-            <a href="{% url 'index' %}">Home</a> |
-            <a href="{% url 'admin:index' %}">Admin</a>
-            <br>
-            <a href="{% url 'images_index' %}">Images</a> |
+          <table>
+            <tr>
+              <td><a href="{% url 'index' %}">Home</a></td>
+              <td><a href="{% url 'admin:index' %}">Admin</a></td>
+            </tr>
+            <tr>
+              <td><a href="{% url 'images_index' %}">Images</a></td>
+              <td><a href="{% url 'game_sessions_index' %}">Game Sessions</a></td>
+            </tr>
+            <tr>
+              <td>Players</td>
+            </tr>
+          </table>
+          <br>
         </div>
         <div class="sidebar">
             {% block sidebar %}

@@ -119,6 +119,8 @@ class Image(models.Model):
     note = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    checksum = models.CharField(max_length=128, null=True, blank=True, db_index=True)
+    filename = models.CharField(max_length=255, null=False, blank=False, db_index=True)
 
     class Meta:
         db_table = "image"

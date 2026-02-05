@@ -11,4 +11,5 @@ urlpatterns = [
     ),
     path("images_ondisk", views.images_ondisk, name="images_ondisk"),
     path("images_indb", views.images_indb, name="images_indb"),
+    path("add_images_to_db", views.add_images_to_db, name="add_images_to_db"),
 ]
