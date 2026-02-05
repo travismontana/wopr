@@ -159,15 +159,20 @@ class Move(models.Model):
     note = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    session = models.ForeignKey("Session", on_delete=models.CASCADE, db_index=True)
-    player = models.ForeignKey("Player", on_delete=models.PROTECT, db_index=True)
+    session = models.ForeignKey(
+        "Session", on_delete=models.CASCADE, db_index=True, null=False, blank=False
+    )
+    player = models.ForeignKey(
+        "Player", on_delete=models.PROTECT, db_index=True, null=False, blank=False
+    )
     previous_move = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.SET_NULL, db_index=True
     )
     image_at_end = models.ForeignKey(
         "Image", null=True, blank=True, on_delete=models.SET_NULL, db_index=True
     )
-
+    round = models.IntegerField(null=True, blank=True)
+    turn = models.IntegerField(null=True, blank=True)
     class Meta:
         db_table = "move"
         ordering = ["session", "created_at"]

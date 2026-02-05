@@ -5,7 +5,7 @@
 {% if players %}
 <ul>
     {% for player in players %}
-    <li>{{ player.name }}</li>
+    <li>{{ player.irl_name }} - {{ player.handle }}</li>
     {% endfor %}
 </ul>
 {% else %}
