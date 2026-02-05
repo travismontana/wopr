@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from picamera2 import Picamera2
 
-from lib.helpers import setup_logger
+from .lib.helpers import setup_logger
 
 logger = setup_logger()
 
