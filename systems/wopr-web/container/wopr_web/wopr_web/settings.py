@@ -185,7 +185,7 @@ else:
             "bob.geocities.com",
             "localhost",
             "127.0.0.1",
-            "boh.wopr.tailandtraillabs.org",
+            "wopr.tailandtraillabs.org",
             ".svc.cluster.local",  # k8s service mesh
         ],
         cidrs=[
