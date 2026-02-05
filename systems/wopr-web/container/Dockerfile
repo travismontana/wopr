@@ -28,6 +28,7 @@ RUN pip install -e .
 COPY --chown=wopr:wopr wopr_web ./
 COPY --chown=wopr:wopr wopr_web/scripts/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+RUN mkdir -p /app/staticfiles && chown -R wopr:wopr /app/staticfiles
 # Switch to non-root user
 USER wopr
 
