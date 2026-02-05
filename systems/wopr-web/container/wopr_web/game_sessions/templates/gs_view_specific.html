@@ -26,15 +26,32 @@
 <p>Session ID: <br>{{ gsession.short_id }}</p>
 <p>Game: <br>{{ gsession.game.shortname }}</p>
 <p>Created At: <br>{{ gsession.created_at }}</p>
-<br>
+<hr>
 <h3>Actions:</h3>
 <ul>
     <li><form method="post" action="{% url 'take_captures' %}">
         {% csrf_token %}
         <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
+        <input type="hidden" name="has_sword" value="no">
         <button type="submit">Take Captures for this Session</button>
     </form></li>
 </ul>
+<hr>
+{% if gsession.sessionimage_set.all %}
+<h3>Captured Images:</h3>
+<ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
+    {% load image_filters %}
+{% for si in gsession.sessionimage_set.all %}
+    <li>
+        <a href="{{imgurl}}/{{ si.image.artifact_uri|strip_base_path }}">
+            <img src="{{thumburl}}/{{ si.image.artifact_uri|strip_base_path }}" alt="{{ si.image.filename }}">
+        </a>
+        <br>
+        {{ si.image.short_id }} - {{ si.image.created_at }}
+    </li>
+{% endfor %}
+</ul>
+{% endif %}
 {% else %}
 <p>No game session found.</p>
 {% endif %}

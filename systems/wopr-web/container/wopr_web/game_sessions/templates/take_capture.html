@@ -16,6 +16,7 @@ For the notes.  If there's something special, note it there.
     {% csrf_token %}
     <label for="player">Player:</label>
     <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
+    <input type="hidden" name="has_sword" value="yes">
     <select name="player" id="player">
         {% for sp in gsession.sessionplayer_set.all %}
         <option value="{{ sp.player.id }}">{{ sp.player.handle }}</option>

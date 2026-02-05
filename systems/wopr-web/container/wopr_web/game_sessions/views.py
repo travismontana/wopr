@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from pathlib import Path
+import json
+import uuid
 from .forms import (
     GameForm,
     GameSessionForm,
@@ -68,7 +70,15 @@ def gs_view_specific(request, session_id):
     else:
         form = SessionPlayerForm(initial={"session": gsession})
 
-    context = {"gsession": gsession, "form": form}
+    url = f"{config['api']['images_url']}"
+    thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/{config['api']['images_url']}"
+    context = {
+        "gsession": gsession,
+        "form": form,
+        "session_images": gsession.sessionimage_set.all(),
+        "imgurl": url,
+        "thumburl": thumb_url,
+    }
     return render(request, "gs_view_specific.html", context)
 
 
@@ -127,9 +137,9 @@ def add_player_to_session(request, session_id):
 
 def take_captures(request):
     context = {}
-
     if request.method == "POST":
         gsession_id = request.POST.get("gsession_id")
+        context["gsession_id"] = gsession_id
         try:
             gsession = Session.objects.get(id=gsession_id)
         except Session.DoesNotExist:
@@ -142,60 +152,48 @@ def take_captures(request):
             ]
             return render(request, "gs_results.html", {"results": results})
         context["gsession"] = gsession
-        # filename: gsession[uuid].jpg
-        # path: configbas/{image_dir}/filename
+        has_sword = request.POST.get("has_sword")
+        if "yes" in has_sword.lower():
+            # filename: gsession[uuid].jpg
+            # path: configbas/{image_dir}/filename
+            uuidname = str(uuid.uuid4())
+            filename = f"{uuidname}.jpg"
+            base = config["storage"]["base_path"]
+            images = config["storage"]["images_subdir"]
+            incoming = config["storage"]["incoming_subdir"]
+            path = Path(base) / images / incoming / filename
+            filepath = str(path)
 
-        filename = f"{gsession.uuid}.jpg"
-        base = config["storage"]["base_path"]
-        images = config["storage"]["images_subdir"]
-        incoming = config["storage"]["incoming_subdir"]
-        path = Path(base) / images / incoming / filename
-        filepath = str(path)
+            width = config["camera"]["camDict"]["0"]["width"]
+            height = config["camera"]["camDict"]["0"]["height"]
 
-        width = config["camera"]["camDict"]["0"]["width"]
-        height = config["camera"]["camDict"]["0"]["height"]
+            payload = {
+                "filepath": filepath,
+                "width": width,
+                "height": height,
+            }
+            grab_capture_results = grab_capture(payload)
+            logger.info(f"Grab capture results: {grab_capture_results}")
+            if grab_capture_results is not None:
+                data = json.loads(
+                    grab_capture_results
+                )  # or grab_capture_results.json() if it's a requests.Response
+                extra = data.get("extra", {})
+                filepath = extra.get("filepath")
+                checksum = extra.get("checksum")
 
-        payload = {
-            "filepath": filepath,
-            "width": width,
-            "height": height,
-        }
-        grab_capture_results = grab_capture(payload)
-        logger.info(f"Grab capture results: {grab_capture_results}")
-        if grab_capture_results is not None:
-            context["capture_results"] = grab_capture_results
-            data = grab_capture_results.json()
-            filepath = data.get("filepath", None)
-            checksum = data.get("checksum", None)
-            imageform = ImageForm(
-                initial={
-                    "artifact_uri": filepath,
-                    "checksum": checksum,
-                    "filename": filename,
-                }
-            )
-            imageinfo = Image(
-                filename=filename, artifact_uri=filepath, checksum=checksum
-            )
-            imageform.save()
-            sessionimageform = SessionImageForm(
-                initial={
-                    "session": gsession,
-                    "image": imageinfo,
-                }
-            )
-            if sessionimageform.is_valid():
-                sessionimageform.save()
+                imageinfo = Image.objects.create(
+                    filename=filename, artifact_uri=filepath, checksum=checksum
+                )
+
+                SessionImage.objects.create(session=gsession, image=imageinfo)
+
+                logger.info(
+                    f"Created image {imageinfo.short_id} for session {gsession.short_id}"
+                )
+                return redirect("gs_view_specific", session_id=gsession.id)
         else:
-            results = [
-                {
-                    "status": "error",
-                    "message": "Failed to fetch capture preview.",
-                    "extra": [],
-                }
-            ]
-            context["results"] = results
-            return render(request, "gs_results.html", context)
+            return render(request, "take_capture.html", context)
     else:
         context = {"error": "No session ID provided."}
     return render(request, "take_capture.html", context)
