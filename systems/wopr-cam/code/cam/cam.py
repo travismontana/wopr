@@ -58,7 +58,7 @@ def capture_preview():
     cam.start()
     time.sleep(2)  # Allow camera to warm up
     try:
-        preview_image = cam.capture_images("main")
+        preview_image = cam.capture_image("main")
     except Exception as e:
         logger.error(f"Error capturing preview image: {e}")
         raise HTTPException(status_code=500, detail="Failed to capture preview image")
