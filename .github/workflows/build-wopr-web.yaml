@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build wopr-boh Docker Image
+name: Build wopr-web Docker Image
 
 on:
   push:
     branches: [ "main" ]
     tags: [ "v*" ]
     paths:
-      - 'systems/wopr-boh/container/**'
+      - 'systems/wopr-web/container/**'
   pull_request:
     branches: [ "main" ]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/wopr-boh
+  IMAGE_NAME: ${{ github.repository }}/wopr-web
 
 jobs:
   build:
@@ -64,7 +64,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./systems/wopr-boh/container
+          context: ./systems/wopr-web/container
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
