@@ -195,6 +195,6 @@ else:
     )
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://boh.wopr.tailandtraillabs.org",
+    "https://wopr.tailandtraillabs.org",
     "https://bob.geocities.com",
 ]
