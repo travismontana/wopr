@@ -5,7 +5,10 @@
 {% if players %}
 <ul>
     {% for player in players %}
-    <li><a href="{% url 'player_view_specific' player_id=player.id %}">{{ player.irl_name }} - {{ player.handle }}</a></li>
+    <li><form action="{% url 'player_edit' player_id=player.id %}" method="get" style="display:inline;">
+            <button type="submit">Edit</button>
+        </form>
+        <a href="{% url 'player_view_specific' player_id=player.id %}">{{ player.irl_name }} - {{ player.handle }}</a></li>
     {% endfor %}
 </ul>
 {% else %}

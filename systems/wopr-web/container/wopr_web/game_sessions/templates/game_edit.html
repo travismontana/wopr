@@ -5,5 +5,9 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Save Player</button>
+    <button type="submit">Save Game</button>
 </form>
+{% else %}
+<p>No form available.</p>
+{% endif %}
+{% endblock %}

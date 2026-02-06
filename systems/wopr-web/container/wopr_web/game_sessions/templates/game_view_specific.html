@@ -15,5 +15,10 @@
     {% if details.notes %}
         <p><strong>Notes:</strong> {{ details.notes }}</p>
     {% endif %}
+    <form action="{% url 'game_edit' game_id=details.id %}" method="get">
+        <button type="submit">Edit Game</button>
+    </form>
+{% else %}
+    <p>Game not found.</p>
 {% endif %}
 {% endblock %}
