@@ -59,6 +59,24 @@
 {% endfor %}
 </ul>
 {% endif %}
+
+{% if moves %}
+<h3>Moves:</h3>
+<ul>
+{% for move in moves %}
+    <li>
+        <strong>Round {{ move.turn.round.number }} - Turn {{ move.turn.number }}:</strong>
+        {{ move.player.handle }} made a move.
+        {% if move.image_at_end %}
+            <br>
+            <a href="{{imgurl}}/{{ move.image_at_end.artifact_uri|strip_base_path }}">
+                <img src="{{thumburl}}/{{ move.image_at_end.artifact_uri|strip_base_path }}" alt="{{ move.image_at_end.filename }}" style="max-width: 200px;">      
+            </a>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+{% endif %}
 {% else %}
 <p>No game session found.</p>
 {% endif %}

@@ -74,7 +74,13 @@ def gs_view_specific(request, session_id):
             return redirect("gs_view_specific", session_id=session_id)
     else:
         form = SessionPlayerForm(initial={"session": gsession})
-
+    rounds = Round.objects.filter(session=session_id).order_by("number")
+    for round in rounds:
+        turns = Turn.objects.filter(round=round).order_by("number")
+        for turn in turns:
+            moves = Move.objects.filter(turn=turn).select_related(
+                "image_at_end", "player"
+            )
     url = f"{config['api']['images_url']}"
     thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/{config['api']['images_url']}"
     context = {
@@ -83,6 +89,7 @@ def gs_view_specific(request, session_id):
         "session_images": gsession.sessionimage_set.all(),
         "imgurl": url,
         "thumburl": thumb_url,
+        "moves": moves,
     }
     return render(request, "gs_view_specific.html", context)
 
