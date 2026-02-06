@@ -47,7 +47,6 @@ def get_status():
 @app.get("/api/capture_preview")
 def capture_preview():
     logger.info("Received request for capture preview")
-    # 4k
     width = 3840
     height = 2160
     cam = Picamera2()
@@ -57,16 +56,19 @@ def capture_preview():
     )
     cam.configure(camera_config)
     cam.start()
-    time.sleep(2)  # Allow camera to warm up
+    time.sleep(2)
     try:
         preview_image = cam.capture_image("main")
+        img_byte_arr = BytesIO()
+        preview_image.save(img_byte_arr, format="JPEG")
+        img_byte_arr.seek(0)
+        return Response(content=img_byte_arr.getvalue(), media_type="image/jpeg")
     except Exception as e:
         logger.error(f"Error capturing preview image: {e}")
         raise HTTPException(status_code=500, detail="Failed to capture preview image")
     finally:
         cam.stop()
-
-    return preview_image
+        cam.close()
 
 
 @app.post("/api/capture")
