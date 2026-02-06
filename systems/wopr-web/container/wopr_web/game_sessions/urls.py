@@ -10,10 +10,16 @@ urlpatterns = [
     path("game/new/", views.game_new_form, name="game_new_form"),
     path("game/<int:game_id>", views.game_view_specific, name="game_view_specific"),
     path("game/list/", views.game_list, name="game_list"),
+    path("game/edit/<int:game_id>", views.game_edit, name="game_edit"),
     path(
         "player/<int:player_id>",
         views.player_view_specific,
         name="player_view_specific",
+    ),
+    path(
+        "player_edit/<int:player_id>",
+        views.player_edit,
+        name="player_edit",
     ),
     path("player/new/", views.player_new_form, name="player_new_form"),
     path("players/", views.player_list, name="player_list"),

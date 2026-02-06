@@ -1,0 +1,9 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+{% if form %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Player</button>
+</form>

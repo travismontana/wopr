@@ -120,6 +120,19 @@ def game_list(request):
     return render(request, "game_list.html", context)
 
 
+def game_edit(request, game_id):
+    game = Game.objects.get(id=game_id)
+    if request.method == "POST":
+        form = GameForm(request.POST, instance=game)
+        if form.is_valid():
+            form.save()
+            return redirect("game_view_specific", game_id=game.id)
+    else:
+        form = GameForm(instance=game)
+    context = {"form": form, "game": game}
+    return render(request, "game_edit.html", context)
+
+
 def player_new_form(request):
     context = {}
     if request.method == "POST":
@@ -146,6 +159,19 @@ def player_view_specific(request, player_id):
     details = Player.objects.get(id=player_id)
     context["details"] = details
     return render(request, "player_view_specific.html", context)
+
+
+def player_edit(request, player_id):
+    player = Player.objects.get(id=player_id)
+    if request.method == "POST":
+        form = PlayerForm(request.POST, instance=player)
+        if form.is_valid():
+            form.save()
+            return redirect("player_view_specific", player_id=player.id)
+    else:
+        form = PlayerForm(instance=player)
+    context = {"form": form, "player": player}
+    return render(request, "player_edit.html", context)
 
 
 def add_player_to_session(request, session_id):

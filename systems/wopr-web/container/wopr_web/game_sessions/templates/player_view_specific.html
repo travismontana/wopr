@@ -11,5 +11,10 @@
     {% if details.notes %}
         <p><strong>Notes:</strong> {{ details.notes }}</p>
     {% endif %}
+    <form method="get" action="{% url 'player_edit' player_id=details.id %}">
+        <button type="submit">Edit Player</button>
+    </form>
+{% else %}
+    <p>Player not found.</p>
 {% endif %}
 {% endblock %}
