@@ -10,7 +10,17 @@ from .forms import (
     SessionImageForm,
 )
 
-from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image
+from core.models import (
+    Game,
+    Session,
+    SessionPlayer,
+    Player,
+    SessionImage,
+    Image,
+    Round,
+    Turn,
+    Move,
+)
 
 from .lib.captures import grab_preview, grab_capture
 from .lib.sessions import (
