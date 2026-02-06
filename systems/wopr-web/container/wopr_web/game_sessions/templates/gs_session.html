@@ -10,6 +10,8 @@
     <p><strong>Turn:</strong> {{ turn_num }}</p>
     <p><strong>Moves in Turn:</strong> {{ state.moves_in_turn }} / {{ state.player_count }}</p>
     <p><strong>Turns in Round:</strong> {{ state.turns_in_round }} / 3</p>
+
+    <br><br>
     {% if next_player %}
         <p><strong>Next Player:</strong> {{ next_player.handle }}</p>
     {% else %}
@@ -19,6 +21,8 @@
 
 <form method="post" action="{% url 'run_session' %}">
     {% csrf_token %}
+    <label for="note">Note for this turn:</label><br>
+    <textarea id="note" name="note" rows="24" cols="80" ></textarea><br><br>
     <input type="hidden" name="gsession_id" value="{{ session.id }}">
     <input type="hidden" name="action" value="advance">  <!-- ADD THIS -->
     {% if next_player %}

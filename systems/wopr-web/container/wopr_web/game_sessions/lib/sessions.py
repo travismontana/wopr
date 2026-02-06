@@ -1,4 +1,4 @@
-    """
+"""
 
 SESSION START
 ├─ Validate: Session has players with seats assigned
@@ -47,8 +47,7 @@ Each Session has players  (SessionPlayers)
 3 Turns each turn is
 1 Move from Each Player in seat order (SessionPlayer.seat)
 
-    """
-
+"""
 
 from django.shortcuts import render, redirect
 from lib.helpers import get_config, setup_logger
@@ -133,7 +132,7 @@ def get_next_player(session, current_turn, moves_in_turn):
     return None  # Turn is complete
 
 
-def advance_session(session):
+def advance_session(session, note=""):
     """
     Execute one move and advance state.
     Returns updated state.
@@ -151,17 +150,21 @@ def advance_session(session):
     if state["round_num"] == 0:
         current_round = Round.objects.create(session=session, number=1)
         current_turn = Turn.objects.create(
-            session=session, round=current_round, number=1
+            session=session, round=current_round, number=1, note=note
         )
-        # Return without capturing - just show initial state
         return {
             "status": "initialized",
-            "state": get_session_state(session),  # Refresh state
+            "state": get_session_state(session),
         }
 
     # Get current round and turn
     current_round = Round.objects.get(session=session, number=state["round_num"])
     current_turn = Turn.objects.get(session=session, number=state["turn_num"])
+
+    # Save note to CURRENT turn (the one being played)
+    if note:
+        current_turn.note = note
+        current_turn.save()
 
     # Execute move for next player
     next_player = state["next_player"]
@@ -174,7 +177,6 @@ def advance_session(session):
         if state["turns_in_round"] >= MAX_TURNS:
             state["round_num"] += 1
 
-            # Check if session complete
             if state["round_num"] > MAX_ROUNDS:
                 return {"status": "complete"}
 
@@ -184,15 +186,17 @@ def advance_session(session):
             )
             state["turns_in_round"] = 0
 
-        # Create next turn
+        # Create next turn (without note - that'll come on next POST)
         state["turn_num"] += 1
         current_turn = Turn.objects.create(
             session=session, round=current_round, number=state["turn_num"]
         )
 
-        # Get next player for new turn
-        state = get_session_state(session)
-        next_player = state["next_player"]
+        # Return WITHOUT capturing - next click will capture first move
+        return {
+            "status": "turn_created",
+            "state": get_session_state(session),
+        }
 
     # Capture image and create move
     image = capture_and_create_image()

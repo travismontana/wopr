@@ -252,24 +252,44 @@ def run_session(request):
     """
     if request.method == "POST":
         session_id = request.POST.get("gsession_id")
-        
+
         if not session_id:
-            # ... error handling ...
-        
+            return render(
+                request,
+                "gs_results.html",
+                {
+                    "results": [
+                        {
+                            "status": "error",
+                            "message": "No session ID provided.",
+                            "extra": [],
+                        }
+                    ]
+                },
+            )
+
         try:
             session = Session.objects.get(id=session_id)
         except Session.DoesNotExist:
-            # ... error handling ...
-        
+            results = [
+                {
+                    "status": "error",
+                    "message": f"Session with ID {session_id} does not exist.",
+                    "extra": [],
+                }
+            ]
+            return render(request, "gs_results.html", {"results": results})
+
         # Only advance if explicitly requested
         action = request.POST.get("action")
         if action == "advance":
-            result = advance_session(session)
-            
+            note = request.POST.get("note", "")  # Get note from textarea
+            result = advance_session(session, note)  # Fixed: removed extra 's'
+
             if result["status"] == "complete":
                 context = {"message": "Session complete!", "session": session}
                 return render(request, "gs_complete.html", context)
-        
+
         # Always show current state
         state = get_session_state(session)
         context = {
@@ -280,3 +300,5 @@ def run_session(request):
             "next_player": state["next_player"],
         }
         return render(request, "gs_session.html", context)
+
+    return redirect("gs_index")
