@@ -143,6 +143,8 @@ def player_list(request):
 
 def player_view_specific(request, player_id):
     context = {"player_id": player_id}
+    details = Player.objects.get(id=player_id)
+    context["details"] = details
     return render(request, "player_view_specific.html", context)
 
 

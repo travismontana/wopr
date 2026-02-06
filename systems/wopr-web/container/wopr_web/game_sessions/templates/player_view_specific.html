@@ -1,0 +1,15 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+{% if details %}
+    <h2>{{ details.name }}</h2>
+    <p><strong>Name:</strong> {{ details.irl_name }}</p>
+    <p><strong>Handle:</strong> {{ details.handle }}</p>
+    {% if details.description %}
+        <p><strong>Description:</strong> {{ details.description }}</p>
+    {% endif %}
+    {% if details.notes %}
+        <p><strong>Notes:</strong> {{ details.notes }}</p>
+    {% endif %}
+{% endif %}
+{% endblock %}
