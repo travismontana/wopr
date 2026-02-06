@@ -10,10 +10,13 @@ services:
       - .env
     environment:
       DB_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
       DB_HOST: "${DB_HOST}"
       DB_PORT: "${DB_PORT}"
       DB_USER: "${DB_USER}"
+      POSTGRES_USER: "${DB_USER}"
       DB_DATABASE: "${DB_DATABASE}"
+      POSTGRES_DB: "${DB_DATABASE}"
       DJANGO_SUPERUSER_USERNAME: "${DJANGO_SUPERUSER_USERNAME}"
       DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
@@ -36,6 +39,7 @@ services:
     environment:
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_DATABASE}"
       PGDATA: "/data/postgres"
     volumes:
       - postgres:/data/postgres

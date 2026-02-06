@@ -39,7 +39,6 @@
         <form method="post" action="{% url 'run_session' %}">
             {% csrf_token %}
             <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
-            <input type="hidden" name="player_ids" value="{{ gsession.sessionplayer_set.all|join:',' }}">
             <button type="submit">Run the session</button>
         </form>
     </li>

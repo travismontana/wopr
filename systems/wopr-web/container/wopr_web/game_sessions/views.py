@@ -13,7 +13,11 @@ from .forms import (
 from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image
 
 from .lib.captures import grab_preview, grab_capture
-from .lib.sessions import start_session
+from .lib.sessions import (
+    get_session_state,
+    get_next_player,
+    advance_session,
+)
 
 from lib.helpers import get_config, setup_logger
 
@@ -242,14 +246,56 @@ def capture_results(request):
 
 
 def run_session(request):
-    context = {}
+    """
+    Single POST advances session by one move.
+    """
     if request.method == "POST":
-        # Have:
-        # - session_id
-        # - player(s)_id
         session_id = request.POST.get("gsession_id")
-        player_ids = request.POST.getlist("player_ids")
-        logger.info(f"Setting up session {session_id} with players {player_ids}")
-        results = start_session(session_id, request, player_ids)
-        context["results"] = results
-    return render(request, "gs_session.html", context)
+
+        if not session_id:  # ← Add this check
+            return render(
+                request,
+                "gs_results.html",
+                {
+                    "results": [
+                        {
+                            "status": "error",
+                            "message": "No session ID provided.",
+                            "extra": [],
+                        }
+                    ]
+                },
+            )
+
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            results = [
+                {
+                    "status": "error",
+                    "message": f"Session with ID {session_id} does not exist.",
+                    "extra": [],
+                }
+            ]
+            return render(request, "gs_results.html", {"results": results})
+
+        # Advance by one move
+        result = advance_session(session)
+
+        if result["status"] == "complete":
+            context = {"message": "Session complete!", "session": session}
+            return render(request, "gs_complete.html", context)
+
+        # Get updated state for display
+        state = get_session_state(session)
+        context = {
+            "session": session,
+            "state": state,
+            "round_num": state["round_num"],
+            "turn_num": state["turn_num"],
+            "next_player": state["next_player"],
+        }
+        return render(request, "gs_session.html", context)
+
+    # Handle GET request
+    return redirect("gs_index")

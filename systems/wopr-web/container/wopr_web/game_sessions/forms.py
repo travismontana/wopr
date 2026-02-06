@@ -20,7 +20,7 @@ class PlayerForm(forms.ModelForm):
 class SessionPlayerForm(forms.ModelForm):
     class Meta:
         model = SessionPlayer
-        fields = ['session', 'player',]
+        fields = ["session", "player", "seat"]
         widgets = {
             'session': forms.HiddenInput(),
         }    
@@ -28,10 +28,10 @@ class SessionPlayerForm(forms.ModelForm):
         cleaned_data = super().clean()
         session = cleaned_data.get('session')
         player = cleaned_data.get('player')
-        
+
         if SessionPlayer.objects.filter(session=session, player=player).exists():
             raise forms.ValidationError("This player is already in this session.")
-        
+
         return cleaned_data
 
 class SessionImageForm(forms.ModelForm):

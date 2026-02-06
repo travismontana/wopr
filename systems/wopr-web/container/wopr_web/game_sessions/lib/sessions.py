@@ -13,29 +13,172 @@ from game_sessions.forms import (
 
 from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image, Round, Turn, Move
 
+from game_sessions.lib.captures import grab_capture
+
 logger = setup_logger()
 config = get_config()
 
-def start_session(gsession, request, player_ids):
-    max_turns = 3
-    max_rounds = 10
-   
-    number_players = gsession.players.count()
-    current_round = Round.objects.filter(session=gsession).order_by('-number').first()
-    if not current_round:
-        current_round = Round.objects.create(session=gsession, number=1)
-        # add logic to add the seats
 
-    sp = SessionPlayer.objects.filter(session=gsession).order_by("seat")
-    if sp.count() != number_players:
-       # error
-       return 1
+def get_session_state(session):
+    """
+    Returns current session state without modifying anything.
+    """
+    # Get current round (latest by number)
+    current_round = Round.objects.filter(session=session).order_by("-number").first()
 
-    turns_in_round = TurnInRound.objects.filter(round=current_round).count()
-    if turns_in_round <= max_turns:
-        for seat in sp:
-            player = seat.player
-            logger.info(f"Player {player.handle} is in seat {seat.seat} for session {gsession.short_id}")
-            # do cool things.
-            # create the turn object
+    # Get current turn (latest by number)
+    current_turn = Turn.objects.filter(session=session).order_by("-number").first()
 
+    # Count moves in current turn
+    moves_in_turn = (
+        Move.objects.filter(turn=current_turn).count() if current_turn else 0
+    )
+
+    # Count turns in current round
+    turns_in_round = (
+        Turn.objects.filter(round=current_round).count() if current_round else 0
+    )
+
+    # Get player count
+    player_count = session.sessionplayer_set.count()
+
+    # Get next player (if turn not complete)
+    next_player = get_next_player(session, current_turn, moves_in_turn)
+
+    return {
+        "round_num": current_round.number if current_round else 0,
+        "turn_num": current_turn.number if current_turn else 0,
+        "turns_in_round": turns_in_round,
+        "moves_in_turn": moves_in_turn,
+        "player_count": player_count,
+        "next_player": next_player,
+        "is_complete": False,
+        # "is_complete": check_if_complete(current_round, turns_in_round),
+    }
+
+
+def get_next_player(session, current_turn, moves_in_turn):
+    """
+    Returns the next player to move based on seat order.
+    """
+    # Get players ordered by seat
+    session_players = session.sessionplayer_set.order_by("seat")
+
+    # Get players who have already moved this turn
+    if current_turn:
+        moved_player_ids = Move.objects.filter(turn=current_turn).values_list(
+            "player_id", flat=True
+        )
+
+        # Get next player who hasn't moved
+        for sp in session_players:
+            if sp.player_id not in moved_player_ids:
+                return sp.player
+    else:
+        # First move of session, return lowest seat
+        return session_players.first().player
+
+    return None  # Turn is complete
+
+
+def advance_session(session):
+    """
+    Execute one move and advance state.
+    Returns updated state.
+    """
+    MAX_ROUNDS = 10
+    MAX_TURNS = 3
+
+    state = get_session_state(session)
+
+    # Check if session complete
+    if state["round_num"] >= MAX_ROUNDS and state["turns_in_round"] >= MAX_TURNS:
+        return {"status": "complete"}
+
+    # Get or create current round
+    if state["round_num"] == 0:
+        current_round = Round.objects.create(session=session, number=1)
+        state["round_num"] = 1
+    else:
+        current_round = Round.objects.get(session=session, number=state["round_num"])
+
+    # Get or create current turn
+    if state["turn_num"] == 0:
+        current_turn = Turn.objects.create(
+            session=session, round=current_round, number=1
+        )
+        state["turn_num"] = 1
+    else:
+        current_turn = Turn.objects.get(session=session, number=state["turn_num"])
+
+    # Execute move for next player
+    next_player = state["next_player"]
+    image = capture_and_create_image()  # Your grab_capture logic
+    move = Move.objects.create(
+        player=next_player, turn=current_turn, image_at_end=image
+    )
+
+    # Update state
+    state["moves_in_turn"] += 1
+
+    # Check if turn complete
+    if state["moves_in_turn"] >= state["player_count"]:
+        state["turns_in_round"] += 1
+
+        # Check if round complete
+        if state["turns_in_round"] >= MAX_TURNS:
+            state["round_num"] += 1
+
+            # Check if session complete
+            if state["round_num"] > MAX_ROUNDS:
+                return {"status": "complete"}
+
+            # Create next round
+            current_round = Round.objects.create(
+                session=session, number=state["round_num"]
+            )
+            state["turns_in_round"] = 0
+
+        # Create next turn
+        state["turn_num"] += 1
+        Turn.objects.create(
+            session=session, round=current_round, number=state["turn_num"]
+        )
+
+    return {"status": "active", "state": state}
+
+
+def capture_and_create_image():
+    """
+    Captures an image and creates a SessionImage linked to the session.
+    """
+    uuidname = str(uuid.uuid4())
+    filename = f"{uuidname}.jpg"
+    base = config["storage"]["base_path"]
+    images = config["storage"]["images_subdir"]
+    incoming = config["storage"]["incoming_subdir"]
+    path = Path(base) / images / incoming / filename
+    filepath = str(path)
+
+    width = config["camera"]["camDict"]["0"]["width"]
+    height = config["camera"]["camDict"]["0"]["height"]
+
+    payload = {
+        "filepath": filepath,
+        "width": width,
+        "height": height,
+    }
+    results = grab_capture(payload)
+    if results is None:
+        logger.error("Failed to capture image")
+        return None
+
+    data = json.loads(results)
+    extra = data.get("extra", {})
+    filepath = extra.get("filepath")
+    checksum = extra.get("checksum")
+
+    imageinfo = Image.objects.create(
+        filename=filename, artifact_uri=filepath, checksum=checksum
+    )
+    return imageinfo

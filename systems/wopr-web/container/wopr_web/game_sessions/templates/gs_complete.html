@@ -1,0 +1,16 @@
+{# templates/gs_complete.html #}
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+
+<h2>Session Complete! 🎉</h2>
+
+<p>{{ message }}</p>
+
+<h3>Session: {{ session.game.shortname }} - {{ session.short_id }}</h3>
+
+<p>All 10 rounds completed!</p>
+
+<a href="{% url 'gs_view_specific' session.id %}">View Session Details</a>
+
+{% endblock %}

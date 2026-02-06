@@ -1,22 +1,48 @@
-{% extends "base.html" %}
+{% extends "gs_base.html" %}
 
 {% block main_content %}
 
-<h2>Game Session {{ gsession.short_id }} - Round {{ round_num }}</h2>
-{% if round_num == 1 %}
-<p>Welcome to Round 1</p>
-<p><strong>Players:</strong></p>
-{% for player in players %}
-<p>{{ player.handle }}</p>
-{% endfor %}
+<h2>Running Session: {{ session.game.shortname }} - {{ session.short_id }}</h2>
 
-{% else %}
-<form method="post">
+<div style="border: 2px solid #333; padding: 1rem; margin: 1rem 0;">
+    <h3>Current State:</h3>
+    <p><strong>Round:</strong> {{ round_num }} / 10</p>
+    <p><strong>Turn:</strong> {{ turn_num }}</p>
+    <p><strong>Moves in Turn:</strong> {{ state.moves_in_turn }} / {{ state.player_count }}</p>
+    <p><strong>Turns in Round:</strong> {{ state.turns_in_round }} / 3</p>
+    {% if next_player %}
+        <p><strong>Next Player:</strong> {{ next_player.handle }}</p>
+    {% else %}
+        <p><strong>Turn Complete - Advancing...</strong></p>
+    {% endif %}
+</div>
+
+<form method="post" action="{% url 'run_session' %}">
     {% csrf_token %}
-    <label for="start_round">Start Round</label>
-    <input type="hidden" name="start_round" value="true">
-    <input type="submit" name="start_round" value="Start Round">
+    <input type="hidden" name="gsession_id" value="{{ session.id }}">
+    {% if next_player %}
+        <button type="submit" style="font-size: 1.5rem; padding: 1rem 2rem;">
+            Capture Move for {{ next_player.handle }}
+        </button>
+    {% else %}
+        <button type="submit" style="font-size: 1.5rem; padding: 1rem 2rem;">
+            Start Next Turn
+        </button>
+    {% endif %}
 </form>
 
-{% endif %}
-{% endblock%}
+<hr>
+
+<h3>Session Players (by seat):</h3>
+<ul>
+{% for sp in session.sessionplayer_set.all %}
+    <li>Seat {{ sp.seat }}: {{ sp.player.handle }}
+        {% if sp.player == next_player %}<strong>NEXT</strong>{% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+<hr>
+<a href="{% url 'gs_view_specific' session.id %}">Back to Session Details</a>
+
+{% endblock %}
