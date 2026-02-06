@@ -20,14 +20,11 @@
 <form method="post" action="{% url 'run_session' %}">
     {% csrf_token %}
     <input type="hidden" name="gsession_id" value="{{ session.id }}">
+    <input type="hidden" name="action" value="advance">  <!-- ADD THIS -->
     {% if next_player %}
-        <button type="submit" style="font-size: 1.5rem; padding: 1rem 2rem;">
-            Capture Move for {{ next_player.handle }}
-        </button>
+        <button type="submit">Capture Move for {{ next_player.handle }}</button>
     {% else %}
-        <button type="submit" style="font-size: 1.5rem; padding: 1rem 2rem;">
-            Start Next Turn
-        </button>
+        <button type="submit">Start Next Turn</button>
     {% endif %}
 </form>
 

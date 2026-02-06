@@ -247,46 +247,30 @@ def capture_results(request):
 
 def run_session(request):
     """
-    Single POST advances session by one move.
+    Display session runner interface. 
+    POST with 'action=advance' to execute a move.
     """
     if request.method == "POST":
         session_id = request.POST.get("gsession_id")
-
-        if not session_id:  # ← Add this check
-            return render(
-                request,
-                "gs_results.html",
-                {
-                    "results": [
-                        {
-                            "status": "error",
-                            "message": "No session ID provided.",
-                            "extra": [],
-                        }
-                    ]
-                },
-            )
-
+        
+        if not session_id:
+            # ... error handling ...
+        
         try:
             session = Session.objects.get(id=session_id)
         except Session.DoesNotExist:
-            results = [
-                {
-                    "status": "error",
-                    "message": f"Session with ID {session_id} does not exist.",
-                    "extra": [],
-                }
-            ]
-            return render(request, "gs_results.html", {"results": results})
-
-        # Advance by one move
-        result = advance_session(session)
-
-        if result["status"] == "complete":
-            context = {"message": "Session complete!", "session": session}
-            return render(request, "gs_complete.html", context)
-
-        # Get updated state for display
+            # ... error handling ...
+        
+        # Only advance if explicitly requested
+        action = request.POST.get("action")
+        if action == "advance":
+            result = advance_session(session)
+            
+            if result["status"] == "complete":
+                context = {"message": "Session complete!", "session": session}
+                return render(request, "gs_complete.html", context)
+        
+        # Always show current state
         state = get_session_state(session)
         context = {
             "session": session,
@@ -296,6 +280,3 @@ def run_session(request):
             "next_player": state["next_player"],
         }
         return render(request, "gs_session.html", context)
-
-    # Handle GET request
-    return redirect("gs_index")

@@ -1,3 +1,55 @@
+    """
+
+SESSION START
+├─ Validate: Session has players with seats assigned
+├─ Config: max_rounds=10, max_turns=3 (per round)
+└─ Initialize: round_num=1, turn_num=1
+
+MAIN LOOP (HTTP POST-driven state machine)
+├─ GET CURRENT STATE
+│  ├─ Which round? (1-10)
+│  ├─ Which turn in round? (1-3)
+│  ├─ Which turn globally? (1-30)
+│  └─ Which player's move next? (by seat order)
+│
+├─ VALIDATE STATE
+│  ├─ Check: round_num <= max_rounds
+│  ├─ Check: turns_in_round < max_turns
+│  ├─ Check: moves_in_turn < player_count
+│  └─ If any boundary hit → advance state or end session
+│
+├─ EXECUTE MOVE
+│  ├─ Get next player (ordered by SessionPlayer.seat)
+│  ├─ Capture image → grab_capture(payload)
+│  ├─ Create Image record
+│  ├─ Create Move(player, turn, image)
+│  └─ Log move completion
+│
+└─ ADVANCE STATE
+   ├─ moves_in_turn++
+   ├─ IF moves_in_turn == player_count:
+   │  ├─ Turn complete
+   │  ├─ turns_in_round++
+   │  ├─ IF turns_in_round == max_turns:
+   │  │  ├─ Round complete
+   │  │  ├─ round_num++
+   │  │  ├─ IF round_num > max_rounds:
+   │  │  │  └─ SESSION COMPLETE
+   │  │  └─ ELSE:
+   │  │     ├─ Create Round(session, round_num)
+   │  │     └─ Create Turn(session, round, global_turn_num++)
+   │  └─ ELSE:
+   │     └─ Create Turn(session, round, global_turn_num++)
+   └─ Return current state for display
+
+Each Session has players  (SessionPlayers)
+10 Rounds each round is
+3 Turns each turn is
+1 Move from Each Player in seat order (SessionPlayer.seat)
+
+    """
+
+
 from django.shortcuts import render, redirect
 from lib.helpers import get_config, setup_logger
 import json
@@ -95,34 +147,27 @@ def advance_session(session):
     if state["round_num"] >= MAX_ROUNDS and state["turns_in_round"] >= MAX_TURNS:
         return {"status": "complete"}
 
-    # Get or create current round
+    # INITIALIZATION: If no rounds exist, create Round 1 & Turn 1 but DON'T capture yet
     if state["round_num"] == 0:
         current_round = Round.objects.create(session=session, number=1)
-        state["round_num"] = 1
-    else:
-        current_round = Round.objects.get(session=session, number=state["round_num"])
-
-    # Get or create current turn
-    if state["turn_num"] == 0:
         current_turn = Turn.objects.create(
             session=session, round=current_round, number=1
         )
-        state["turn_num"] = 1
-    else:
-        current_turn = Turn.objects.get(session=session, number=state["turn_num"])
+        # Return without capturing - just show initial state
+        return {
+            "status": "initialized",
+            "state": get_session_state(session),  # Refresh state
+        }
+
+    # Get current round and turn
+    current_round = Round.objects.get(session=session, number=state["round_num"])
+    current_turn = Turn.objects.get(session=session, number=state["turn_num"])
 
     # Execute move for next player
     next_player = state["next_player"]
-    image = capture_and_create_image()  # Your grab_capture logic
-    move = Move.objects.create(
-        player=next_player, turn=current_turn, image_at_end=image
-    )
 
-    # Update state
-    state["moves_in_turn"] += 1
-
-    # Check if turn complete
-    if state["moves_in_turn"] >= state["player_count"]:
+    if not next_player:
+        # Turn is complete, need to create next turn/round
         state["turns_in_round"] += 1
 
         # Check if round complete
@@ -141,11 +186,23 @@ def advance_session(session):
 
         # Create next turn
         state["turn_num"] += 1
-        Turn.objects.create(
+        current_turn = Turn.objects.create(
             session=session, round=current_round, number=state["turn_num"]
         )
 
-    return {"status": "active", "state": state}
+        # Get next player for new turn
+        state = get_session_state(session)
+        next_player = state["next_player"]
+
+    # Capture image and create move
+    image = capture_and_create_image()
+    move = Move.objects.create(
+        player=next_player, turn=current_turn, image_at_end=image
+    )
+
+    logger.info(f"Created move for {next_player.handle} in turn {current_turn.number}")
+
+    return {"status": "active", "state": get_session_state(session)}
 
 
 def capture_and_create_image():
