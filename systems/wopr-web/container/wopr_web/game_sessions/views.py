@@ -85,6 +85,7 @@ def gs_view_specific(request, session_id):
     else:
         form = SessionPlayerForm(initial={"session": gsession})
     rounds = Round.objects.filter(session=session_id).order_by("number")
+    moves = []
     for round in rounds:
         turns = Turn.objects.filter(round=round).order_by("number")
         for turn in turns:
