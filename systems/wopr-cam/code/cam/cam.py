@@ -4,7 +4,7 @@ import time
 import hashlib
 
 from fastapi import FastAPI, HTTPException, APIRouter
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from picamera2 import Picamera2
 from libcamera import Transform
