@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<h2>Game Session {{ gsession.short_id }} - Round {{ round_num }}</h2>
+{% if round_num == 1 %}
+<p>Welcome to Round 1</p>
+<p><strong>Players:</strong></p>
+{% for player in players %}
+<p>{{ player.handle }}</p>
+{% endfor %}
+
+{% else %}
+<form method="post">
+    {% csrf_token %}
+    <label for="start_round">Start Round</label>
+    <input type="hidden" name="start_round" value="true">
+    <input type="submit" name="start_round" value="Start Round">
+</form>
+
+{% endif %}
+{% endblock%}

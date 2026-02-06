@@ -35,6 +35,14 @@
         <input type="hidden" name="has_sword" value="no">
         <button type="submit">Take Captures for this Session</button>
     </form></li>
+    <li>
+        <form method="post" action="{% url 'run_session' %}">
+            {% csrf_token %}
+            <input type="hidden" name="gsession_id" value="{{ gsession.id }}">
+            <input type="hidden" name="player_ids" value="{{ gsession.sessionplayer_set.all|join:',' }}">
+            <button type="submit">Run the session</button>
+        </form>
+    </li>
 </ul>
 <hr>
 {% if gsession.sessionimage_set.all %}

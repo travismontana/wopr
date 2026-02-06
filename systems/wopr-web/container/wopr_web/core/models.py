@@ -90,20 +90,19 @@ class Session(models.Model):
 
 
 class SessionPlayer(models.Model):
-    """Join table for sessions and players with optional seat assignment."""
+    """Join table for sessions and players with REQUIRED seat assignment."""
 
     session = models.ForeignKey("Session", on_delete=models.CASCADE, db_index=True)
     player = models.ForeignKey("Player", on_delete=models.CASCADE, db_index=True)
-    seat = models.IntegerField(null=True, blank=True)
+    seat = models.IntegerField(null=False, blank=False)
 
     class Meta:
         db_table = "session_players"
-        unique_together = [["session", "player"]]
+        unique_together = [["session", "player"], ["session", "seat"]]
         ordering = ["session", "seat", "player"]
 
     def __str__(self):
-        seat_info = f" (seat {self.seat})" if self.seat is not None else ""
-        return f"{self.player.handle} in {self.session.short_id}{seat_info}"
+        return f"{self.player.handle} in {self.session.short_id} (seat {self.seat})"
 
 
 class SessionImage(models.Model):
@@ -147,46 +146,8 @@ class Image(models.Model):
         return self.short_id
 
 
-class Move(models.Model):
-    """A single move in a session, forming a linked list."""
-
-    id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(
-        unique=True, default=uuid.uuid4, editable=False, db_index=True
-    )
-    short_id = models.CharField(max_length=5, unique=True, db_index=True)
-    description = models.TextField(null=True, blank=True)
-    note = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    session = models.ForeignKey(
-        "Session", on_delete=models.CASCADE, db_index=True, null=False, blank=False
-    )
-    player = models.ForeignKey(
-        "Player", on_delete=models.PROTECT, db_index=True, null=False, blank=False
-    )
-    previous_move = models.ForeignKey(
-        "self", null=True, blank=True, on_delete=models.SET_NULL, db_index=True
-    )
-    image_at_end = models.ForeignKey(
-        "Image", null=True, blank=True, on_delete=models.SET_NULL, db_index=True
-    )
-
-    class Meta:
-        db_table = "move"
-        ordering = ["session", "created_at"]
-
-    def save(self, *args, **kwargs):
-        if not self.short_id:
-            self.short_id = str(self.uuid)[:5]
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.player.handle} - {self.short_id}"
-
-
 class Round(models.Model):
-    """A round in a session, grouping multiple moves."""
+    """A round in a session, grouping multiple turns."""
 
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(
@@ -204,6 +165,7 @@ class Round(models.Model):
 
     class Meta:
         db_table = "round"
+        unique_together = [["session", "number"]]
         ordering = ["session", "number"]
 
     def save(self, *args, **kwargs):
@@ -216,7 +178,7 @@ class Round(models.Model):
 
 
 class Turn(models.Model):
-    """A turn in a session, grouping multiple moves."""
+    """A turn in a round - one pass through all players."""
 
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(
@@ -230,10 +192,14 @@ class Turn(models.Model):
     session = models.ForeignKey(
         "Session", on_delete=models.CASCADE, db_index=True, null=False, blank=False
     )
+    round = models.ForeignKey(
+        "Round", on_delete=models.CASCADE, db_index=True, null=False, blank=False
+    )
     number = models.IntegerField(null=False, blank=False)
 
     class Meta:
         db_table = "turn"
+        unique_together = [["session", "number"]]
         ordering = ["session", "number"]
 
     def save(self, *args, **kwargs):
@@ -245,14 +211,35 @@ class Turn(models.Model):
         return f"{self.session.short_id} - Turn {self.number}"
 
 
-class TurninRound(models.Model):
-    """Join table for turns and rounds"""
+class Move(models.Model):
+    """A single player action within a turn."""
 
-    turn = models.ForeignKey("Turn", on_delete=models.CASCADE, db_index=True)
-    round = models.ForeignKey("Round", on_delete=models.CASCADE, db_index=True)
-    move = models.ForeignKey("Move", on_delete=models.CASCADE, db_index=True)
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    short_id = models.CharField(max_length=5, unique=True, db_index=True)
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    image_at_end = models.ForeignKey(
+        "Image", null=True, blank=True, on_delete=models.SET_NULL, db_index=True
+    )
+    player = models.ForeignKey("Player", on_delete=models.PROTECT, db_index=True)
+    turn = models.ForeignKey(
+        "Turn", on_delete=models.CASCADE, db_index=True, null=False, blank=False
+    )
 
     class Meta:
-        db_table = "turn_in_round"
-        unique_together = [["turn", "round"]]
-        ordering = ["round", "turn"]
+        db_table = "move"
+        unique_together = [["turn", "player"]]
+        ordering = ["created_at"]
+
+    def save(self, *args, **kwargs):
+        if not self.short_id:
+            self.short_id = str(self.uuid)[:5]
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.player.handle} - Turn {self.turn.number}"

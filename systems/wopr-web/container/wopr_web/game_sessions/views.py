@@ -13,6 +13,7 @@ from .forms import (
 from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image
 
 from .lib.captures import grab_preview, grab_capture
+from .lib.sessions import start_session
 
 from lib.helpers import get_config, setup_logger
 
@@ -238,3 +239,17 @@ def capture_results(request):
         return render(request, "gs_results.html", context)
 
     return render(request, "gs_results.html", context)
+
+
+def run_session(request):
+    context = {}
+    if request.method == "POST":
+        # Have:
+        # - session_id
+        # - player(s)_id
+        session_id = request.POST.get("gsession_id")
+        player_ids = request.POST.getlist("player_ids")
+        logger.info(f"Setting up session {session_id} with players {player_ids}")
+        results = start_session(session_id, request, player_ids)
+        context["results"] = results
+    return render(request, "gs_session.html", context)

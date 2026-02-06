@@ -24,4 +24,5 @@ urlpatterns = [
     ),
     path("take_captures", views.take_captures, name="take_captures"),
     path("capture_preview", views.capture_preview, name="capture_preview"),
+    path("run_session", views.run_session, name="run_session"),
 ]
