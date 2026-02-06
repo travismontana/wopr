@@ -1,0 +1,19 @@
+{% extends "gs_base.html" %}
+
+{% block main_content %}
+{% if details %}
+    <h2>{{ details.name }}</h2>
+    <p><string>Name:</strong> {{ details.name }}</p>
+    <p><strong>Short Name:</strong> {{ details.shortname }}</p>
+    <p><strong>Players:</strong>Min: {{ details.min_players }} Max: {{ details.max_players }}</p>
+    {% if details.url %}
+        <p><strong>URL:</strong> <a href="{{ details.url }}">{{ details.url }}</a></p>
+    {% endif %}
+    {% if details.description %}
+        <p><strong>Description:</strong> {{ details.description }}</p>
+    {% endif %}
+    {% if details.notes %}
+        <p><strong>Notes:</strong> {{ details.notes }}</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

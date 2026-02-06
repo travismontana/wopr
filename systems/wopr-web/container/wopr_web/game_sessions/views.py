@@ -108,6 +108,8 @@ def gs_view_specific(request, session_id):
 
 def game_view_specific(request, game_id):
     context = {"game_id": game_id}
+    details = Game.objects.get(id=game_id)
+    context["details"] = details
     return render(request, "game_view_specific.html", context)
 
 
