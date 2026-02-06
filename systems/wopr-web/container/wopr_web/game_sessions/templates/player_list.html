@@ -5,7 +5,7 @@
 {% if players %}
 <ul>
     {% for player in players %}
-    <li>{{ player.irl_name }} - {{ player.handle }}</li>
+    <li><a href="{% url 'player_view_specific' player_id=player.id %}">{{ player.irl_name }} - {{ player.handle }}</a></li>
     {% endfor %}
 </ul>
 {% else %}
