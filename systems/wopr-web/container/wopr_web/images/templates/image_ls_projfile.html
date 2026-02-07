@@ -1,0 +1,13 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+    {% if task_images %}
+        {% for img in task_images %}
+            {%if img.task_id%}
+                <p>{{ img.filename }} - Task ID: {{ img.task_id }}</p>
+            {%else%}
+                <p>{{ img.filename }} - No task found</p>
+            {%endif%}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

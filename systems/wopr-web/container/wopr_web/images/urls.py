@@ -12,4 +12,10 @@ urlpatterns = [
     path("images_ondisk", views.images_ondisk, name="images_ondisk"),
     path("images_indb", views.images_indb, name="images_indb"),
     path("add_images_to_db", views.add_images_to_db, name="add_images_to_db"),
+    path(
+        "images_ls_list_projects",
+        views.images_ls_list_projects,
+        name="images_ls_list_projects",
+    ),
+    path("images_ls_projfile", views.images_ls_projfile, name="images_ls_projfile"),
 ]

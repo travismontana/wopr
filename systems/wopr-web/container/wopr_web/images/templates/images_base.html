@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
+<h2>Images</h2>
 <ul>
-    <li><a href="{% url 'images_show_dir_selector' %}">Images On Disk</a></li>
-    <li><a href="{% url 'images_indb' %}">Images In DB</a></li>
+<li><a href="{% url 'images_show_dir_selector' %}">Images On Disk</a></li>
+<li><a href="{% url 'images_indb' %}">Images In DB</a></li>
+<li><a href="{% url 'images_ls_list_projects' %}">Images and Label Studio</a></li>
 </ul>
+
 {% endblock %}

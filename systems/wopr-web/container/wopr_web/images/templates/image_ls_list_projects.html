@@ -1,0 +1,18 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+{% if projects %}
+<form action="{% url 'images_ls_projfile' %}" method="post">
+    {% csrf_token %}
+    <label for="project">Select a Label Studio project:</label>
+    <select name="project_id" id="project">
+        {% for project in projects %}
+        <option value="{{ project.id }}">{{ project.title }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Work images</button>
+</form>
+{% else %}
+<p>No Label Studio projects found.</p>
+{% endif %}
+{% endblock %}

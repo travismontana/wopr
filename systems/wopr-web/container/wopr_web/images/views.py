@@ -10,6 +10,7 @@ from core.models import Image
 from lib.helpers import setup_logger, get_config
 
 from .lib.lib_images import get_images_ondisk, image_sort
+from .lib.lib_labelstudio import image_ls_list_projects_action, image_ls_projfile_action
 
 logger = setup_logger()
 config = get_config()
@@ -254,3 +255,38 @@ def add_images_to_db(request):  # plural
         )
 
     return render(request, "images_results.html", {"results": results})
+
+
+def images_ls_list_projects(request):
+    logger.info("Rendering image labelstudio page")
+    results = []
+    action_results = image_ls_list_projects_action(request)
+    results.append(
+        {
+            "status": "success",
+            "message": "Rendered image labelstudio page",
+            "extra": {"action_results": action_results},
+        }
+    )
+    context = {"projects": action_results}
+    return render(request, "image_ls_list_projects.html", context)
+
+
+def images_ls_projfile(request):
+    logger.info("Rendering image labelstudio project file page")
+    debug_vars = []
+    results = []
+    if request.method == "POST":
+        project_id = request.POST.get("project_id")
+        logger.info(f"Selected project ID: {project_id}")
+        # Here you would add logic to retrieve and display the project file based on the selected project ID
+        context = {"project_id": project_id}
+        image_ls_projfile_results = image_ls_projfile_action(project_id)
+        context["task_images"] = image_ls_projfile_results
+
+        return render(request, "image_ls_projfile.html", context)
+    else:
+        logger.warning("No project ID selected")
+        return render(
+            request, "image_ls_projfile.html", {"error": "No project ID selected"}
+        )
