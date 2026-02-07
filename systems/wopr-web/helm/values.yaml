@@ -58,3 +58,8 @@ wopr-baseapp:
         secretKeyRef:
           name: wopr-db-user-credentials
           key: password
+    - name: LABEL_STUDIO_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: labelstudio-token-secret
+          key: labelstudio-token
