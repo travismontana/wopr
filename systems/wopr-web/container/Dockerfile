@@ -9,6 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     net-tools \
+    iputils-ping\
     libpq-dev \
     git \
     && pip install --upgrade pip setuptools wheel \
