@@ -1,0 +1,15 @@
+<View>
+    <Header value="Labeling image: $image" />
+    <Image name="image" value="$image"/>
+    <RectangleLabels name="label" toName="image">
+        <Label value="board" background="#FF0000"/>
+        <Label value="mantellian_savrip" background="#FFD700"/>
+        <Label value="kintan_strider" background="#FFA500"/>
+        <Label value="klorslug" background="#D2691E"/>
+        <Label value="ngok" background="#8B4513"/>
+        <Label value="molator" background="#999999"/>
+        <Label value="monnok" background="#EBD3CB"/>
+        <Label value="ghhhk" background="#00ff00"/>
+        <Label value="houjix" background="#944E38"/>
+    </RectangleLabels>
+</View>

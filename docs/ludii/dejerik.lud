@@ -1,0 +1,81 @@
+(game "Dejarik"
+  (players 2)
+  (equipment {
+    (board (concentric {12 12} stagger:false))
+
+    (piece "Mantellian Savrip" P1 (moves {
+      (move    (step   (to (sites Empty))             (directions {In Out CW CCW})))
+      (capture (step   (to (sites Occupied by:Next))  (directions {In Out CW CCW})))
+    }))
+
+    (piece "Kintan Strider" P2 (moves {
+      (move    (step   (to (sites Empty))             (directions {In Out})))
+      (capture (step   (to (sites Occupied by:Next))  (directions {In Out})))
+    }))
+
+    (piece "K'lor'slug" P1 (moves {
+      (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+      (move (step (to (sites Empty)) (directions {In Out})))
+      (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+      (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
+    }))
+
+    (piece "Ng'ok" P2 (moves {
+      (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+      (move (step (to (sites Empty)) (directions {In Out})))
+      (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+      (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
+    }))
+
+    (piece "Molator" P1 (moves {
+    (move 
+        (step (to (sites Empty)) (directions {In Out}))
+        (then (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+    )
+    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+    }))
+
+    (piece "Monnok" P2 (moves {
+    (move 
+        (step (to (sites Empty)) (directions {In Out}))
+        (then (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+    )
+    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+    }))
+
+
+    (piece "Ghhhk" P1 (moves {
+        (move
+            (slide (to (sites Empty)) (directions  {CW CCW In Out}) (between 1 1))
+            )
+        (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
+        }
+        )
+    )
+    (piece "Houjix" P2 (moves {
+        (move
+            (slide (to (sites Empty)) (directions  {CW CCW In Out}) (between 1 1))
+            )
+            (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
+        }
+        )
+    )
+  })
+
+  (rules
+    (start {
+        (place "Ng'ok" (site 0))
+        (place "Monnok" (site 11))
+        (place "Houjix" (site 12))
+        (place "Kintan Strider" (site 23))
+        (place "K'lor'slug" (site 6))
+        (place "Ghhhk" (site 5))
+        (place "Molator" (site 18))
+        (place "Mantellian Savrip" (site 17))
+    })
+
+    (play (move))  ; uses each piece’s (moves ...) definitions
+
+    (end (if (no Pieces Next) (result Mover Win)))
+  )
+)
