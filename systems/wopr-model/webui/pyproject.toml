@@ -14,7 +14,7 @@ dependencies = [
     "requests",
     "pydantic",
     "pylint",
-    
+    "label_studio_sdk",
 ]
 
 [project.optional-dependencies]

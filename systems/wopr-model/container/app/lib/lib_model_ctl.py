@@ -86,15 +86,16 @@ def initialize_model(filename: str, model_family: str):
     return results
 
 
-def generate_dataset(dataset_uuid: str, dataset: dict):
+def generate_dataset(dataset: dict):
     """Generate Dataset from Label Studio project.
 
     Exports project annotations in YOLO format and downloads all images.
 
     Args:
-        project_id (int): Label Studio project ID
         dataset_uuid (str): UUID for the dataset directory
-        view_id (int, optional): Specific view to export
+        dataset (dict): Additional dataset info (e.g. project_id, view_id)
+            project_id (str): Label Studio project ID to export from
+            view_id (int, optional): Specific view ID to filter tasks (if any)
 
     Returns:
         dict: Results with status and dataset info
@@ -108,8 +109,9 @@ def generate_dataset(dataset_uuid: str, dataset: dict):
     try:
         # Setup paths
         logger.info("Starting dataset generation process")
-        logger.debug(f"Dataset UUID: {dataset_uuid}, Dataset info: {dataset}")
+        logger.debug(f"Dataset info: {dataset}")
         project_id = dataset.get("project_id", "")
+        dataset_uuid = dataset.get("dataset_uuid", "")
         if dataset_uuid == "":
             return {
                 "status": "error",

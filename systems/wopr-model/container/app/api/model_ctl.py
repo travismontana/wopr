@@ -44,8 +44,7 @@ def model_control(body: dict[str, Any]):  # Removed unused Request
             results = initialize_model(filename, model_family)
         case "generate_dataset":
             dataset = payload.get("dataset", "")
-            dataset_uuid = payload.get("dataset_uuid", "")
-            results = generate_dataset(dataset_uuid, dataset)
+            results = generate_dataset(dataset)
         case "train":
             results = train_yolo_model(
                 model_version=payload.get("model_version", {}),
