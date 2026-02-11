@@ -36,7 +36,7 @@ def model_control(body: dict[str, Any]):  # Removed unused Request
     logit("model_control", f"body: {body}")
     payload = body.get("payload", {})
     action = payload.get("action", "")
-
+    logit("model_control_action", f"Action: {action}, Payload: {payload}")
     match action:
         case "create_new_model_file":
             filename = payload.get("filename", "")
