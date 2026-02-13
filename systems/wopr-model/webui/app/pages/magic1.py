@@ -84,7 +84,10 @@ if uploaded_file is not None:
     cells = find_cells(center, filtered_corners, circles[0][0][2])
 
     st.write(f"Found {len(cells)} cells around the circle.")
-    for cell in cells:
-        cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
-        cv.line(cimg, center, tuple(cell[1]), (255, 255, 0), 2)
+    for angle, corner_list in cells.items():
+        # corner_list is [(corner, dist), (corner, dist), ...]
+        # Draw lines for first two corners on this radial
+        for corner, dist in corner_list[:2]:
+            cv.line(cimg, center, tuple(corner), (255, 255, 0), 2)
+
     st.image(cimg, caption="Cells Connected to Circle Center")
