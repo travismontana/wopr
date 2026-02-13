@@ -101,7 +101,7 @@ if uploaded_file is not None:
         (128, 0, 128),
     ]
 
-    for idx, (angle, corner_list) in enumerate(cells.items()):
+    for idx, (angle, corner_list) in enumerate(lines.items()):
         color = colors[idx % len(colors)]  # Cycle through colors
 
         # Mark each corner on this radial
