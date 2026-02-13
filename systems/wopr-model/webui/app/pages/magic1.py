@@ -78,7 +78,7 @@ if uploaded_file is not None:
 
     x, y, radius = circles[0][0]  # Unpack first circle
     center = (x, y)
-    cells = find_cells(center, reshaped_corners, dist=circles[0][0][2])
+    cells = find_cells(center, reshaped_corners, circles[0][0][2])
     st.write(f"Found {len(cells)} cells around the circle.")
     for cell in cells:
         cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
