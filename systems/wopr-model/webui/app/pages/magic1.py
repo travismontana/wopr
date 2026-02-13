@@ -47,3 +47,9 @@ if uploaded_file is not None:
         x, y = corner.ravel()
         cv.circle(cimg, (x, y), 3, (255, 0, 0), -1)
     st.image(cimg, caption="Good Features to Track")
+
+    gray = np.float32(img)
+    corner_harris = cv.cornerHarris(gray, 2, 3, 0.04)
+    corner_harris = cv.dilate(corner_harris, None)
+    cimg[corner_harris > 0.01 * corner_harris.max()] = [0, 0, 255]
+    st.image(cimg, caption="Harris Corner Detection")
