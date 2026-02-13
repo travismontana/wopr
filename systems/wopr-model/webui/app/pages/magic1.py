@@ -31,7 +31,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
     orig_img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
-    img = cv.GaussianBlur(orig_img, (5, 5), 0)
+    gauss_img = cv.GaussianBlur(orig_img, (5, 5), 0)
     img_reg = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
     img = cv.medianBlur(orig_img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
@@ -57,7 +57,7 @@ if uploaded_file is not None:
         for corners, marker_id in zip(marker_corners, marker_ids):
             st.write(f"Marker ID: {marker_id[0]}, Corners: {corners[0]}")
 
-    canny_color = cv.Canny(img, 100, 200)
+    canny_color = cv.Canny(gauss_img, 100, 200)
     st.image(canny_color, caption="Canny Edge Detection")
 
     corners = cv.goodFeaturesToTrack(canny_color, 100, 0.01, 10)
