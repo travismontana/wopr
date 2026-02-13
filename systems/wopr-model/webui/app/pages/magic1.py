@@ -304,8 +304,11 @@ if uploaded_file is not None:
             )
 
             # Thresholding - Otsu's Method - RGB
+            img_blur_rgb_gray_u8_temp = cv2.cvtColor(
+                img_blur_rgb_u8, cv2.COLOR_RGB2GRAY
+            )
             _, img_otsu_rgb_u8 = cv2.threshold(
-                img_blur_rgb_u8, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+                img_blur_rgb_gray_u8_temp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
             )
             st.image(img_otsu_rgb_u8, caption="Otsu's Thresholding")
 
@@ -327,7 +330,7 @@ if uploaded_file is not None:
                 key="adap_thres_C_rgb",
             )
             img_adap_thresh_rgb_u8 = cv2.adaptiveThreshold(
-                img_blur_rgb_u8,
+                img_blur_rgb_gray_u8_temp,
                 255,
                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                 cv2.THRESH_BINARY,
