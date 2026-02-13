@@ -13,6 +13,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
     img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
+    img_reg = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
     img = cv.medianBlur(img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     circles = cv.HoughCircles(
@@ -27,7 +28,7 @@ if uploaded_file is not None:
     dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_25h9)
     detectorParams = cv.aruco.DetectorParameters()
     detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
-    marker_corners, marker_ids, rejected_candidates = detector.detectMarkers(img)
+    marker_corners, marker_ids, rejected_candidates = detector.detectMarkers(img_reg)
     st.write(f"Found Aruco Markers: {len(marker_ids) if marker_ids is not None else 0}")
     if marker_ids is not None:
         for corners, marker_id in zip(marker_corners, marker_ids):
