@@ -64,7 +64,7 @@ if uploaded_file is not None:
                 key="gray_mbk",
             )
             img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_mbk)
-            st.image(img_gauBlur_gray_u8, caption=f"Gaussian Blur {imgu8_gbk}")
+            st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_mbk}")
 
             # Gaussian Blur - Gray
             imgu8_gbk = st.slider(
@@ -78,7 +78,7 @@ if uploaded_file is not None:
             img_gauBlur_gray_u8 = cv2.GaussianBlur(
                 img_gray_u8, (imgu8_gbk, imgu8_gbk), 0
             )
-            st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_mbk}")
+            st.image(img_gauBlur_gray_u8, caption=f"Gaussian Blur {imgu8_gbk}")
 
             # bilateralFilter - Gray
             imgu8_bf_d = st.slider(
