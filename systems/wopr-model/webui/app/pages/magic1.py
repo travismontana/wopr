@@ -24,5 +24,11 @@ if uploaded_file is not None:
         cv.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
     st.image(cimg, caption="Processed Image with Detected Circles")
 
-    found_aruco = cv.aruco.ArucoDetector.detectMarkers(img)
-    st.write(f"Found Aruco Markers: {found_aruco}")
+    dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_25h9)
+    detectorParams = cv.aruco.DetectorParameters()
+    detector = cv.aruco.ArucoDetector(dictionary, detectorParams)
+    marker_corners, marker_ids, rejected_candidates = detector.detectMarkers(img)
+    st.write(f"Found Aruco Markers: {len(marker_ids) if marker_ids is not None else 0}")
+    if marker_ids is not None:
+        for corners, marker_id in zip(marker_corners, marker_ids):
+            st.write(f"Marker ID: {marker_id[0]}, Corners: {corners[0]}")
