@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 
-def find_cells(center, corners, tol=2.0):
+def find_cells(center, corners, dist, tol=2.0):
     radials = {}
 
     for corner in corners:
@@ -17,7 +17,7 @@ def find_cells(center, corners, tol=2.0):
         radials[angle_rounded].append((corner, dist))
     cells = []
     for angle, points in radials.items():
-        if len(points) >= 2 and all(p[1] < 20000 for p in points):
+        if len(points) >= 2 and all(p[1] < 2 * dist for p in points):
             points = sorted(points, key=lambda p: p[1])  # Sort by distance
             cells.append([p[0] for p in points[:2]])
     return cells
@@ -78,7 +78,7 @@ if uploaded_file is not None:
 
     x, y, radius = circles[0][0]  # Unpack first circle
     center = (x, y)
-    cells = find_cells(center, reshaped_corners)
+    cells = find_cells(center, reshaped_corners, dist=circles[0][0][2])
     st.write(f"Found {len(cells)} cells around the circle.")
     for cell in cells:
         cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
