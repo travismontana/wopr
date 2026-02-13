@@ -49,7 +49,7 @@ if uploaded_file is not None:
     st.image(cimg, caption="Good Features to Track")
 
     gray = np.float32(img)
-    corner_harris = cv.cornerHarris(gray, 2, 30, 0.04)
+    corner_harris = cv.cornerHarris(gray, 2, 5, 0.04)
     corner_harris = cv.dilate(corner_harris, None)
     cimg[corner_harris > 0.01 * corner_harris.max()] = [0, 0, 255]
     st.image(cimg, caption="Harris Corner Detection")
