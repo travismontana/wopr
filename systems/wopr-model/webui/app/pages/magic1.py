@@ -184,3 +184,182 @@ if uploaded_file is not None:
                 img_bilateralFilter_rgb_u8,
                 caption=f"Bilateral Filter d={imrgb_bf_d} sc={imrgb_bf_sigmaColor} ss={imrgb_bf_sigmaSpace}",
             )
+    match gray_selected_blur:
+        case "Gaussian Blur":
+            img_blur_gray_u8 = img_gauBlur_gray_u8
+        case "Median Blur":
+            img_blur_gray_u8 = img_medBlur_gray_u8
+        case "Bilateral Filter":
+            img_blur_gray_u8 = img_bilateralFilter_gray_u8
+    match rgb_selected_blur:
+        case "Gaussian Blur":
+            img_blur_rgb_u8 = img_gauBlur_rgb_u8
+        case "Median Blur":
+            img_blur_rgb_u8 = img_medBlur_rgb_u8
+        case "Bilateral Filter":
+            img_blur_rgb_u8 = img_bilateralFilter_rgb_u8
+
+    with st.expander("Thresholding", expanded=False):
+        st.write(
+            "Thresholding is a technique used to segment an image by converting it into a binary image based on a specified threshold value."
+        )
+        col_thres_gray, col_thres_rgb = st.columns(2)
+
+        with col_thres_gray:
+            st.header("Gray")
+
+            # Thresholding - Gray
+            imgu8_thres = st.slider(
+                "Threshold Value",
+                min_value=0,
+                max_value=255,
+                value=127,
+                step=1,
+                key="thres",
+            )
+            _, img_thresh_gray_u8 = cv2.threshold(
+                img_blur_gray_u8, imgu8_thres, 255, cv2.THRESH_BINARY
+            )
+            st.image(
+                img_thresh_gray_u8, caption=f"Thresholding with value {imgu8_thres}"
+            )
+
+            # Thresholding - Otsu's Method - Gray
+            _, img_otsu_gray_u8 = cv2.threshold(
+                img_blur_gray_u8, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+            )
+            st.image(img_otsu_gray_u8, caption="Otsu's Thresholding")
+
+            # Adaptive Thresholding - Gray
+            imgu8_adap_thres_block_size = st.slider(
+                "Adaptive Threshold Block Size",
+                min_value=3,
+                max_value=31,
+                value=11,
+                step=2,
+                key="adap_thres_block_size",
+            )
+            imgu8_adap_thres_C = st.slider(
+                "Adaptive Threshold C",
+                min_value=-50,
+                max_value=50,
+                value=2,
+                step=1,
+                key="adap_thres_C",
+            )
+            img_adap_thresh_gray_u8 = cv2.adaptiveThreshold(
+                img_blur_gray_u8,
+                255,
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                cv2.THRESH_BINARY,
+                imgu8_adap_thres_block_size,
+                imgu8_adap_thres_C,
+            )
+            st.image(
+                img_adap_thresh_gray_u8,
+                caption=f"Adaptive Thresholding with block size {imgu8_adap_thres_block_size} and C {imgu8_adap_thres_C}",
+            )
+
+            # inRange Thresholding - Gray
+            imgu8_inrange_thres_lower = st.slider(
+                "InRange Threshold Lower",
+                min_value=0,
+                max_value=255,
+                value=100,
+                step=1,
+                key="inrange_thres_lower",
+            )
+            imgu8_inrange_thres_upper = st.slider(
+                "InRange Threshold Upper",
+                min_value=0,
+                max_value=255,
+                value=200,
+                step=1,
+                key="inrange_thres_upper",
+            )
+            img_inrange_thresh_gray_u8 = cv2.inRange(
+                img_blur_gray_u8, imgu8_inrange_thres_lower, imgu8_inrange_thres_upper
+            )
+            st.image(
+                img_inrange_thresh_gray_u8,
+                caption=f"InRange Thresholding with lower {imgu8_inrange_thres_lower} and upper {imgu8_inrange_thres_upper}",
+            )
+        with col_thres_rgb:
+            st.header("RGB")
+
+            # Thresholding - RGB
+            imrgb_thres = st.slider(
+                "Threshold Value",
+                min_value=0,
+                max_value=255,
+                value=127,
+                step=1,
+                key="thres_rgb",
+            )
+            _, img_thresh_rgb_u8 = cv2.threshold(
+                img_blur_rgb_u8, imrgb_thres, 255, cv2.THRESH_BINARY
+            )
+            st.image(
+                img_thresh_rgb_u8, caption=f"Thresholding with value {imrgb_thres}"
+            )
+
+            # Thresholding - Otsu's Method - RGB
+            _, img_otsu_rgb_u8 = cv2.threshold(
+                img_blur_rgb_u8, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+            )
+            st.image(img_otsu_rgb_u8, caption="Otsu's Thresholding")
+
+            # Adaptive Thresholding - RGB
+            imrgb_adap_thres_block_size = st.slider(
+                "Adaptive Threshold Block Size",
+                min_value=3,
+                max_value=31,
+                value=11,
+                step=2,
+                key="adap_thres_block_size_rgb",
+            )
+            imrgb_adap_thres_C = st.slider(
+                "Adaptive Threshold C",
+                min_value=-50,
+                max_value=50,
+                value=2,
+                step=1,
+                key="adap_thres_C_rgb",
+            )
+            img_adap_thresh_rgb_u8 = cv2.adaptiveThreshold(
+                img_blur_rgb_u8,
+                255,
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                cv2.THRESH_BINARY,
+                imrgb_adap_thres_block_size,
+                imrgb_adap_thres_C,
+            )
+            st.image(
+                img_adap_thresh_rgb_u8,
+                caption=f"Adaptive Thresholding with block size {imrgb_adap_thres_block_size} and C {imrgb_adap_thres_C}",
+            )
+
+            # inRange Thresholding - RGB
+            imrgb_inrange_thres_lower = st.slider(
+                "InRange Threshold Lower",
+                min_value=0,
+                max_value=255,
+                value=100,
+                step=1,
+                key="inrange_thres_lower_rgb",
+            )
+            imrgb_inrange_thres_upper = st.slider(
+                "InRange Threshold Upper",
+                min_value=0,
+                max_value=255,
+                value=200,
+                step=1,
+                key="inrange_thres_upper_rgb",
+            )
+            img_inrange_thresh_rgb_u8 = cv2.inRange(
+                img_blur_rgb_u8, imrgb_inrange_thres_lower, imrgb_inrange_thres_upper
+            )
+            st.image(
+                img_inrange_thresh_rgb_u8,
+                caption=f"InRange Thresholding with lower {imrgb_inrange_thres_lower} and upper {imrgb_inrange_thres_upper}",
+            )
