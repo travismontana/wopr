@@ -33,3 +33,6 @@ if uploaded_file is not None:
     if marker_ids is not None:
         for corners, marker_id in zip(marker_corners, marker_ids):
             st.write(f"Marker ID: {marker_id[0]}, Corners: {corners[0]}")
+
+    canny_color = cv.Canny(img, 100, 200)
+    st.image(canny_color, caption="Canny Edge Detection")
