@@ -61,7 +61,7 @@ if uploaded_file is not None:
 
     # Edge detection
     otsu_ret, otsu_binary = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    canny = cv.Canny(otsu_binary, 100, 200)
+    canny = cv.Canny(img, 100, 200)
     st.image(canny, caption="Canny Edges")
 
     # Corner detection
