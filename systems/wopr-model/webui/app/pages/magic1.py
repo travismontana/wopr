@@ -23,3 +23,6 @@ if uploaded_file is not None:
         cv.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
         cv.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
     st.image(cimg, caption="Processed Image with Detected Circles")
+
+    found_aruco = aruco.ArucoDetector.detectMarkers(cimg)
+    st.write(f"Found Aruco Markers: {found_aruco}")
