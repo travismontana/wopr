@@ -72,7 +72,7 @@ if uploaded_file is not None:
         cv.circle(cimg, (x, y), 3, (255, 0, 0), -1)
     st.image(cimg, caption="Good Features to Track")
     kernel = np.ones((7, 7), np.uint8)
-    img_dilation = cv2.dilate(canny, kernel, iterations=1)
+    img_dilation = cv2.dilate(canny_color, kernel, iterations=1)
 
     gray = np.float32(img)
     corner_harris = cv.cornerHarris(gray, 5, 7, 0.06)
