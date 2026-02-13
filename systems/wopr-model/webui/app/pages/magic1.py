@@ -47,8 +47,8 @@ if uploaded_file is not None:
 
     with col_gray:
         st.header("Gray")
-        st.image(img_medBlur_gray_u8, use_column_width=True, caption="Median Blur 9")
+        st.image(img_medBlur_gray_u8, caption="Median Blur 9")
 
     with col_rgb:
         st.header("RGB")
-        st.image(img_medBlur_rgb_u8, use_column_width=True, caption="Median Blur 9")
+        st.image(img_medBlur_rgb_u8, caption="Median Blur 9")
