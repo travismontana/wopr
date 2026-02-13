@@ -65,6 +65,7 @@ if uploaded_file is not None:
 
     corners = cv.goodFeaturesToTrack(canny_color, 100, 0.01, 10)
     corners = np.uint16(np.around(corners))
+    reshaped_corners = corners.reshape(-1, 2)
     for corner in corners:
         x, y = corner.ravel()
         cv.circle(cimg, (x, y), 3, (255, 0, 0), -1)
@@ -78,7 +79,7 @@ if uploaded_file is not None:
 
     x, y, radius = circles[0][0]  # Unpack first circle
     center = (x, y)
-    cells = find_cells(center, corners)
+    cells = find_cells(center, reshaped_corners)
     st.write(f"Found {len(cells)} cells around the circle.")
     for cell in cells:
         cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
