@@ -78,7 +78,14 @@ if uploaded_file is not None:
 
     x, y, radius = circles[0][0]  # Unpack first circle
     center = (x, y)
-    cells = find_cells(center, reshaped_corners, circles[0][0][2])
+    filtered_corners = []
+    for corner in reshaped_corners:
+        dist = np.hypot(corner[0] - center[0], corner[1] - center[1])
+        if dist < radius * 0.95:  # Inside circle, with small margin
+            filtered_corners.append(corner)
+    filtered_corners = np.array(filtered_corners)
+    cells = find_cells(center, filtered_corners, circles[0][0][2])
+
     st.write(f"Found {len(cells)} cells around the circle.")
     for cell in cells:
         cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
