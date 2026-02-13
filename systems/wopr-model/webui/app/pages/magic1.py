@@ -88,6 +88,7 @@ if uploaded_file is not None:
         # corner_list is [(corner, dist), (corner, dist), ...]
         # Draw lines for first two corners on this radial
         for corner, dist in corner_list[:2]:
+            cv.point(cimg, tuple(corner), (0, 255, 255), 5)
             cv.line(cimg, center, tuple(corner), (255, 255, 0), 2)
 
     st.image(cimg, caption="Lines Connected to Circle Center")
