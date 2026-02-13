@@ -20,27 +20,26 @@ def find_lines(center, corners, circle_dist, tol=10.0):
     return lines
 
 
-st.title("Magic 1, ")
 st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+st.title("Magic 1, ")
 
 # need a picture to work with.
 # let's ask the user to give us one.
 uploaded_file = st.file_uploader(
     "Choose a picture to work with", type=["jpg", "jpeg", "png"]
 )
-with st.expander("Blurs", expanded=False):
+if uploaded_file is not None:
+    raw_bytes = uploaded_file.read()
+    raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
+    img_bgr_u8 = cv2.imdecode(raw_buf_u8, cv2.IMREAD_COLOR)
 
-    if uploaded_file is not None:
-        raw_bytes = uploaded_file.read()
-        raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
-        img_bgr_u8 = cv2.imdecode(raw_buf_u8, cv2.IMREAD_COLOR)
-
-        img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
-        img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
-
+    img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
+    img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
+    
+    with st.expander("Blurs", expanded=False):
     col_gray, col_rgb = st.columns(2)
     with col_gray:
         st.header("Gray")
