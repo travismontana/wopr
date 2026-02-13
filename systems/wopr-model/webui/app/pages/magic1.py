@@ -2,7 +2,31 @@ import streamlit as st
 import numpy as np
 import cv2 as cv
 
-# ... keep find_lines function ...
+
+def find_lines(center, corners, circle_dist, tol=10.0):
+    radials = {}
+
+    for corner in corners:
+        dx = corner[0] - center[0]
+        dy = corner[1] - center[1]
+        angle = np.degrees(np.arctan2(dy, dx)) % 360
+        dist = np.hypot(dx, dy)
+        angle_rounded = round(angle / tol) * tol
+        if angle_rounded not in radials:
+            radials[angle_rounded] = []
+        radials[angle_rounded].append((corner, dist))
+    lines = []
+    lines = {angle: corners for angle, corners in radials.items() if len(corners) >= 3}
+    return lines
+
+
+st.title("Magic 1, ")
+
+# need a picture to work with.
+# let's ask the user to give us one.
+uploaded_file = st.file_uploader(
+    "Choose a picture to work with", type=["jpg", "jpeg", "png"]
+)
 
 if uploaded_file is not None:
     file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
