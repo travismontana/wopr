@@ -735,8 +735,10 @@ if uploaded_file is not None:
                 ],
                 key="aruco_dict_gray",
             )
-            dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_25h9)
-            detector = cv.aruco.ArucoDetector(dictionary, cv.aruco.DetectorParameters())
+            dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_25h9)
+            detector = cv2.aruco.ArucoDetector(
+                dictionary, cv2.aruco.DetectorParameters()
+            )
             corners, ids, rejected = cv2.aruco.detectMarkers(
                 img_edges_gray_u8, dictionary, parameters=detector
             )
@@ -896,11 +898,11 @@ if uploaded_file is not None:
                 ],
                 key="aruco_dict_rgb",
             )
-            rgb_dictionary = cv.aruco.getPredefinedDictionary(
-                cv.aruco.DICT_APRILTAG_25h9
+            rgb_dictionary = cv2.aruco.getPredefinedDictionary(
+                cv2.aruco.DICT_APRILTAG_25h9
             )
-            rgb_detector = cv.aruco.ArucoDetector(
-                rgb_dictionary, cv.aruco.DetectorParameters()
+            rgb_detector = cv2.aruco.ArucoDetector(
+                rgb_dictionary, cv2.aruco.DetectorParameters()
             )
             corners_rgb, ids_rgb, rejected_rgb = rgb_detector.detectMarkers(
                 img_edges_rgb_u8
