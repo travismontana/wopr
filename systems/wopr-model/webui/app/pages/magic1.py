@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 
-def find_cells(center, corners, circle_dist, tol=6.0):
+def find_lines(center, corners, circle_dist, tol=8.0):
     radials = {}
 
     for corner in corners:
@@ -15,9 +15,9 @@ def find_cells(center, corners, circle_dist, tol=6.0):
         if angle_rounded not in radials:
             radials[angle_rounded] = []
         radials[angle_rounded].append((corner, dist))
-    cells = []
-    cells = {angle: corners for angle, corners in radials.items() if len(corners) >= 2}
-    return cells
+    lines = []
+    lines = {angle: corners for angle, corners in radials.items() if len(corners) >= 2}
+    return lines
 
 
 st.title("Magic 1, ")
@@ -90,4 +90,4 @@ if uploaded_file is not None:
         for corner, dist in corner_list[:2]:
             cv.line(cimg, center, tuple(corner), (255, 255, 0), 2)
 
-    st.image(cimg, caption="Cells Connected to Circle Center")
+    st.image(cimg, caption="Lines Connected to Circle Center")
