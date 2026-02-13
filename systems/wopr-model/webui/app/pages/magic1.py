@@ -208,6 +208,19 @@ if uploaded_file is not None:
         with col_thres_gray:
             st.header("Gray")
 
+            # Select box none, threshold, threshold - otsu, adaptive
+            selectbox_thres_options = [
+                "None",
+                "Threshold",
+                "Otsu's Threshold",
+                "Adaptive Threshold",
+                "InRange Threshold",
+            ]
+            selected_thres_option_gray = st.selectbox(
+                "Select Thresholding Method",
+                options=selectbox_thres_options,
+                key="thres_select_gray",
+            )
             # Thresholding - Gray
             imgu8_thres = st.slider(
                 "Threshold Value",
@@ -284,9 +297,37 @@ if uploaded_file is not None:
                 img_inrange_thresh_gray_u8,
                 caption=f"InRange Thresholding with lower {imgu8_inrange_thres_lower} and upper {imgu8_inrange_thres_upper}",
             )
+
+            match selected_thres_option_gray:
+                case "None":
+                    img_thresh_gray_u8 = img_blur_gray_u8
+                case "Threshold":
+                    img_thresh_gray_u8 = img_thresh_gray_u8
+                case "Otsu's Threshold":
+                    img_thresh_gray_u8 = img_otsu_gray_u8
+                case "Adaptive Threshold":
+                    img_thresh_gray_u8 = img_adap_thresh_gray_u8
+                case "InRange Threshold":
+                    img_thresh_gray_u8 = img_inrange_thresh_gray_u8
+                case _:
+                    img_thresh_gray_u8 = img_blur_gray_u8
+
         with col_thres_rgb:
             st.header("RGB")
 
+            # Select box none, threshold, threshold - otsu, adaptive
+            selectbox_thres_options_rgb = [
+                "None",
+                "Threshold",
+                "Otsu's Threshold",
+                "Adaptive Threshold",
+                "InRange Threshold",
+            ]
+            selected_thres_option_rgb = st.selectbox(
+                "Select Thresholding Method",
+                options=selectbox_thres_options_rgb,
+                key="thres_select_rgb",
+            )
             # Thresholding - RGB
             imrgb_thres = st.slider(
                 "Threshold Value",
@@ -366,3 +407,166 @@ if uploaded_file is not None:
                 img_inrange_thresh_rgb_u8,
                 caption=f"InRange Thresholding with lower {imrgb_inrange_thres_lower} and upper {imrgb_inrange_thres_upper}",
             )
+            match selected_thres_option_rgb:
+                case "None":
+                    img_thresh_rgb_u8 = img_blur_rgb_u8
+                case "Threshold":
+                    img_thresh_rgb_u8 = img_thresh_rgb_u8
+                case "Otsu's Threshold":
+                    img_thresh_rgb_u8 = img_otsu_rgb_u8
+                case "Adaptive Threshold":
+                    img_thresh_rgb_u8 = img_adap_thresh_rgb_u8
+                case "InRange Threshold":
+                    img_thresh_rgb_u8 = img_inrange_thresh_rgb_u8
+                case _:
+                    img_thresh_rgb_u8 = img_blur_rgb_u8
+
+    with st.expander("Edge Detection", expanded=False):
+        st.write(
+            "Edge detection is a technique used to identify and locate sharp discontinuities in an image, which typically correspond to object boundaries."
+        )
+        col_edge_gray, col_edge_rgb = st.columns(2)
+
+        edge_options = [
+            "Canny Edge Detection",
+            "Sobel Edge Detection",
+            "Laplacian Edge Detection",
+        ]
+        with col_edge_gray:
+            st.header("Gray")
+            selected_edge_option_gray = st.selectbox(
+                "Select Edge Detection Method",
+                options=edge_options,
+                key="edge_select_gray",
+            )
+
+            # Canny Edge Detection - Gray
+            imgu8_canny_thres1 = st.slider(
+                "Canny Edge Detection Threshold 1",
+                min_value=0,
+                max_value=255,
+                value=100,
+                step=1,
+                key="canny_thres1_gray",
+            )
+            imgu8_canny_thres2 = st.slider(
+                "Canny Edge Detection Threshold 2",
+                min_value=0,
+                max_value=255,
+                value=200,
+                step=1,
+                key="canny_thres2_gray",
+            )
+            img_edges_gray_u8_canny = cv2.Canny(
+                img_thresh_gray_u8, imgu8_canny_thres1, imgu8_canny_thres2
+            )
+            st.image(
+                img_edges_gray_u8_canny,
+                caption=f"Canny Edge Detection with thresholds {imgu8_canny_thres1} and {imgu8_canny_thres2}",
+            )
+
+            # Sobel Edge Detection - Gray
+            imgu8_sobel_ksize = st.slider(
+                "Sobel Edge Detection Kernel Size",
+                min_value=1,
+                max_value=31,
+                value=5,
+                step=2,
+                key="sobel_ksize_gray",
+            )
+            sobelx = cv2.Sobel(
+                img_thresh_gray_u8, cv2.CV_64F, 1, 0, ksize=imgu8_sobel_ksize
+            )
+            sobely = cv2.Sobel(
+                img_thresh_gray_u8, cv2.CV_64F, 0, 1, ksize=imgu8_sobel_ksize
+            )
+            img_edges_gray_u8_sobel = cv2.magnitude(sobelx, sobely)
+            st.image(
+                img_edges_gray_u8_sobel,
+                caption=f"Sobel Edge Detection with kernel size {imgu8_sobel_ksize}",
+            )
+
+            # Laplacian Edge Detection - Gray
+            img_edges_gray_u8_laplacian = cv2.Laplacian(img_thresh_gray_u8, cv2.CV_64F)
+            st.image(img_edges_gray_u8_laplacian, caption="Laplacian Edge Detection")
+
+            match selected_edge_option_gray:
+                case "Canny Edge Detection":
+                    img_edges_gray_u8 = cv2.Canny(img_thresh_gray_u8, 100, 200)
+                case "Sobel Edge Detection":
+                    sobelx = cv2.Sobel(img_thresh_gray_u8, cv2.CV_64F, 1, 0, ksize=5)
+                    sobely = cv2.Sobel(img_thresh_gray_u8, cv2.CV_64F, 0, 1, ksize=5)
+                    img_edges_gray_u8 = cv2.magnitude(sobelx, sobely)
+                case "Laplacian Edge Detection":
+                    img_edges_gray_u8 = cv2.Laplacian(img_thresh_gray_u8, cv2.CV_64F)
+                case _:
+                    img_edges_gray_u8 = img_thresh_gray_u8
+
+        with col_edge_rgb:
+            st.header("RGB")
+            selected_edge_option_rgb = st.selectbox(
+                "Select Edge Detection Method",
+                options=edge_options,
+                key="edge_select_rgb",
+            )
+
+            # Canny Edge Detection - RGB
+            imrgb_canny_thres1 = st.slider(
+                "Canny Edge Detection Threshold 1",
+                min_value=0,
+                max_value=255,
+                value=100,
+                step=1,
+                key="canny_thres1_rgb",
+            )
+            imrgb_canny_thres2 = st.slider(
+                "Canny Edge Detection Threshold 2",
+                min_value=0,
+                max_value=255,
+                value=200,
+                step=1,
+                key="canny_thres2_rgb",
+            )
+            img_edges_rgb_u8_canny = cv2.Canny(
+                img_thresh_rgb_u8, imrgb_canny_thres1, imrgb_canny_thres2
+            )
+            st.image(
+                img_edges_rgb_u8_canny,
+                caption=f"Canny Edge Detection with thresholds {imrgb_canny_thres1} and {imrgb_canny_thres2}",
+            )
+
+            # Sobel Edge Detection - RGB
+            imrgb_sobel_ksize = st.slider(
+                "Sobel Edge Detection Kernel Size",
+                min_value=1,
+                max_value=31,
+                value=5,
+                step=2,
+                key="sobel_ksize_rgb",
+            )
+            sobelx_rgb = cv2.Sobel(
+                img_thresh_rgb_u8, cv2.CV_64F, 1, 0, ksize=imrgb_sobel_ksize
+            )
+            sobely_rgb = cv2.Sobel(
+                img_thresh_rgb_u8, cv2.CV_64F, 0, 1, ksize=imrgb_sobel_ksize
+            )
+            img_edges_rgb_u8_sobel = cv2.magnitude(sobelx_rgb, sobely_rgb)
+            st.image(
+                img_edges_rgb_u8_sobel,
+                caption=f"Sobel Edge Detection with kernel size {imrgb_sobel_ksize}",
+            )
+
+            # Laplacian Edge Detection - RGB
+            img_edges_rgb_u8_laplacian = cv2.Laplacian(img_thresh_rgb_u8, cv2.CV_64F)
+            st.image(img_edges_rgb_u8_laplacian, caption="Laplacian Edge Detection")
+            match selected_edge_option_rgb:
+                case "Canny Edge Detection":
+                    img_edges_rgb_u8 = cv2.Canny(img_thresh_rgb_u8, 100, 200)
+                case "Sobel Edge Detection":
+                    sobelx = cv2.Sobel(img_thresh_rgb_u8, cv2.CV_64F, 1, 0, ksize=5)
+                    sobely = cv2.Sobel(img_thresh_rgb_u8, cv2.CV_64F, 0, 1, ksize=5)
+                    img_edges_rgb_u8 = cv2.magnitude(sobelx, sobely)
+                case "Laplacian Edge Detection":
+                    img_edges_rgb_u8 = cv2.Laplacian(img_thresh_rgb_u8, cv2.CV_64F)
+                case _:
+                    img_edges_rgb_u8 = img_thresh_rgb_u8
