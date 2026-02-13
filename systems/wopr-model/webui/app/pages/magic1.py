@@ -576,3 +576,334 @@ if uploaded_file is not None:
                     img_edges_rgb_u8 = cv2.Laplacian(img_thresh_rgb_u8, cv2.CV_64F)
                 case _:
                     img_edges_rgb_u8 = img_thresh_rgb_u8
+
+    # Now the find stuff, findContours, HoughLines, HoughCircles, findChessboardCorners, ArUco.
+
+    with st.expander("Find Stuff", expanded=False):
+        st.write(
+            "Finding stuff is a technique used to identify and locate specific features or patterns in an image, such as contours, lines, circles, corners, or markers."
+        )
+        col_find_gray, col_find_rgb = st.columns(2)
+        with col_find_gray:
+            st.header("Gray")
+            # Find Contours - Gray
+            contours, _ = cv2.findContours(
+                img_edges_gray_u8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
+            st.write(f"Found {len(contours)} contours in the image.")
+
+            # Hough Lines - Gray
+            imgu8_hough_lines_rho = st.slider(
+                "Hough Lines Rho",
+                min_value=1,
+                max_value=10,
+                value=1,
+                step=1,
+                key="hough_lines_rho_gray",
+            )
+            imgu8_hough_lines_theta = st.slider(
+                "Hough Lines Theta",
+                min_value=1,
+                max_value=180,
+                value=1,
+                step=1,
+                key="hough_lines_theta_gray",
+            )
+            imgu8_hough_lines_threshold = st.slider(
+                "Hough Lines Threshold",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_lines_threshold_gray",
+            )
+            lines = cv2.HoughLines(
+                img_edges_gray_u8,
+                imgu8_hough_lines_rho,
+                np.radians(imgu8_hough_lines_theta),
+                imgu8_hough_lines_threshold,
+            )
+            if lines is not None:
+                st.write(f"Found {len(lines)} lines in the image.")
+            else:
+                st.write("Found 0 lines in the image.")
+
+            # Hough Circles - Gray
+            imgu8_hough_circles_dp = st.slider(
+                "Hough Circles DP",
+                min_value=1,
+                max_value=10,
+                value=1,
+                step=1,
+                key="hough_circles_dp_gray",
+            )
+            imgu8_hough_circles_minDist = st.slider(
+                "Hough Circles MinDist",
+                min_value=1,
+                max_value=500,
+                value=20,
+                step=1,
+                key="hough_circles_minDist_gray",
+            )
+            imgu8_hough_circles_param1 = st.slider(
+                "Hough Circles Param1",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_circles_param1_gray",
+            )
+            imgu8_hough_circles_param2 = st.slider(
+                "Hough Circles Param2",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_circles_param2_gray",
+            )
+            imgu8_hough_circles_minRadius = st.slider(
+                "Hough Circles MinRadius",
+                min_value=0,
+                max_value=500,
+                value=0,
+                step=1,
+                key="hough_circles_minRadius_gray",
+            )
+            imgu8_hough_circles_maxRadius = st.slider(
+                "Hough Circles MaxRadius",
+                min_value=0,
+                max_value=500,
+                value=0,
+                step=1,
+                key="hough_circles_maxRadius_gray",
+            )
+            circles = cv2.HoughCircles(
+                img_edges_gray_u8,
+                cv2.HOUGH_GRADIENT,
+                imgu8_hough_circles_dp,
+                imgu8_hough_circles_minDist,
+                param1=imgu8_hough_circles_param1,
+                param2=imgu8_hough_circles_param2,
+                minRadius=imgu8_hough_circles_minRadius,
+                maxRadius=imgu8_hough_circles_maxRadius,
+            )
+            if circles is not None:
+                st.write(f"Found {circles.shape[1]} circles in the image.")
+            else:
+                st.write("Found 0 circles in the image.")
+
+            # findChessboardCorners - Gray
+            imgu8_chessboard_corners_pattern_size = st.slider(
+                "Chessboard Corners Pattern Size",
+                min_value=1,
+                max_value=20,
+                value=7,
+                step=1,
+                key="chessboard_corners_pattern_size_gray",
+            )
+            ret, corners = cv2.findChessboardCorners(
+                img_edges_gray_u8,
+                (
+                    imgu8_chessboard_corners_pattern_size,
+                    imgu8_chessboard_corners_pattern_size,
+                ),
+                None,
+            )
+            if ret:
+                st.write(f"Found chessboard corners in the image.")
+            else:
+                st.write("Found 0 chessboard corners in the image.")
+
+            # ArUco - Gray - Hint - it'll be AprilTag 25h9
+            imgu8_aruco_dict = st.selectbox(
+                "ArUco Dictionary",
+                options=[
+                    "DICT_APRILTAG_25h9",
+                    "DICT_4X4_50",
+                    "DICT_4X4_100",
+                    "DICT_4X4_250",
+                    "DICT_4X4_1000",
+                    "DICT_5X5_50",
+                    "DICT_5X5_100",
+                    "DICT_5X5_250",
+                    "DICT_5X5_1000",
+                    "DICT_6X6_50",
+                    "DICT_6X6_100",
+                    "DICT_6X6_250",
+                    "DICT_6X6_1000",
+                    "DICT_ARUCO_ORIGINAL",
+                ],
+                key="aruco_dict_gray",
+            )
+            aruco_dict = cv2.aruco.Dictionary_get(getattr(cv2.aruco, imgu8_aruco_dict))
+            aruco_params = cv2.aruco.DetectorParameters_create()
+            corners, ids, rejected = cv2.aruco.detectMarkers(
+                img_edges_gray_u8, aruco_dict, parameters=aruco_params
+            )
+            if ids is not None:
+                st.write(f"Found {len(ids)} ArUco markers in the image.")
+            else:
+                st.write("Found 0 ArUco markers in the image.")
+
+        with col_find_rgb:
+            st.header("RGB")
+            # Find Contours - RGB
+            contours_rgb, _ = cv2.findContours(
+                img_edges_rgb_u8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
+            st.write(f"Found {len(contours_rgb)} contours in the image.")
+
+            # Hough Lines - RGB
+            imrgb_hough_lines_rho = st.slider(
+                "Hough Lines Rho",
+                min_value=1,
+                max_value=10,
+                value=1,
+                step=1,
+                key="hough_lines_rho_rgb",
+            )
+            imrgb_hough_lines_theta = st.slider(
+                "Hough Lines Theta",
+                min_value=1,
+                max_value=180,
+                value=1,
+                step=1,
+                key="hough_lines_theta_rgb",
+            )
+            imrgb_hough_lines_threshold = st.slider(
+                "Hough Lines Threshold",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_lines_threshold_rgb",
+            )
+            lines_rgb = cv2.HoughLines(
+                img_edges_rgb_u8,
+                imrgb_hough_lines_rho,
+                np.radians(imrgb_hough_lines_theta),
+                imrgb_hough_lines_threshold,
+            )
+            if lines_rgb is not None:
+                st.write(f"Found {len(lines_rgb)} lines in the image.")
+            else:
+                st.write("Found 0 lines in the image.")
+
+            # Hough Circles - RGB
+            imrgb_hough_circles_dp = st.slider(
+                "Hough Circles DP",
+                min_value=1,
+                max_value=10,
+                value=1,
+                step=1,
+                key="hough_circles_dp_rgb",
+            )
+            imrgb_hough_circles_minDist = st.slider(
+                "Hough Circles MinDist",
+                min_value=1,
+                max_value=500,
+                value=20,
+                step=1,
+                key="hough_circles_minDist_rgb",
+            )
+            imrgb_hough_circles_param1 = st.slider(
+                "Hough Circles Param1",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_circles_param1_rgb",
+            )
+            imrgb_hough_circles_param2 = st.slider(
+                "Hough Circles Param2",
+                min_value=1,
+                max_value=500,
+                value=100,
+                step=1,
+                key="hough_circles_param2_rgb",
+            )
+            imrgb_hough_circles_minRadius = st.slider(
+                "Hough Circles MinRadius",
+                min_value=0,
+                max_value=500,
+                value=0,
+                step=1,
+                key="hough_circles_minRadius_rgb",
+            )
+            imrgb_hough_circles_maxRadius = st.slider(
+                "Hough Circles MaxRadius",
+                min_value=0,
+                max_value=500,
+                value=0,
+                step=1,
+                key="hough_circles_maxRadius_rgb",
+            )
+            circles_rgb = cv2.HoughCircles(
+                img_edges_rgb_u8,
+                cv2.HOUGH_GRADIENT,
+                imrgb_hough_circles_dp,
+                imrgb_hough_circles_minDist,
+                param1=imrgb_hough_circles_param1,
+                param2=imrgb_hough_circles_param2,
+                minRadius=imrgb_hough_circles_minRadius,
+                maxRadius=imrgb_hough_circles_maxRadius,
+            )
+            if circles_rgb is not None:
+                st.write(f"Found {circles_rgb.shape[1]} circles in the image.")
+            else:
+                st.write("Found 0 circles in the image.")
+
+            # findChessboardCorners - RGB
+            imrgb_chessboard_corners_pattern_size = st.slider(
+                "Chessboard Corners Pattern Size",
+                min_value=1,
+                max_value=20,
+                value=7,
+                step=1,
+                key="chessboard_corners_pattern_size_rgb",
+            )
+            ret_rgb, corners_rgb = cv2.findChessboardCorners(
+                img_edges_rgb_u8,
+                (
+                    imrgb_chessboard_corners_pattern_size,
+                    imrgb_chessboard_corners_pattern_size,
+                ),
+                None,
+            )
+            if ret_rgb:
+                st.write(f"Found chessboard corners in the image.")
+            else:
+                st.write("Found 0 chessboard corners in the image.")
+
+            # ArUco - RGB - Hint - it'll be AprilTag 25h9
+            imrgb_aruco_dict = st.selectbox(
+                "ArUco Dictionary",
+                options=[
+                    "DICT_APRILTAG_25h9",
+                    "DICT_4X4_50",
+                    "DICT_4X4_100",
+                    "DICT_4X4_250",
+                    "DICT_4X4_1000",
+                    "DICT_5X5_50",
+                    "DICT_5X5_100",
+                    "DICT_5X5_250",
+                    "DICT_5X5_1000",
+                    "DICT_6X6_50",
+                    "DICT_6X6_100",
+                    "DICT_6X6_250",
+                    "DICT_6X6_1000",
+                    "DICT_ARUCO_ORIGINAL",
+                ],
+                key="aruco_dict_rgb",
+            )
+            aruco_dict_rgb = cv2.aruco.Dictionary_get(
+                getattr(cv2.aruco, imrgb_aruco_dict)
+            )
+            aruco_params_rgb = cv2.aruco.DetectorParameters_create()
+            corners_rgb, ids_rgb, rejected_rgb = cv2.aruco.detectMarkers(
+                img_edges_rgb_u8, aruco_dict_rgb, parameters=aruco_params_rgb
+            )
+            if ids_rgb is not None:
+                st.write(f"Found {len(ids_rgb)} ArUco markers in the image.")
+            else:
+                st.write("Found 0 ArUco markers in the image.")
