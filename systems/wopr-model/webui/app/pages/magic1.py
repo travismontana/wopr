@@ -16,7 +16,7 @@ if uploaded_file is not None:
     img = cv.medianBlur(img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     circles = cv.HoughCircles(
-        img, cv.HOUGH_GRADIENT, 1, 50, param1=50, param2=30, minRadius=150, maxRadius=0
+        img, cv.HOUGH_GRADIENT, 1, 50, param1=50, param2=30, minRadius=100, maxRadius=0
     )
     circles = np.uint16(np.around(circles))
     for i in circles[0, :]:
