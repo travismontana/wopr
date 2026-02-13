@@ -11,6 +11,7 @@ def find_cells(center, corners, tol=2.0):
         dy = corner[1] - center[1]
         angle = np.degrees(np.arctan2(dy, dx)) % 360
         dist = np.hypot(dx, dy)
+        st.write(f"Corner: {corner}, Angle: {angle:.2f}, Distance: {dist:.2f}")
         angle_rounded = round(angle / tol) * tol
         if angle_rounded not in radials:
             radials[angle_rounded] = []
