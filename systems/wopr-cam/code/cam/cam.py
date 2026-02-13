@@ -51,15 +51,18 @@ def capture_preview():
     width = 3840
     height = 2160
     cam = Picamera2()
+    logger.info("Configuring camera for preview capture")
     camera_config = cam.create_preview_configuration(
         main={"size": (width, height), "format": "RGB888"},
         transform=Transform(hflip=1, vflip=1),
     )
     cam.configure(camera_config)
+    logger.info("Starting camera for preview capture")
     cam.start()
     time.sleep(2)
     try:
         preview_image = cam.capture_image("main")
+        logger.info("Preview image captured successfully")
         img_byte_arr = BytesIO()
         preview_image.save(img_byte_arr, format="JPEG")
         img_byte_arr.seek(0)
@@ -68,6 +71,7 @@ def capture_preview():
         logger.error(f"Error capturing preview image: {e}")
         raise HTTPException(status_code=500, detail="Failed to capture preview image")
     finally:
+        logger.info("Stopping and closing camera after preview capture")
         cam.stop()
         cam.close()
 
