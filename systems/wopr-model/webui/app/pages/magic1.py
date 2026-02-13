@@ -42,13 +42,19 @@ if uploaded_file is not None:
 
     img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
     img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
-    img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, 9)
-    img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, 9)
 
     with col_gray:
         st.header("Gray")
-        st.image(img_medBlur_gray_u8, caption="Median Blur 9")
+        imgu8_k = st.slider(
+            "Median Blur Kernel Size", min_value=1, max_value=31, value=9, step=2
+        )
+        img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_k)
+        st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_k}")
 
     with col_rgb:
         st.header("RGB")
-        st.image(img_medBlur_rgb_u8, caption="Median Blur 9")
+        imrgb_k = st.slider(
+            "Median Blur Kernel Size", min_value=1, max_value=31, value=9, step=2
+        )
+        img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, imrgb_k)
+        st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_k}")
