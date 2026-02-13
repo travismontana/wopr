@@ -61,9 +61,7 @@ if uploaded_file is not None:
     st.write(f"ArUco Markers: {len(marker_ids) if marker_ids is not None else 0}")
 
     # Edge detection
-    otsu_ret, otsu_binary = cv.threshold(
-        gauss_img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU
-    )
+    otsu_ret, otsu_binary = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
     canny = cv.Canny(otsu_binary, 100, 200)
     st.image(canny, caption="Canny Edges")
 
