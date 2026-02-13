@@ -38,7 +38,7 @@ if uploaded_file is not None:
     st.image(canny_color, caption="Canny Edge Detection")
 
     chess_ret, chess_corners = cv.findChessboardCorners(img, (6, 6), None)
-
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     chess_corners2 = cv.cornerSubPix(img, chess_corners, (11, 11), (-1, -1), criteria)
     img_chess = cv.drawChessboardCorners(
         img_reg.copy(), (6, 6), chess_corners2, chess_ret
