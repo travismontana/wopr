@@ -12,9 +12,6 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
     img = cv.imread(uploaded_file.name, cv.IMREAD_GRAYSCALE)
-    assert (
-        img is not None
-    ), "Failed to read the uploaded image. Please ensure it's a valid image file."
     img = cv.medianBlur(img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     circles = cv.HoughCircles(
