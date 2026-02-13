@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 
-def find_lines(center, corners, circle_dist, tol=8.0):
+def find_lines(center, corners, circle_dist, tol=10.0):
     radials = {}
 
     for corner in corners:
@@ -16,7 +16,7 @@ def find_lines(center, corners, circle_dist, tol=8.0):
             radials[angle_rounded] = []
         radials[angle_rounded].append((corner, dist))
     lines = []
-    lines = {angle: corners for angle, corners in radials.items() if len(corners) >= 2}
+    lines = {angle: corners for angle, corners in radials.items() if len(corners) >= 3}
     return lines
 
 
