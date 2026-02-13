@@ -2,6 +2,28 @@ import streamlit as st
 import numpy as np
 import cv2 as cv
 
+
+def find_cells(center, corners, tol=2.0):
+    radials = {}
+
+    for corner in corners:
+        dx = corner[0] - center[0]
+        dy = corner[1] - center[1]
+        angle = np.degrees(np.arctan2(dy, dx)) % 360
+        angle_rounded = round(angle / tol) * tol
+        if angle_rounded not in radials:
+            radials[angle_rounded] = []
+        radials[angle_rounded].append(corner)
+    cells = []
+    for angle, points in radials.items():
+        if len(points) >= 2:
+            points = sorted(
+                points, key=lambda p: np.hypot(p[0] - center[0], p[1] - center[1])
+            )
+            cells.append(points[:2])
+    return cells
+
+
 st.title("Magic 1, ")
 
 # need a picture to work with.
@@ -53,3 +75,12 @@ if uploaded_file is not None:
     corner_harris = cv.dilate(corner_harris, None)
     cimg[corner_harris > 0.01 * corner_harris.max()] = [0, 0, 255]
     st.image(cimg, caption="Harris Corner Detection")
+
+    x, y, radius = circles[0][0]  # Unpack first circle
+    center = (x, y)
+    cells = find_cells(center, corners)
+    st.write(f"Found {len(cells)} cells around the circle.")
+    for cell in cells:
+        cv.line(cimg, center, tuple(cell[0]), (255, 255, 0), 2)
+        cv.line(cimg, center, tuple(cell[1]), (255, 255, 0), 2)
+    st.image(cimg, caption="Cells Connected to Circle Center")
