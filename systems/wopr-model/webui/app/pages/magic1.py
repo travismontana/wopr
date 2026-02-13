@@ -20,6 +20,10 @@ if uploaded_file is not None:
         img, cv.HOUGH_GRADIENT, 1, 50, param1=50, param2=30, minRadius=100, maxRadius=0
     )
     circles = np.uint16(np.around(circles))
+    num_circles = len(circles[0, :]) if circles is not None else 0
+    if num_circles == 0 or num_circles > 1:
+        st.write(f"Found more or less than 1 circle: {num_circles}")
+        raise ValueError("Expected exactly one circle in the image.")
     for i in circles[0, :]:
         cv.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
         cv.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
@@ -37,9 +41,9 @@ if uploaded_file is not None:
     canny_color = cv.Canny(img, 100, 200)
     st.image(canny_color, caption="Canny Edge Detection")
 
-    chess_ret, chess_corners = cv.findChessboardCorners(img, (6, 6), None)
-    if chess_ret:
-        chess_image = cv.drawChessboardCorners(
-            img_reg, (6, 6), chess_corners, chess_ret
-        )
-        st.image(chess_image, caption="Chessboard Corners Detected")
+    corners = cv.goodFeaturesToTrack(img, 100, 0.01, 10)
+    corners = np.int0(corners)
+    for corner in corners:
+        x, y = corner.ravel()
+        cv.circle(cimg, (x, y), 3, (255, 0, 0), -1)
+    st.image(cimg, caption="Good Features to Track")
