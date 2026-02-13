@@ -57,7 +57,10 @@ if uploaded_file is not None:
         for corners, marker_id in zip(marker_corners, marker_ids):
             st.write(f"Marker ID: {marker_id[0]}, Corners: {corners[0]}")
 
-    canny_color = cv.Canny(gauss_img, 100, 200)
+    otsu_ret, otsu_binary = cv2.threshold(
+        gauss_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+    )
+    canny_color = cv.Canny(otsu_binary, 100, 200)
     st.image(canny_color, caption="Canny Edge Detection")
 
     corners = cv.goodFeaturesToTrack(canny_color, 100, 0.01, 10)
