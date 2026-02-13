@@ -739,9 +739,7 @@ if uploaded_file is not None:
             detector = cv2.aruco.ArucoDetector(
                 dictionary, cv2.aruco.DetectorParameters()
             )
-            corners, ids, rejected = cv2.aruco.detectMarkers(
-                img_edges_gray_u8, dictionary, parameters=detector
-            )
+            corners, ids, rejected = detector.detectMarkers(img_edges_gray_u8)
             if ids is not None:
                 st.write(f"Found {len(ids)} ArUco markers in the image.")
             else:
