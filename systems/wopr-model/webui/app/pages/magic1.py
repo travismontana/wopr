@@ -17,7 +17,7 @@ def find_cells(center, corners, dist, tol=2.0):
         radials[angle_rounded].append((corner, dist))
     cells = []
     for angle, points in radials.items():
-        if len(points) >= 2 and all(p[1] < 2 * dist for p in points):
+        if len(points) >= 2 and all(p[1] < dist for p in points):
             points = sorted(points, key=lambda p: p[1])  # Sort by distance
             cells.append([p[0] for p in points[:2]])
     return cells
