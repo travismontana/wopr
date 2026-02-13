@@ -25,7 +25,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 st.title("Magic 1, ")
-
+gray_selected_blur = "Median Blur"
+rgb_selected_blur = "Median Blur"
 # need a picture to work with.
 # let's ask the user to give us one.
 uploaded_file = st.file_uploader(
@@ -38,9 +39,6 @@ if uploaded_file is not None:
 
     img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
     img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
-
-    gray_selected_blur = "Median Blur"
-    rgb_selected_blur = "Median Blur"
 
     with st.expander(
         f"Blurs - Gray: {gray_selected_blur} - RGB: {rgb_selected_blur}", expanded=False
