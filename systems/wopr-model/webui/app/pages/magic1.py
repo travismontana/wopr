@@ -46,7 +46,12 @@ if uploaded_file is not None:
     with col_gray:
         st.header("Gray")
         imgu8_k = st.slider(
-            "Median Blur Kernel Size", min_value=1, max_value=31, value=9, step=2
+            "Median Blur Kernel Size",
+            min_value=1,
+            max_value=31,
+            value=9,
+            step=2,
+            key="gray_k",
         )
         img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_k)
         st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_k}")
@@ -54,7 +59,12 @@ if uploaded_file is not None:
     with col_rgb:
         st.header("RGB")
         imrgb_k = st.slider(
-            "Median Blur Kernel Size", min_value=1, max_value=31, value=9, step=2
+            "Median Blur Kernel Size",
+            min_value=1,
+            max_value=31,
+            value=9,
+            step=2,
+            key="rgb_k",
         )
         img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, imrgb_k)
         st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_k}")
