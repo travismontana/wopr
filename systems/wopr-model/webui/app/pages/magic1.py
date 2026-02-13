@@ -81,10 +81,10 @@ if uploaded_file is not None:
         if dist < radius * 0.95:  # Inside circle, with small margin
             filtered_corners.append(corner)
     filtered_corners = np.array(filtered_corners)
-    cells = find_cells(center, filtered_corners, circles[0][0][2])
+    lines = find_lines(center, filtered_corners, circles[0][0][2])
 
-    st.write(f"Found {len(cells)} cells around the circle.")
-    for angle, corner_list in cells.items():
+    st.write(f"Found {len(lines)} lines around the circle.")
+    for angle, corner_list in lines.items():
         # corner_list is [(corner, dist), (corner, dist), ...]
         # Draw lines for first two corners on this radial
         for corner, dist in corner_list[:2]:
