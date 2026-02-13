@@ -31,9 +31,8 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
     orig_img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
-    gauss_img = cv.GaussianBlur(orig_img, (5, 5), 0)
     img_reg = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
-    img = cv.medianBlur(orig_img, 5)
+    img = cv.medianBlur(orig_img, 9)
 
     # Circle detection
     circles = cv.HoughCircles(
