@@ -90,5 +90,30 @@ if uploaded_file is not None:
         for corner, dist in corner_list[:2]:
             cv.point(cimg, tuple(corner), (0, 255, 255), 5)
             cv.line(cimg, center, tuple(corner), (255, 255, 0), 2)
+    # Different color for each radial (optional)
+    colors = [
+        (255, 0, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (255, 255, 0),
+        (255, 0, 255),
+        (0, 255, 255),
+        (128, 128, 0),
+        (128, 0, 128),
+    ]
 
-    st.image(cimg, caption="Lines Connected to Circle Center")
+    for idx, (angle, corner_list) in enumerate(cells.items()):
+        color = colors[idx % len(colors)]  # Cycle through colors
+
+        # Mark each corner on this radial
+        for corner, dist in corner_list:
+            cv.circle(cimg, tuple(corner), 5, color, -1)  # Filled circle
+
+        # Draw the radial line from center through corners
+        if len(corner_list) > 0:
+            # Get outermost corner on this radial
+            farthest = max(corner_list, key=lambda x: x[1])[0]
+            cv.line(cimg, center, tuple(farthest), color, 2)
+
+    st.image(cimg, caption="Detected Radial Boundaries")
+    # st.image(cimg, caption="Lines Connected to Circle Center")
