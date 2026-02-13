@@ -11,7 +11,8 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
-    img = cv.imread(uploaded_file.name, cv.IMREAD_GRAYSCALE)
+    file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
+    img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
     img = cv.medianBlur(img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     circles = cv.HoughCircles(
