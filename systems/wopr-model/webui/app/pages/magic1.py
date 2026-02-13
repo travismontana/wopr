@@ -10,17 +10,16 @@ def find_cells(center, corners, tol=2.0):
         dx = corner[0] - center[0]
         dy = corner[1] - center[1]
         angle = np.degrees(np.arctan2(dy, dx)) % 360
+        dist = np.hypot(dx, dy)
         angle_rounded = round(angle / tol) * tol
         if angle_rounded not in radials:
             radials[angle_rounded] = []
-        radials[angle_rounded].append(corner)
+        radials[angle_rounded].append((corner, dist))
     cells = []
     for angle, points in radials.items():
         if len(points) >= 2:
-            points = sorted(
-                points, key=lambda p: np.hypot(p[0] - center[0], p[1] - center[1])
-            )
-            cells.append(points[:2])
+            points = sorted(points, key=lambda p: p[1])  # Sort by distance
+            cells.append([p[0] for p in points[:2]])
     return cells
 
 
