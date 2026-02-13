@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-import cv2 as cv
+import cv2
 
 
 def find_lines(center, corners, circle_dist, tol=10.0):
@@ -33,14 +33,13 @@ col_gray, col_rgb = st.columns(2)
 
 if uploaded_file is not None:
     raw_bytes = uploaded_file.read()
-    raw_buf_u8 = np.frombuffer(img_raw_bytes, dtype=np.uint8)
-    img_bgr_u8 = cv.imdecode(raw_buf_u8, cv.IMREAD_COLOR)
+    raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
+    img_bgr_u8 = cv2.imdecode(raw_buf_u8, cv2.IMREAD_COLOR)
 
-    img_gray_u8 = cv.cvtColor(img_bgr_u8, cv.COLOR_BGR2GRAY)
-    img_rgb_u8 = cv.cvtColor(img_bgr_u8, cv.COLOR_BGR2RGB)
-
-    img_medBlur_gray_u8 = cv.medianBlur(img_gray_u8, 9)
-    img_medBlur_rgb_u8 = cv.medianBlur(img_rgb_u8, 9)
+    img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
+    img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
+    img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, 9)
+    img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, 9)
 
     with col_gray:
         st.header("Gray")
