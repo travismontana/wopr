@@ -39,7 +39,9 @@ if uploaded_file is not None:
     img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
     img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
 
-    with st.expander("Blurs", expanded=False):
+    with st.expander(
+        f"Blurs - Gray: {gray_selected_blur} - RGB: {rgb_selected_blur}", expanded=False
+    ):
         col_gray, col_rgb = st.columns(2)
         with col_gray:
             st.header("Gray")
@@ -55,7 +57,6 @@ if uploaded_file is not None:
                 key="gray_mbk",
             )
             img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_mbk)
-            st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_mbk}")
 
             # Gaussian Blur - Gray
             imgu8_gbk = st.slider(
@@ -69,7 +70,6 @@ if uploaded_file is not None:
             img_gauBlur_gray_u8 = cv2.GaussianBlur(
                 img_gray_u8, (imgu8_gbk, imgu8_gbk), 0
             )
-            st.image(img_gauBlur_gray_u8, caption=f"Gaussian Blur {imgu8_gbk}")
 
             # bilateralFilter - Gray
             imgu8_bf_d = st.slider(
@@ -102,6 +102,17 @@ if uploaded_file is not None:
                 imgu8_bf_sigmaColor,
                 imgu8_bf_sigmaSpace,
             )
+
+            # Selectbox button to select which blur to use in the next steps
+            blur_options = ["Gaussian Blur", "Median Blur", "Bilateral Filter"]
+            gray_selected_blur = st.selectbox(
+                "Select Blur for Next Steps",
+                options=blur_options,
+                key="gray_blur_select",
+            )
+
+            st.image(img_gauBlur_gray_u8, caption=f"Gaussian Blur {imgu8_gbk}")
+            st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_mbk}")
             st.image(
                 img_bilateralFilter_gray_u8,
                 caption=f"Bilateral Filter d={imgu8_bf_d} sc={imgu8_bf_sigmaColor} ss={imgu8_bf_sigmaSpace}",
@@ -120,7 +131,6 @@ if uploaded_file is not None:
                 key="rgb_mbk",
             )
             img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, imrgb_mbk)
-            st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_mbk}")
 
             # Gaussian Blur - RGB
             imrgb_gbk = st.slider(
@@ -132,7 +142,6 @@ if uploaded_file is not None:
                 key="rgb_gbk",
             )
             img_gauBlur_rgb_u8 = cv2.GaussianBlur(img_rgb_u8, (imrgb_gbk, imrgb_gbk), 0)
-            st.image(img_gauBlur_rgb_u8, caption=f"Gaussian Blur {imrgb_gbk}")
 
             # bilateralFilter - RGB
             imrgb_bf_d = st.slider(
@@ -165,6 +174,15 @@ if uploaded_file is not None:
                 imrgb_bf_sigmaColor,
                 imrgb_bf_sigmaSpace,
             )
+
+            rgb_blur_options = ["Gaussian Blur", "Median Blur", "Bilateral Filter"]
+            rgb_selected_blur = st.selectbox(
+                "Select Blur for Next Steps",
+                options=rgb_blur_options,
+                key="rgb_blur_select",
+            )
+            st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_mbk}")
+            st.image(img_gauBlur_rgb_u8, caption=f"Gaussian Blur {imrgb_gbk}")
             st.image(
                 img_bilateralFilter_rgb_u8,
                 caption=f"Bilateral Filter d={imrgb_bf_d} sc={imrgb_bf_sigmaColor} ss={imrgb_bf_sigmaSpace}",
