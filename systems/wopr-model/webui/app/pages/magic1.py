@@ -45,7 +45,7 @@ if uploaded_file is not None:
 
     with col_gray:
         st.header("Gray")
-        imgu8_k = st.slider(
+        imgu8_mbk = st.slider(
             "Median Blur Kernel Size",
             min_value=1,
             max_value=31,
@@ -53,12 +53,13 @@ if uploaded_file is not None:
             step=2,
             key="gray_k",
         )
-        img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_k)
-        st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_k}")
+        img_medBlur_gray_u8 = cv2.medianBlur(img_gray_u8, imgu8_mbk)
+        st.image(img_medBlur_gray_u8, caption=f"Median Blur {imgu8_mbk}")
 
     with col_rgb:
         st.header("RGB")
-        imrgb_k = st.slider(
+        col_rgb_medBlur, col_rgb_gauBlur = st.columns(2)
+        imrgb_mbk = st.slider(
             "Median Blur Kernel Size",
             min_value=1,
             max_value=31,
@@ -66,5 +67,18 @@ if uploaded_file is not None:
             step=2,
             key="rgb_k",
         )
-        img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, imrgb_k)
-        st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_k}")
+        with col_rgb_medBlur:
+            img_medBlur_rgb_u8 = cv2.medianBlur(img_rgb_u8, imrgb_mbk)
+            st.image(img_medBlur_rgb_u8, caption=f"Median Blur {imrgb_mbk}")
+
+        imrgb_gbk = st.slider(
+            "Gaussian Blur Kernel Size",
+            min_value=1,
+            max_value=31,
+            value=9,
+            step=2,
+            key="rgb_k",
+        )
+        with col_rgb_gauBlur:
+            img_gauBlur_rgb_u8 = cv2.GaussianBlur(img_rgb_u8, (imrgb_gbk, imrgb_gbk), 0)
+            st.image(img_gauBlur_rgb_u8, caption=f"Gaussian Blur {imrgb_gbk}")
