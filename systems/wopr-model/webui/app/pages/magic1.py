@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 
-def find_cells(center, corners, circle_dist, tol=2.0):
+def find_cells(center, corners, circle_dist, tol=5.0):
     radials = {}
 
     for corner in corners:
