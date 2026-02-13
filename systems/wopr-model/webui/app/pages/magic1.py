@@ -735,10 +735,10 @@ if uploaded_file is not None:
                 ],
                 key="aruco_dict_gray",
             )
-            aruco_dict = cv2.aruco.Dictionary_get(getattr(cv2.aruco, imgu8_aruco_dict))
-            aruco_params = cv2.aruco.DetectorParameters_create()
+            dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_25h9)
+            detector = cv.aruco.ArucoDetector(dictionary, cv.aruco.DetectorParameters())
             corners, ids, rejected = cv2.aruco.detectMarkers(
-                img_edges_gray_u8, aruco_dict, parameters=aruco_params
+                img_edges_gray_u8, dictionary, parameters=detector
             )
             if ids is not None:
                 st.write(f"Found {len(ids)} ArUco markers in the image.")
@@ -896,12 +896,14 @@ if uploaded_file is not None:
                 ],
                 key="aruco_dict_rgb",
             )
-            aruco_dict_rgb = cv2.aruco.Dictionary_get(
-                getattr(cv2.aruco, imrgb_aruco_dict)
+            rgb_dictionary = cv.aruco.getPredefinedDictionary(
+                cv.aruco.DICT_APRILTAG_25h9
             )
-            aruco_params_rgb = cv2.aruco.DetectorParameters_create()
-            corners_rgb, ids_rgb, rejected_rgb = cv2.aruco.detectMarkers(
-                img_edges_rgb_u8, aruco_dict_rgb, parameters=aruco_params_rgb
+            rgb_detector = cv.aruco.ArucoDetector(
+                rgb_dictionary, cv.aruco.DetectorParameters()
+            )
+            corners_rgb, ids_rgb, rejected_rgb = rgb_detector.detectMarkers(
+                img_edges_rgb_u8
             )
             if ids_rgb is not None:
                 st.write(f"Found {len(ids_rgb)} ArUco markers in the image.")
