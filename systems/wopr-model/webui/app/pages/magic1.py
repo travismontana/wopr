@@ -30,9 +30,10 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
     file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
-    img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
+    orig_img = cv.imdecode(file_bytes, cv.IMREAD_GRAYSCALE)
+    img = cv.GaussianBlur(orig_img, (5, 5), 0)
     img_reg = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
-    img = cv.medianBlur(img, 5)
+    # img = cv.medianBlur(img, 5)
     cimg = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     circles = cv.HoughCircles(
         img, cv.HOUGH_GRADIENT, 1, 50, param1=50, param2=30, minRadius=100, maxRadius=0
