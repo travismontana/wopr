@@ -21,6 +21,10 @@ def find_lines(center, corners, circle_dist, tol=10.0):
 
 
 st.title("Magic 1, ")
+st.set_page_config(
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
 # need a picture to work with.
 # let's ask the user to give us one.
