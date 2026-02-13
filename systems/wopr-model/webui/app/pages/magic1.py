@@ -41,7 +41,7 @@ if uploaded_file is not None:
     canny_color = cv.Canny(img, 100, 200)
     st.image(canny_color, caption="Canny Edge Detection")
 
-    corners = cv.goodFeaturesToTrack(img, 100, 0.01, 10)
+    corners = cv.goodFeaturesToTrack(canny_color, 100, 0.01, 10)
     corners = np.int0(corners)
     for corner in corners:
         x, y = corner.ravel()
