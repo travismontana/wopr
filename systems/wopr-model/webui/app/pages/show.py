@@ -81,3 +81,9 @@ if lines is not None:
 
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image", use_container_width=True)
+st.write("Circle1")
+st.write(circle1)
+st.write("Circle2")
+st.write(circle2)
+st.write("Lines")
+st.write(lines)
