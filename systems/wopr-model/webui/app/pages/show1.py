@@ -51,11 +51,11 @@ circle2 = cv2.HoughCircles(
     img_edges_gray_u8,
     cv2.HOUGH_GRADIENT,
     dp=2,
-    minDist=67,
+    minDist=300,
     param1=100,
     param2=100,
-    minRadius=107,
-    maxRadius=129,
+    minRadius=200,
+    maxRadius=400,
 )
 
 if circle1 is not None:
