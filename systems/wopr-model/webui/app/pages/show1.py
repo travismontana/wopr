@@ -35,15 +35,11 @@ H, W = img_gray_u8.shape[:2]
 if marker_center is not None:
     cx, cy = int(marker_center[0]), int(marker_center[1])
     # board center is offset from tag; adjust these once you measure it
-    est_cx, est_cy = cx - 180, cy - 30  # <-- tweak for your physical placement
+    est_cx, est_cy = cx - 250, cy - 60  # <-- tweak for your physical placement
 else:
     est_cx, est_cy = W // 2, H // 2
 
-roi_half = (
-    estimated_radius_px
-    * 1.5
-    # 420
-)  # px; keep it big enough to include the whole board
+roi_half = 420  # px; keep it big enough to include the whole board
 x0, y0 = max(0, est_cx - roi_half), max(0, est_cy - roi_half)
 x1, y1 = min(W, est_cx + roi_half), min(H, est_cy + roi_half)
 roi_gray = img_gray_u8[y0:y1, x0:x1]
