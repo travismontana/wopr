@@ -35,7 +35,7 @@ H, W = img_gray_u8.shape[:2]
 if marker_center is not None:
     cx, cy = int(marker_center[0]), int(marker_center[1])
     # board center is offset from tag; adjust these once you measure it
-    est_cx, est_cy = cx - 300, cy - 50  # <-- tweak for your physical placement
+    est_cx, est_cy = cx - 300, cy - 100  # <-- tweak for your physical placement
 else:
     est_cx, est_cy = W // 2, H // 2
 
