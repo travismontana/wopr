@@ -236,6 +236,16 @@ for i in range(n_cells):
         "outer_radius": outer_radius,
     }
 
+for j in range(n_cells):
+    cell_num = ((j - cell0_idx) % n_cells) + 12
+    start, end = cell_boundaries[j]
+    cells[cell_num] = {
+        "start_angle": start % 360,
+        "end_angle": end % 360,
+        "inner_radius": 0,
+        "outer_radius": inner_radius,
+    }
+
 # Display cell map
 for cell_num in sorted(cells.keys()):
     c = cells[cell_num]
