@@ -112,6 +112,30 @@ else:
         "Could not detect circles in the image. Cannot determine the center of the board."
     )
 
+marker_center = corners[0][0].mean(axis=0).astype(int)
+dx = int(marker_center[0]) - center_of_board[0]
+dy = int(marker_center[1]) - center_of_board[1]
+marker_angle = np.degrees(np.arctan2(dy, dx)) % 360
+
+cell0_top_bottom = {}
+for line in lines:
+    rho, theta = line[0]
+    a = np.cos(theta)
+    b = np.sin(theta)
+    x0 = a * rho
+    y0 = b * rho
+    x1 = int(x0 + 1000 * (-b))
+    y1 = int(y0 + 1000 * (a))
+    x2 = int(x0 - 1000 * (-b))
+    y2 = int(y0 - 1000 * (a))
+    if abs(theta) < np.radians(10) or abs(theta - np.pi) < np.radians(10):
+        cell0_top_bottom[rho] = ((x1, y1), (x2, y2))
+    elif abs(theta - np.pi / 2) < np.radians(10):
+        cell0_top_bottom[rho] = ((x1, y1), (x2, y2))
+
+# add those lines to the image
+for rho, (pt1, pt2) in cell0_top_bottom.items():
+    cv2.line(img_rgb_u8, pt1, pt2, (255, 0, 255), 2)
 
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image")
