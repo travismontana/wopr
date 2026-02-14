@@ -121,8 +121,12 @@ cell0_top_bottom = {}
 # looking for the 2  lines that are closest to the marker_angle
 for line in lines:
     rho, theta = line[0]
-    angle = np.degrees(theta) % 360
-    angle_diff = min(abs(angle - marker_angle), 360 - abs(angle - marker_angle))
+    line_angle1 = (np.degrees(theta) + 90) % 360
+    line_angle2 = (np.degrees(theta) - 90) % 360
+
+    diff1 = min(abs(line_angle1 - marker_angle), 360 - abs(line_angle1 - marker_angle))
+    diff2 = min(abs(line_angle2 - marker_angle), 360 - abs(line_angle2 - marker_angle))
+    angle_diff = min(diff1, diff2)
     if angle_diff < 10:  # within 10 degrees of the marker angle
         st.write(
             f"Found line with angle {angle:.2f} degrees, which is within 10 degrees of the marker angle {marker_angle:.2f} degrees."
