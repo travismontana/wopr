@@ -75,5 +75,7 @@ if circles is not None:
     for gx, gy, r in kept[:1]:
         cv2.circle(img_rgb_u8, (gx, gy), r, (0, 255, 0), 2)
         cv2.circle(img_rgb_u8, (gx, gy), 2, (0, 0, 255), 3)
+else:
+    st.warning("No circles detected. Try adjusting the Hough parameters or thresholds.")
 
 st.image(img_rgb_u8)
