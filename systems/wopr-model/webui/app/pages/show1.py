@@ -46,7 +46,7 @@ roi_gray = img_gray_u8[y0:y1, x0:x1]
 
 # --- Preprocess on GRAYSCALE (this is the big bugfix) ---
 # roi_blur = cv2.GaussianBlur(roi_gray, (9, 9), 1.5)
-roi_blur = cv2.MedianBlur(roi_gray, 9)  # median can be better for sharp edges and noise
+roi_blur = cv2.medianBlur(roi_gray, 9)  # median can be better for sharp edges and noise
 roi_edges = cv2.Canny(roi_blur, 20, 80)  # raise thresholds vs 10/50
 
 # --- Hough on edges (single-channel) ---
