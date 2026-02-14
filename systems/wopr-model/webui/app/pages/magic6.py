@@ -92,7 +92,7 @@ def apply_threshold(img, method, params):
 def apply_single_edge(img, method, params):
     gray = ensure_gray_u8(img)
     if method == "Canny":
-        return cv2.Canny(gray, params["thresh1"], params["thresh2"])
+        return cv2.Canny(gray, params["thresh1"], params["thresh2"], apertureSize=params["apertureSize"])
     elif method == "Sobel":
         k = params["kernel"]
         sx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=k)
@@ -413,7 +413,7 @@ def render_pipeline(col, label, base_img, is_gray, result_container):
                 )
                 params = {}
                 if method == "Canny":
-                    c1, c2 = st.columns(2)
+                    c1, c2, c3 = st.columns(3)
                     with c1:
                         params["thresh1"] = st.slider(
                             "T1",
@@ -439,6 +439,17 @@ def render_pipeline(col, label, base_img, is_gray, result_container):
                                 "Rule of thumb: T2 ≈ 2–3× T1."
                             ),
                         )
+                    with c3:
+                        params["apertureSize"] = st.selectbox(
+                            "Aperture",
+                            [3, 5, 7],
+                            3,
+                            key=f"{prefix}_canny_ap_{i}",
+                            help=(
+                                "Size of the Sobel kernel used internally for gradient calculation. "
+                                "Larger = more smoothing, less noise sensitivity but thicker edges. "
+                                "Smaller = sharper edges but more noise."
+                            ),
                 elif method == "Sobel":
                     params["kernel"] = st.slider(
                         "Kernel",
