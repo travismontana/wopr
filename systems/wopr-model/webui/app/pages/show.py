@@ -118,19 +118,20 @@ dy = int(marker_center[1]) - center_of_board[1]
 marker_angle = np.degrees(np.arctan2(dy, dx)) % 360
 
 cell0_top_bottom = {}
+# looking for the 2  lines that are closest to the marker_angle
 for line in lines:
     rho, theta = line[0]
-    a = np.cos(theta)
-    b = np.sin(theta)
-    x0 = a * rho
-    y0 = b * rho
-    x1 = int(x0 + 1000 * (-b))
-    y1 = int(y0 + 1000 * (a))
-    x2 = int(x0 - 1000 * (-b))
-    y2 = int(y0 - 1000 * (a))
-    if abs(theta) < np.radians(10) or abs(theta - np.pi) < np.radians(10):
-        cell0_top_bottom[rho] = ((x1, y1), (x2, y2))
-    elif abs(theta - np.pi / 2) < np.radians(10):
+    angle = np.degrees(theta) % 360
+    angle_diff = min(abs(angle - marker_angle), 360 - abs(angle - marker_angle))
+    if angle_diff < 10:  # within 10 degrees of the marker angle
+        a = np.cos(theta)
+        b = np.sin(theta)
+        x0 = a * rho
+        y0 = b * rho
+        x1 = int(x0 + 1000 * (-b))
+        y1 = int(y0 + 1000 * (a))
+        x2 = int(x0 - 1000 * (-b))
+        y2 = int(y0 - 1000 * (a))
         cell0_top_bottom[rho] = ((x1, y1), (x2, y2))
 
 # add those lines to the image
