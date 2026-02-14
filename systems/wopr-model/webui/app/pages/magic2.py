@@ -11,7 +11,6 @@ if uploaded_file is None:
     st.info("Upload an image to get started.")
     st.stop()
 
-
 # Decode uploaded image
 raw_bytes = uploaded_file.read()
 raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
@@ -94,14 +93,13 @@ def apply_edge(img, method, params):
     return img
 
 
-def render_pipeline(col, label, base_img, is_gray):
+def render_pipeline(col, label, base_img, is_gray, result_container):
     """Render one side of the pipeline with controls and final image."""
     prefix = "gray" if is_gray else "rgb"
 
     with col:
         st.header(label)
-        st.subheader("Result")
-        st.image(img, caption=caption, use_container_width=True)
+
         # --- Blur ---
         blur_method = st.selectbox(
             "Blur",
@@ -196,8 +194,22 @@ def render_pipeline(col, label, base_img, is_gray):
             steps.append(edge_method)
         caption = " → ".join(steps) if steps else "Original"
 
+        result_container.image(
+            img, caption=f"{label}: {caption}", use_container_width=True
+        )
 
-# --- Layout ---
+
+# --- Result display at top ---
+st.subheader("Result")
+result_col_gray, result_col_rgb = st.columns(2)
+gray_result_container = result_col_gray.empty()
+rgb_result_container = result_col_rgb.empty()
+
+# --- Controls ---
 col_gray, col_rgb = st.columns(2)
-render_pipeline(col_gray, "Gray", img_gray_u8, is_gray=True)
-render_pipeline(col_rgb, "RGB", img_rgb_u8, is_gray=False)
+render_pipeline(
+    col_gray, "Gray", img_gray_u8, is_gray=True, result_container=gray_result_container
+)
+render_pipeline(
+    col_rgb, "RGB", img_rgb_u8, is_gray=False, result_container=rgb_result_container
+)
