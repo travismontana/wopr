@@ -443,7 +443,6 @@ def render_pipeline(col, label, base_img, is_gray, result_container):
                         params["apertureSize"] = st.selectbox(
                             "Aperture",
                             [3, 5, 7],
-                            3,
                             key=f"{prefix}_canny_ap_{i}",
                             help=(
                                 "Size of the Sobel kernel used internally for gradient calculation. "
