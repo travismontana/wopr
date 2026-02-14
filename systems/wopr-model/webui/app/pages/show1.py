@@ -76,6 +76,13 @@ if circles is not None:
     for gx, gy, r in kept[:1]:
         cv2.circle(img_rgb_u8, (gx, gy), r, (0, 255, 0), 2)
         cv2.circle(img_rgb_u8, (gx, gy), 2, (0, 0, 255), 3)
+
+    circle_center = (gx, gy)
+    st.write(f"Detected circle center at: {circle_center} with radius {r}")
+    marker_to_circle = np.sqrt(
+        (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
+    )
+    st.write(f"Distance from estimated center: {marker_to_circle:.2f} pixels")
 else:
     st.warning("No circles detected. Try adjusting the Hough parameters or thresholds.")
 cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
