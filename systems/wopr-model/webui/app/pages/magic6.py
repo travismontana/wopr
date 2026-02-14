@@ -450,6 +450,7 @@ def render_pipeline(col, label, base_img, is_gray, result_container):
                                 "Larger = more smoothing, less noise sensitivity but thicker edges. "
                                 "Smaller = sharper edges but more noise."
                             ),
+                        )
                 elif method == "Sobel":
                     params["kernel"] = st.slider(
                         "Kernel",
