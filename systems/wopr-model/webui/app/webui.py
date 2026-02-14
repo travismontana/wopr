@@ -54,13 +54,14 @@ if uploaded:
     results = model.predict(source=img, conf=conf, iou=iou)
     annotated = results[0].plot(pil=True)
     st.image(annotated, caption="YOLO Detections")
-    st.json(results)
+
     detection_count = len(results[0].boxes)
     st.write(f"Detected {detection_count} objects")
     for box in results[0].boxes:
         cls_name = model.names[int(box.cls[0])]
         conf_score = float(box.conf[0])
-        st.write(f"- {cls_name}: {conf_score:.2f}")
+        coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
+        st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
 
     # === AprilTag + Hough Circle Detection ===
     st.subheader("Board Detection (AprilTag + Hough)")
@@ -139,6 +140,13 @@ if uploaded:
         st.warning(
             "No circles detected. Try adjusting the Hough parameters or thresholds."
         )
+    n = len(results[0].boxes)
+    for i, box in enumerate(results[0].boxes):
+        hue = int(180 * i / max(n, 1))
+        bgr = cv2.cvtColor(np.uint8([[[hue, 255, 255]]]), cv2.COLOR_HSV2RGB)[0][0]
+        color = tuple(int(c) for c in bgr)
+        x1, y1, x2, y2 = box.xyxy[0].int().tolist()
+        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
     cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
