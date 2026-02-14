@@ -117,33 +117,46 @@ dx = int(marker_center[0]) - center_of_board[0]
 dy = int(marker_center[1]) - center_of_board[1]
 marker_angle = np.degrees(np.arctan2(dy, dx)) % 360
 
-cell0_top_bottom = {}
-# looking for the 2  lines that are closest to the marker_angle
+# Compute angle difference for every line, sort, take closest 2
+line_angles = []
 for line in lines:
-    rho, theta = line[0]
-    line_angle1 = (np.degrees(theta) + 90) % 360
-    line_angle2 = (np.degrees(theta) - 90) % 360
+    rho_val, theta_val = line[0]
+    line_angle1 = (np.degrees(theta_val) + 90) % 360
+    line_angle2 = (np.degrees(theta_val) - 90) % 360
 
     diff1 = min(abs(line_angle1 - marker_angle), 360 - abs(line_angle1 - marker_angle))
     diff2 = min(abs(line_angle2 - marker_angle), 360 - abs(line_angle2 - marker_angle))
-    angle_diff = min(diff1, diff2)
-    if angle_diff < 10:  # within 10 degrees of the marker angle
-        st.write(
-            f"Found line with angle {line_angle1:.2f} or {line_angle2:.2f} close to marker angle {marker_angle:.2f} (diff {angle_diff:.2f})"
-        )
-        a = np.cos(theta)
-        b = np.sin(theta)
-        x0 = a * rho
-        y0 = b * rho
-        x1 = int(x0 + 1000 * (-b))
-        y1 = int(y0 + 1000 * (a))
-        x2 = int(x0 - 1000 * (-b))
-        y2 = int(y0 - 1000 * (a))
-        cell0_top_bottom[rho] = ((x1, y1), (x2, y2))
+    best_diff = min(diff1, diff2)
+    best_angle = line_angle1 if diff1 < diff2 else line_angle2
+
+    line_angles.append((best_diff, best_angle, rho_val, theta_val))
+
+line_angles.sort(key=lambda x: x[0])
+
+# Take top 2 — but they might be duplicates of the same spoke.
+# Deduplicate: skip lines within 5° of one already picked.
+cell0_lines = []
+for diff, angle, rho_val, theta_val in line_angles:
+    if len(cell0_lines) >= 2:
+        break
+    if any(min(abs(angle - a), 360 - abs(angle - a)) < 5 for _, a, _, _ in cell0_lines):
+        continue
+    cell0_lines.append((diff, angle, rho_val, theta_val))
+    st.write(
+        f"Cell 0 boundary: {angle:.1f}° ({diff:.1f}° from marker at {marker_angle:.1f}°)"
+    )
 
 # add those lines to the image
-for rho, (pt1, pt2) in cell0_top_bottom.items():
-    cv2.line(img_rgb_u8, pt1, pt2, (255, 0, 255), 2)
+for _, _, rho_val, theta_val in cell0_lines:
+    a = np.cos(theta_val)
+    b = np.sin(theta_val)
+    x0 = a * rho_val
+    y0 = b * rho_val
+    x1 = int(x0 + 1000 * (-b))
+    y1 = int(y0 + 1000 * (a))
+    x2 = int(x0 - 1000 * (-b))
+    y2 = int(y0 - 1000 * (a))
+    cv2.line(img_rgb_u8, (x1, y1), (x2, y2), (255, 0, 255), 2)
 
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image")
