@@ -84,10 +84,11 @@ dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_25h9)
 detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
 corners, ids, rejected = detector.detectMarkers(img_edges_gray_u8)
 
+st.write(f"Found {len(ids) if ids is not None else 0} ArUco markers in the image.")
 if ids is not None:
     for corner in corners:
         corner = corner.astype(int)
         cv2.polylines(img_rgb_u8, [corner], True, (0, 255, 255), 2)
 
 st.subheader("Result")
-st.image(img_rgb_u8, caption="Processed Image", use_container_width=True)
+st.image(img_rgb_u8, caption="Processed Image")
