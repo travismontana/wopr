@@ -79,7 +79,7 @@ if lines is not None:
         y2 = int(y0 - 1000 * (a))
         cv2.line(img_rgb_u8, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
-blurred_gray = cv2.medianBlur(img_gray_u8, 3)
+blurred_gray = cv2.medianBlur(img_rgb_u8, 3)
 img_edges_gray_u8 = cv2.Canny(blurred_gray, 50, 150)
 dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_25h9)
 detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
