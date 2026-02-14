@@ -33,9 +33,12 @@ if ids is not None:
 marker_center = None
 marker_center = np.mean(corners[0][0], axis=0)
 
+# Median blur and Canny edge detection
+blurred_gray = cv2.medianBlur(img_rgb_u8, 3)
+img_edges_gray_u8 = cv2.Canny(blurred_gray, 10, 50)
 # Circle detection
 circle1 = cv2.HoughCircles(
-    img_gray_u8,
+    img_edges_gray_u8,
     cv2.HOUGH_GRADIENT,
     dp=3,
     minDist=318,
@@ -45,7 +48,7 @@ circle1 = cv2.HoughCircles(
     maxRadius=158,
 )
 circle2 = cv2.HoughCircles(
-    img_gray_u8,
+    img_edges_gray_u8,
     cv2.HOUGH_GRADIENT,
     dp=2,
     minDist=67,
