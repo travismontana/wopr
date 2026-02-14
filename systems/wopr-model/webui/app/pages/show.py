@@ -92,11 +92,14 @@ if ids is not None:
         cv2.polylines(img_rgb_u8, [corner], True, (0, 255, 255), 2)
 
 # center of the cicles (let's check if both are the same), then we can use that as the center of the board
+# can be within 10 pixels of each other, otherwise we might have detected the wrong circles
 center_of_board = None
 if circle1 is not None and circle2 is not None:
     center1 = (circle1[0][0][0], circle1[0][0][1])
     center2 = (circle2[0][0][0], circle2[0][0][1])
-    if center1 == center2:
+    if center1 == center2 or (
+        abs(center1[0] - center2[0]) <= 10 and abs(center1[1] - center2[1]) <= 10
+    ):
         center_of_board = center1
         cv2.circle(img_rgb_u8, center_of_board, 5, (255, 255, 255), -1)
         st.write(f"Center of the board: {center_of_board}")
