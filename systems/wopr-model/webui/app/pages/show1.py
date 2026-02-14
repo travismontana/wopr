@@ -55,7 +55,7 @@ circles = cv2.HoughCircles(
     dp=1.2,
     minDist=300,  # >= expected board diameter/2
     param1=120,  # internal Canny high threshold used by Hough
-    param2=70,  # HIGHER => fewer false positives
+    param2=0,  # HIGHER => fewer false positives
     minRadius=210,  # tighten to your board
     maxRadius=260,
 )
