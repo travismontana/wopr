@@ -54,7 +54,7 @@ if uploaded:
     results = model.predict(source=img, conf=conf, iou=iou)
     annotated = results[0].plot(pil=True)
     st.image(annotated, caption="YOLO Detections")
-
+    st.json(results)
     detection_count = len(results[0].boxes)
     st.write(f"Detected {detection_count} objects")
     for box in results[0].boxes:
