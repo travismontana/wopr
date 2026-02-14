@@ -155,7 +155,7 @@ if uploaded:
         cls_name = model.names[int(box.cls[0])]
         color = CLASS_COLORS[cls_name]
         x1, y1, x2, y2 = box.xyxy[0].int().tolist()
-        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+        cv2.rectangle(img_rgb_u8, (x1, y1), (x2, y2), color, 2)
 
     cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
