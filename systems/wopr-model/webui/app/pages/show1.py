@@ -43,8 +43,8 @@ circle1 = cv2.HoughCircles(
     dp=1.2,
     minDist=400,
     param1=80,
-    param2=50,
-    minRadius=200,
+    param2=70,
+    minRadius=220,
     maxRadius=270,
 )
 
