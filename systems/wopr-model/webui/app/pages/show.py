@@ -124,6 +124,9 @@ for line in lines:
     angle = np.degrees(theta) % 360
     angle_diff = min(abs(angle - marker_angle), 360 - abs(angle - marker_angle))
     if angle_diff < 10:  # within 10 degrees of the marker angle
+        st.write(
+            f"Found line with angle {angle:.2f} degrees, which is within 10 degrees of the marker angle {marker_angle:.2f} degrees."
+        )
         a = np.cos(theta)
         b = np.sin(theta)
         x0 = a * rho
