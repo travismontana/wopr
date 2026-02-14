@@ -51,7 +51,7 @@ roi_edges = cv2.Canny(roi_blur, 20, 80)  # raise thresholds vs 10/50
 
 # --- Hough on edges (single-channel) ---
 circles = cv2.HoughCircles(
-    roi_edges,
+    roi_blur,
     cv2.HOUGH_GRADIENT_ALT,
     dp=1.2,
     minDist=300,  # >= expected board diameter/2
