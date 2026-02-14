@@ -4,6 +4,7 @@ import cv2
 import os
 from PIL import Image
 import tempfile
+import numpy as np
 
 st.title("WOPR Object Detection")
 st.set_page_config(layout="wide")
