@@ -11,7 +11,17 @@ import numpy as np
 st.title("WOPR Object Detection")
 
 RUNS_PATH = "/ultralytics/runs"
-
+CLASS_COLORS = {
+    "board": (128, 128, 128),  # gray
+    "ghhhk": (255, 0, 0),  # red
+    "houjix": (0, 255, 0),  # green
+    "kintan_strider": (0, 0, 255),  # blue
+    "klorslug": (255, 255, 0),  # yellow
+    "mantellian_savrip": (255, 0, 255),  # magenta
+    "molator": (0, 255, 255),  # cyan
+    "monnok": (255, 128, 0),  # orange
+    "ngok": (128, 0, 255),  # purple
+}
 
 @st.cache_resource
 def load_model(model_path):
@@ -141,10 +151,9 @@ if uploaded:
             "No circles detected. Try adjusting the Hough parameters or thresholds."
         )
     n = len(results[0].boxes)
-    for i, box in enumerate(results[0].boxes):
-        hue = int(180 * i / max(n, 1))
-        bgr = cv2.cvtColor(np.uint8([[[hue, 255, 255]]]), cv2.COLOR_HSV2RGB)[0][0]
-        color = tuple(int(c) for c in bgr)
+    for box in results[0].boxes:
+        cls_name = model.names[int(box.cls[0])]
+        color = CLASS_COLORS[cls_name]
         x1, y1, x2, y2 = box.xyxy[0].int().tolist()
         cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
