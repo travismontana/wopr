@@ -64,6 +64,7 @@ if circle2 is not None:
 rho = 1
 theta = np.radians(1)
 threshold = 100
+gray = cv2.Canny(img_gray_u8, 100, 200, apertureSize=3)
 lines = cv2.HoughLines(gray, rho, theta, threshold)
 if lines is not None:
     for line in lines:
@@ -77,6 +78,6 @@ if lines is not None:
         x2 = int(x0 - 1000 * (-b))
         y2 = int(y0 - 1000 * (a))
         cv2.line(img_rgb_u8, (x1, y1), (x2, y2), (255, 255, 255), 2)
-        
+
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image", use_container_width=True)
