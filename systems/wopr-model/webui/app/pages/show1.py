@@ -35,7 +35,7 @@ H, W = img_gray_u8.shape[:2]
 if marker_center is not None:
     cx, cy = int(marker_center[0]), int(marker_center[1])
     # board center is offset from tag; adjust these once you measure it
-    est_cx, est_cy = cx - 180, cy - 10  # <-- tweak for your physical placement
+    est_cx, est_cy = cx - 180, cy - 30  # <-- tweak for your physical placement
 else:
     est_cx, est_cy = W // 2, H // 2
 
@@ -51,7 +51,7 @@ roi_edges = cv2.Canny(roi_blur, 40, 120)  # raise thresholds vs 10/50
 # --- Hough on edges (single-channel) ---
 circles = cv2.HoughCircles(
     roi_edges,
-    cv2.HOUGH_GRADIENT,
+    cv2.HOUGH_GRADIENT_ALT,
     dp=1.2,
     minDist=300,  # >= expected board diameter/2
     param1=120,  # internal Canny high threshold used by Hough
