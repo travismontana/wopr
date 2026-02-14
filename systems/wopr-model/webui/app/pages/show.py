@@ -157,6 +157,135 @@ for _, _, rho_val, theta_val in cell0_lines:
     x2 = int(x0 - 1000 * (-b))
     y2 = int(y0 - 1000 * (a))
     cv2.line(img_rgb_u8, (x1, y1), (x2, y2), (255, 0, 255), 2)
+# ---------------------------------------------------------------------------
+# Build cell map
+# ---------------------------------------------------------------------------
+
+# Get the two ring radii from detected circles
+inner_radius = int(circle1[0][0][2])  # whichever is smaller
+outer_radius = int(circle2[0][0][2])
+if inner_radius > outer_radius:
+    inner_radius, outer_radius = outer_radius, inner_radius
+
+# Deduplicate spokes: convert all lines to radial angles, cluster nearby ones
+spoke_angles = []
+for line in lines:
+    rho_val, theta_val = line[0]
+    # Two possible directions per line
+    a1 = (np.degrees(theta_val) + 90) % 360
+    a2 = (np.degrees(theta_val) - 90) % 360
+    # Keep the one in 0-180 range to avoid duplicates from both directions
+    # (each spoke covers both directions, we only want one entry per spoke)
+    spoke_angles.append(a1 % 180)
+
+# Cluster angles within 5° of each other, keep the mean
+spoke_angles.sort()
+clustered = []
+cluster = [spoke_angles[0]]
+for a in spoke_angles[1:]:
+    if a - cluster[-1] < 5:
+        cluster.append(a)
+    else:
+        clustered.append(np.mean(cluster))
+        cluster = [a]
+clustered.append(np.mean(cluster))
+
+# Each spoke is a diameter, so it creates two radial directions
+# Expand back to full 360°
+spoke_directions = sorted(
+    set([a % 360 for a in clustered] + [(a + 180) % 360 for a in clustered])
+)
+
+st.write(
+    f"Found {len(spoke_directions)} spoke directions: {[f'{a:.1f}°' for a in spoke_directions]}"
+)
+
+# Find cell 0: which pair of consecutive spokes contains the marker angle?
+# Wrap-around: append first spoke + 360 for boundary check
+n_spokes = len(spoke_directions)
+cell_boundaries = []  # list of (start_angle, end_angle) per cell
+cell0_idx = None
+
+for i in range(n_spokes):
+    start = spoke_directions[i]
+    end = spoke_directions[(i + 1) % n_spokes]
+    if end < start:
+        end += 360  # wrap-around
+
+    cell_boundaries.append((start, end))
+
+    # Check if marker falls in this wedge
+    m = marker_angle
+    if m < start:
+        m += 360
+    if start <= m < end:
+        cell0_idx = i
+
+st.write(f"Marker angle: {marker_angle:.1f}°, Cell 0 index: {cell0_idx}")
+
+# Number cells starting from cell 0
+n_cells = len(cell_boundaries)
+cells = {}
+for i in range(n_cells):
+    cell_num = (i - cell0_idx) % n_cells
+    start, end = cell_boundaries[i]
+    cells[cell_num] = {
+        "start_angle": start % 360,
+        "end_angle": end % 360,
+        "inner_radius": inner_radius,
+        "outer_radius": outer_radius,
+    }
+
+# Display cell map
+for cell_num in sorted(cells.keys()):
+    c = cells[cell_num]
+    st.write(
+        f"Cell {cell_num}: {c['start_angle']:.1f}° → {c['end_angle']:.1f}°, "
+        f"r={c['inner_radius']}→{c['outer_radius']}"
+    )
+
+
+def point_to_cell(x, y, center, cells):
+    """Given a pixel coordinate, return which cell it's in (or None)."""
+    dx = x - center[0]
+    dy = y - center[1]
+    dist = np.hypot(dx, dy)
+    angle = np.degrees(np.arctan2(dy, dx)) % 360
+
+    for cell_num, c in cells.items():
+        # Radius check
+        if not (c["inner_radius"] <= dist <= c["outer_radius"]):
+            continue
+        # Angle check (handle wrap-around)
+        start = c["start_angle"]
+        end = c["end_angle"]
+        if start < end:
+            if start <= angle < end:
+                return cell_num
+        else:  # wraps around 360
+            if angle >= start or angle < end:
+                return cell_num
+    return None
+
+
+# Draw cell numbers on the image
+for cell_num, c in cells.items():
+    mid_angle = np.radians((c["start_angle"] + c["end_angle"]) / 2)
+    # Handle wrap-around for midpoint
+    if c["end_angle"] < c["start_angle"]:
+        mid_angle = np.radians((c["start_angle"] + c["end_angle"] + 360) / 2)
+    mid_radius = (c["inner_radius"] + c["outer_radius"]) / 2
+    tx = int(center_of_board[0] + mid_radius * np.cos(mid_angle))
+    ty = int(center_of_board[1] + mid_radius * np.sin(mid_angle))
+    cv2.putText(
+        img_rgb_u8,
+        str(cell_num),
+        (tx - 5, ty + 5),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        (255, 255, 255),
+        2,
+    )
 
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image")
