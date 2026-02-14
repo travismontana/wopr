@@ -129,7 +129,7 @@ for line in lines:
     angle_diff = min(diff1, diff2)
     if angle_diff < 10:  # within 10 degrees of the marker angle
         st.write(
-            f"Found line with angle {angle:.2f} degrees, which is within 10 degrees of the marker angle {marker_angle:.2f} degrees."
+            f"Found line with angle {line_angle1:.2f} or {line_angle2:.2f} close to marker angle {marker_angle:.2f} (diff {angle_diff:.2f})"
         )
         a = np.cos(theta)
         b = np.sin(theta)
