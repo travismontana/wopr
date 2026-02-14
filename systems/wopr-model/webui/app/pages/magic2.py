@@ -11,6 +11,12 @@ if uploaded_file is None:
     st.info("Upload an image to get started.")
     st.stop()
 
+# --- Layout ---
+col_gray, col_rgb = st.columns(2)
+render_pipeline(col_gray, "Gray", img_gray_u8, is_gray=True)
+render_pipeline(col_rgb, "RGB", img_rgb_u8, is_gray=False)
+
+
 # Decode uploaded image
 raw_bytes = uploaded_file.read()
 raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
@@ -196,9 +202,3 @@ def render_pipeline(col, label, base_img, is_gray):
 
         st.subheader("Result")
         st.image(img, caption=caption, use_container_width=True)
-
-
-# --- Layout ---
-col_gray, col_rgb = st.columns(2)
-render_pipeline(col_gray, "Gray", img_gray_u8, is_gray=True)
-render_pipeline(col_rgb, "RGB", img_rgb_u8, is_gray=False)
