@@ -83,6 +83,9 @@ if circles is not None:
         (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
     )
     st.write(f"Distance from estimated center: {marker_to_circle:.2f} pixels")
+    # convert pixel distance to real-world units if you know the scale (e.g., mm/px)
+    # the marker is 35mm in real life, so you can use that to estimate scale if you measure its pixel size
+
 else:
     st.warning("No circles detected. Try adjusting the Hough parameters or thresholds.")
 cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
