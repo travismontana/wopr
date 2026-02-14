@@ -91,5 +91,24 @@ if ids is not None:
         corner = corner.astype(int)
         cv2.polylines(img_rgb_u8, [corner], True, (0, 255, 255), 2)
 
+# center of the cicles (let's check if both are the same), then we can use that as the center of the board
+center_of_board = None
+if circle1 is not None and circle2 is not None:
+    center1 = (circle1[0][0][0], circle1[0][0][1])
+    center2 = (circle2[0][0][0], circle2[0][0][1])
+    if center1 == center2:
+        center_of_board = center1
+        cv2.circle(img_rgb_u8, center_of_board, 5, (255, 255, 255), -1)
+        st.write(f"Center of the board: {center_of_board}")
+    else:
+        st.warning(
+            f"Circle centers do not match: {center1} vs {center2}. Cannot determine the center of the board."
+        )
+else:
+    st.warning(
+        "Could not detect circles in the image. Cannot determine the center of the board."
+    )
+
+
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image")
