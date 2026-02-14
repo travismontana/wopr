@@ -40,12 +40,12 @@ img_edges_gray_u8 = cv2.Canny(blurred_gray, 10, 50)
 circle1 = cv2.HoughCircles(
     img_edges_gray_u8,
     cv2.HOUGH_GRADIENT,
-    dp=3,
+    dp=2,
     minDist=318,
     param1=100,
     param2=100,
-    minRadius=24,
-    maxRadius=158,
+    minRadius=350,
+    maxRadius=600,
 )
 circle2 = cv2.HoughCircles(
     img_edges_gray_u8,
