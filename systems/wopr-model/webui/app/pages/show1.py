@@ -47,16 +47,7 @@ circle1 = cv2.HoughCircles(
     minRadius=200,
     maxRadius=270,
 )
-circle2 = cv2.HoughCircles(
-    img_edges_gray_u8,
-    cv2.HOUGH_GRADIENT,
-    dp=2,
-    minDist=300,
-    param1=100,
-    param2=100,
-    minRadius=200,
-    maxRadius=400,
-)
+
 
 if circle1 is not None:
     circle1 = np.uint16(np.around(circle1))
@@ -65,12 +56,5 @@ if circle1 is not None:
         cv2.circle(img_rgb_u8, (i[0], i[1]), i[2], (0, 255, 0), 2)
         # draw the center of the circle
         cv2.circle(img_rgb_u8, (i[0], i[1]), 2, (0, 0, 255), 3)
-if circle2 is not None:
-    circle2 = np.uint16(np.around(circle2))
-    for i in circle2[0, :]:
-        # draw the outer circle
-        cv2.circle(img_rgb_u8, (i[0], i[1]), i[2], (255, 0, 0), 2)
-        # draw the center of the circle
-        cv2.circle(img_rgb_u8, (i[0], i[1]), 2, (255, 255, 0), 3)
 
 st.image(img_rgb_u8)
