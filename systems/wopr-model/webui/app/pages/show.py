@@ -95,8 +95,8 @@ if ids is not None:
 # can be within 10 pixels of each other, otherwise we might have detected the wrong circles
 center_of_board = None
 if circle1 is not None and circle2 is not None:
-    center1 = (circle1[0][0][0], circle1[0][0][1])
-    center2 = (circle2[0][0][0], circle2[0][0][1])
+    center1 = (int(circle1[0][0][0]), int(circle1[0][0][1]))
+    center2 = (int(circle2[0][0][0]), int(circle2[0][0][1]))
     if center1 == center2 or (
         abs(center1[0] - center2[0]) <= 10 and abs(center1[1] - center2[1]) <= 10
     ):
