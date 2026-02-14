@@ -29,3 +29,9 @@ if ids is not None:
     for corner in corners:
         corner = corner.astype(int)
         cv2.polylines(img_rgb_u8, [corner], True, (0, 255, 255), 2)
+
+marker_center = None
+marker_center = np.mean(corners[0][0], axis=0)
+
+
+st.image(img_rgb_u8)
