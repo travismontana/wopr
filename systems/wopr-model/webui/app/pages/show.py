@@ -79,11 +79,14 @@ if lines is not None:
         y2 = int(y0 - 1000 * (a))
         cv2.line(img_rgb_u8, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
+dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_25h9)
+detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
+corners, ids, rejected = detector.detectMarkers(img_edges_gray_u8)
+
+if ids is not None:
+    for corner in corners:
+        corner = corner.astype(int)
+        cv2.polylines(img_rgb_u8, [corner], True, (0, 255, 255), 2)
+
 st.subheader("Result")
 st.image(img_rgb_u8, caption="Processed Image", use_container_width=True)
-st.write("Circle1")
-st.write(circle1)
-st.write("Circle2")
-st.write(circle2)
-st.write("Lines")
-st.write(lines)
