@@ -52,11 +52,11 @@ roi_edges = cv2.Canny(roi_blur, 20, 80)  # raise thresholds vs 10/50
 # --- Hough on edges (single-channel) ---
 circles = cv2.HoughCircles(
     roi_blur,
-    cv2.HOUGH_GRADIENT_ALT,
+    cv2.HOUGH_GRADIENT,
     dp=1.2,
     minDist=300,  # >= expected board diameter/2
     param1=60,  # internal Canny high threshold used by Hough
-    param2=0,  # HIGHER => fewer false positives
+    param2=70,  # HIGHER => fewer false positives
     minRadius=210,  # tighten to your board
     maxRadius=260,
 )
