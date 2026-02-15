@@ -114,6 +114,8 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
 
     save_list = []
     for piece in pieces_list:
+        if save_list is not None and save_list["class"] == piece["class"]:
+            pass
         x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
         polar1_rho_px = piece["polar1"]["rho"]
         polar2_rho_px = piece["polar2"]["rho"]
