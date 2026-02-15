@@ -152,7 +152,7 @@ if uploaded:
         minRadius=300,
         maxRadius=500,
     )
-
+    circle_center = None
     # --- Post-filter: keep circles near estimated center ---
     if circles is not None:
         circles = np.uint16(np.around(circles))[0]
