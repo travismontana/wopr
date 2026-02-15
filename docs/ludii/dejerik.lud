@@ -22,12 +22,12 @@
  */
 (define "PredatorMoves"
   {
-    (move (leap (to (sites Empty)) (directions {CW CCW})))
+    (move (leap {{CW CW} {CCW CCW}} (to (sites Empty))))
     (move (step (to (sites Empty)) (directions {In Out})))
     (capture 
       (step (to (sites Occupied by:Next)) (directions {In Out}))
       (then
-        (capture (leap (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+        (capture (leap {{CW  CW} {CCW CCW}} (to (sites Occupied by:Next))))
       )
     )
   }
@@ -40,13 +40,10 @@
 (define "GuardianMoves"
   {
     (move
-      (step (to (sites Empty)) (directions {In Out}))
-      (then
-        (move (leap (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
-      )
+      (leap {{In CW CW} {In CCW CCW} {Out CW CW} {Out CCW CCW}} (to (sites Empty)))
     )
     (capture
-      (leap (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2 ))
+      (leap {{CW CW} {CCW CCW}} (to (sites Occupied by:Next)) (directions {CW CCW}))
     )
   }
 )
@@ -58,7 +55,7 @@
 (define "ScoutMoves"
   {
     (move 
-      (leap (to (sites Empty)) (directions {CW CCW}) (between 2 2))
+      (leap {{CW CW} {CCW CCW}} (to (sites Empty)))
       (then
         (if (= (var "scoutMoved") 0)
           (do
