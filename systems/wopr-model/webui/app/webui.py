@@ -177,6 +177,7 @@ if uploaded:
             circle_rho = math.isqrt(
                 int((circle_center[0] ** 2 + (circle_center[1] ** 2)))
             )
+            circle_rho_mm = circle_rho / pixel_to_mm
             circle_theta_deg = math.degrees(
                 math.atan2(circle_center[1], circle_center[0])
             )
@@ -185,7 +186,7 @@ if uploaded:
                 f"Detected circle center at: {circle_center} with radius {r} pixels {r * pixel_to_mm:.2f} mm"
             )
             st.write(
-                f"Circle center polar coordinates: rho={circle_rho} pixels, theta={circle_theta_deg} degrees"
+                f"Circle center polar coordinates: rho={circle_rho} pixels ({circle_rho_mm:.2f} mm), theta={circle_theta_deg} degrees, pixels_to_mm={pixel_to_mm:.2f}"
             )
             marker_to_circle = np.sqrt(
                 (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
