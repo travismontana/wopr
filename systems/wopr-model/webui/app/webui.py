@@ -75,12 +75,12 @@ if uploaded:
         coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
         st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
         x1, y1, x2, y2 = box.xyxy[0].int().tolist()
-        polar1_dis = math.isqrt(x1 ^ 2 + y1 ^ 2)
-        polar1_deg = math.degrees(math.atan2(y1, x1))
-        polar1_rad = math.radians(polar1_deg)
-        polar2_dis = math.isqrt(x2 ^ 2 + y2 ^ 2)
-        polar2_deg = math.degrees(math.atan2(y2, x2))
-        polar2_rad = math.radians(polar2_deg)
+        polar1_rho = math.isqrt(x1 ^ 2 + y1 ^ 2)
+        polar1_theta_deg = math.degrees(math.atan2(y1, x1))
+        polar1_theta_rad = math.radians(polar1_theta_deg)
+        polar2_rho = math.isqrt(x2 ^ 2 + y2 ^ 2)
+        polar2_theta_deg = math.degrees(math.atan2(y2, x2))
+        polar2_theta_rad = math.radians(polar2_theta_deg)
         pieces_list.append(
             {
                 "class": cls_name,
@@ -90,8 +90,16 @@ if uploaded:
                 "y1": y1,
                 "x2": x2,
                 "y2": y2,
-                "polar1": {"rad": polar1_rad, "deg": polar1_deg},
-                "polar2": {"rad": polar2_rad, "deg": polar2_deg},
+                "polar1": {
+                    "rho": polar1_rho,
+                    "theta_deg": polar1_theta_deg,
+                    "theta_rad": polar1_theta_rad,
+                },
+                "polar2": {
+                    "rho": polar2_rho,
+                    "theta_deg": polar2_theta_deg,
+                    "theta_rad": polar2_theta_rad,
+                },
             }
         )
 
