@@ -231,11 +231,14 @@ if uploaded:
 
     # for every 30 degrees starting at 15* and at a set rho, we'll write something
     for num in range(15, 360, 30):
+        # these are in mm, needs to be pixels
         inner = 70
+        inner_px = inner / pixel_to_mm
         outer = 140
+        outer_px = outer / pixel_to_mm
         theta = math.radians(num)
-        inner_x = int(cc_x + inner * math.cos(theta))
-        inner_y = int(cc_y + inner * math.sin(theta))
+        inner_x = int(cc_x + inner_px * math.cos(theta))
+        inner_y = int(cc_y + inner_px * math.sin(theta))
         inner_num = num // 15  # this should be 1 if 15, 2 if 45
         cv2.putText(
             img_rgb_u8,
@@ -247,8 +250,8 @@ if uploaded:
             1,
         )
 
-        outer_x = int(cc_x + outer * math.cos(theta))
-        outer_y = int(cc_y + outer * math.sin(theta))
+        outer_x = int(cc_x + outer_px * math.cos(theta))
+        outer_y = int(cc_y + outer_px * math.sin(theta))
         outer_num = (num // 15) + 12
         cv2.putText(
             img_rgb_u8,
