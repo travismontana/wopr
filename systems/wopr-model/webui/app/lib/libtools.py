@@ -104,20 +104,13 @@ def export_annotations(project_id):
         logger.error(f"Failed to send export request: {e}")
 
 def where_are_pieces(pieces_list, circle_center):
-    
+
     OUTER_RING_RHO = 158
     MIDDLE_RING_RHO = 86
     INNER_RING_RHO = 40
-    
+
     for piece in pieces_list:
         x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
-    
         polar1_rho = piece["polar1"]["rho"]
-        polar1_theta_deg = piece["polar1"]["theta_deg"]
-        polar1_theta_rad = piece["polar1"]["theta_rad"]
-        
+
         polar2_rho = piece["polar2"]["rho"]
-        polar2_theta_deg = piece["polar2"]["theta_deg"]
-        polar2_theta_rad = piece["polar2"]["theta_rad"]
-        
-        if rho 
