@@ -131,9 +131,9 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
         fixed_y1_mm = fixed_y1 * pixel_to_mm
         fixed_y2_mm = fixed_y2 * pixel_to_mm
         middle_y_mm = middle_y * pixel_to_mm
-        piece_s1_rho = math.isqrt(fixed_x1_mm**2 + fixed_y1_mm**2)
-        piece_s2_rho = math.isqrt(fixed_x2_mm**2 + fixed_y2_mm**2)
-        piece_mid_rho = math.isqrt(middle_x_mm**2 + middle_y_mm**2)
+        piece_s1_rho = math.isqrt(int(fixed_x1_mm**2) + int(fixed_y1_mm**2))
+        piece_s2_rho = math.isqrt(int(fixed_x2_mm**2) + int(fixed_y2_mm**2))
+        piece_mid_rho = math.isqrt(int(middle_x_mm**2) + int(middle_y_mm**2))
         piece_s1_theta_deg = math.degrees(math.atan2(fixed_y1_mm, fixed_x1_mm))
         piece_s2_theta_deg = math.degrees(math.atan2(fixed_y2_mm, fixed_x2_mm))
         piece_mid_theta_deg = math.degrees(math.atan2(middle_y_mm, middle_x_mm))
