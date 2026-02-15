@@ -232,9 +232,9 @@ if uploaded:
     # for every 30 degrees starting at 15* and at a set rho, we'll write something
     for num in range(15, 360, 30):
         # these are in mm, needs to be pixels
-        inner = 70
+        inner = 50
         inner_px = inner / pixel_to_mm
-        outer = 140
+        outer = 120
         outer_px = outer / pixel_to_mm
         theta = math.radians(num)
         inner_x = int(cc_x + inner_px * math.cos(theta))
