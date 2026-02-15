@@ -222,7 +222,7 @@ if uploaded:
 
     # cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
     # cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
-    # st.image(img_rgb_u8, caption="Board Detection")
+    #
 
     results = where_are_pieces(pieces_list, board_center, pixel_to_mm, img_rgb_u8)
 
@@ -266,3 +266,4 @@ if uploaded:
         st.write(
             f"Piece {piece} is in cell {cell} inner {result['is_inner_ring']} rho {result['mid_rho']}"
         )
+    st.image(img_rgb_u8, caption="Board Detection")
