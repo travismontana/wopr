@@ -77,8 +77,12 @@ if uploaded:
         cls_name = model.names[int(box.cls[0])]
         if cls_name == "board":
             board_coor = box.xyxy[0].int().tolist()
-            board_rho = math.isqrt(board_coor[0] ** 2 + board_coor[1] ** 2)
-            board_theta_rad = math.atan2(board_coor[1], board_coor[0])
+            board_center = [
+                (board_coor[0] + board_coor[2]) // 2,
+                (board_coor[1] + board_coor[3]) // 2,
+            ]
+            board_rho = math.isqrt(board_center[0] ** 2 + board_center[1] ** 2)
+            board_theta_rad = math.atan2(board_center[1], board_center[0])
         conf_score = float(box.conf[0])
         coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
         st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
@@ -220,5 +224,5 @@ if uploaded:
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
     st.image(img_rgb_u8, caption="Board Detection")
 
-    results = where_are_pieces(pieces_list, circle_center, pixel_to_mm)
+    results = where_are_pieces(pieces_list, board_center, pixel_to_mm)
     st.write(results)
