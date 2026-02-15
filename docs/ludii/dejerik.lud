@@ -11,7 +11,6 @@
  */
 (define "BruteMoves"
   { // Todos
-    // Can not capture backwards
     // Can not attack pieces who havnt moved yet
     (move
       (step (to (sites Empty))
@@ -20,8 +19,7 @@
     (move    
       (leap (from (sites Outer))
         {{CCW CCW CCW CCW CCW CCW}}
-        rotations:False
-        (to if:(is Empty (to)))
+        (to (sites Empty))
       )
     )
     (capture (step (to (sites Occupied by:Next))  (directions {In Out CW CCW {In CW} {In CCW} {Out CW} {Out CCW}})))
