@@ -141,6 +141,8 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
         piece_s2_theta_rad = math.radians(piece_s2_theta_deg)
         piece_mid_theta_rad = math.radians(piece_mid_theta_deg)
         pclass = piece["class"]
+        is_inner = piece_mid_rho < INNER_RING_RHO_MM
+        sector = int(piece_mid_theta_deg // 30)
         save_list.append(
             {
                 "class": pclass,
@@ -153,13 +155,10 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
                 "s1_theta_rad": piece_s1_theta_rad,
                 "s2_theta_rad": piece_s2_theta_rad,
                 "mid_theta_rad": piece_mid_theta_rad,
-            },
+                "is_inner_ring": is_inner,
+                "sector": sector,
+                "cell": (sector + 12) if is_inner else sector,
+            }
         )
-
-        is_inner = piece_mid_rho < INNER_RING_RHO_MM
-        save_list["pclass"]["is_inner_ring"] = is_inner
-        sector = int(piece_mid_theta_deg // 30)
-        save_list["pclass"]["sector"] = sector
-        save_list["pclass"]["cell"] = (sector + 12) if is_inner else sector
 
     return save_list
