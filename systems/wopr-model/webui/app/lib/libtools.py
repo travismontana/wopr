@@ -111,6 +111,6 @@ def where_are_pieces(pieces_list, circle_center):
 
     for piece in pieces_list:
         x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
-        polar1_rho = piece["polar1"]["rho"]
-
-        polar2_rho = piece["polar2"]["rho"]
+        polar1_rho_px = piece["polar1"]["rho"]
+        polar2_rho_px = piece["polar2"]["rho"]
+        polar1_rho_mm = 

@@ -143,7 +143,7 @@ if uploaded:
     roi_blur = cv2.medianBlur(roi_gray, 9)
 
     circles = cv2.HoughCircles(
-        roi_blur,
+        img_rgb_u8,
         cv2.HOUGH_GRADIENT,
         dp=1.2,
         minDist=250,
