@@ -131,9 +131,9 @@ if uploaded:
     st.write(f"Found {len(ids) if ids is not None else 0} markers.")
     marker_center = None
     if ids is not None and len(corners) > 0:
-        for c in corners:
-            c_int = c.astype(int)
-            cv2.polylines(img_rgb_u8, [c_int], True, (0, 255, 255), 2)
+        # for c in corners:
+        # c_int = c.astype(int)
+        # cv2.polylines(img_rgb_u8, [c_int], True, (0, 255, 255), 2)
         marker_center = np.mean(corners[0][0], axis=0).astype(int)
         # distance between the corners is the size of the marker
         tag_side_length = np.linalg.norm(corners[0][0][0] - corners[0][0][1])
@@ -180,9 +180,9 @@ if uploaded:
 
         kept.sort(key=lambda t: t[2], reverse=True)
         if kept:
-            for gx, gy, r in kept[:1]:
-                cv2.circle(img_rgb_u8, (gx, gy), r, (0, 255, 0), 2)
-                cv2.circle(img_rgb_u8, (gx, gy), 2, (0, 0, 255), 3)
+            # for gx, gy, r in kept[:1]:
+            #    cv2.circle(img_rgb_u8, (gx, gy), r, (0, 255, 0), 2)
+            #    cv2.circle(img_rgb_u8, (gx, gy), 2, (0, 0, 255), 3)
 
             circle_center = (kept[0][0], kept[0][1])
             circle_rho = math.isqrt(
