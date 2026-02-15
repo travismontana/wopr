@@ -134,12 +134,13 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
         piece_s1_rho = math.isqrt(int(fixed_x1_mm**2) + int(fixed_y1_mm**2))
         piece_s2_rho = math.isqrt(int(fixed_x2_mm**2) + int(fixed_y2_mm**2))
         piece_mid_rho = math.isqrt(int(middle_x_mm**2) + int(middle_y_mm**2))
-        piece_s1_theta_deg = math.degrees(math.atan2(fixed_y1_mm, fixed_x1_mm))
-        piece_s2_theta_deg = math.degrees(math.atan2(fixed_y2_mm, fixed_x2_mm))
-        piece_mid_theta_deg = math.degrees(math.atan2(middle_y_mm, middle_x_mm))
-        piece_s1_theta_rad = math.radians(piece_s1_theta_deg)
-        piece_s2_theta_rad = math.radians(piece_s2_theta_deg)
-        piece_mid_theta_rad = math.radians(piece_mid_theta_deg)
+        piece_s1_theta_rad = math.atan2(fixed_y1_mm, fixed_x1_mm) % (2 * math.pi)
+        piece_s2_theta_rad = math.atan2(fixed_y2_mm, fixed_x2_mm) % (2 * math.pi)
+        piece_mid_theta_rad = math.atan2(middle_y_mm, middle_x_mm) % (2 * math.pi)
+        piece_s1_theta_deg = math.degrees(piece_s1_theta_rad) % 360
+        piece_s2_theta_deg = math.degrees(piece_s2_theta_rad) % 360
+        piece_mid_theta_deg = math.degrees(piece_mid_theta_rad) % 360
+
         pclass = piece["class"]
         is_inner = piece_mid_rho < INNER_RING_RHO_MM
         sector = int(piece_mid_theta_deg // 30)
