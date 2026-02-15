@@ -718,7 +718,7 @@ if uploaded_file is not None:
             imgu8_aruco_dict = st.selectbox(
                 "ArUco Dictionary",
                 options=[
-                    "DICT_APRILTAG_32h11",
+                    "DICT_APRILTAG_36h11",
                     "DICT_4X4_50",
                     "DICT_4X4_100",
                     "DICT_4X4_250",

@@ -141,9 +141,10 @@ if uploaded:
 
     # --- Preprocess + Hough ---
     roi_blur = cv2.medianBlur(roi_gray, 9)
+    roi_edge = cv2.Canny(roi_blur, 30, 80)
 
     circles = cv2.HoughCircles(
-        roi_blur,
+        roi_edge,
         cv2.HOUGH_GRADIENT,
         dp=1.2,
         minDist=250,
