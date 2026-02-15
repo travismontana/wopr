@@ -201,3 +201,4 @@ if uploaded:
     st.image(img_rgb_u8, caption="Board Detection")
 
     results = where_are_pieces(pieces_list, circle_center, pixel_to_mm)
+    st.write(results)
