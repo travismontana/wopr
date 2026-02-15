@@ -1,16 +1,81 @@
+/*
+ * Important Notes apparently.
+ * When your piece attacks your opponent’s piece, your piece will move to occupy that location. Once in that location if another opponent’s piece is on a subsequent attack tile then you can take that piece too, chaining the attacks together.
+ * ^ ^ ^ ^ ^
+ * that means chainable attackes, e.g. SequenceCapture
+ */
+
+/*
+ * MOVE: 1 tile forward, backward, left, right, or diagonally. When moving backward on the outer circle this piece can move as if it was going off the board to the other side.
+ * ATTACK: 1 tile forward, left, right, or diagonally. Cannot attack pieces that have not moved from their starting position.
+ */
 (define "BruteMoves"
-  {
-    (move    (step   (to (sites Empty))             (directions {In Out CW CCW Diagonal})))
-    (capture (step   (to (sites Occupied by:Next))  (directions {In Out CW CCW Diagonal})))  
+  { // Add wrap around
+    (move    (step (to (sites Empty))             (directions {In Out CW CCW Diagonal})))
+    (capture (step (to (sites Occupied by:Next))  (directions {In Out CW CCW Diagonal})))
   }
 )
 
-(define
+/*
+ * MOVE: 2 tiles to the left or 2 tiles to the right. This piece can hop over other pieces. 1 tile forward or backward.
+ * ATTACK: 1 tile forward or backward then 2 tiles to the right or the left (an L-shaped move).
+ */
+(define "PredatorMoves"
   {
-    (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+    (move (leap (to (sites Empty)) (directions {CW CCW})))
     (move (step (to (sites Empty)) (directions {In Out})))
-    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
-    (capture (step (to (sites Occupied by:Next)) (directions {In Out})))    
+    (capture 
+      (step (to (sites Occupied by:Next)) (directions {In Out}))
+      (then
+        (capture (leap (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+      )
+    )
+  }
+)
+
+/*
+ * MOVE: 1 tile forward or backward 2 tiles to the right or the left (an L-shaped move).
+ * ATTACK: 2 tiles to the right or the left.
+ */
+(define "GuardianMoves"
+  {
+    (move
+      (step (to (sites Empty)) (directions {In Out}))
+      (then
+        (move (leap (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+      )
+    )
+    (capture
+      (leap (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2 ))
+    )
+  }
+)
+
+/*
+ * MOVE: 2 tiles in any direction. This piece can move off the start point and back again.
+ * ATTACK: 1 square forward or backward. Can attack before or after moving, but can only attack once.
+ */
+(define "ScoutMoves"
+  {
+    (move 
+      (leap (to (sites Empty)) (directions {CW CCW}) (between 2 2))
+      (then
+        (if (= (var "scoutMoved") 0)
+          (do
+            (set Var "scoutMoved" 1)
+            (moveAgain)
+          )
+        )
+      )
+    )
+    (move 
+      (step (to (sites Empty)) (directions {Diagonal}))
+      (then
+      (if (= (var "scoutMoved") 0)
+          (do
+            (set Var "scoutMoved" 1)
+            (moveAgain)))))
+    (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
   }
 )
 
@@ -22,53 +87,14 @@
     (piece "Mantellian Savrip" P1 (moves "BruteMoves"))
     (piece "Kintan Strider" P2 (moves "BruteMoves"))
 
-    (piece "K'lor'slug" P1 (moves {
-      (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
-      (move (step (to (sites Empty)) (directions {In Out})))
-      (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
-      (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
-    }))
+    (piece "K'lor'slug" P1 (moves "PredatorMoves"))
+    (piece "Ng'ok" P2 (moves "PredatorMoves"))
 
-    (piece "Ng'ok" P2 (moves {
-      (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
-      (move (step (to (sites Empty)) (directions {In Out})))
-      (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
-      (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
-    }))
+    (piece "Molator" P1 (moves "GuardianMoves"))
+    (piece "Monnok" P2 (moves "GuardianMoves"))
 
-    (piece "Molator" P1 (moves {
-    (move 
-        (step (to (sites Empty)) (directions {In Out}))
-        (then (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
-    )
-    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
-    }))
-
-    (piece "Monnok" P2 (moves {
-    (move 
-        (step (to (sites Empty)) (directions {In Out}))
-        (then (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
-    )
-    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
-    }))
-
-
-    (piece "Ghhhk" P1 (moves {
-        (move
-            (slide (to (sites Empty)) (directions  {CW CCW In Out}) (between 1 1))
-            )
-        (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
-        }
-        )
-    )
-    (piece "Houjix" P2 (moves {
-        (move
-            (slide (to (sites Empty)) (directions  {CW CCW In Out}) (between 1 1))
-            )
-            (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
-        }
-        )
-    )
+    (piece "Ghhhk" P1 (moves "ScoutMoves"))
+    (piece "Houjix" P2 (moves "ScoutMoves"))
   })
 
   (rules
