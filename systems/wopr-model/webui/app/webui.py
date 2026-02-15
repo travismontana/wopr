@@ -8,6 +8,7 @@ import cv2
 import os
 from PIL import Image
 import numpy as np
+from lib.libtools import where_are_pieces
 
 st.title("WOPR Object Detection")
 
@@ -75,10 +76,10 @@ if uploaded:
         coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
         st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
         x1, y1, x2, y2 = box.xyxy[0].int().tolist()
-        polar1_rho = math.isqrt(x1 ^ 2 + y1 ^ 2)
+        polar1_rho = math.isqrt(x1**2 + y1**2)
         polar1_theta_deg = math.degrees(math.atan2(y1, x1))
         polar1_theta_rad = math.radians(polar1_theta_deg)
-        polar2_rho = math.isqrt(x2 ^ 2 + y2 ^ 2)
+        polar2_rho = math.isqrt(x2**2 + y2**2)
         polar2_theta_deg = math.degrees(math.atan2(y2, x2))
         polar2_theta_rad = math.radians(polar2_theta_deg)
         pieces_list.append(
@@ -174,8 +175,7 @@ if uploaded:
                 (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
             )
             st.write(f"Distance from estimated center: {marker_to_circle:.2f} pixels")
-        else:
-            st.warning("Circles found but none near estimated center.")
+
     else:
         st.warning(
             "No circles detected. Try adjusting the Hough parameters or thresholds."
@@ -191,3 +191,5 @@ if uploaded:
     cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
     st.image(img_rgb_u8, caption="Board Detection")
+
+    results = where_are_pieces(pieces_list, circle_center)
