@@ -177,7 +177,7 @@ if uploaded:
             circle_rho = math.isqrt(
                 int((circle_center[0] ** 2 + (circle_center[1] ** 2)))
             )
-            circle_rho_mm = circle_rho / pixel_to_mm
+            circle_rho_mm = circle_rho * pixel_to_mm
             circle_theta_deg = math.degrees(
                 math.atan2(circle_center[1], circle_center[0])
             )
