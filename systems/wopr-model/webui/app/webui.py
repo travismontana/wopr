@@ -238,7 +238,7 @@ if uploaded:
         inner_y = int(cc_y + inner * math.sin(theta))
         inner_num = num // 15  # this should be 1 if 15, 2 if 45
         cv2.putText(
-            img_rgb_u8,s
+            img_rgb_u8,
             str(inner_num),
             (inner_x, inner_y),
             cv2.FONT_HERSHEY_SIMPLEX,
