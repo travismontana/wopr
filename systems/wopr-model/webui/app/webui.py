@@ -245,7 +245,7 @@ if uploaded:
             str(inner_num),
             (inner_x, inner_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            2,
+            1.25,
             (170, 0, 0),
             5,
         )

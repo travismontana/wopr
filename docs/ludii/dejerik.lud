@@ -1,17 +1,26 @@
+(define "BruteMoves"
+  {
+    (move    (step   (to (sites Empty))             (directions {In Out CW CCW Diagonal})))
+    (capture (step   (to (sites Occupied by:Next))  (directions {In Out CW CCW Diagonal})))  
+  }
+)
+
+(define
+  {
+    (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
+    (move (step (to (sites Empty)) (directions {In Out})))
+    (capture (slide (to (sites Occupied by:Next)) (directions {CW CCW}) (between 2 2)))
+    (capture (step (to (sites Occupied by:Next)) (directions {In Out})))    
+  }
+)
+
 (game "Dejarik"
   (players 2)
   (equipment {
     (board (concentric {12 12} stagger:false))
 
-    (piece "Mantellian Savrip" P1 (moves {
-      (move    (step   (to (sites Empty))             (directions {In Out CW CCW})))
-      (capture (step   (to (sites Occupied by:Next))  (directions {In Out CW CCW})))
-    }))
-
-    (piece "Kintan Strider" P2 (moves {
-      (move    (step   (to (sites Empty))             (directions {In Out})))
-      (capture (step   (to (sites Occupied by:Next))  (directions {In Out})))
-    }))
+    (piece "Mantellian Savrip" P1 (moves "BruteMoves"))
+    (piece "Kintan Strider" P2 (moves "BruteMoves"))
 
     (piece "K'lor'slug" P1 (moves {
       (move (slide (to (sites Empty)) (directions {CW CCW}) (between 2 2)))
