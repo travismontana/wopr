@@ -112,7 +112,7 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
     MIDDLE_RING_RHO_MM = 86
     INNER_RING_RHO_MM = 40
 
-    save_list = {}
+    save_list = []
     for piece in pieces_list:
         x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
         polar1_rho_px = piece["polar1"]["rho"]
@@ -141,18 +141,20 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
         piece_s2_theta_rad = math.radians(piece_s2_theta_deg)
         piece_mid_theta_rad = math.radians(piece_mid_theta_deg)
         pclass = piece["class"]
-        save_list["pclass"] = {
-            "class": pclass,
-            "s1_rho": piece_s1_rho,
-            "s2_rho": piece_s2_rho,
-            "mid_rho": piece_mid_rho,
-            "s1_theta_deg": piece_s1_theta_deg,
-            "s2_theta_deg": piece_s2_theta_deg,
-            "mid_theta_deg": piece_mid_theta_deg,
-            "s1_theta_rad": piece_s1_theta_rad,
-            "s2_theta_rad": piece_s2_theta_rad,
-            "mid_theta_rad": piece_mid_theta_rad,
-        }
+        save_list.append(
+            {
+                "class": pclass,
+                "s1_rho": piece_s1_rho,
+                "s2_rho": piece_s2_rho,
+                "mid_rho": piece_mid_rho,
+                "s1_theta_deg": piece_s1_theta_deg,
+                "s2_theta_deg": piece_s2_theta_deg,
+                "mid_theta_deg": piece_mid_theta_deg,
+                "s1_theta_rad": piece_s1_theta_rad,
+                "s2_theta_rad": piece_s2_theta_rad,
+                "mid_theta_rad": piece_mid_theta_rad,
+            },
+        )
 
         is_inner = piece_mid_rho < INNER_RING_RHO_MM
         save_list["pclass"]["is_inner_ring"] = is_inner
