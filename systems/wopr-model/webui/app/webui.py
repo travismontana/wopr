@@ -247,7 +247,7 @@ if uploaded:
             cv2.FONT_HERSHEY_SIMPLEX,
             3,
             (170, 0, 0),
-            1,
+            3,
         )
 
         outer_x = int(cc_x + outer_px * math.cos(theta))
@@ -260,7 +260,7 @@ if uploaded:
             cv2.FONT_HERSHEY_SIMPLEX,
             3,
             (170, 0, 0),
-            1,
+            3,
         )
 
     for result in results:
