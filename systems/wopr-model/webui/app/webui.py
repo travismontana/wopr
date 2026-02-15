@@ -70,8 +70,15 @@ if uploaded:
     detection_count = len(results[0].boxes)
     st.write(f"Detected {detection_count} objects")
     pieces_list = []
+    board_coor = None
+    board_rho = None
+    board_theta_rad = None
     for box in results[0].boxes:
         cls_name = model.names[int(box.cls[0])]
+        if cls_name == "board":
+            board_coor = box.xyxy[0].int().tolist()
+            board_rho = math.isqrt(board_coor[0] ** 2 + board_coor[1] ** 2)
+            board_theta_rad = math.atan2(board_coor[1], board_coor[0])
         conf_score = float(box.conf[0])
         coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
         st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
@@ -187,6 +194,9 @@ if uploaded:
             )
             st.write(
                 f"Circle center polar coordinates: rho={circle_rho} pixels ({circle_rho_mm:.2f} mm), theta={circle_theta_deg} degrees, pixels_to_mm={pixel_to_mm:.2f}"
+            )
+            st.write(
+                f"Board center polar coordinates: rho={board_rho} pixels ({board_rho * pixel_to_mm:.2f} mm), theta={math.degrees(board_theta_rad)} degrees"
             )
             marker_to_circle = np.sqrt(
                 (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
