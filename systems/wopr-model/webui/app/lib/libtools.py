@@ -106,7 +106,7 @@ def export_annotations(project_id):
         logger.error(f"Failed to send export request: {e}")
 
 
-def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
+def where_are_pieces(pieces_list, circle_center, pixel_to_mm, image):
 
     OUTER_RING_RHO_MM = 158
     MIDDLE_RING_RHO_MM = 86
@@ -165,6 +165,15 @@ def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
                     "sector": sector,
                     "cell": (sector + 12) if is_inner else sector,
                 }
+            )
+            cv2.putText(
+                image,
+                pclass,
+                (middle_x + cc_x, middle_y + cc_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 255, 0),
+                1,
             )
 
     return save_list

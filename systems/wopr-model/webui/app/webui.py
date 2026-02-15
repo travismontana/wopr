@@ -220,11 +220,45 @@ if uploaded:
         cv2.rectangle(img_rgb_u8, (x1, y1), (x2, y2), color, 2)
         st.write(f"Found {cls_name} at ({piece['polar1']}, {piece['polar2']})")
 
-    cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
-    cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
-    st.image(img_rgb_u8, caption="Board Detection")
+    # cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
+    # cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
+    # st.image(img_rgb_u8, caption="Board Detection")
 
-    results = where_are_pieces(pieces_list, board_center, pixel_to_mm)
+    results = where_are_pieces(pieces_list, board_center, pixel_to_mm, img_rgb_u8)
+
+    cc_x = circle_center[0]
+    cc_y = circle_center[1]
+
+    # for every 30 degrees starting at 15* and at a set rho, we'll write something
+    for num in range(15, 360, 30):
+        inner = 70
+        outer = 140
+        theta = math.radians(num)
+        inner_x = int(cc_x + inner * math.cos(theta))
+        inner_y = int(cc_y + inner * math.sin(theta))
+        inner_num = num // 15  # this should be 1 if 15, 2 if 45
+        cv2.putText(
+            img_rgb_u8,
+            str(inner_num),
+            (inner_x, inner_y),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 255, 0),
+            1,
+        )
+        
+        outer_x = int(cc_x + outer * math.cos(theta))
+        outer_y = int(cc_y + outer * math.sin(theta))
+        outer_num = (num // 15) + 12
+         cv2.putText(
+            img_rgb_u8,
+            str(outer_num),
+            (outer_x, outer_y),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 255, 0),
+            1,
+        )       
 
     for result in results:
         piece = result["class"]
