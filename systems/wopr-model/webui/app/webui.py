@@ -245,9 +245,9 @@ if uploaded:
             str(inner_num),
             (inner_x, inner_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            3,
+            2,
             (170, 0, 0),
-            3,
+            5,
         )
 
         outer_x = int(cc_x + outer_px * math.cos(theta))
@@ -258,9 +258,9 @@ if uploaded:
             str(outer_num),
             (outer_x, outer_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            3,
+            2,
             (170, 0, 0),
-            3,
+            5,
         )
 
     for result in results:
