@@ -239,7 +239,7 @@ if uploaded:
         theta = math.radians(num)
         inner_x = int(cc_x + inner_px * math.cos(theta))
         inner_y = int(cc_y + inner_px * math.sin(theta))
-        inner_num = num // 15  # this should be 1 if 15, 2 if 45
+        inner_num = num // 30  # this should be 1 if 15, 2 if 45
         cv2.putText(
             img_rgb_u8,
             str(inner_num),
@@ -252,7 +252,7 @@ if uploaded:
 
         outer_x = int(cc_x + outer_px * math.cos(theta))
         outer_y = int(cc_y + outer_px * math.sin(theta))
-        outer_num = (num // 15) + 12
+        outer_num = (num // 30) + 12
         cv2.putText(
             img_rgb_u8,
             str(outer_num),
