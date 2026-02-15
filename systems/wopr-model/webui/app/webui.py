@@ -246,11 +246,11 @@ if uploaded:
             (0, 255, 0),
             1,
         )
-        
+
         outer_x = int(cc_x + outer * math.cos(theta))
         outer_y = int(cc_y + outer * math.sin(theta))
         outer_num = (num // 15) + 12
-         cv2.putText(
+        cv2.putText(
             img_rgb_u8,
             str(outer_num),
             (outer_x, outer_y),
@@ -258,7 +258,7 @@ if uploaded:
             0.5,
             (0, 255, 0),
             1,
-        )       
+        )
 
     for result in results:
         piece = result["class"]
