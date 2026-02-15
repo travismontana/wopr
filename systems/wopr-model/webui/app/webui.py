@@ -68,7 +68,7 @@ if uploaded:
 
     detection_count = len(results[0].boxes)
     st.write(f"Detected {detection_count} objects")
-    peices_list = []
+    pieces_list = []
     for box in results[0].boxes:
         cls_name = model.names[int(box.cls[0])]
         conf_score = float(box.conf[0])
@@ -81,7 +81,7 @@ if uploaded:
         polar2_dis = math.isqrt(x2 ^ 2 + y2 ^ 2)
         polar2_deg = math.degrees(math.atan2(y2, x2))
         polar2_rad = math.radians(polar2_deg)
-        peices_list.append(
+        pieces_list.append(
             {
                 "class": cls_name,
                 "confidence": conf_score,
