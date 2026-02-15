@@ -5,6 +5,8 @@ import uuid
 import requests
 import math
 
+import numpy as np
+
 from label_studio_sdk import LabelStudio
 from label_studio_sdk.converter import Converter
 from label_studio_sdk._extensions.label_studio_tools.core.utils.io import get_local_path
