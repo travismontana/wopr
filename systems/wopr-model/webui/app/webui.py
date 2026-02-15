@@ -229,4 +229,4 @@ if uploaded:
     for result in results:
         piece = result["class"]
         cell = result["cell"]
-        st.write(f"Piece {piece} is in cell {cell}")
+        st.write(f"Piece {piece} is in cell {cell} inner {result['is_inner_ring']}")
