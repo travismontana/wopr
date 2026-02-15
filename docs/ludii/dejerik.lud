@@ -10,9 +10,13 @@
  * ATTACK: 1 tile forward, left, right, or diagonally. Cannot attack pieces that have not moved from their starting position.
  */
 (define "BruteMoves"
-  { // Add wrap around
-    (move    (step (to (sites Empty))             (directions {In Out CW CCW Diagonal})))
-    (capture (step (to (sites Occupied by:Next))  (directions {In Out CW CCW Diagonal})))
+  { // Todos
+    // Can not capture backwards
+    // Can not attack pieces who havnt moved yet
+    // Outer ring wrap
+    (move    (step (to (sites Empty))             (directions {In Out CW CCW {In CW} {In CCW} {Out CW} {Out CCW}} )))
+    (move    (step (to (sites Empty))if:((sites Outer)({{CW CW CW CW CW CW} {CCW CCW CCW CCW CCW CCW}}))))
+    (capture (step (to (sites Occupied by:Next))  (directions {In Out CW CCW {In CW} {In CCW} {Out CW} {Out CCW}})))
   }
 )
 
@@ -24,12 +28,7 @@
   {
     (move (leap {{CW CW} {CCW CCW}} (to (sites Empty))))
     (move (step (to (sites Empty)) (directions {In Out})))
-    (capture 
-      (step (to (sites Occupied by:Next)) (directions {In Out}))
-      (then
-        (capture (leap {{CW  CW} {CCW CCW}} (to (sites Occupied by:Next))))
-      )
-    )
+    (capture (leap {{In CW CW} {In CCW CCW} {Out CW CW} {Out CCW CCW}} (to (sites Occupied by:Next)))    )
   }
 )
 
@@ -43,19 +42,20 @@
       (leap {{In CW CW} {In CCW CCW} {Out CW CW} {Out CCW CCW}} (to (sites Empty)))
     )
     (capture
-      (leap {{CW CW} {CCW CCW}} (to (sites Occupied by:Next)) (directions {CW CCW}))
+      (leap {{CW CW} {CCW CCW}} (to (sites Occupied by:Next)))
     )
   }
 )
 
 /*
  * MOVE: 2 tiles in any direction. This piece can move off the start point and back again.
+ * reading this as 2 tiles, 2 cw/ccw, or 1 cw/ccw && 1 in/out
  * ATTACK: 1 square forward or backward. Can attack before or after moving, but can only attack once.
  */
 (define "ScoutMoves"
   {
     (move 
-      (leap {{CW CW} {CCW CCW}} (to (sites Empty)))
+      (leap {{In CW} {Out CW} {In CCW} {Out CCW} {CW CW} {CCW CCW}} (to (sites Empty)))
       (then
         (if (= (var "scoutMoved") 0)
           (do
@@ -65,13 +65,6 @@
         )
       )
     )
-    (move 
-      (step (to (sites Empty)) (directions {Diagonal}))
-      (then
-      (if (= (var "scoutMoved") 0)
-          (do
-            (set Var "scoutMoved" 1)
-            (moveAgain)))))
     (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
   }
 )
