@@ -1,4 +1,5 @@
 import streamlit as st
+import math
 
 st.set_page_config(layout="wide")  # MUST be first Streamlit call
 
@@ -67,11 +68,32 @@ if uploaded:
 
     detection_count = len(results[0].boxes)
     st.write(f"Detected {detection_count} objects")
+    peices_list = []
     for box in results[0].boxes:
         cls_name = model.names[int(box.cls[0])]
         conf_score = float(box.conf[0])
         coordinates = box.xyxy[0].tolist()  # [x1, y1, x2, y2]
         st.write(f"- {cls_name}: {conf_score:.2f}, Coordinates: {coordinates}")
+        x1, y1, x2, y2 = box.xyxy[0].int().tolist()
+        polar1_dis = math.isqrt(x1 ^ 2 + y1 ^ 2)
+        polar1_deg = math.degrees(math.atan2(y1, x1))
+        polar1_rad = math.radians(polar1_deg)
+        polar2_dis = math.isqrt(x2 ^ 2 + y2 ^ 2)
+        polar2_deg = math.degrees(math.atan2(y2, x2))
+        polar2_rad = math.radians(polar2_deg)
+        peices_list.append(
+            {
+                "class": cls_name,
+                "confidence": conf_score,
+                "coordinates": coordinates,
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
+                "polar1": {"rad": polar1_rad, "deg": polar1_deg},
+                "polar2": {"rad": polar2_rad, "deg": polar2_deg},
+            }
+        )
 
     # === AprilTag + Hough Circle Detection ===
     st.subheader("Board Detection (AprilTag + Hough)")
@@ -82,7 +104,7 @@ if uploaded:
     img_rgb_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2RGB)
 
     # --- AprilTag detection ---
-    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_25h9)
+    dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_36h11)
     detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
     corners, ids, rejected = detector.detectMarkers(img_gray_u8)
 
@@ -150,12 +172,13 @@ if uploaded:
         st.warning(
             "No circles detected. Try adjusting the Hough parameters or thresholds."
         )
-    n = len(results[0].boxes)
-    for box in results[0].boxes:
-        cls_name = model.names[int(box.cls[0])]
+
+    for piece in pieces_list:
+        cls_name = piece["class"]
         color = CLASS_COLORS[cls_name]
-        x1, y1, x2, y2 = box.xyxy[0].int().tolist()
+        x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
         cv2.rectangle(img_rgb_u8, (x1, y1), (x2, y2), color, 2)
+        st.write(f"Found {cls_name} at ({piece['polar1']}, {piece['polar2']})")
 
     cv2.rectangle(img_rgb_u8, (x0, y0), (x1, y1), (255, 255, 0), 2)
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
