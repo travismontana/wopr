@@ -230,5 +230,5 @@ if uploaded:
         piece = result["class"]
         cell = result["cell"]
         st.write(
-            f"Piece {piece} is in cell {cell} inner {result['is_inner_ring']} rho {result['piece_mid_rho']}"
+            f"Piece {piece} is in cell {cell} inner {result['is_inner_ring']} rho {result['mid_rho']}"
         )
