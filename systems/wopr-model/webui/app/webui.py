@@ -225,4 +225,8 @@ if uploaded:
     st.image(img_rgb_u8, caption="Board Detection")
 
     results = where_are_pieces(pieces_list, board_center, pixel_to_mm)
-    st.write(results)
+
+    for result in results:
+        piece = result["class"]
+        cell = result["cell"]
+        st.write(f"Piece {piece} is in cell {cell}")
