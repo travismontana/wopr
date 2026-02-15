@@ -245,8 +245,8 @@ if uploaded:
             str(inner_num),
             (inner_x, inner_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (0, 255, 0),
+            3,
+            (170, 0, 0),
             1,
         )
 
@@ -258,8 +258,8 @@ if uploaded:
             str(outer_num),
             (outer_x, outer_y),
             cv2.FONT_HERSHEY_SIMPLEX,
-            4,
-            (0, 255, 0),
+            3,
+            (170, 0, 0),
             1,
         )
 
