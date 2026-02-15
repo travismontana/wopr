@@ -124,6 +124,10 @@ if uploaded:
             c_int = c.astype(int)
             cv2.polylines(img_rgb_u8, [c_int], True, (0, 255, 255), 2)
         marker_center = np.mean(corners[0][0], axis=0).astype(int)
+        # distance between the corners is the size of the marker
+        tag_side_length = np.linalg.norm(corners[0][0][0] - corners[0][0][1])
+        tag_size = 35
+        pixel_to_mm = tag_size / tag_side_length
 
     H, W = img_gray_u8.shape[:2]
 
@@ -171,12 +175,15 @@ if uploaded:
 
             circle_center = (kept[0][0], kept[0][1])
             r = kept[0][2]
-            st.write(f"Detected circle center at: {circle_center} with radius {r}")
+            st.write(
+                f"Detected circle center at: {circle_center} with radius {r} pixels {r * pixel_to_mm:.2f} mm"
+            )
             marker_to_circle = np.sqrt(
                 (circle_center[0] - est_cx) ** 2 + (circle_center[1] - est_cy) ** 2
             )
-            st.write(f"Distance from estimated center: {marker_to_circle:.2f} pixels")
-
+            st.write(
+                f"Marker to circle center: {marker_to_circle:.2f} pixels {marker_to_circle * pixel_to_mm:.2f} mm"
+            )
     else:
         st.warning(
             "No circles detected. Try adjusting the Hough parameters or thresholds."
@@ -193,4 +200,4 @@ if uploaded:
     cv2.circle(img_rgb_u8, (est_cx, est_cy), 6, (255, 255, 0), -1)
     st.image(img_rgb_u8, caption="Board Detection")
 
-    results = where_are_pieces(pieces_list, circle_center)
+    results = where_are_pieces(pieces_list, circle_center, pixel_to_mm)

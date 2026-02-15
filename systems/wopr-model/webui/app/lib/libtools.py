@@ -103,13 +103,51 @@ def export_annotations(project_id):
     except Exception as e:
         logger.error(f"Failed to send export request: {e}")
 
-def where_are_pieces(pieces_list, circle_center):
 
-    OUTER_RING_RHO = 158
-    MIDDLE_RING_RHO = 86
-    INNER_RING_RHO = 40
+def where_are_pieces(pieces_list, circle_center, pixel_to_mm):
 
+    OUTER_RING_RHO_MM = 158
+    MIDDLE_RING_RHO_MM = 86
+    INNER_RING_RHO_MM = 40
+
+    save_list = []
     for piece in pieces_list:
         x1, y1, x2, y2 = piece["x1"], piece["y1"], piece["x2"], piece["y2"]
         polar1_rho_px = piece["polar1"]["rho"]
         polar2_rho_px = piece["polar2"]["rho"]
+        cc_x = circle_center[0]
+        cc_y = circle_center[1]
+        fixed_x1 = x1 - cc_x
+        fixed_x2 = x2 - cc_x
+        fixed_y1 = y1 - cc_y
+        fixed_y2 = y2 - cc_y
+        middle_x = np.mean([fixed_x1, fixed_x2]).astype(int)
+        middle_y = np.mean([fixed_y1, fixed_y2]).astype(int)
+        fixed_x1_mm = fixed_x1 * pixel_to_mm
+        fixed_x2_mm = fixed_x2 * pixel_to_mm
+        middle_x_mm = middle_x * pixel_to_mm
+        fixed_y1_mm = fixed_y1 * pixel_to_mm
+        fixed_y2_mm = fixed_y2 * pixel_to_mm
+        middle_y_mm = middle_y * pixel_to_mm
+        piece_s1_rho = math.isqrt(fixed_x1_mm**2 + fixed_y1_mm**2)
+        piece_s2_rho = math.isqrt(fixed_x2_mm**2 + fixed_y2_mm**2)
+        piece_mid_rho = math.isqrt(middle_x_mm**2 + middle_y_mm**2)
+        piece_s1_theta_deg = math.degrees(math.atan2(fixed_y1_mm, fixed_x1_mm))
+        piece_s2_theta_deg = math.degrees(math.atan2(fixed_y2_mm, fixed_x2_mm))
+        piece_mid_theta_deg = math.degrees(math.atan2(middle_y_mm, middle_x_mm))
+        piece_s1_theta_rad = math.radians(piece_s1_theta_deg)
+        piece_s2_theta_rad = math.radians(piece_s2_theta_deg)
+        piece_mid_theta_rad = math.radians(piece_mid_theta_deg)
+        pclass = piece["class"]
+        save_list[pclass] = {
+            "class": pclass,
+            "s1_rho": piece_s1_rho,
+            "s2_rho": piece_s2_rho,
+            "mid_rho": piece_mid_rho,
+            "s1_theta_deg": piece_s1_theta_deg,
+            "s2_theta_deg": piece_s2_theta_deg,
+            "mid_theta_deg": piece_mid_theta_deg,
+            "s1_theta_rad": piece_s1_theta_rad,
+            "s2_theta_rad": piece_s2_theta_rad,
+            "mid_theta_rad": piece_mid_theta_rad,
+        }
