@@ -17,7 +17,11 @@ logger.setLevel(logging.INFO)
 
 logger.info("Starting JVM...")
 logger.info(f"Default JVM Path: {jpype.getDefaultJVMPath()}")
-jpype.startJVM(classpath=["./Ludii.jar"])
+jpype.startJVM(
+    "-Djava.awt.headless=true",
+    "--enable-native-access=ALL-UNNAMED",
+    classpath=["./Ludii.jar"],
+)
 logger.info("JVM started.")
 
 
