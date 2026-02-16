@@ -1,112 +1,158 @@
-/*
- * Important Notes apparently.
- * When your piece attacks your opponent’s piece, your piece will move to occupy that location. Once in that location if another opponent’s piece is on a subsequent attack tile then you can take that piece too, chaining the attacks together.
- * ^ ^ ^ ^ ^
- * that means chainable attackes, e.g. SequenceCapture
- */
+// Dejarik (Holochess) - Star Wars
+// Board: Two concentric rings of 12 positions each
+// joinCorners:True creates diagonal adjacency between rings
 
-/*
- * MOVE: 1 tile forward, backward, left, right, or diagonally. When moving backward on the outer circle this piece can move as if it was going off the board to the other side.
- * ATTACK: 1 tile forward, left, right, or diagonally. Cannot attack pieces that have not moved from their starting position.
- */
+// TODO: "Cannot attack pieces that have not moved from their starting position"
+//       Requires per-piece state tracking (e.g. (state) on each piece).
+//       Not yet implemented.
+
+// TODO: "When moving backward on the outer circle this piece can move as if
+//       it was going off the board to the other side."
+//       CW/CCW wrapping is handled by ring topology, but Out-wrapping on
+//       the outer ring to the opposite side needs custom logic.
+
+// TODO: Chainable attacks (SequenceCapture) — noted in the design doc but
+//       not yet wired into any piece moves.
+
+//-------------------------------------------------------------------------
+// Shared defines
+//-------------------------------------------------------------------------
+
+(define "IsEnemyAt" (is Enemy (who at:(to))))
+
+// BRUTE class
+// MOVE: 1 tile forward, backward, left, right, or diagonally.
+// ATTACK: 1 tile forward, left, right, or diagonally (no backward).
+//         Cannot attack pieces that have not moved from their starting position.
 (define "BruteMoves"
-  { // Todos
-    // Can not attack pieces who havnt moved yet
-    (move
-      (step (to (sites Empty))
-      (directions {In Out CW CCW {In CW} {In CCW} {Out CW} {Out CCW}} ))
-    )
-    (move    
-      (leap (from (sites Outer))
-        {{CCW CCW CCW CCW CCW CCW}}
-        (to (sites Empty))
-      )
-    )
-    (capture (step (to (sites Occupied by:Next))  (directions {In Out CW CCW {In CW} {In CCW} {Out CW} {Out CCW}})))
-  }
-)
-
-/*
- * MOVE: 2 tiles to the left or 2 tiles to the right. This piece can hop over other pieces. 1 tile forward or backward.
- * ATTACK: 1 tile forward or backward then 2 tiles to the right or the left (an L-shaped move).
- */
-(define "PredatorMoves"
-  {
-    (move (leap {{CW CW} {CCW CCW}} (to (sites Empty))))
-    (move (step (to (sites Empty)) (directions {In Out})))
-    (capture (leap {{In CW CW} {In CCW CCW} {Out CW CW} {Out CCW CCW}} (to (sites Occupied by:Next)))    )
-  }
-)
-
-/*
- * MOVE: 1 tile forward or backward 2 tiles to the right or the left (an L-shaped move).
- * ATTACK: 2 tiles to the right or the left.
- */
-(define "GuardianMoves"
-  {
-    (move
-      (leap {{In CW CW} {In CCW CCW} {Out CW CW} {Out CCW CCW}} (to (sites Empty)))
-    )
-    (capture
-      (leap {{CW CW} {CCW CCW}} (to (sites Occupied by:Next)))
-    )
-  }
-)
-
-/*
- * MOVE: 2 tiles in any direction. This piece can move off the start point and back again.
- * reading this as 2 tiles, 2 cw/ccw, or 1 cw/ccw && 1 in/out
- * ATTACK: 1 square forward or backward. Can attack before or after moving, but can only attack once.
- */
-(define "ScoutMoves"
-  {
-    (move 
-      (leap {{In CW} {Out CW} {In CCW} {Out CCW} {CW CW} {CCW CCW}} (to (sites Empty)))
-      (then
-        (if (= (var "scoutMoved") 0)
-          (do
-            (set Var "scoutMoved" 1)
-            (moveAgain)
-          )
+    (or
+        // Movement — all adjacent directions (includes diagonals via joinCorners)
+        (move Step
+          (directions {In CW CCW Diagonal})
+          (to if:(is Empty (to)))
         )
-      )
+        // Attack — all directions except Out (backward)
+        (move Step
+            (directions {In CW CCW Diagonal})
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
     )
-    (capture (step (to (sites Occupied by:Next)) (directions {In Out})))
-  }
 )
+
+// PREDATOR class
+// MOVE: 2 tiles to the left or right (can hop). 1 tile forward or backward.
+// ATTACK: 1 tile forward or backward then 2 tiles right or left (L-shape).
+(define "PredatorMoves"
+    // TODO: Implement L-shaped attack and 2-tile hop movement.
+    //       Hop ludeme needs validation on concentric boards.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+// GUARDIAN class
+// MOVE: 1 tile forward or backward, 2 tiles right or left (L-shape).
+// ATTACK: 2 tiles to the right or left.
+(define "GuardianMoves"
+    // TODO: Implement L-shaped movement and 2-tile lateral attack.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+// SCOUT class
+// MOVE: 2 tiles in any direction.
+// ATTACK: 1 tile forward or backward. Can attack before or after moving,
+//         but only once.
+(define "ScoutMoves"
+    // TODO: Implement 2-tile movement and attack-before-or-after-move logic.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (directions {In Out})
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+//-------------------------------------------------------------------------
+// Game
+//-------------------------------------------------------------------------
 
 (game "Dejarik"
-  (players 2)
-  (equipment {
-    (board (concentric {12 12} stagger:false))
+    (players 2)
+    (equipment {
+        (board (concentric {12 12} joinCorners:True))
 
-    (piece "Mantellian Savrip" P1 (moves "BruteMoves"))
-    (piece "Kintan Strider" P2 (moves "BruteMoves"))
+        (piece "A" P1 ("BruteMoves"))   // Mantellian Savrip
+        (piece "B" P2 ("BruteMoves"))   // Kintan Strider
 
-    (piece "K'lor'slug" P1 (moves "PredatorMoves"))
-    (piece "Ng'ok" P2 (moves "PredatorMoves"))
+        (piece "C" P1 ("PredatorMoves")) // K'lor'slug
+        (piece "D" P2 ("PredatorMoves")) // Ng'ok
 
-    (piece "Molator" P1 (moves "GuardianMoves"))
-    (piece "Monnok" P2 (moves "GuardianMoves"))
+        (piece "E" P1 ("GuardianMoves")) // Molator
+        (piece "F" P2 ("GuardianMoves")) // Monnok
 
-    (piece "Ghhhk" P1 (moves "ScoutMoves"))
-    (piece "Houjix" P2 (moves "ScoutMoves"))
-  })
-
-  (rules
-    (start {
-        (place "Ng'ok" (site 0))
-        (place "Monnok" (site 11))
-        (place "Houjix" (site 12))
-        (place "Kintan Strider" (site 23))
-        (place "K'lor'slug" (site 6))
-        (place "Ghhhk" (site 5))
-        (place "Molator" (site 18))
-        (place "Mantellian Savrip" (site 17))
+        (piece "G" P1 ("ScoutMoves"))   // Ghhhk
+        (piece "H" P2 ("ScoutMoves"))   // Houjix
     })
 
-    (play (move))  ; uses each piece’s (moves ...) definitions
+    (rules
+        (start {
+            // P2 pieces
+            (place "D2" 18)    // Ng'ok
+            (place "F2" 19)   // Monnok
+            (place "H2" 5)   // Houjix
+            (place "B2" 6)   // Kintan Strider
+            // P1 pieces
+            (place "C1" 13)    // K'lor'slug
+            (place "G1" 11)    // Ghhhk
+            (place "E1" 12)   // Molator
+            (place "A1" 0)   // Mantellian Savrip
+        })
 
-    (end (if (no Pieces Next) (result Mover Win)))
-  )
+        (play
+            (do
+                (set Var "scoutMoved" 0)
+                next:(forEach Piece)
+            )
+        )
+
+        (end (if (no Pieces Next) (result Mover Win)))
+    )
+)
+
+(metadata
+    (info
+        {
+            (description "Dejarik is a strategy board game played on a circular board with concentric rings. Players control various pieces with unique movement and attack patterns.")
+        }
+    )
 )
