@@ -1,0 +1,158 @@
+// Dejarik (Holochess) - Star Wars
+// Board: Two concentric rings of 12 positions each
+// joinCorners:True creates diagonal adjacency between rings
+
+// TODO: "Cannot attack pieces that have not moved from their starting position"
+//       Requires per-piece state tracking (e.g. (state) on each piece).
+//       Not yet implemented.
+
+// TODO: "When moving backward on the outer circle this piece can move as if
+//       it was going off the board to the other side."
+//       CW/CCW wrapping is handled by ring topology, but Out-wrapping on
+//       the outer ring to the opposite side needs custom logic.
+
+// TODO: Chainable attacks (SequenceCapture) — noted in the design doc but
+//       not yet wired into any piece moves.
+
+//-------------------------------------------------------------------------
+// Shared defines
+//-------------------------------------------------------------------------
+
+(define "IsEnemyAt" (is Enemy (who at:(to))))
+
+// BRUTE class
+// MOVE: 1 tile forward, backward, left, right, or diagonally.
+// ATTACK: 1 tile forward, left, right, or diagonally (no backward).
+//         Cannot attack pieces that have not moved from their starting position.
+(define "BruteMoves"
+    (or
+        // Movement — all adjacent directions (includes diagonals via joinCorners)
+        (move Step
+          (directions {In CW CCW Diagonal})
+          (to if:(is Empty (to)))
+        )
+        // Attack — all directions except Out (backward)
+        (move Step
+            (directions {In CW CCW Diagonal})
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+// PREDATOR class
+// MOVE: 2 tiles to the left or right (can hop). 1 tile forward or backward.
+// ATTACK: 1 tile forward or backward then 2 tiles right or left (L-shape).
+(define "PredatorMoves"
+    // TODO: Implement L-shaped attack and 2-tile hop movement.
+    //       Hop ludeme needs validation on concentric boards.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+// GUARDIAN class
+// MOVE: 1 tile forward or backward, 2 tiles right or left (L-shape).
+// ATTACK: 2 tiles to the right or left.
+(define "GuardianMoves"
+    // TODO: Implement L-shaped movement and 2-tile lateral attack.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+// SCOUT class
+// MOVE: 2 tiles in any direction.
+// ATTACK: 1 tile forward or backward. Can attack before or after moving,
+//         but only once.
+(define "ScoutMoves"
+    // TODO: Implement 2-tile movement and attack-before-or-after-move logic.
+    //       Stubbed to basic step for now so the file compiles.
+    (or
+        (move Step
+            (to if:(is Empty (to)))
+        )
+        (move Step
+            (directions {In Out})
+            (to
+                if:("IsEnemyAt" (to))
+                (apply (remove (to)))
+            )
+        )
+    )
+)
+
+//-------------------------------------------------------------------------
+// Game
+//-------------------------------------------------------------------------
+
+(game "Dejarik"
+    (players 2)
+    (equipment {
+        (board (concentric {12 12} joinCorners:True))
+
+        (piece "A" P1 ("BruteMoves"))   // Mantellian Savrip
+        (piece "B" P2 ("BruteMoves"))   // Kintan Strider
+
+        (piece "C" P1 ("PredatorMoves")) // K'lor'slug
+        (piece "D" P2 ("PredatorMoves")) // Ng'ok
+
+        (piece "E" P1 ("GuardianMoves")) // Molator
+        (piece "F" P2 ("GuardianMoves")) // Monnok
+
+        (piece "G" P1 ("ScoutMoves"))   // Ghhhk
+        (piece "H" P2 ("ScoutMoves"))   // Houjix
+    })
+
+    (rules
+        (start {
+            // P2 pieces
+            (place "D2" 18)    // Ng'ok
+            (place "F2" 19)   // Monnok
+            (place "H2" 5)   // Houjix
+            (place "B2" 6)   // Kintan Strider
+            // P1 pieces
+            (place "C1" 13)    // K'lor'slug
+            (place "G1" 11)    // Ghhhk
+            (place "E1" 12)   // Molator
+            (place "A1" 0)   // Mantellian Savrip
+        })
+
+        (play
+            (do
+                (set Var "scoutMoved" 0)
+                next:(forEach Piece)
+            )
+        )
+
+        (end (if (no Pieces Next) (result Mover Win)))
+    )
+)
+
+(metadata
+    (info
+        {
+            (description "Dejarik is a strategy board game played on a circular board with concentric rings. Players control various pieces with unique movement and attack patterns.")
+        }
+    )
+)
