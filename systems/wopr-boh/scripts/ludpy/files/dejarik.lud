@@ -109,7 +109,7 @@
 (game "Dejarik"
     (players 2)
     (equipment {
-        (board (concentric {12 12} joinCorners:True))
+        (board (concentric {12 13} rings:2 joinCorners:False))
 
         (piece "A" P1 ("BruteMoves"))   // Mantellian Savrip
         (piece "B" P2 ("BruteMoves"))   // Kintan Strider

@@ -20,6 +20,9 @@
 
 (define "IsEnemyAt" (is Enemy (who at:(to))))
 
+(define "InnerRing" (is Ring 1))
+(define "OuterRing" (is Ring 2))
+
 // BRUTE class
 // MOVE: 1 tile forward, backward, left, right, or diagonally.
 // ATTACK: 1 tile forward, left, right, or diagonally (no backward).
@@ -28,12 +31,12 @@
     (or
         // Movement — all adjacent directions (includes diagonals via joinCorners)
         (move Step
-          (directions {In CW CCW Diagonal})
-          (to if:(is Empty (to)))
+            (to if:(is Empty (to)
+                )
+            )
         )
         // Attack — all directions except Out (backward)
         (move Step
-            (directions {In CW CCW Diagonal})
             (to
                 if:("IsEnemyAt" (to))
                 (apply (remove (to)))
@@ -50,7 +53,8 @@
     //       Hop ludeme needs validation on concentric boards.
     //       Stubbed to basic step for now so the file compiles.
     (or
-        (move Step
+        (move Leap
+            (directions Backwards of:All)
             (to if:(is Empty (to)))
         )
         (move Step
@@ -62,6 +66,9 @@
     )
 )
 
+(define "GuardWalk"
+{ { In CW In } }
+)
 // GUARDIAN class
 // MOVE: 1 tile forward or backward, 2 tiles right or left (L-shape).
 // ATTACK: 2 tiles to the right or left.
@@ -69,8 +76,8 @@
     // TODO: Implement L-shaped movement and 2-tile lateral attack.
     //       Stubbed to basic step for now so the file compiles.
     (or
-        (move Step
-            (to if:(is Empty (to)))
+        ("LWalk")
+            (to if:(is Empty (to))
         )
         (move Step
             (to
@@ -109,7 +116,9 @@
 (game "Dejarik"
     (players 2)
     (equipment {
-        (board (concentric {12 12} joinCorners:True))
+        (board
+            (remove (concentric {12 12 12} joinCorners:True) cells:{0..11}
+        ))
 
         (piece "A" P1 ("BruteMoves"))   // Mantellian Savrip
         (piece "B" P2 ("BruteMoves"))   // Kintan Strider
@@ -129,11 +138,11 @@
             // P2 pieces
             (place "D2" 18)    // Ng'ok
             (place "F2" 19)   // Monnok
-            (place "H2" 5)   // Houjix
+            (place "H2" 7)   // Houjix
             (place "B2" 6)   // Kintan Strider
             // P1 pieces
             (place "C1" 13)    // K'lor'slug
-            (place "G1" 11)    // Ghhhk
+            (place "G1" 1)    // Ghhhk
             (place "E1" 12)   // Molator
             (place "A1" 0)   // Mantellian Savrip
         })

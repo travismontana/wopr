@@ -1,7 +1,7 @@
 game=/home/bob/local/wopr/systems/wopr-boh/scripts/ludpy/dejarik.lud
 START GAME OPTIONS
 END GAME OPTIONS
-RNG internal state=29,-11,55,37,96,19,-37,-17
+RNG internal state=27,119,-5,-42,19,98,29,65
 Move=[Move:mover=0,from=18,to=18,actions=[Add:type=Cell,to=18,what=4]]
 Move=[Move:mover=0,from=19,to=19,actions=[Add:type=Cell,to=19,what=6]]
 Move=[Move:mover=0,from=5,to=5,actions=[Add:type=Cell,to=5,what=8]]
@@ -10,7 +10,6 @@ Move=[Move:mover=0,from=13,to=13,actions=[Add:type=Cell,to=13,what=3]]
 Move=[Move:mover=0,from=11,to=11,actions=[Add:type=Cell,to=11,what=7]]
 Move=[Move:mover=0,from=12,to=12,actions=[Add:type=Cell,to=12,what=5]]
 Move=[Move:mover=0,from=0,to=0,actions=[Add:type=Cell,to=0,what=1]]
-Move=[Move:mover=1,from=13,to=23,actions=[SetVar:name=scoutMoved,value=0],[Move:typeFrom=Cell,from=13,typeTo=Cell,to=23,decision=true]]
 numInitialPlacementMoves=8
 rankings=0.0,0.0,0.0
 SANDBOX=false
