@@ -78,6 +78,7 @@ def setup_arg():
 
 # do_move
 def do_moves(moves_file, game, trial, context):
+    results = []
     logger.info(f"Processing moves from file: {moves_file}")
     model = context.model()
     piece_maps = map_pieces(game)
@@ -96,17 +97,46 @@ def do_moves(moves_file, game, trial, context):
         logger.info(f"Total lines read: {len(rows)}")
     logger.debug(f"Rows details: {rows}")
     logger.info(f"Fields: {', '.join(fields)}")
-
+    first_run = True
     for move in rows:
+        this_move_results = []
         logger.info(f"Working on: {move}")
         # playerid,pieceid,destcell
         player_id = move[0]
         piece_id = move[1]
-        dest_cell = move[2]
+        source_cell = int(move[2])
+        source_cell_validated = source_cell if 0 < source_cell < 24 else None
+        if source_cell_validated is None:
+            logger.error(f"Invalid source cell: {source_cell}")
+            results.append(
+                {
+                    "piece_id": piece_id,
+                    "source_cell": source_cell,
+                    "dest_cell": dest_cell,
+                    "move": move,
+                    "reason": "Invalid source cell",
+                    "status": "illegal",
+                    "details": {},
+                }
+            )
+            return results
+        logger.info(f"Validated source cell: {source_cell} -> {source_cell_validated}")
+        dest_cell = int(move[3])
         dest_cell_validated = dest_cell if 0 < dest_cell < 24 else None
         if dest_cell_validated is None:
             logger.error(f"Invalid destination cell: {dest_cell}")
-            continue
+            results.append(
+                {
+                    "piece_id": piece_id,
+                    "source_cell": source_cell,
+                    "dest_cell": dest_cell,
+                    "move": move,
+                    "reason": "Invalid destination cell",
+                    "status": "illegal",
+                    "details": {},
+                }
+            )
+            return results
         logger.info(f"Validated destination cell: {dest_cell} -> {dest_cell_validated}")
 
         piece_id_validated = piece_maps.get(piece_id)
@@ -114,6 +144,58 @@ def do_moves(moves_file, game, trial, context):
             logger.error(f"Invalid piece ID: {piece_id}")
             continue
         logger.info(f"Validated piece ID: {piece_id} -> {piece_id_validated}")
+
+        legal_moves = game.moves(context).moves()
+        possible_start = []
+        possible_dest = []
+        for index in range(legal_moves.size()):
+            move = legal_moves.get(index)
+            possible_start.append(move.fromNonDecision())
+            possible_dest.append(move.toNonDecision())
+            logger.info(f"Move: {move}")
+            if (
+                move.fromNonDecision() == source_cell_validated
+                and move.toNonDecision() == dest_cell_validated
+            ):
+                logger.info(f"Found matching move: {move}")
+                results.append(
+                    {
+                        "piece_id": piece_id,
+                        "source_cell": source_cell_validated,
+                        "dest_cell": dest_cell_validated,
+                        "move": move,
+                        "reason": "Move matches source and destination cells",
+                        "status": "valid",
+                        "details": {},
+                    }
+                )
+                continue
+        logger.info(f"Results: {results}")
+        if len(this_move_results) == 0 and not first_run:
+            if source_cell_validated not in possible_start:
+                reason = "Source cell is not a possible start"
+            elif dest_cell_validated not in possible_dest:
+                reason = "Destination cell is not a possible destination"
+            else:
+                reason = "Move does not match source and destination cells, illegal"
+            results.append(
+                {
+                    "piece_id": piece_id,
+                    "source_cell": source_cell_validated,
+                    "dest_cell": dest_cell_validated,
+                    "move": None,
+                    "reason": reason,
+                    "status": "illegal",
+                    "details": {
+                        "possible_start": possible_start,
+                        "possible_dest": possible_dest,
+                    },
+                }
+            )
+            return results
+        else:
+            first_run = False
+    return results
 
 
 def print_all(game, trial, context):
@@ -128,12 +210,18 @@ def print_all(game, trial, context):
     print_info("Cell 0 Details", game.board().topology().cells().get(0).label())
     # inspect(game.board().topology().cells().get(0))
     print_info("Legal Moves", game.moves(context).moves())
-    inspect(game.moves(context).moves())
+    # inspect(game.moves(context).moves())
     print_info("Move 1", game.moves(context).moves().get(1))
-    inspect(game.moves(context).moves().get(1))
+    inspect(game.moves(context).moves().get(0))
     print_info(
         "Move 1 toNonDecision()", game.moves(context).moves().get(1).toNonDecision()
     )
+    print_info("Pieces info", game.equipment().components())
+    for piece in game.equipment().components():
+        print_info(f"Piece {piece.name()}", piece)
+        inspect(piece)
+    print_info("Pieces info", game.equipment().components())
+    # inspect(game.equipment().components().name())
 
     print_info_flush()
 
@@ -195,6 +283,20 @@ def inspect(obj, show_inherited=False):
     print(f"  ({len(entries)} methods)\n")
 
 
+def results_print(results):
+    for result in results:
+        print(f"** Move Results: **")
+        print(f"Piece: {result.get('piece_id')}")
+        print(f"Source: {result.get('source_cell')}")
+        print(f"Destination: {result.get('dest_cell')}")
+        print(f"Move: {result.get('move')}")
+        print(f"Status: {result.get('status')}")
+        print(f"Reason: {result.get('reason')}")
+        for deet in result.get("details", {}):
+            print(f"  {deet}: {result['details'][deet]}")
+        print()
+
+
 args = setup_arg().parse_args()
 
 if args.verbose:
@@ -238,7 +340,9 @@ if args.moves:
         exit(1)
     else:
         logger.info(f"Moves file exists: {moves_file}")
-    do_moves(moves_file, game, trial, context)
+    results = do_moves(moves_file, game, trial, context)
+    results_print(results)
+
 
 if args.info:
     print_all(game, trial, context)
