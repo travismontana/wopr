@@ -245,7 +245,7 @@ def add_images_to_db(request):  # plural
                     logger.info(f"Added to DB: {image_name}")
                 elif action == "move_to_archive":
                     # Move file to archive
-                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_path']}/{image_name}"
+                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
                     try:
                         os.rename(full_path, archive_path)
                     except Exception as e:
