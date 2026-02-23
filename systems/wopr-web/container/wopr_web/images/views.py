@@ -256,6 +256,9 @@ def add_images_to_db(request):  # plural
                                 "message": f"Failed to move {image_name} to archive: {str(e)}",
                             }
                         )
+                        return render(
+                            request, "images_results.html", {"results": results}
+                        )
                     logger.info(f"Moved {image_name} to archive")
                     results.append(
                         {
@@ -263,6 +266,7 @@ def add_images_to_db(request):  # plural
                             "message": f"Moved to archive: {image_name}",
                         }
                     )
+
             except Exception as e:
                 logger.error(f"Failed to add {image_name}: {e}")
                 results.append(
