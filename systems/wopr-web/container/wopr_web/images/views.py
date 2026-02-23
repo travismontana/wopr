@@ -367,12 +367,13 @@ def images_games_index(request):
     images = Image.objects.all()
     image_games = ImageGame.objects.all()
     for game in games:
-        image_game_data[f"{game.id}"] = [
-            img
-            for img in images
-            if ImageGame.objects.filter(game=game, image=img).exists()
-        ]
-
+        image_game_data.append(
+            {
+                "id": game.id,
+                "name": game.name,
+                "images": ImageGame.objects.filter(game=game),
+            }
+        )
     images_not_assigned_to_a_game = [
         img for img in images if not ImageGame.objects.filter(image=img).exists()
     ]
