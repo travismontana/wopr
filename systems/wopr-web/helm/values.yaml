@@ -28,10 +28,15 @@ wopr-baseapp:
   volumeMounts:
     - name: config
       mountPath: /config
+    - name: wopr-data
+      mountPath: /remote/wopr
   volumes:
     - name: config
       configMap:
         name: wopr-json
+    - name: wopr-data
+      persistentVolumeClaim:
+        claimName: wopr-web-nfs-pvc
   env:
     - name: DB_HOST
       valueFrom:
