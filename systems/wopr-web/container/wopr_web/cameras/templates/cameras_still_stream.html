@@ -15,6 +15,30 @@ Welcome to the Cameras page.
             <img src="https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300:200/plain/http://wopr-cam:5100/snapshot"></a></td>
         <td><a href="http://wopr-cam:5101/stream">
             <img src="https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300:200/plain/http://wopr-cam:5101/snapshot"></a></td>
+        <td><blink>Coming Soon!</blink></td>
+    </tr>
+    <tr>
+        <td>
+            <form action="{% url 'grab_snapshot' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="camera" value="1">
+                <button type="submit">Grab Snapshot</button>
+            </form>
+        </td>
+        <td>
+            <form action="{% url 'grab_snapshot' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="camera" value="2">
+                <button type="submit">Grab Snapshot</button>
+            </form>
+        </td>
+        <td>
+            <form action="{% url 'grab_snapshot' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="camera" value="0">
+                <button type="submit">Grab Snapshot</button>
+            </form>
+        </td>
     </tr>
 </table>
 {% endblock %}

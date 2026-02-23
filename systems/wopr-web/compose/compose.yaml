@@ -23,7 +23,9 @@ services:
       LABEL_STUDIO_URL: "${LABEL_STUDIO_URL}"
       LABEL_STUDIO_TOKEN: "${LABEL_STUDIO_TOKEN}"
       CAMERA_HOST: "${CAMERA_HOST}"
-      CAMERA_PORT: "${CAMERA_PORT}"
+      CAMERA_PORT1: "${CAMERA_PORT1}"
+      CAMERA_PORT2: "${CAMERA_PORT2}"
+      CAMERA_PORT3: "${CAMERA_PORT3}"
     volumes:
       - /remote/wopr/labelstudio:/remote/wopr/labelstudio
       - /remote/wopr/images:/remote/wopr/images
