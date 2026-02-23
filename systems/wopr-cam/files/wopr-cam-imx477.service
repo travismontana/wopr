@@ -5,8 +5,11 @@ After=network.target
 Environment="SCRIPT_ARGS=%I"
 User=wopr
 Group=wopr
-ExecStart=/bin/sh -c '/usr/bin/rpicam-vid -t 0 --width 3840 --height 2160 \
-            --codec mjpeg --framerate 6 -o - | \
-            /usr/bin/ustreamer -d /dev/stdin --format=MJPEG -h 0.0.0.0 -p 5102'
+ExecStartPre=/bin/sh -c 'rm -f /tmp/imx477.fifo && mkfifo /tmp/imx477.fifo'
+ExecStart=/bin/sh -c '/usr/bin/rpicam-vid -t 0 --width 1920 --height 1080 \
+  --codec mjpeg --framerate 6 -o /tmp/imx477.fifo & \
+  /usr/bin/ustreamer -d /tmp/imx477.fifo --format=MJPEG -h 0.0.0.0 -p 5102; \
+  wait'
+ExecStopPost=/bin/sh -c 'rm -f /tmp/imx477.fifo' 
 [Install]
 WantedBy=multi-user.target
