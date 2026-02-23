@@ -5,7 +5,7 @@ import sys
 
 from django.shortcuts import render
 
-from core.models import Image
+from core.models import Image, ImageGame, Game
 
 from lib.helpers import setup_logger, get_config
 
@@ -363,3 +363,36 @@ def images_games_index(request):
     # Need name, image_total
     image_game_data = []
     results = []
+    games = Game.objects.all()
+    images = Image.objects.all()
+    image_games = ImageGame.objects.all()
+    for game in games:
+        image_game_data[f"{game.id}"] = [
+            img
+            for img in images
+            if ImageGame.objects.filter(game=game, image=img).exists()
+        ]
+
+    images_not_assigned_to_a_game = [
+        img for img in images if not ImageGame.objects.filter(image=img).exists()
+    ]
+
+    if image_game_data is not None:
+        results = {
+            "status": "success",
+            "message": "Retrieved image game data successfully",
+        }
+    else:
+        results = {
+            "status": "error",
+            "message": "Failed to retrieve image game data",
+        }
+    return render(
+        request,
+        "image_games_index.html",
+        {
+            "results": results,
+            "image_game_data": image_game_data,
+            "images_not_assigned_to_a_game": images_not_assigned_to_a_game,
+        },
+    )

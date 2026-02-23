@@ -14,5 +14,11 @@
         <td>{{ game.num_images_total }}</td>
     </tr>
     {% endfor %}
+    {% if images_not_assigned_to_a_game %}
+    <tr>
+        <td>Not Assigned to a Game</td>
+        <td>{{ images_not_assigned_to_a_game|length }}</td>
+    </tr>
+    {% endif %}
 {% endif %}
 {% endblock %}
