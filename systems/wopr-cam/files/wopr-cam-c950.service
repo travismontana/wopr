@@ -1,0 +1,9 @@
+[Unit]
+Description=c950 streamer
+After=network.target
+[Service]
+Environment="SCRIPT_ARGS=%I"
+User=wopr
+ExecStart=/usr/bin/ustreamer -r 1920x1080 -s 0.0.0.0 -p 5101 --format=mjpeg -f 6 -d /dev/wopr-c950 --quality 100
+[Install]
+WantedBy=multi-user.target
