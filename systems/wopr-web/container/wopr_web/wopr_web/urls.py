@@ -24,4 +24,5 @@ urlpatterns = [
     path("images/", include("images.urls")),
     path("game_sessions/", include("game_sessions.urls")),
     path("admin/", admin.site.urls),
+    path("cameras/", include("cameras.urls")),
 ]

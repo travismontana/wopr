@@ -1,0 +1,20 @@
+{% extends "cameras_base.html" %}
+
+{% block main_content %}
+<p>
+Welcome to the Cameras page.
+</p>
+<table>
+    <tr>
+        <th>C960 - 4K</th>
+        <th>C950 - 1080P</th>
+        <th>rPi Cam</th>
+    </tr>
+    <tr>
+        <td><a href="http://wopr-cam:5100/stream">
+            <img src="https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300:200/plain/http://wopr-cam:5100/snapshot"></a></td>
+        <td><a href="http://wopr-cam:5101/stream">
+            <img src="https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300:200/plain/http://wopr-cam:5101/snapshot"></a></td>
+    </tr>
+</table>
+{% endblock %}

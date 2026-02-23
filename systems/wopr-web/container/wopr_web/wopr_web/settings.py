@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "core",
     "images",
     "game_sessions",
+    "cameras",
 ]
 
 MIDDLEWARE = [

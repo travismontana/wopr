@@ -4,6 +4,7 @@ After=network.target
 [Service]
 Environment="SCRIPT_ARGS=%I"
 User=wopr
+Group=wopr
 ExecStart=/usr/bin/ustreamer -r 3840x2160 -s 0.0.0.0 -p 5100 --format=mjpeg -f 6 -d /dev/wopr-c960
 [Install]
 WantedBy=multi-user.target

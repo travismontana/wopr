@@ -1,0 +1,12 @@
+[Unit]
+Description=c950 streamer
+After=network.target
+[Service]
+Environment="SCRIPT_ARGS=%I"
+User=wopr
+Group=wopr
+ExecStart=/usr/bin/rpicam-vid -t 0 --width 3840 --height 2160 --fps 30 \
+            --codec mjpeg --framerate 6 -o - | \
+            /usr/bin/ustreamer --device=stdin --format=MJPEG -h 0.0.0.0 -p 5102
+[Install]
+WantedBy=multi-user.target

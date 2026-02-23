@@ -1,0 +1,19 @@
+{% extends "cameras_base.html" %}
+
+{% block main_content %}
+<p>
+Welcome to the Cameras page.
+</p>
+<table>
+    <tr>
+        <th>C960 - 4K</th>
+        <th>C950 - 1080P</th>
+        <th>rPi Cam</th>
+    </tr>
+    <tr>
+        <td><a href="http://wopr-cam:5100/stream">
+            <img src="http://wopr-cam:5100/stream/height=240"></a></td>
+        <td><a href="http://wopr-cam:5101/stream">
+            <img src="http://wopr-cam:5101/stream/height=240"></a></td>
+    </tr>
+{% endblock %}
