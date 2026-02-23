@@ -246,7 +246,16 @@ def add_images_to_db(request):  # plural
                 elif action == "move_to_archive":
                     # Move file to archive
                     archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_path']}/{image_name}"
-                    os.rename(full_path, archive_path)
+                    try:
+                        os.rename(full_path, archive_path)
+                    except Exception as e:
+                        logger.error(f"Failed to move {image_name} to archive: {e}")
+                        results.append(
+                            {
+                                "status": "error",
+                                "message": f"Failed to move {image_name} to archive: {str(e)}",
+                            }
+                        )
                     logger.info(f"Moved {image_name} to archive")
                     results.append(
                         {
