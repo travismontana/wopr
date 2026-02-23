@@ -2,7 +2,7 @@
 
 ## What is WOPR?
 
-WOPR - Wargamming Oversight and Position Recognition.  In short, WOPR is a tabletop game adjuticator.
+WOPR - Worldstate Observation and Prediction Report.  In short, WOPR is a tabletop game adjuticator.
 
 WOPR tracks tabletop game state through computer vision.  Players use a web interface to capture overhead images of their game board. WOPR analyzes the images, detects game pieces, validates moves against rules, and maintains a complete game history.
 
