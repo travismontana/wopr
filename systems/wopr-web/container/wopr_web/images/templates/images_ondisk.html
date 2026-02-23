@@ -17,8 +17,10 @@
         {% endfor %}
         </ul>
 
-    <button type="submit">Add Selected to DB</button>
-        </form>
+    <button type="submit"><input type="hidden" name="action" value="add_to_db">Add Selected to DB</button>
+    <br>
+    <button type="submit"><input type="hidden" name="action" value="move_to_archive">Move Selected to Archive</button>
+    </form>
     <hr>
             <h2>Images in DB and disk</h2>
         <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">

@@ -222,27 +222,38 @@ def add_images_to_db(request):  # plural
                         {"status": "error", "message": f"File not found: {image_name}"}
                     )
                     continue
+                action = request.POST.get("action")
+                if action == "add_to_db":
+                    # Generate checksum from file contents
+                    with open(full_path, "rb") as f:
+                        checksum = hashlib.sha256(f.read()).hexdigest()
 
-                # Generate checksum from file contents
-                with open(full_path, "rb") as f:
-                    checksum = hashlib.sha256(f.read()).hexdigest()
+                    # Check for duplicate
+                    if Image.objects.filter(checksum=checksum).exists():
+                        logger.info(f"Duplicate checksum, skipping: {image_name}")
+                        results.append(
+                            {"status": "warning", "message": f"Duplicate: {image_name}"}
+                        )
+                        continue
 
-                # Check for duplicate
-                if Image.objects.filter(checksum=checksum).exists():
-                    logger.info(f"Duplicate checksum, skipping: {image_name}")
-                    results.append(
-                        {"status": "warning", "message": f"Duplicate: {image_name}"}
+                    # Create record
+                    new_image = Image(
+                        filename=image_name, artifact_uri=image_path, checksum=checksum
                     )
-                    continue
-
-                # Create record
-                new_image = Image(
-                    filename=image_name, artifact_uri=image_path, checksum=checksum
-                )
-                new_image.save()
-                added_count += 1
-                logger.info(f"Added to DB: {image_name}")
-
+                    new_image.save()
+                    added_count += 1
+                    logger.info(f"Added to DB: {image_name}")
+                elif action == "move_to_archive":
+                    # Move file to archive
+                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_path']}/{image_name}"
+                    os.rename(full_path, archive_path)
+                    logger.info(f"Moved {image_name} to archive")
+                    results.append(
+                        {
+                            "status": "success",
+                            "message": f"Moved to archive: {image_name}",
+                        }
+                    )
             except Exception as e:
                 logger.error(f"Failed to add {image_name}: {e}")
                 results.append(
@@ -290,3 +301,46 @@ def images_ls_projfile(request):
         return render(
             request, "image_ls_projfile.html", {"error": "No project ID selected"}
         )
+
+
+def move_images_to_archive(request):
+    results = []
+    debug_vars = []
+
+    if request.method == "POST":
+        selected_images = request.POST.getlist("selected_images")
+        image_dir = request.POST.get("image_dir")
+
+        debug_vars.append(("selected_images", selected_images))
+        debug_vars.append(("image_dir", image_dir))
+        logger.info(f"Processing {len(selected_images)} images from {image_dir}")
+
+        added_count = 0
+        for image_name in selected_images:
+            try:
+                image_path = f"{image_dir}/{image_name}"
+                full_path = f"{config['storage']['base_path']}/{image_path}"
+
+                # Validate file exists
+                if not os.path.isfile(full_path):
+                    logger.warning(f"File not found: {full_path}")
+                    results.append(
+                        {"status": "error", "message": f"File not found: {image_name}"}
+                    )
+                    continue
+
+                # Move file to archive
+                archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_path']}/{image_name}"
+                os.rename(full_path, archive_path)
+                logger.info(f"Moved {image_name} to archive")
+                results.append(
+                    {"status": "success", "message": f"Moved to archive: {image_name}"}
+                )
+            except Exception as e:
+                logger.error(f"Failed to move {image_name} to archive: {e}")
+                results.append(
+                    {
+                        "status": "error",
+                        "message": f"Failed to move {image_name} to archive: {str(e)}",
+                    }
+                )

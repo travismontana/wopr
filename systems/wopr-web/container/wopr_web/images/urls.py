@@ -13,6 +13,11 @@ urlpatterns = [
     path("images_indb", views.images_indb, name="images_indb"),
     path("add_images_to_db", views.add_images_to_db, name="add_images_to_db"),
     path(
+        "move_images_to_archive",
+        views.move_images_to_archive,
+        name="move_images_to_archive",
+    ),
+    path(
         "images_ls_list_projects",
         views.images_ls_list_projects,
         name="images_ls_list_projects",
