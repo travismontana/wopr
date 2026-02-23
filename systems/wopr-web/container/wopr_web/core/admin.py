@@ -10,6 +10,7 @@ from .models import (
     SessionImage,
     Round,
     Turn,
+    ImageGame,
 )
 
 # Register your models here.
@@ -19,6 +20,7 @@ admin.site.register(Session)
 admin.site.register(SessionImage)
 admin.site.register(SessionPlayer)
 admin.site.register(Image)
+admin.site.register(ImageGame)
 admin.site.register(Move)
 admin.site.register(Round)
 admin.site.register(Turn)

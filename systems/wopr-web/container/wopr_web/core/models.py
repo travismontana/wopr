@@ -146,6 +146,18 @@ class Image(models.Model):
         return self.short_id
 
 
+class ImageGame(models.Model):
+    """Image to game relationship."""
+
+    game = models.ForeignKey("Game", on_delete=models.CASCADE, db_index=True)
+    image = models.ForeignKey("Image", on_delete=models.CASCADE, db_index=True)
+
+    class Meta:
+        db_table = "image_game"
+        unique_together = [["game", "image"]]
+        ordering = ["game", "image"]
+
+
 class Round(models.Model):
     """A round in a session, grouping multiple turns."""
 

@@ -23,4 +23,5 @@ urlpatterns = [
         name="images_ls_list_projects",
     ),
     path("images_ls_projfile", views.images_ls_projfile, name="images_ls_projfile"),
+    path("images_games_index", views.images_games_index, name="images_games_index"),
 ]

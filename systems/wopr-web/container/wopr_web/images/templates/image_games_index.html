@@ -1,0 +1,18 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+
+{% if image_game_data %}
+<table>
+    <tr>
+        <th>Game</th>
+        <th>Num Images Total</th>
+    </tr>
+    {% for game in image_game_data %}
+    <tr>
+        <td>{{ game.name }}</td>
+        <td>{{ game.num_images_total }}</td>
+    </tr>
+    {% endfor %}
+{% endif %}
+{% endblock %}

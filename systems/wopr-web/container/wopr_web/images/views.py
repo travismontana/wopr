@@ -357,3 +357,9 @@ def move_images_to_archive(request):
                         "message": f"Failed to move {image_name} to archive: {str(e)}",
                     }
                 )
+
+
+def images_games_index(request):
+    # Need name, image_total
+    image_game_data = []
+    results = []
