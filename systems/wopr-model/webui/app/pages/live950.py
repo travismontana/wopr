@@ -55,9 +55,9 @@ conf = st.slider("Confidence", 0.0, 1.0, 0.25)
 iou = st.slider("IoU", 0.0, 1.0, 0.45)
 
 cam_options = [
-    {"name": "c950", "endpoint": "http://wopr-cam:5001/snapshot"},
-    {"name": "c960", "endpoint": "http://wopr-cam:5000/snapshot"},
-    {"name": "rPi", "endpoint": "http://wopr-cam:5002/snapshot"},
+    {"name": "c950", "endpoint": "http://wopr-cam:5101/snapshot"},
+    {"name": "c960", "endpoint": "http://wopr-cam:5100/snapshot"},
+    {"name": "rPi", "endpoint": "http://wopr-cam:5102/snapshot"},
 ]
 
 selected_cam = st.selectbox(
