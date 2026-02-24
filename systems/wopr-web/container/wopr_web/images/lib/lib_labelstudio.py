@@ -3,8 +3,7 @@ import os
 # from label_studio_sdk import Client
 from label_studio_sdk import LabelStudio
 
-from core.models import Games, Images, ImageGames
-
+from core.models import Image, ImageGame, Game
 from lib.helpers import setup_logger, get_config
 from .lib_images import get_images_ondisk, image_sort
 
