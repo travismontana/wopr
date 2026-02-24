@@ -3,15 +3,15 @@
 {% block main_content %}
 
 {% if images_list %}
-    <h2>Images for Game: {{ game.name }}</h2>
+    <h2>Images for Game: {% if game.name %}{{ game.name }}{%else%}Images with no games{% endif %}</h2>
     <p>Game Id: {{game.id}}</p>
     <form method="post" action="{% url 'change_image_game' %}">
     {% csrf_token %}
     <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
         {% for image in images_list %}
-        <li><a href="{{ image.image_full_url }}"><img src="{{ image.thumb_url }}" alt="{{ image.name }}"></a>
+        <li><a href="{{ image.image_full_url }}"><img src="{{ image.thumb_url }}" alt="{{ image.filename }}"></a>
         <br>
-        <input type="checkbox" name="selected_images" value="{{image.name}}">{{image.name}}</a>
+        <input type="checkbox" name="selected_images" value="{{image.filename}}">{{image.filename}}</a>
         </li>
         {% endfor %}
     </ul>
@@ -22,7 +22,7 @@
         <option value="{{ game.id }}">{{ game.name }}</option>
         {% endfor %}
     </select>
-    <button type="submit">Add Images to Game</button>
+    <button type="submit">Add Images to Game</button><br>
     </form>
     <br>
 {% else %}

@@ -414,7 +414,7 @@ def images_games_details(request, game_id):
     # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
     thumb_url_base = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain"
     if game_id != 0:
-        images = Image.objects.filter(imagegame__isnull=True)
+        images = Image.objects.filter(imagegame__game_id=game_id)
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         for image in images:
