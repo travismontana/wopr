@@ -380,6 +380,7 @@ def images_games_index(request):
                 "id": game.id,
                 "name": game.name,
                 "images": ImageGame.objects.filter(game=game),
+                "num_images_total": ImageGame.objects.filter(game=game).count(),
             }
         )
     # FIX: single query instead of N+1 (one ImageGame filter per image in loop)
