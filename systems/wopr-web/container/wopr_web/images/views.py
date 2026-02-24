@@ -1,9 +1,7 @@
 import hashlib
 import os
-import re
-import sys
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from core.models import Image, ImageGame, Game
 
@@ -33,6 +31,7 @@ WOPRS = {
         "archive": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['archive_subdir']}",
     },
 }
+
 
 # Create your views here.
 def images_index(request):
@@ -181,6 +180,7 @@ def images_indb(request):
                 "extra": {"debug_vars": debug_vars},
             }
         )
+        # FIX: results merged into context instead of passed as 4th positional arg to render()
         context = {"images": images, "results": results}
         return render(request, "images_indb.html", context)
     except Exception as e:
@@ -194,7 +194,9 @@ def images_indb(request):
                 "extra": {"context": context},
             }
         )
-        return render(request, "images_indb.html", context, results)
+        # FIX: results merged into context instead of passed as 4th positional arg to render()
+        context["results"] = results
+        return render(request, "images_indb.html", context)
 
 
 def add_images_to_db(request):  # plural
@@ -209,6 +211,9 @@ def add_images_to_db(request):  # plural
         debug_vars.append(("image_dir", image_dir))
         logger.info(f"Processing {len(selected_images)} images from {image_dir}")
 
+        # FIX: action fetched once outside the loop - it doesn't change per iteration
+        action = request.POST.get("action")
+
         added_count = 0
         for image_name in selected_images:
             try:
@@ -222,7 +227,7 @@ def add_images_to_db(request):  # plural
                         {"status": "error", "message": f"File not found: {image_name}"}
                     )
                     continue
-                action = request.POST.get("action")
+
                 if action == "add_to_db":
                     # Generate checksum from file contents
                     with open(full_path, "rb") as f:
@@ -244,7 +249,7 @@ def add_images_to_db(request):  # plural
                     added_count += 1
                     logger.info(f"Added to DB: {image_name}")
                 elif action == "move_to_archive":
-                    # Move file to archive
+                    # FIX: use archive_subdir consistently (was archive_path in move_images_to_archive)
                     archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
                     try:
                         os.rename(full_path, archive_path)
@@ -342,8 +347,8 @@ def move_images_to_archive(request):
                     )
                     continue
 
-                # Move file to archive
-                archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_path']}/{image_name}"
+                # FIX: use archive_subdir to match add_images_to_db (was archive_path)
+                archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
                 os.rename(full_path, archive_path)
                 logger.info(f"Moved {image_name} to archive")
                 results.append(
@@ -357,6 +362,9 @@ def move_images_to_archive(request):
                         "message": f"Failed to move {image_name} to archive: {str(e)}",
                     }
                 )
+
+    # FIX: added missing return statement - was falling off the end with no response
+    return render(request, "images_results.html", {"results": results})
 
 
 def images_games_index(request):
@@ -374,9 +382,8 @@ def images_games_index(request):
                 "images": ImageGame.objects.filter(game=game),
             }
         )
-    images_not_assigned_to_a_game = [
-        img for img in images if not ImageGame.objects.filter(image=img).exists()
-    ]
+    # FIX: single query instead of N+1 (one ImageGame filter per image in loop)
+    images_not_assigned_to_a_game = Image.objects.filter(imagegame__isnull=True)
 
     if image_game_data is not None:
         results = {
@@ -404,7 +411,10 @@ def images_games_details(request, game_id):
     images_list = []
     results = []
     url = f"{config['api']['images_url']}"
-    thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
+    # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
+    thumb_url_base = (
+        f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
+    )
     if game_id != 0:
         images = ImageGame.objects.filter(game_id=game_id)
         game = Game.objects.filter(id=game_id).first()
@@ -412,7 +422,9 @@ def images_games_details(request, game_id):
         for image in images:
             spec_url = f"{url}/images/games/{game.shortname}/{image.image.name}"
             image_full_url = spec_url
-            thumb_url = f"{thumb_url}/${spec_url}"
+            # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
+            # FIX: use thumb_url_base so it doesn't compound across iterations
+            thumb_url = f"{thumb_url_base}{spec_url}"
             images_list.append(
                 {"image_full_url": image_full_url, "thumb_url": thumb_url}
             )
@@ -434,7 +446,8 @@ def images_games_details(request, game_id):
         for image in images:
             spec_url = f"{url}/images/games/{image.image.name}"
             image_full_url = spec_url
-            thumb_url = f"{thumb_url}/${spec_url}"
+            # FIX: same thumb_url fixes applied to else branch
+            thumb_url = f"{thumb_url_base}{spec_url}"
             images_list.append(
                 {"image_full_url": image_full_url, "thumb_url": thumb_url}
             )
@@ -443,8 +456,8 @@ def images_games_details(request, game_id):
             "image_games_details.html",
             {"images_list": images_list, "games": games},
         )
-    results.append({"status": "success", "message": "Nothing happened"})
-    return render(request, "images_results.html", {"results": results})
+    # NOTE: the two lines below this were unreachable dead code - removed
+
 
 def change_image_game(request):
     results = []
@@ -455,7 +468,8 @@ def change_image_game(request):
             game = Game.objects.filter(id=game_id).first()
             if game:
                 for image_name in selected_images:
-                    image = Image.objects.filter(name=image_name).first()
+                    # FIX: filter on 'filename' field to match model usage elsewhere (was 'name')
+                    image = Image.objects.filter(filename=image_name).first()
                     if image:
                         ImageGame.objects.update_or_create(
                             image=image, defaults={"game": game}
