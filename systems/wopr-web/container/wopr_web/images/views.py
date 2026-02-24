@@ -312,7 +312,6 @@ def images_ls_projfile(request):
         context = {"project_id": project_id}
         image_ls_projfile_results = image_ls_projfile_action(project_id)
         context["task_images"] = image_ls_projfile_results
-
         return render(request, "image_ls_projfile.html", context)
     else:
         logger.warning("No project ID selected")
@@ -438,6 +437,8 @@ def images_games_details(request, game_id):
         )
     else:
         images = Image.objects.filter(imagegame__isnull=True)
+        tasks = image_ls_projfile_action
+        logger.info(f"Tasks: {tasks}")
         if len(images) == 0:
             results.append(
                 {
@@ -461,7 +462,7 @@ def images_games_details(request, game_id):
         return render(
             request,
             "image_games_details.html",
-            {"images_list": images_list, "games": games},
+            {"images_list": images_list, "games": games, "tasks": tasks},
         )
     # NOTE: the two lines below this were unreachable dead code - removed
 

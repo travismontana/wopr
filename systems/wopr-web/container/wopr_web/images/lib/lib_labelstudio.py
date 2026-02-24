@@ -3,6 +3,8 @@ import os
 # from label_studio_sdk import Client
 from label_studio_sdk import LabelStudio
 
+from core.models import Games, Images, ImageGames
+
 from lib.helpers import setup_logger, get_config
 from .lib_images import get_images_ondisk, image_sort
 
@@ -40,19 +42,5 @@ def image_ls_projfile_action(project_id):
     tasks = list(ls.tasks.list(project=project_id))
     logger.info(f"Retrieved {tasks} tasks from labelstudio project {project_id}.")
     logger.info(f"Exported project {project_id} from labelstudio.")
-    image_dir = "images/incoming"
-    get_images_ondisk_results = get_images_ondisk(image_dir)
-    
-    disk_images = [item["name"] for item in get_images_ondisk_results['extra'][0]['extra']]
-    task_images = []
-    ls_mapping = {}
-    for task in tasks:
-        filename = task['data']['image'].split("/")[-1]
-        ls_mapping[filename] = task.id
-    
-    for filename in disk_images:
-        if filename in ls_mapping:
-            task_images.append({"filename": filename, "task_id": ls_mapping[filename]})
-        else:
-            task_images.append({"filename": filename, "task_id": None})
-    return task_images
+
+    return tasks
