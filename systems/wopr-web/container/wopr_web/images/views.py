@@ -421,6 +421,7 @@ def images_games_details(request, game_id):
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         tasks = image_ls_projfile_action(ls_project_id)
+        images_not_in_tasks = []
         for image in images:
             spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
             image_full_url = spec_url
@@ -434,11 +435,9 @@ def images_games_details(request, game_id):
                     "filename": image.filename,
                 }
             )
-        images_not_in_tasks = [
-            image
-            for image in images
-            if image.filename not in [task["data"]["filename"] for task in tasks]
-        ]
+            if image.filename not in [task["data"]["filename"] for task in tasks]:
+                images_not_in_tasks.append(image)
+
         return render(
             request,
             "image_games_details.html",
