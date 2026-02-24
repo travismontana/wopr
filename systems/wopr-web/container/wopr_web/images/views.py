@@ -3,7 +3,7 @@ import os
 
 from django.shortcuts import render, redirect
 
-from core.models import Image, ImageGame, Game
+from core.models import Image, ImageGame, Game, GameLabelproj
 
 from lib.helpers import setup_logger, get_config
 
@@ -413,13 +413,14 @@ def images_games_details(request, game_id):
     url = f"{config['api']['images_url']}"
     # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
     thumb_url_base = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain"
+    ls_project_id = GameLabelproj.objects.filter(game_id=game_id).first().ls_project_id
     if game_id != 0:
         images = Image.objects.filter(imagegame__game_id=game_id)
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         for image in images:
             spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
-            # tasks = image_ls_projfile_action
+            tasks = image_ls_projfile_action(ls_project_id)
             image_full_url = spec_url
             # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
             # FIX: use thumb_url_base so it doesn't compound across iterations
@@ -438,7 +439,7 @@ def images_games_details(request, game_id):
         )
     else:
         images = Image.objects.filter(imagegame__isnull=True)
-        # tasks = image_ls_projfile_action
+        tasks = image_ls_projfile_action(ls_project_id)
         logger.info(f"Tasks: {tasks}")
         if len(images) == 0:
             results.append(
