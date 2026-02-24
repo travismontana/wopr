@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from core.models import Image, ImageGame, Game, GameLabelproj
 
 from lib.helpers import setup_logger, get_config
-
+from urllib.parse import urlparse, parse_qs
 from .lib.lib_images import get_images_ondisk, image_sort
 from .lib.lib_labelstudio import image_ls_list_projects_action, image_ls_projfile_action
 
@@ -421,6 +421,14 @@ def images_games_details(request, game_id):
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         tasks = image_ls_projfile_action(ls_project_id)
+        tasks_clean = []
+        for task in tasks:
+            image_url = task["data"]["image"]
+            # ++ parse the query param 'd' and grab just the filename ++
+            parsed = urlparse(image_url)
+            d_param = parse_qs(parsed.query).get("d", [""])[0]
+            image_filename = d_param.split("/")[-1]  # e.g. "7e35877a-....jpg"
+            tasks_clean.append({"id": task["id"], "filename": image_filename})
         images_not_in_tasks = []
         for image in images:
             spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
@@ -435,7 +443,9 @@ def images_games_details(request, game_id):
                     "filename": image.filename,
                 }
             )
-            if image.filename not in [task["data"]["filename"] for task in tasks]:
+            if image.filename not in [
+                task_clean["filename"] for task_clean in tasks_clean
+            ]:
                 images_not_in_tasks.append(image)
 
         return render(
