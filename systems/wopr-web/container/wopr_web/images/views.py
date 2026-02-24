@@ -414,7 +414,13 @@ def images_games_details(request, game_id):
                 }
             )
             if image.filename not in task_filenames:
-                images_not_in_tasks.append(image)
+                images_not_in_tasks.append(
+                    {
+                        "image_full_url": spec_url,
+                        "thumb_url": f"{THUMB_URL_BASE}/{spec_url}",
+                        "filename": image.filename,
+                    }
+                )
 
         return render(
             request,
