@@ -478,4 +478,6 @@ def change_image_game(request):
             results.append(
                 {"status": "error", "message": "No images selected or invalid game"}
             )
+    if not results:
+        results.append({"status": "error", "message": "Dropped right through"})
     return render(request, "images_results.html", {"results": results})
