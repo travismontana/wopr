@@ -21,14 +21,14 @@ def image_ls_list_projects_action(request):
     logger.info("This is the main function for the labelstudio image processing module.")
     # get the list of projects from labelstudio
     ls = LabelStudio(base_url=config["api"]["labels_url"], api_key=LABEL_STUDIO_TOKEN, timeout=10)
-    
+
     projects = list(ls.projects.list())
     project_list = [{"id": p.id, "title": p.title} for p in projects]
     logger.info(f"Retrieved {project_list} projects from labelstudio.")
     return project_list 
 
 
-def image_ls_projfile_action(project_id):
+def image_ls_projfile_action(project_id, max_tasks=None):
     # gets the list of images in the project and returns it as a json file
     logger.info("This is the main function for the labelstudio image processing module.")
 
