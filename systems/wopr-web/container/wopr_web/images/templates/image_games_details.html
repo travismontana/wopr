@@ -3,6 +3,8 @@
 {% block main_content %}
 
 {% if images_list %}
+    <h2>Images for Game: {{ game.name }}</h2>
+    <p>Game Id: {{game.id}}</p>
     <form method="post" action="{% url 'change_image_game' %}">
     {% csrf_token %}
     <ul>

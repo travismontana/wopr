@@ -412,9 +412,7 @@ def images_games_details(request, game_id):
     results = []
     url = f"{config['api']['images_url']}"
     # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
-    thumb_url_base = (
-        f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
-    )
+    thumb_url_base = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain"
     if game_id != 0:
         images = Image.objects.filter(imagegame__isnull=True)
         game = Game.objects.filter(id=game_id).first()
@@ -424,17 +422,17 @@ def images_games_details(request, game_id):
             image_full_url = spec_url
             # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
             # FIX: use thumb_url_base so it doesn't compound across iterations
-            thumb_url = f"{thumb_url_base}{spec_url}"
+            thumb_url = f"{thumb_url_base}/{spec_url}"
             images_list.append(
                 {"image_full_url": image_full_url, "thumb_url": thumb_url}
             )
         return render(
             request,
             "image_games_details.html",
-            {"images_list": images_list, "games": games},
+            {"images_list": images_list, "games": games, "game": game},
         )
     else:
-        images = ImageGame.objects.filter(game__isnull=True)
+        images = Image.objects.filter(imagegame__isnull=True)
         if len(images) == 0:
             results.append(
                 {
@@ -444,10 +442,10 @@ def images_games_details(request, game_id):
             )
         games = Game.objects.all()
         for image in images:
-            spec_url = f"{url}/images/games/{image.image.name}"
+            spec_url = f"{url}/images/incoming/{image.filename}"
             image_full_url = spec_url
             # FIX: same thumb_url fixes applied to else branch
-            thumb_url = f"{thumb_url_base}{spec_url}"
+            thumb_url = f"{thumb_url_base}/{spec_url}"
             images_list.append(
                 {"image_full_url": image_full_url, "thumb_url": thumb_url}
             )
