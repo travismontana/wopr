@@ -452,7 +452,6 @@ def images_games_details(request, game_id):
         )
     else:
         images = Image.objects.filter(imagegame__isnull=True)
-        logger.info(f"Tasks: {tasks}")
         if len(images) == 0:
             results.append(
                 {
