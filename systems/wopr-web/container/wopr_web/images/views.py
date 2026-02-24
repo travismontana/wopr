@@ -248,6 +248,28 @@ def add_images_to_db(request):  # plural
                     new_image.save()
                     added_count += 1
                     logger.info(f"Added to DB: {image_name}")
+                elif action == "unarchive":
+                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
+                    incoming_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['incoming_subdir']}/{image_name}"
+                    try:
+                        os.rename(archive_path, incoming_path)
+                    except Exception as e:
+                        logger.error(f"Failed to unarchive {image_name}: {e}")
+                        results.append(
+                            {
+                                "status": "error",
+                                "message": f"Failed to unarchive {image_name}: {str(e)}",
+                            }
+                        )
+                        return render(
+                            request, "images_results.html", {"results": results}
+                    logger.info(f"Unarchived {image_name}")
+                    results.append(
+                        {
+                            "status": "success",
+                            "message": f"Unarchived: {image_name}",
+                        }
+                    )
                 elif action == "move_to_archive":
                     # FIX: use archive_subdir consistently (was archive_path in move_images_to_archive)
                     archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
