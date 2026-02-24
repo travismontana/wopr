@@ -1,39 +1,58 @@
 import hashlib
 import os
+from urllib.parse import parse_qs, urlparse
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
-from core.models import Image, ImageGame, Game, GameLabelproj
-
-from lib.helpers import setup_logger, get_config
-from urllib.parse import urlparse, parse_qs
+from core.models import Game, GameLabelproj, Image, ImageGame
+from lib.helpers import get_config, setup_logger
 from .lib.lib_images import get_images_ondisk, image_sort
 from .lib.lib_labelstudio import image_ls_list_projects_action, image_ls_projfile_action
 
 logger = setup_logger()
 config = get_config()
 
+BASE_PATH = config["storage"]["base_path"]
+
+IMAGES_SUBDIR = config["storage"]["images_subdir"]
+INCOMING_SUBDIR = config["storage"]["incoming_subdir"]
+ARCHIVE_SUBDIR = config["storage"]["archive_subdir"]
+
+LABEL_SUBDIR = config["storage"]["label_subdir"]
+LABEL_SOURCE_SUBDIR = config["storage"]["label_source_subdir"]
+LABEL_TARGET_SUBDIR = config["storage"]["label_target_subdir"]
+
+MODELS_SUBDIR = config["storage"]["models_subdir"]
+WEIGHTS_SUBDIR = config["storage"]["weights_subdir"]
+RUNS_SUBDIR = config["storage"]["runs_subdir"]
+DISTFILES_SUBDIR = config["storage"]["distfiles_subdir"]
+BACKUPS_SUBDIR = config["storage"]["backups_subdir"]
+MODELS_ARCHIVE_SUBDIR = config["storage"]["archive_subdir"]
+
+IMAGES_URL = config["api"]["images_url"]
+THUMBS_URL = config["api"]["thumbs_url"]
+THUMB_URL_BASE = f"{THUMBS_URL}/insecure/resize:fill:300:200/plain"
+
 WOPRS = {
     "images": {
-        "incoming": f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['incoming_subdir']}",
-        "archive": f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}",
-        "backups": f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['backups_subdir']}",
+        "incoming": f"{BASE_PATH}/{IMAGES_SUBDIR}/{INCOMING_SUBDIR}",
+        "archive": f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}",
+        "backups": f"{BASE_PATH}/{IMAGES_SUBDIR}/{config['storage']['backups_subdir']}",
     },
     "ls": {
-        "source": f"{config['storage']['base_path']}/{config['storage']['label_subdir']}/{config['storage']['label_source_subdir']}",
-        "target": f"{config['storage']['base_path']}/{config['storage']['label_subdir']}/{config['storage']['label_target_subdir']}",
+        "source": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_SOURCE_SUBDIR}",
+        "target": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_TARGET_SUBDIR}",
     },
     "models": {
-        "weights": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['weights_subdir']}",
-        "runs": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['runs_subdir']}",
-        "distfiles": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['distfiles_subdir']}",
-        "backups": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['backups_subdir']}",
-        "archive": f"{config['storage']['base_path']}/{config['storage']['models_subdir']}/{config['storage']['archive_subdir']}",
+        "weights": f"{BASE_PATH}/{MODELS_SUBDIR}/{WEIGHTS_SUBDIR}",
+        "runs": f"{BASE_PATH}/{MODELS_SUBDIR}/{RUNS_SUBDIR}",
+        "distfiles": f"{BASE_PATH}/{MODELS_SUBDIR}/{DISTFILES_SUBDIR}",
+        "backups": f"{BASE_PATH}/{MODELS_SUBDIR}/{BACKUPS_SUBDIR}",
+        "archive": f"{BASE_PATH}/{MODELS_SUBDIR}/{MODELS_ARCHIVE_SUBDIR}",
     },
 }
 
 
-# Create your views here.
 def images_index(request):
     logger.info("Rendering image index page")
     return render(request, "image_index.html")
@@ -41,116 +60,27 @@ def images_index(request):
 
 def show_dir_selector(request):
     logger.info("Rendering directory selector")
-    debug_vars = []
-    dirs = {"WOPRS": WOPRS}
-    debug_vars.append(("WOPRS", WOPRS))
 
     dir_selector = []
-    for dir_key in dirs["WOPRS"]["images"]:
-        d = dirs["WOPRS"]["images"][dir_key].split(
-            f"{config['storage']['base_path']}/"
-        )[-1]
+    for dir_key, full_path in WOPRS["images"].items():
+        rel_path = full_path.split(f"{BASE_PATH}/")[-1]
         dir_selector.append(
             {
-                "name": f"images_{d}",
+                "name": f"images_{rel_path}",
                 "dir_key": dir_key,
-                "path": d,
+                "path": rel_path,
             }
         )
-    context = {"dir_selector": dir_selector}
-    debug_vars.append(("dir_selector", dir_selector))
-    logger.debug(f"Debug vars: {debug_vars}")
-    return render(request, "images_dir_selector.html", context)
+
+    return render(request, "images_dir_selector.html", {"dir_selector": dir_selector})
 
 
 def images_ondisk(request):
     logger.info("Starting images_ondisk view")
-    context = []
     results = []
     debug_vars = []
-    if request.method == "POST":
-        image_dir = request.POST.get("image_dir")
-        debug_vars.append(("image_dir", image_dir))
-        logger.info(f"Selected image directory: {image_dir}")
-        logger.debug(f"Debug vars: {debug_vars}")
 
-        get_images_ondisk_results = get_images_ondisk(image_dir)
-        logger.info("Back to images_ondisk after get_images_ondisk()")
-        debug_vars.append(("get_images_ondisk_results", get_images_ondisk_results))
-        logger.debug(f"Debug vars: {debug_vars}")
-
-        if (
-            get_images_ondisk_results is None
-            or get_images_ondisk_results[0]["status"] != "success"
-        ):
-            logger.error("Error retrieving images on disk")
-            logger.debug(f"Debug vars: {debug_vars}")
-            results.append(
-                {
-                    "status": "error",
-                    "message": "get_images_ondisk_results = get_images_ondisk(image_dir) - failed.",
-                    "extra": {"debug_vars": debug_vars},
-                }
-            )
-            return render(request, "images_results.html", {"results": results})
-
-        else:
-            logger.info("Successfully retrieved images on disk")
-            results.append(
-                {
-                    "status": "success",
-                    "message": "retrieved images on disk",
-                    "extra": get_images_ondisk_results,
-                }
-            )
-            for res in get_images_ondisk_results[0]["extra"]:
-                logger.info(f"Result: {res['status']} - {res['message']}")
-                if "retrieved directory listing" in res["message"]:
-                    dirs = res["extra"]
-                    debug_vars.append(("dirs", dirs))
-
-            images = Image.objects.all()
-            logger.info(f"Retrieved {len(images)} images from DB")
-            debug_vars.append(("images", images))
-            logger.debug(f"Debug vars: {debug_vars}")
-
-            image_sort_results = image_sort(images, dirs)
-            logger.info("Sorted images")
-            debug_vars.append(("image_sort_results", image_sort_results))
-            logger.debug(f"Debug vars: {debug_vars}")
-
-            images_full = []
-            images_on_disk_list = []
-            images_on_both_list = []
-            for imageondisk in image_sort_results[0]["extra"]["images_disk"]:
-                logger.info(f"Image: {imageondisk['name']} - on disk only")
-                url = f"{config['api']['images_url']}/{image_dir}/{imageondisk['name']}"
-                thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/{config['api']['images_url']}/{image_dir}/{imageondisk['name']}"
-                imageondisk["url"] = url
-                imageondisk["thumb_url"] = thumb_url
-                imageondisk["path"] = f"{image_dir}/{imageondisk['name']}"
-                images_on_disk_list.append(imageondisk)
-            for imageinboth in image_sort_results[0]["extra"]["images_both"]:
-                logger.info(f"Image: {imageinboth['name']} - both")
-                url = f"{config['api']['images_url']}/{image_dir}/{imageinboth['name']}"
-                thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/{config['api']['images_url']}/{image_dir}/{imageinboth['name']}"
-                imageinboth["url"] = url
-                imageinboth["thumb_url"] = thumb_url
-                imageinboth["path"] = f"{image_dir}/{imageinboth['name']}"
-                images_on_both_list.append(imageinboth)
-
-            debug_vars.append(("images_full", images_full))
-            logger.debug(f"Debug vars: {debug_vars}")
-            context = {
-                "image_dir": image_dir,
-                "dirs": dirs,
-                "images_on_disk": images_on_disk_list,
-                "images_in_both": images_on_both_list,
-                "images_url": config["api"]["images_url"],
-                "thumbs_url": config["api"]["thumbs_url"],
-            }
-            return render(request, "images_ondisk.html", context)
-    else:
+    if request.method != "POST":
         logger.warning("No image directory selected")
         results.append(
             {
@@ -159,148 +89,187 @@ def images_ondisk(request):
                 "extra": {"debug_vars": debug_vars},
             }
         )
-        logger.debug(f"Debug vars: {debug_vars}")
+        return render(request, "images_results.html", {"results": results})
 
-    return render(request, "images_results.html", {"results": results})
+    image_dir = request.POST.get("image_dir")
+    debug_vars.append(("image_dir", image_dir))
+    logger.info("Selected image directory: %s", image_dir)
 
+    get_images_ondisk_results = get_images_ondisk(image_dir)
+    debug_vars.append(("get_images_ondisk_results", get_images_ondisk_results))
 
-def images_indb(request):
-    results = []
-    debug_vars = []
-    images = []
-    logger.info("Rendering images in DB page")
-
-    try:
-        images = Image.objects.all()
-        debug_vars.append(("images", images))
-        results.append(
-            {
-                "status": "success",
-                "message": f"Retrieved {len(images)} images from DB",
-                "extra": {"debug_vars": debug_vars},
-            }
-        )
-        # FIX: results merged into context instead of passed as 4th positional arg to render()
-        context = {"images": images, "results": results}
-        return render(request, "images_indb.html", context)
-    except Exception as e:
-        logger.error(f"Error retrieving images from DB: {e}")
-        context = {"error": str(e)}
-        debug_vars.append(("context", context))
+    if (
+        not get_images_ondisk_results
+        or get_images_ondisk_results[0].get("status") != "success"
+    ):
+        logger.error("Error retrieving images on disk")
         results.append(
             {
                 "status": "error",
-                "message": f"Retrieved {len(images)} images from DB",
-                "extra": {"context": context},
+                "message": "get_images_ondisk(image_dir) failed",
+                "extra": {"debug_vars": debug_vars},
             }
         )
-        # FIX: results merged into context instead of passed as 4th positional arg to render()
-        context["results"] = results
-        return render(request, "images_indb.html", context)
+        return render(request, "images_results.html", {"results": results})
+
+    dirs = []
+    for res in get_images_ondisk_results[0].get("extra", []):
+        if "retrieved directory listing" in res.get("message", ""):
+            dirs = res.get("extra", [])
+            break
+    debug_vars.append(("dirs", dirs))
+
+    images = Image.objects.all()
+    debug_vars.append(("images_count", images.count()))
+
+    image_sort_results = image_sort(images, dirs)
+    debug_vars.append(("image_sort_results", image_sort_results))
+
+    extra = image_sort_results[0].get("extra", {}) if image_sort_results else {}
+    images_disk = extra.get("images_disk", [])
+    images_both = extra.get("images_both", [])
+
+    def enrich(image_obj):
+        name = image_obj["name"]
+        url = f"{IMAGES_URL}/{image_dir}/{name}"
+        thumb_url = f"{THUMB_URL_BASE}/{IMAGES_URL}/{image_dir}/{name}"
+        return {
+            **image_obj,
+            "url": url,
+            "thumb_url": thumb_url,
+            "path": f"{image_dir}/{name}",
+        }
+
+    images_on_disk_list = [enrich(i) for i in images_disk]
+    images_on_both_list = [enrich(i) for i in images_both]
+
+    context = {
+        "image_dir": image_dir,
+        "dirs": dirs,
+        "images_on_disk": images_on_disk_list,
+        "images_in_both": images_on_both_list,
+        "images_url": IMAGES_URL,
+        "thumbs_url": THUMBS_URL,
+    }
+    return render(request, "images_ondisk.html", context)
 
 
-def add_images_to_db(request):  # plural
+def images_indb(request):
+    logger.info("Rendering images in DB page")
     results = []
-    debug_vars = []
 
-    if request.method == "POST":
-        selected_images = request.POST.getlist("selected_images")
-        image_dir = request.POST.get("image_dir")
+    try:
+        images = Image.objects.all()
+        results.append(
+            {
+                "status": "success",
+                "message": f"Retrieved {images.count()} images from DB",
+            }
+        )
+        return render(
+            request,
+            "images_indb.html",
+            {"images": images, "results": results},
+        )
+    except Exception as exc:
+        logger.exception("Error retrieving images from DB")
+        results.append(
+            {
+                "status": "error",
+                "message": f"Error retrieving images from DB: {exc}",
+            }
+        )
+        return render(
+            request,
+            "images_indb.html",
+            {"images": [], "results": results, "error": str(exc)},
+        )
 
-        debug_vars.append(("selected_images", selected_images))
-        debug_vars.append(("image_dir", image_dir))
-        logger.info(f"Processing {len(selected_images)} images from {image_dir}")
 
-        # FIX: action fetched once outside the loop - it doesn't change per iteration
-        action = request.POST.get("action")
+def add_images_to_db(request):
+    results = []
 
-        added_count = 0
-        for image_name in selected_images:
-            try:
-                image_path = f"{image_dir}/{image_name}"
-                full_path = f"{config['storage']['base_path']}/{image_path}"
+    if request.method != "POST":
+        return render(request, "images_results.html", {"results": results})
 
-                # Validate file exists
-                if not os.path.isfile(full_path):
-                    logger.warning(f"File not found: {full_path}")
+    selected_images = request.POST.getlist("selected_images")
+    image_dir = request.POST.get("image_dir")
+    action = request.POST.get("action")
+
+    logger.info(
+        "Processing %d images from %s action=%s",
+        len(selected_images),
+        image_dir,
+        action,
+    )
+
+    added_count = 0
+
+    for image_name in selected_images:
+        image_path = f"{image_dir}/{image_name}"
+        full_path = f"{BASE_PATH}/{image_path}"
+
+        if not os.path.isfile(full_path):
+            logger.warning("File not found: %s", full_path)
+            results.append(
+                {"status": "error", "message": f"File not found: {image_name}"}
+            )
+            continue
+
+        try:
+            if action == "add_to_db":
+                with open(full_path, "rb") as f:
+                    checksum = hashlib.sha256(f.read()).hexdigest()
+
+                if Image.objects.filter(checksum=checksum).exists():
                     results.append(
-                        {"status": "error", "message": f"File not found: {image_name}"}
+                        {"status": "warning", "message": f"Duplicate: {image_name}"}
                     )
                     continue
 
-                if action == "add_to_db":
-                    # Generate checksum from file contents
-                    with open(full_path, "rb") as f:
-                        checksum = hashlib.sha256(f.read()).hexdigest()
-
-                    # Check for duplicate
-                    if Image.objects.filter(checksum=checksum).exists():
-                        logger.info(f"Duplicate checksum, skipping: {image_name}")
-                        results.append(
-                            {"status": "warning", "message": f"Duplicate: {image_name}"}
-                        )
-                        continue
-
-                    # Create record
-                    new_image = Image(
-                        filename=image_name, artifact_uri=image_path, checksum=checksum
-                    )
-                    new_image.save()
-                    added_count += 1
-                    logger.info(f"Added to DB: {image_name}")
-                elif action == "unarchive":
-                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
-                    incoming_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['incoming_subdir']}/{image_name}"
-                    try:
-                        os.rename(archive_path, incoming_path)
-                    except Exception as e:
-                        logger.error(f"Failed to unarchive {image_name}: {e}")
-                        results.append(
-                            {
-                                "status": "error",
-                                "message": f"Failed to unarchive {image_name}: {str(e)}",
-                            }
-                        )
-                        return render(
-                            request, "images_results.html", {"results": results}
-                    logger.info(f"Unarchived {image_name}")
-                    results.append(
-                        {
-                            "status": "success",
-                            "message": f"Unarchived: {image_name}",
-                        }
-                    )
-                elif action == "move_to_archive":
-                    # FIX: use archive_subdir consistently (was archive_path in move_images_to_archive)
-                    archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
-                    try:
-                        os.rename(full_path, archive_path)
-                    except Exception as e:
-                        logger.error(f"Failed to move {image_name} to archive: {e}")
-                        results.append(
-                            {
-                                "status": "error",
-                                "message": f"Failed to move {image_name} to archive: {str(e)}",
-                            }
-                        )
-                        return render(
-                            request, "images_results.html", {"results": results}
-                        )
-                    logger.info(f"Moved {image_name} to archive")
-                    results.append(
-                        {
-                            "status": "success",
-                            "message": f"Moved to archive: {image_name}",
-                        }
-                    )
-
-            except Exception as e:
-                logger.error(f"Failed to add {image_name}: {e}")
+                Image.objects.create(
+                    filename=image_name,
+                    artifact_uri=image_path,
+                    checksum=checksum,
+                )
+                added_count += 1
                 results.append(
-                    {"status": "error", "message": f"Failed: {image_name} - {str(e)}"}
+                    {"status": "success", "message": f"Added to DB: {image_name}"}
                 )
 
-        logger.info(f"Successfully added {added_count}/{len(selected_images)} images")
+            elif action == "unarchive":
+                archive_path = (
+                    f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}/{image_name}"
+                )
+                incoming_path = (
+                    f"{BASE_PATH}/{IMAGES_SUBDIR}/{INCOMING_SUBDIR}/{image_name}"
+                )
+                os.rename(archive_path, incoming_path)
+                results.append(
+                    {"status": "success", "message": f"Unarchived: {image_name}"}
+                )
+
+            elif action == "move_to_archive":
+                archive_path = (
+                    f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}/{image_name}"
+                )
+                os.rename(full_path, archive_path)
+                results.append(
+                    {"status": "success", "message": f"Moved to archive: {image_name}"}
+                )
+
+            else:
+                results.append(
+                    {"status": "error", "message": f"Unknown action: {action}"}
+                )
+
+        except Exception as exc:
+            logger.exception("Action failed for %s", image_name)
+            results.append(
+                {"status": "error", "message": f"Failed: {image_name} - {exc}"}
+            )
+
+    if action == "add_to_db":
         results.append(
             {"status": "success", "message": f"Added {added_count} images to DB"}
         )
@@ -310,113 +279,87 @@ def add_images_to_db(request):  # plural
 
 def images_ls_list_projects(request):
     logger.info("Rendering image labelstudio page")
-    results = []
-    action_results = image_ls_list_projects_action(request)
-    results.append(
-        {
-            "status": "success",
-            "message": "Rendered image labelstudio page",
-            "extra": {"action_results": action_results},
-        }
-    )
-    context = {"projects": action_results}
-    return render(request, "image_ls_list_projects.html", context)
+    projects = image_ls_list_projects_action(request)
+    return render(request, "image_ls_list_projects.html", {"projects": projects})
 
 
 def images_ls_projfile(request):
     logger.info("Rendering image labelstudio project file page")
-    debug_vars = []
-    results = []
-    if request.method == "POST":
-        project_id = request.POST.get("project_id")
-        logger.info(f"Selected project ID: {project_id}")
-        # Here you would add logic to retrieve and display the project file based on the selected project ID
-        context = {"project_id": project_id}
-        image_ls_projfile_results = image_ls_projfile_action(project_id)
-        context["task_images"] = image_ls_projfile_results
-        return render(request, "image_ls_projfile.html", context)
-    else:
+
+    if request.method != "POST":
         logger.warning("No project ID selected")
         return render(
             request, "image_ls_projfile.html", {"error": "No project ID selected"}
         )
 
+    project_id = request.POST.get("project_id")
+    logger.info("Selected project ID: %s", project_id)
+
+    task_images = image_ls_projfile_action(project_id)
+    return render(
+        request,
+        "image_ls_projfile.html",
+        {"project_id": project_id, "task_images": task_images},
+    )
+
 
 def move_images_to_archive(request):
     results = []
-    debug_vars = []
 
-    if request.method == "POST":
-        selected_images = request.POST.getlist("selected_images")
-        image_dir = request.POST.get("image_dir")
+    if request.method != "POST":
+        return render(request, "images_results.html", {"results": results})
 
-        debug_vars.append(("selected_images", selected_images))
-        debug_vars.append(("image_dir", image_dir))
-        logger.info(f"Processing {len(selected_images)} images from {image_dir}")
+    selected_images = request.POST.getlist("selected_images")
+    image_dir = request.POST.get("image_dir")
+    logger.info("Processing %d images from %s", len(selected_images), image_dir)
 
-        added_count = 0
-        for image_name in selected_images:
-            try:
-                image_path = f"{image_dir}/{image_name}"
-                full_path = f"{config['storage']['base_path']}/{image_path}"
+    for image_name in selected_images:
+        image_path = f"{image_dir}/{image_name}"
+        full_path = f"{BASE_PATH}/{image_path}"
 
-                # Validate file exists
-                if not os.path.isfile(full_path):
-                    logger.warning(f"File not found: {full_path}")
-                    results.append(
-                        {"status": "error", "message": f"File not found: {image_name}"}
-                    )
-                    continue
+        if not os.path.isfile(full_path):
+            results.append(
+                {"status": "error", "message": f"File not found: {image_name}"}
+            )
+            continue
 
-                # FIX: use archive_subdir to match add_images_to_db (was archive_path)
-                archive_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/{config['storage']['archive_subdir']}/{image_name}"
-                os.rename(full_path, archive_path)
-                logger.info(f"Moved {image_name} to archive")
-                results.append(
-                    {"status": "success", "message": f"Moved to archive: {image_name}"}
-                )
-            except Exception as e:
-                logger.error(f"Failed to move {image_name} to archive: {e}")
-                results.append(
-                    {
-                        "status": "error",
-                        "message": f"Failed to move {image_name} to archive: {str(e)}",
-                    }
-                )
+        archive_path = f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}/{image_name}"
+        try:
+            os.rename(full_path, archive_path)
+            results.append(
+                {"status": "success", "message": f"Moved to archive: {image_name}"}
+            )
+        except Exception as exc:
+            logger.exception("Failed to move %s to archive", image_name)
+            results.append(
+                {"status": "error", "message": f"Failed to move {image_name}: {exc}"}
+            )
 
-    # FIX: added missing return statement - was falling off the end with no response
     return render(request, "images_results.html", {"results": results})
 
 
 def images_games_index(request):
-    # Need name, image_total
-    image_game_data = []
-    results = []
     games = Game.objects.all()
-    images = Image.objects.all()
-    image_games = ImageGame.objects.all()
+
+    image_game_data = []
     for game in games:
+        qs = ImageGame.objects.filter(game=game)
         image_game_data.append(
             {
                 "id": game.id,
                 "name": game.name,
-                "images": ImageGame.objects.filter(game=game),
-                "num_images_total": ImageGame.objects.filter(game=game).count(),
+                "images": qs,
+                "num_images_total": qs.count(),
             }
         )
-    # FIX: single query instead of N+1 (one ImageGame filter per image in loop)
+
     images_not_assigned_to_a_game = Image.objects.filter(imagegame__isnull=True)
 
-    if image_game_data is not None:
-        results = {
-            "status": "success",
-            "message": "Retrieved image game data successfully",
-        }
-    else:
-        results = {
-            "status": "error",
-            "message": "Failed to retrieve image game data",
-        }
+    results = {
+        "status": "success",
+        "message": "Retrieved image game data successfully",
+    }
+
     return render(
         request,
         "image_games_index.html",
@@ -429,45 +372,48 @@ def images_games_index(request):
 
 
 def images_games_details(request, game_id):
-    images = []
-    images_list = []
-    results = []
-    url = f"{config['api']['images_url']}"
-    # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
-    thumb_url_base = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain"
+    url_base = IMAGES_URL
+
     if game_id != 0:
-        ls_project_id = (
-            GameLabelproj.objects.filter(game_id=game_id).first().ls_project_id
-        )
-        images = Image.objects.filter(imagegame__game_id=game_id)
+        glp = GameLabelproj.objects.filter(game_id=game_id).first()
+        if not glp:
+            return render(
+                request,
+                "image_games_details.html",
+                {
+                    "images_list": [],
+                    "games": Game.objects.all(),
+                    "error": "No LS project mapped",
+                },
+            )
+
+        ls_project_id = glp.ls_project_id
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
-        tasks = image_ls_projfile_action(ls_project_id)
-        tasks_clean = []
+        images = Image.objects.filter(imagegame__game_id=game_id)
+
+        tasks = image_ls_projfile_action(ls_project_id) or []
+        task_filenames = set()
+
         for task in tasks:
-            image_url = task["data"]["image"]
-            # ++ parse the query param 'd' and grab just the filename ++
+            image_url = task.get("data", {}).get("image", "")
             parsed = urlparse(image_url)
             d_param = parse_qs(parsed.query).get("d", [""])[0]
-            image_filename = d_param.split("/")[-1]  # e.g. "7e35877a-....jpg"
-            tasks_clean.append({"id": task["id"], "filename": image_filename})
+            task_filenames.add(d_param.split("/")[-1])
+
+        images_list = []
         images_not_in_tasks = []
+
         for image in images:
-            spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
-            image_full_url = spec_url
-            # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
-            # FIX: use thumb_url_base so it doesn't compound across iterations
-            thumb_url = f"{thumb_url_base}/{spec_url}"
+            spec_url = f"{url_base}/images/games/{game.shortname}/{image.filename}"
             images_list.append(
                 {
-                    "image_full_url": image_full_url,
-                    "thumb_url": thumb_url,
+                    "image_full_url": spec_url,
+                    "thumb_url": f"{THUMB_URL_BASE}/{spec_url}",
                     "filename": image.filename,
                 }
             )
-            if image.filename not in [
-                task_clean["filename"] for task_clean in tasks_clean
-            ]:
+            if image.filename not in task_filenames:
                 images_not_in_tasks.append(image)
 
         return render(
@@ -481,84 +427,88 @@ def images_games_details(request, game_id):
                 "images_not_in_tasks": images_not_in_tasks,
             },
         )
-    else:
-        images = Image.objects.filter(imagegame__isnull=True)
-        if len(images) == 0:
-            results.append(
-                {
-                    "status": "error",
-                    "message": f"No images available; game_id is {game_id}",
-                }
-            )
-        games = Game.objects.all()
-        for image in images:
-            spec_url = f"{url}/images/incoming/{image.filename}"
-            image_full_url = spec_url
-            # FIX: same thumb_url fixes applied to else branch
-            thumb_url = f"{thumb_url_base}/{spec_url}"
-            images_list.append(
-                {
-                    "image_full_url": image_full_url,
-                    "thumb_url": thumb_url,
-                    "filename": image.filename,
-                }
-            )
-        return render(
-            request,
-            "image_games_details.html",
-            {"images_list": images_list, "games": games},
+
+    # game_id == 0 => unassigned
+    images = Image.objects.filter(imagegame__isnull=True)
+    games = Game.objects.all()
+
+    images_list = []
+    for image in images:
+        spec_url = f"{url_base}/images/incoming/{image.filename}"
+        images_list.append(
+            {
+                "image_full_url": spec_url,
+                "thumb_url": f"{THUMB_URL_BASE}/{spec_url}",
+                "filename": image.filename,
+            }
         )
-    # NOTE: the two lines below this were unreachable dead code - removed
+
+    return render(
+        request,
+        "image_games_details.html",
+        {"images_list": images_list, "games": games},
+    )
 
 
 def change_image_game(request):
     results = []
     logger.info("Change image game request received")
-    if request.method == "POST":
-        logger.info("Processing POST request - change_image_game")
-        selected_images = request.POST.getlist("selected_images")
-        new_game_id = request.POST.get("new_game")
-        game_id = request.POST.get("current_game")
-        logger.info(
-            f"Selected images: {selected_images}, New game ID: {new_game_id}, Current game ID: {game_id}"
-        )
-        if selected_images and new_game_id:
-            old_game = Game.objects.filter(id=game_id).first()
-            logger.debug(f"Old game: {old_game}")
-            new_game = Game.objects.filter(id=new_game_id).first()
-            logger.debug(f"New game: {new_game}")
-            for image_name in selected_images:
-                # FIX: filter on 'filename' field to match model usage elsewhere (was 'name')
-                image = Image.objects.filter(filename=image_name).first()
-                if image:
-                    ImageGame.objects.update_or_create(
-                        image=image, defaults={"game": new_game}
-                    )
-            game_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/games"
-            dest_path = f"{game_path}/{new_game.shortname}/{image_name}"
-            if game_id == 0 or game_id is None or old_game is None:
-                source_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/incoming/{image_name}"
-            else:
-                source_path = f"{game_path}/{old_game.shortname}/{image_name}"
-            try:
-                os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-                os.rename(source_path, dest_path)
-            except OSError as e:
-                results.append(
-                    {"status": "error", "message": f"Error moving image: {e}"}
-                )
-            else:
-                results.append(
-                    {"status": "success", "message": "Images updated successfully"}
-                )
-        else:
-            results.append(
-                {"status": "error", "message": "No images selected or invalid game"}
-            )
-    else:
-        logger.info(f"No post: {request}")
-    if not results:
+
+    if request.method != "POST":
+        results.append({"status": "error", "message": "Invalid method"})
+        return render(request, "images_results.html", {"results": results})
+
+    selected_images = request.POST.getlist("selected_images")
+    new_game_id = request.POST.get("new_game")
+    game_id = request.POST.get("current_game")
+
+    if not selected_images or not new_game_id:
         results.append(
-            {"status": "error", "message": f"Dropped right through request {request}"}
+            {"status": "error", "message": "No images selected or invalid game"}
         )
+        return render(request, "images_results.html", {"results": results})
+
+    old_game = Game.objects.filter(id=game_id).first() if game_id else None
+    new_game = Game.objects.filter(id=new_game_id).first()
+
+    if not new_game:
+        results.append({"status": "error", "message": "New game not found"})
+        return render(request, "images_results.html", {"results": results})
+
+    game_path = f"{BASE_PATH}/{IMAGES_SUBDIR}/games"
+
+    for image_name in selected_images:
+        image = Image.objects.filter(filename=image_name).first()
+        if not image:
+            results.append(
+                {"status": "error", "message": f"Image not found in DB: {image_name}"}
+            )
+            continue
+
+        ImageGame.objects.update_or_create(image=image, defaults={"game": new_game})
+
+        dest_path = f"{game_path}/{new_game.shortname}/{image_name}"
+        if not old_game:
+            source_path = f"{BASE_PATH}/{IMAGES_SUBDIR}/{INCOMING_SUBDIR}/{image_name}"
+        else:
+            source_path = f"{game_path}/{old_game.shortname}/{image_name}"
+
+        try:
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            os.rename(source_path, dest_path)
+            results.append(
+                {
+                    "status": "success",
+                    "message": f"Moved {image_name} to {new_game.shortname}",
+                }
+            )
+        except OSError as exc:
+            logger.exception("Error moving image %s", image_name)
+            results.append(
+                {"status": "error", "message": f"Error moving {image_name}: {exc}"}
+            )
+
+    if not results:
+        results.append({"status": "error", "message": "No changes made"})
+
     return render(request, "images_results.html", {"results": results})
