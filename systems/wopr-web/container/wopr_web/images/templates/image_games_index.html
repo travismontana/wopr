@@ -11,7 +11,11 @@
     {% for game in image_game_data %}
     <tr>
         <td>{{ game.name }}</td>
-        <td><a href="{% url 'images_games_details' game.id %}">{% if game.num_images_total %}{{ game.num_images_total }}{% else %}0{% endif %}</a></td>
+        <td>
+            <a href="{% url 'images_games_details' game.id %}">
+                {% if game.num_images_total %}{{ game.num_images_total }}{% else %}0{% endif %}
+            </a>
+        </td>
     </tr>
     {% endfor %}
     {% if images_not_assigned_to_a_game %}

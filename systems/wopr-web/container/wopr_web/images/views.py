@@ -399,7 +399,7 @@ def images_games_index(request):
     )
 
 
-def images_games_details(request):
+def images_games_details(request, game_id):
     images = []
     images_list = []
     if request.method == "POST":
