@@ -3,7 +3,7 @@ import os
 import re
 import sys
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from core.models import Image, ImageGame, Game
 
@@ -409,6 +409,7 @@ def images_games_details(request):
         if game_id:
             images = ImageGame.objects.filter(game_id=game_id)
             game = Game.objects.filter(id=game_id).first()
+            games = Game.objects.all()
             for image in images:
                 spec_url = f"{url}/images/games/{game.shortname}/{image.image.name}"
                 image_full_url = spec_url
@@ -417,5 +418,38 @@ def images_games_details(request):
                     {"image_full_url": image_full_url, "thumb_url": thumb_url}
                 )
             return render(
-                request, "image_games_details.html", {"images_list": images_list}
+                request,
+                "image_games_details.html",
+                {"images_list": images_list, "games": games},
             )
+        else:
+            images = ImageGame.objects.filter(game__isnull=True)
+            games = Game.objects.all()
+            for image in images:
+                spec_url = f"{url}/images/games/{image.image.name}"
+                image_full_url = spec_url
+                thumb_url = f"{thumb_url}/${spec_url}"
+                images_list.append(
+                    {"image_full_url": image_full_url, "thumb_url": thumb_url}
+                )
+            return render(
+                request,
+                "image_games_details.html",
+                {"images_list": images_list, "games": games},
+            )
+
+
+def change_image_game(request):
+    if request.method == "POST":
+        selected_images = request.POST.getlist("selected_images")
+        game_id = request.POST.get("game")
+        if selected_images and game_id:
+            game = Game.objects.filter(id=game_id).first()
+            if game:
+                for image_name in selected_images:
+                    image = Image.objects.filter(name=image_name).first()
+                    if image:
+                        ImageGame.objects.update_or_create(
+                            image=image, defaults={"game": game}
+                        )
+    return redirect("images_games_index")

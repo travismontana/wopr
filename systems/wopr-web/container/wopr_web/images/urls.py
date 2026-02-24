@@ -27,4 +27,5 @@ urlpatterns = [
     path(
         "images_games_details", views.images_games_details, name="images_games_details"
     ),
+    path("change_image_game", views.change_image_game, name="change_image_game"),
 ]
