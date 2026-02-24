@@ -481,7 +481,7 @@ def change_image_game(request):
                 image = Image.objects.filter(filename=image_name).first()
                 if image:
                     ImageGame.objects.update_or_create(
-                        image=image, defaults={"game": game}
+                        image=image, defaults={"game": new_game}
                     )
             game_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/games"
             dest_path = f"{game_path}/{new_game.shortname}/{image_name}"
