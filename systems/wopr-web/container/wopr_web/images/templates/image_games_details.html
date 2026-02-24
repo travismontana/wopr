@@ -5,6 +5,22 @@
 {% if images_list %}
     <h2>Images for Game: {% if game.name %}{{ game.name }}{%else%}Images with no games{% endif %}</h2>
     <p>Game Id: {{game.id}}</p>
+    <table>
+        <tr>
+            <td>Images in db</td>
+            <td>{{ images_list|length }}</td>
+        </tr>
+        <tr>
+            <td>Images in Label Studio</td>
+            <td>
+                {% if tasks %}
+                    {{ tasks|length }}
+                {% else %}
+                    0
+                {% endif %}
+            </td>
+        </tr>
+    </table>
     <form method="post" action="{% url 'change_image_game' %}">
     {% csrf_token %}
     <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
