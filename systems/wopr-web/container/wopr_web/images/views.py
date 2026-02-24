@@ -402,6 +402,7 @@ def images_games_index(request):
 def images_games_details(request, game_id):
     images = []
     images_list = []
+    results = []
     if request.method == "POST":
         game_id = request.POST.get("game_id")
         url = f"{config['api']['images_url']}"
@@ -437,8 +438,9 @@ def images_games_details(request, game_id):
                 "image_games_details.html",
                 {"images_list": images_list, "games": games},
             )
-    return redirect("images_games_index")
-
+    else:
+        results.append({"status": "error", "message": "Invalid request method"})
+    return render(request, "images_results.html", {"results": results})
 
 def change_image_game(request):
     if request.method == "POST":
@@ -453,4 +455,4 @@ def change_image_game(request):
                         ImageGame.objects.update_or_create(
                             image=image, defaults={"game": game}
                         )
-    return redirect("images_games_index")
+    return render(request, "images_results.html", {"results": results})
