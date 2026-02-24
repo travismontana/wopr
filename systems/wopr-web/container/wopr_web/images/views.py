@@ -419,6 +419,7 @@ def images_games_details(request, game_id):
         games = Game.objects.all()
         for image in images:
             spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
+            # tasks = image_ls_projfile_action
             image_full_url = spec_url
             # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
             # FIX: use thumb_url_base so it doesn't compound across iterations
@@ -437,7 +438,7 @@ def images_games_details(request, game_id):
         )
     else:
         images = Image.objects.filter(imagegame__isnull=True)
-        tasks = image_ls_projfile_action
+        # tasks = image_ls_projfile_action
         logger.info(f"Tasks: {tasks}")
         if len(images) == 0:
             results.append(

@@ -158,6 +158,18 @@ class ImageGame(models.Model):
         ordering = ["game", "image"]
 
 
+class GameLabelproj(models.Model):
+    """Game to label studio project relationship."""
+
+    game = models.ForeignKey("Game", on_delete=models.CASCADE, db_index=True)
+    ls_project_id = models.IntegerField(null=False, blank=False)
+
+    class Meta:
+        db_table = "game_labelproj"
+        unique_together = [["game", "ls_project_id"]]
+        ordering = ["game", "ls_project_id"]
+
+
 class Round(models.Model):
     """A round in a session, grouping multiple turns."""
 
