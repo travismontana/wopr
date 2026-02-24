@@ -37,8 +37,15 @@ def image_ls_projfile_action(project_id):
         raise ValueError("Project ID is required.")
 
     # get the project file from labelstudio
-    ls = LabelStudio(base_url=config["api"]["labels_url"], api_key=LABEL_STUDIO_TOKEN)
-    tasks = list(ls.tasks.list(project=project_id))
+    ls = LabelStudio(
+        base_url=config["api"]["labels_url"], api_key=LABEL_STUDIO_TOKEN, timeout=60
+    )
+    pager = ls.tasks.list(project=project_id)  # <-- keep as pager/iterator
+    tasks = []
+    for i, t in enumerate(pager, start=1):
+        tasks.append(t)
+        if max_tasks and i >= max_tasks:
+            break
     logger.info(f"Retrieved {tasks} tasks from labelstudio project {project_id}.")
     logger.info(f"Exported project {project_id} from labelstudio.")
 
