@@ -459,7 +459,9 @@ def images_games_details(request, game_id):
 
 def change_image_game(request):
     results = []
+    logger.info("Change image game request received")
     if request.method == "POST":
+        logger.info("Processing POST request - change_image_game")
         selected_images = request.POST.getlist("selected_images")
         game_id = request.POST.get("game")
         if selected_images and game_id:
@@ -478,6 +480,8 @@ def change_image_game(request):
             results.append(
                 {"status": "error", "message": "No images selected or invalid game"}
             )
+    else:
+        logger.info(f"No post: {request}")
     if not results:
         results.append({"status": "error", "message": "Dropped right through"})
     return render(request, "images_results.html", {"results": results})
