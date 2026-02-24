@@ -485,7 +485,7 @@ def change_image_game(request):
                     )
             game_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/games"
             dest_path = f"{game_path}/{new_game.shortname}/{image_name}"
-            if game_id == 0:
+            if game_id == 0 or game_id is None:
                 source_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/incoming/{image_name}"
             else:
                 source_path = f"{game_path}/{old_game.shortname}/{image_name}"
