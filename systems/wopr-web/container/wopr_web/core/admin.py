@@ -11,6 +11,7 @@ from .models import (
     Round,
     Turn,
     ImageGame,
+    GameLabelproj,
 )
 
 # Register your models here.
