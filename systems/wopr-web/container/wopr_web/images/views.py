@@ -437,6 +437,7 @@ def images_games_details(request, game_id):
                 "image_games_details.html",
                 {"images_list": images_list, "games": games},
             )
+    return redirect("images_games_index")
 
 
 def change_image_game(request):
