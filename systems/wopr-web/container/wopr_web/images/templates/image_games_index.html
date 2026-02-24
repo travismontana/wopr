@@ -21,7 +21,11 @@
     {% if images_not_assigned_to_a_game %}
     <tr>
         <td>Not Assigned to a Game</td>
-        <td>{% if images_not_assigned_to_a_game %}{{ images_not_assigned_to_a_game|length }}{% else %}0{% endif %}</td>
+        <td>
+            <a href="{% url 'images_games_details' 0 %}">
+                {% if images_not_assigned_to_a_game %}{{ images_not_assigned_to_a_game|length }}{% else %}0{% endif %}
+            </a>
+        </td>
     </tr>
     {% endif %}
 {% endif %}
