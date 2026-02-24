@@ -8,18 +8,21 @@
         <input type="hidden" name="image_dir" value="{{ image_dir }}">
 
         <h2>Images on disk but not in the DB</h2>
-        <label>
-            <input type="checkbox" id="select-all"> Select All
-        </label>
+
         <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
         {% for image in images_on_disk %}
             <li><a href="{{image.url}}">
-                <img src="{{image.thumb_url}}" alt="{{ image.name }}"><br>
-                <input type="checkbox" name="selected_images" value="{{image.name}}">{{image.name}}</a>
+                <img src="{{image.thumb_url}}" alt="{{ image.name }}"></a><br>
+                <label>
+                    <input type="checkbox" name="selected_images" value="{{image.name}}"><br>
+                    <p>{{image.name}}</p>
+                </label>
             </li>
         {% endfor %}
         </ul>
-
+    <label>
+        <input type="checkbox" id="select-all"> Select All
+    </label>
     <button type="submit"><input type="hidden" name="action" value="add_to_db">Add Selected to DB</button>
     <br>
     <button type="submit"><input type="hidden" name="action" value="move_to_archive">Move Selected to Archive</button>
