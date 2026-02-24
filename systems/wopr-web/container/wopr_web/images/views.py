@@ -403,43 +403,40 @@ def images_games_details(request, game_id):
     images = []
     images_list = []
     results = []
-    if request.method == "POST":
-        game_id = request.POST.get("game_id")
-        url = f"{config['api']['images_url']}"
-        thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
-        if game_id:
-            images = ImageGame.objects.filter(game_id=game_id)
-            game = Game.objects.filter(id=game_id).first()
-            games = Game.objects.all()
-            for image in images:
-                spec_url = f"{url}/images/games/{game.shortname}/{image.image.name}"
-                image_full_url = spec_url
-                thumb_url = f"{thumb_url}/${spec_url}"
-                images_list.append(
-                    {"image_full_url": image_full_url, "thumb_url": thumb_url}
-                )
-            return render(
-                request,
-                "image_games_details.html",
-                {"images_list": images_list, "games": games},
+    url = f"{config['api']['images_url']}"
+    thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
+    if game_id:
+        images = ImageGame.objects.filter(game_id=game_id)
+        game = Game.objects.filter(id=game_id).first()
+        games = Game.objects.all()
+        for image in images:
+            spec_url = f"{url}/images/games/{game.shortname}/{image.image.name}"
+            image_full_url = spec_url
+            thumb_url = f"{thumb_url}/${spec_url}"
+            images_list.append(
+                {"image_full_url": image_full_url, "thumb_url": thumb_url}
             )
-        else:
-            images = ImageGame.objects.filter(game__isnull=True)
-            games = Game.objects.all()
-            for image in images:
-                spec_url = f"{url}/images/games/{image.image.name}"
-                image_full_url = spec_url
-                thumb_url = f"{thumb_url}/${spec_url}"
-                images_list.append(
-                    {"image_full_url": image_full_url, "thumb_url": thumb_url}
-                )
-            return render(
-                request,
-                "image_games_details.html",
-                {"images_list": images_list, "games": games},
-            )
+        return render(
+            request,
+            "image_games_details.html",
+            {"images_list": images_list, "games": games},
+        )
     else:
-        results.append({"status": "error", "message": "Invalid request method"})
+        images = ImageGame.objects.filter(game__isnull=True)
+        games = Game.objects.all()
+        for image in images:
+            spec_url = f"{url}/images/games/{image.image.name}"
+            image_full_url = spec_url
+            thumb_url = f"{thumb_url}/${spec_url}"
+            images_list.append(
+                {"image_full_url": image_full_url, "thumb_url": thumb_url}
+            )
+        return render(
+            request,
+            "image_games_details.html",
+            {"images_list": images_list, "games": games},
+        )
+    results.append({"status": "success", "message": "Nothing happened"})
     return render(request, "images_results.html", {"results": results})
 
 def change_image_game(request):
