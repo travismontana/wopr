@@ -405,7 +405,7 @@ def images_games_details(request, game_id):
     results = []
     url = f"{config['api']['images_url']}"
     thumb_url = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
-    if game_id:
+    if game_id != 0:
         images = ImageGame.objects.filter(game_id=game_id)
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
