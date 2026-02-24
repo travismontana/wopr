@@ -1,7 +1,7 @@
 import hashlib
 import os
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from core.models import Image, ImageGame, Game
 
@@ -424,7 +424,11 @@ def images_games_details(request, game_id):
             # FIX: use thumb_url_base so it doesn't compound across iterations
             thumb_url = f"{thumb_url_base}/{spec_url}"
             images_list.append(
-                {"image_full_url": image_full_url, "thumb_url": thumb_url}
+                {
+                    "image_full_url": image_full_url,
+                    "thumb_url": thumb_url,
+                    "filename": image.filename,
+                }
             )
         return render(
             request,
@@ -447,7 +451,11 @@ def images_games_details(request, game_id):
             # FIX: same thumb_url fixes applied to else branch
             thumb_url = f"{thumb_url_base}/{spec_url}"
             images_list.append(
-                {"image_full_url": image_full_url, "thumb_url": thumb_url}
+                {
+                    "image_full_url": image_full_url,
+                    "thumb_url": thumb_url,
+                    "filename": image.filename,
+                }
             )
         return render(
             request,
@@ -474,8 +482,12 @@ def change_image_game(request):
                         ImageGame.objects.update_or_create(
                             image=image, defaults={"game": game}
                         )
+                results.append(
+                    {"status": "success", "message": "Images updated successfully"}
+                )
             else:
                 results.append({"status": "error", "message": "Invalid game"})
+                return redirect("image_games_index")
         else:
             results.append(
                 {"status": "error", "message": "No images selected or invalid game"}
@@ -483,5 +495,7 @@ def change_image_game(request):
     else:
         logger.info(f"No post: {request}")
     if not results:
-        results.append({"status": "error", "message": "Dropped right through"})
+        results.append(
+            {"status": "error", "message": f"Dropped right through request {request}"}
+        )
     return render(request, "images_results.html", {"results": results})
