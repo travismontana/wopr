@@ -1,0 +1,12 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+
+{% if images_list %}
+    <ul>
+        {% for image in images_list %}
+        <li><a href="{{ image.image_full_url }}"><img src="{{ image.thumb_url }}" alt="{{ image.uuid }}"></a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}
