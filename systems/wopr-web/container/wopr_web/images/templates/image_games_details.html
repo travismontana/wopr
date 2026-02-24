@@ -16,12 +16,13 @@
         {% endfor %}
     </ul>
     <br>
-    <label for="game">Select Game to Change to:</label>
-    <select name="game" id="game">
-        {% for game in games %}
-        <option value="{{ game.id }}">{{ game.name }}</option>
+    <label for="new_game">Select Game to Change to:</label>
+    <select name="new_game" id="new_game">
+        {% for new_game in games %}
+        <option value="{{ new_game.id }}">{{ new_game.name }}</option>
         {% endfor %}
     </select>
+    <input type="hidden" name="current_game" value="{{ game.id }}">
     <button type="submit">Add Images to Game</button><br>
     </form>
     <br>

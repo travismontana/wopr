@@ -471,23 +471,34 @@ def change_image_game(request):
     if request.method == "POST":
         logger.info("Processing POST request - change_image_game")
         selected_images = request.POST.getlist("selected_images")
-        game_id = request.POST.get("game")
-        if selected_images and game_id:
-            game = Game.objects.filter(id=game_id).first()
-            if game:
-                for image_name in selected_images:
-                    # FIX: filter on 'filename' field to match model usage elsewhere (was 'name')
-                    image = Image.objects.filter(filename=image_name).first()
-                    if image:
-                        ImageGame.objects.update_or_create(
-                            image=image, defaults={"game": game}
-                        )
+        new_game_id = request.POST.get("new_game")
+        game_id = request.POST.get("current_game")
+        if selected_images and new_game_id:
+            old_game = Game.objects.filter(id=game_id).first()
+            new_game = Game.objects.filter(id=new_game_id).first()
+            for image_name in selected_images:
+                # FIX: filter on 'filename' field to match model usage elsewhere (was 'name')
+                image = Image.objects.filter(filename=image_name).first()
+                if image:
+                    ImageGame.objects.update_or_create(
+                        image=image, defaults={"game": game}
+                    )
+            game_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/games"
+            dest_path = f"{game_path}/{new_game.shortname}/{image_name}"
+            if game_id == 0:
+                source_path = f"{config['storage']['base_path']}/{config['storage']['images_subdir']}/incoming/{image_name}"
+            else:
+                source_path = f"{game_path}/{old_game.shortname}/{image_name}"
+            try:
+                os.rename(source_path, dest_path)
+            except OSError as e:
+                results.append(
+                    {"status": "error", "message": f"Error moving image: {e}"}
+                )
+            else:
                 results.append(
                     {"status": "success", "message": "Images updated successfully"}
                 )
-            else:
-                results.append({"status": "error", "message": "Invalid game"})
-                return redirect("image_games_index")
         else:
             results.append(
                 {"status": "error", "message": "No images selected or invalid game"}
