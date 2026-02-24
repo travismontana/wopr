@@ -416,11 +416,11 @@ def images_games_details(request, game_id):
         f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain/"
     )
     if game_id != 0:
-        images = ImageGame.objects.filter(game_id=game_id)
+        images = Image.objects.filter(imagegame__isnull=True)
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         for image in images:
-            spec_url = f"{url}/images/games/{game.shortname}/{image.image.name}"
+            spec_url = f"{url}/images/games/{game.shortname}/{image.filename}"
             image_full_url = spec_url
             # FIX: removed stray $ (was f"{thumb_url}/${spec_url}" - literal dollar sign, not interpolation)
             # FIX: use thumb_url_base so it doesn't compound across iterations
