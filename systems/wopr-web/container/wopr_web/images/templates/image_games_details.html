@@ -22,7 +22,7 @@
         <option value="{{ new_game.id }}">{{ new_game.name }}</option>
         {% endfor %}
     </select>
-    <input type="hidden" name="current_game" value="{{ game.id }}">
+    <input type="hidden" name="current_game" value="{{ game.id|default:'0' }}">
     <button type="submit">Add Images to Game</button><br>
     </form>
     <br>
