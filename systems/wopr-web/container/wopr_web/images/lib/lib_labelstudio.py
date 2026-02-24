@@ -43,7 +43,12 @@ def image_ls_projfile_action(project_id, max_tasks=None):
     pager = ls.tasks.list(project=project_id)  # <-- keep as pager/iterator
     tasks = []
     for i, t in enumerate(pager, start=1):
-        tasks.append(t)
+        tasks.append(
+            {
+                "id": t.id,
+                "data": t.data,
+            }
+        )
         if max_tasks and i >= max_tasks:
             break
     logger.info(f"Retrieved {tasks} tasks from labelstudio project {project_id}.")
