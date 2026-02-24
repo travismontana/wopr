@@ -8,6 +8,9 @@
         <input type="hidden" name="image_dir" value="{{ image_dir }}">
 
         <h2>Images on disk but not in the DB</h2>
+        <label>
+            <input type="checkbox" id="select-all"> Select All
+        </label>
         <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
         {% for image in images_on_disk %}
             <li><a href="{{image.url}}">

@@ -413,8 +413,10 @@ def images_games_details(request, game_id):
     url = f"{config['api']['images_url']}"
     # FIX: thumb_url_base extracted so it isn't clobbered on first loop iteration
     thumb_url_base = f"{config['api']['thumbs_url']}/insecure/resize:fill:300:200/plain"
-    ls_project_id = GameLabelproj.objects.filter(game_id=game_id).first().ls_project_id
     if game_id != 0:
+        ls_project_id = (
+            GameLabelproj.objects.filter(game_id=game_id).first().ls_project_id
+        )
         images = Image.objects.filter(imagegame__game_id=game_id)
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
@@ -432,10 +434,21 @@ def images_games_details(request, game_id):
                     "filename": image.filename,
                 }
             )
+        images_not_in_tasks = [
+            image
+            for image in images
+            if image.filename not in [task["data"]["filename"] for task in tasks]
+        ]
         return render(
             request,
             "image_games_details.html",
-            {"images_list": images_list, "games": games, "game": game, "tasks": tasks},
+            {
+                "images_list": images_list,
+                "games": games,
+                "game": game,
+                "tasks": tasks,
+                "images_not_in_tasks": images_not_in_tasks,
+            },
         )
     else:
         images = Image.objects.filter(imagegame__isnull=True)

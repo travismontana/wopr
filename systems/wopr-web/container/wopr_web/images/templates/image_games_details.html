@@ -21,6 +21,23 @@
             </td>
         </tr>
     </table>
+    <br>
+    <h2>
+    <h2>Images not in labelsudio</h2>
+    {% if images_not_in_tasks %}
+        <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
+            {% for image in images_not_in_tasks %}
+            <li><a href="{{ image.image_full_url }}"><img src="{{ image.thumb_url }}" alt="{{ image.filename }}"></a>
+            <br>
+            <input type="checkbox" name="selected_images" value="{{image.filename}}">{{image.filename}}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No images available.</p>
+    {% endif %}
+
+    <h2>Move image to another game:</h2>
     <form method="post" action="{% url 'change_image_game' %}">
     {% csrf_token %}
     <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
