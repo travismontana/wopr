@@ -473,9 +473,14 @@ def change_image_game(request):
         selected_images = request.POST.getlist("selected_images")
         new_game_id = request.POST.get("new_game")
         game_id = request.POST.get("current_game")
+        logger.info(
+            f"Selected images: {selected_images}, New game ID: {new_game_id}, Current game ID: {game_id}"
+        )
         if selected_images and new_game_id:
             old_game = Game.objects.filter(id=game_id).first()
+            logger.debug(f"Old game: {old_game}")
             new_game = Game.objects.filter(id=new_game_id).first()
+            logger.debug(f"New game: {new_game}")
             for image_name in selected_images:
                 # FIX: filter on 'filename' field to match model usage elsewhere (was 'name')
                 image = Image.objects.filter(filename=image_name).first()
