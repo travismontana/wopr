@@ -7,7 +7,7 @@
     <p>Game Id: {{game.id}}</p>
     <form method="post" action="{% url 'change_image_game' %}">
     {% csrf_token %}
-    <ul>
+    <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
         {% for image in images_list %}
         <li><a href="{{ image.image_full_url }}"><img src="{{ image.thumb_url }}" alt="{{ image.name }}"></a>
         <br>
