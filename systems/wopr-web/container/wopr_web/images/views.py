@@ -423,6 +423,13 @@ def images_games_details(request, game_id):
         )
     else:
         images = ImageGame.objects.filter(game__isnull=True)
+        if len(images) == 0:
+            results.append(
+                {
+                    "status": "error",
+                    "message": f"No images available; game_id is {game_id}",
+                }
+            )
         games = Game.objects.all()
         for image in images:
             spec_url = f"{url}/images/games/{image.image.name}"
@@ -440,6 +447,7 @@ def images_games_details(request, game_id):
     return render(request, "images_results.html", {"results": results})
 
 def change_image_game(request):
+    results = []
     if request.method == "POST":
         selected_images = request.POST.getlist("selected_images")
         game_id = request.POST.get("game")
@@ -452,4 +460,10 @@ def change_image_game(request):
                         ImageGame.objects.update_or_create(
                             image=image, defaults={"game": game}
                         )
+            else:
+                results.append({"status": "error", "message": "Invalid game"})
+        else:
+            results.append(
+                {"status": "error", "message": "No images selected or invalid game"}
+            )
     return render(request, "images_results.html", {"results": results})
