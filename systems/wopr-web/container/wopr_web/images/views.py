@@ -2,10 +2,11 @@ import hashlib
 import os
 import shutil  # ++ added for shutil.copy2 ++
 from urllib.parse import parse_qs, urlparse
+import uuid
 
 from django.shortcuts import render, redirect
 
-from core.models import Game, GameLabelproj, Image, ImageGame, MLDatasets
+from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
 from .lib.lib_images import get_images_ondisk, image_sort
 from .lib.lib_labelstudio import (
@@ -13,6 +14,7 @@ from .lib.lib_labelstudio import (
     image_ls_projfile_action,
     send_labelstudio,
 )
+from .lib.lib_datasets import work_create_mldataset, work_datasets_mgmt
 
 logger = setup_logger()
 config = get_config()
@@ -622,3 +624,28 @@ def datasets_mgmt(request):
                     "images_mldataset_detail.html",
                     {"dataset": ds, "game": game, "ls_project_id": ls_project_id},
                 )
+
+
+def create_mldatasets(request):
+    results = []
+    if request.method != "POST":
+        results.append({"status": "error", "message": "Invalid method"})
+        return render(request, "images_results.html", {"results": results})
+    else:
+        game_id = request.POST.get("game_id")
+        ls_project_id = request.POST.get("ls_project_id")
+        mldataset, created = MLDataset.objects.update_or_create(
+            name=mldataset_name,
+            defaults={"game_id": game_id, "ls_project_id": ls_project_id},
+        )
+        mldataset_name = mldataset.name
+        logger.info(
+            f"Creating ML dataset {mldataset_name} for game_id: {game_id}, ls_project_id: {ls_project_id}"
+        )
+        retval = work_create_mldataset(game_id, ls_project_id, mldataset_name)
+        ds = MLDataset.objects.filter(game_id=game_id)
+        return render(
+            request,
+            "images_mldataset_detail.html",
+            {"dataset": ds, "game_id": game_id, "ls_project_id": ls_project_id},
+        )

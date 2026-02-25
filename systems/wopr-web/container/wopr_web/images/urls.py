@@ -32,4 +32,5 @@ urlpatterns = [
     path("change_image_game", views.change_image_game, name="change_image_game"),
     path("add_to_labelstudio", views.add_to_labelstudio, name="add_to_labelstudio"),
     path("datasets_mgmt", views.datasets_mgmt, name="datasets_mgmt"),
+    path("create_mldatasets", views.create_mldatasets, name="create_mldatasets"),
 ]

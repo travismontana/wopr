@@ -1,5 +1,7 @@
-from core.models import Game, GameLabelproj, Image, ImageGame, MLDatasets
+import os
+from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
+from .lib_labelstudio import export_and_download_snapshot
 
 logger = setup_logger()
 config = get_config()
@@ -40,6 +42,7 @@ WOPRS = {
     },
     "models": {
         "weights": f"{BASE_PATH}/{MODELS_SUBDIR}/{WEIGHTS_SUBDIR}",
+        "datasets": f"{BASE_PATH}/{MODELS_SUBDIR}/datasets",
         "runs": f"{BASE_PATH}/{MODELS_SUBDIR}/{RUNS_SUBDIR}",
         "distfiles": f"{BASE_PATH}/{MODELS_SUBDIR}/{DISTFILES_SUBDIR}",
         "backups": f"{BASE_PATH}/{MODELS_SUBDIR}/{BACKUPS_SUBDIR}",
@@ -56,3 +59,35 @@ def work_datasets_mgmt(game_id):
     logger.info("Found %d datasets for game_id: %s", ml_datasets.count(), game_id)
     results.append({"status": "success", "message": ml_datasets})
     return results
+
+
+def work_create_mldataset(game_id, ls_project_id, mldataset_name):
+    """_summary_
+
+    Args:
+        game_id (_type_): _description_
+        ls_project_id (_type_): _description_
+        mldataset_name (_type_): _description_
+    """
+    logger.info(
+        "Creating ML dataset %s for game_id: %s, ls_project_id: %s",
+        mldataset_name,
+        game_id,
+        ls_project_id,
+    )
+    # directory
+    dataset_base = WOPRS["models"]["datasets"]
+    dataset_path = f"{dataset_base}/{mldataset_name}"
+    os.makedirs(os.path.dirname(dataset_path), exist_ok=True)
+    logger.info(f"Created dataset directory at {dataset_path}")
+    export_id = export_and_download_snapshot(ls_project_id)
+    logger.info(f"Downloaded export snapshot with ID {export_id}")
+    export_type = "JSON"
+    convert_snapshot(ls_project_id, dataset_path, export_type, export_id)
+    logger.info(f"Converted export snapshot to {export_type} format")
+    export_type = "YOLO"
+    convert_snapshot(ls_project_id, dataset_path, export_type, export_id)
+    logger.info(f"Converted export snapshot to {export_type} format")
+    stuff = {}
+    stuff["mldataset_name"] = mldataset_name
+    return stuff
