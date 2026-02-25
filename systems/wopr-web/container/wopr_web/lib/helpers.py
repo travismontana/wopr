@@ -79,7 +79,7 @@ def get_config() -> dict:
                 "label_subdir": "labelstudio",
                 "label_source_subdir": "source",
                 "label_target_subdir": "target",
-                "models_subdir": "models",
+                "models_subdir": "models/ua",
                 "weights_subdir": "weights",
                 "runs_subdir": "runs",
                 "distfiles_subdir": "distfiles",
