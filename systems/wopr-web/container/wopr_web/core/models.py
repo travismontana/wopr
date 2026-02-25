@@ -223,7 +223,7 @@ class Turn(models.Model):
 
     class Meta:
         db_table = "turn"
-        unique_together = [["session", "number"]]
+        unique_together = [["round", "number"]]
         ordering = ["session", "number"]
 
     def save(self, *args, **kwargs):
@@ -267,3 +267,30 @@ class Move(models.Model):
 
     def __str__(self):
         return f"{self.player.handle} - Turn {self.turn.number}"
+
+
+class MLDataset(models.Model):
+    """A dataset used for machine learning purposes."""
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    short_id = models.CharField(max_length=5, unique=True, db_index=True)
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    game = models.ForeignKey("Game", on_delete=models.CASCADE, db_index=True)
+
+    class Meta:
+        db_table = "ml_dataset"
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        if not self.short_id:
+            self.short_id = str(self.uuid)[:5]
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.game.shortname} - {self.short_id}"
