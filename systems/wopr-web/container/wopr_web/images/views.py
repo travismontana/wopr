@@ -633,11 +633,9 @@ def create_mldatasets(request):
         return render(request, "images_results.html", {"results": results})
     else:
         game_id = request.POST.get("game_id")
+        game = Game.objects.filter(id=game_id).first()
         ls_project_id = request.POST.get("ls_project_id")
-        mldataset, created = MLDataset.objects.update_or_create(
-            name=mldataset_name,
-            defaults={"game_id": game_id, "ls_project_id": ls_project_id},
-        )
+        mldataset, created = MLDataset.objects.update_or_create(game=game)
         mldataset_name = mldataset.name
         logger.info(
             f"Creating ML dataset {mldataset_name} for game_id: {game_id}, ls_project_id: {ls_project_id}"
