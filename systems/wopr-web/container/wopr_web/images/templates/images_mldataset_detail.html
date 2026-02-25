@@ -1,0 +1,31 @@
+{% extends "images_base.html" %}
+
+{% block main_content %}
+
+<h2>ML Datasets for {{game.name}}</h2>
+
+<table>
+    <tr>
+        <th>Dataset Name</th>
+        <th>Description</th>
+        <th>Created At</th>
+    </tr>
+    {% for dataset in dataset %}
+    <tr>
+        <td>{{ dataset.name }}</td>
+        <td>{{ dataset.description }}</td>
+        <td>{{ dataset.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="3">No datasets available</td>
+    </tr>
+    {% endfor %}
+</table>
+<hr><br>
+<form action="{% url 'create_mldatasets' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="game_id" value="{{ game.id }}">
+    <input type="hidden" name="ls_project_id" value="{{ ls_project_id.id }}">
+    <button name="action" value="create">Create ML Dataset</button>
+</form>

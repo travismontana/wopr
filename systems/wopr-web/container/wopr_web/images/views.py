@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 from django.shortcuts import render, redirect
 
-from core.models import Game, GameLabelproj, Image, ImageGame
+from core.models import Game, GameLabelproj, Image, ImageGame, MLDatasets
 from lib.helpers import get_config, setup_logger
 from .lib.lib_images import get_images_ondisk, image_sort
 from .lib.lib_labelstudio import (
@@ -411,7 +411,7 @@ def images_games_details(request, game_id):
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         images = Image.objects.filter(imagegame__game_id=game_id)
-
+        mldatasets = MLDataset.objects.filter(game_id=game_id)
         tasks = image_ls_projfile_action(ls_project_id) or []
         task_filenames = set()
 
@@ -453,6 +453,7 @@ def images_games_details(request, game_id):
                 "tasks": tasks,
                 "images_not_in_tasks": images_not_in_tasks,
                 "ls_project_id": ls_project_id,
+                "mldatasets": mldatasets,
             },
         )
 
@@ -598,5 +599,26 @@ def add_to_labelstudio(request):
     except RuntimeError as exc:
         results.append({"status": "error", "message": str(exc)})
         return render(request, "images_results.html", {"results": results})
-
     return redirect("images_games_index")
+
+
+def datasets_mgmt(request):
+    results = []
+    if request.method != "POST":
+        results.append({"status": "error", "message": "Invalid method"})
+        return render(request, "images_results.html", {"results": results})
+    else:
+        game_id = request.POST.get("game_id")
+        game = Game.objects.filter(id=game_id).first()
+        ls_project_id = GameLabelproj.objects.filter(game=game).first()
+        results = work_datasets_mgmt(game_id)
+        for result in results:
+            if result["status"] == "error":
+                return render(request, "images_results.html", {"results": results})
+            else:
+                ds = result["message"]
+                return render(
+                    request,
+                    "images_mldataset_detail.html",
+                    {"dataset": ds, "game": game, "ls_project_id": ls_project_id},
+                )
