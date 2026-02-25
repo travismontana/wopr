@@ -55,7 +55,7 @@ def work_datasets_mgmt(game_id):
     logger.info("Managing datasets for game_id: %s", game_id)
     results = []
     game = Game.objects.get(id=game_id)
-    ml_datasets = MLDatasets.objects.filter(game=game)
+    ml_datasets = MLDataset.objects.filter(game=game)
     logger.info("Found %d datasets for game_id: %s", ml_datasets.count(), game_id)
     results.append({"status": "success", "message": ml_datasets})
     return results
