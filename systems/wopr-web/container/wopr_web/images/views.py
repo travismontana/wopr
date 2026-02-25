@@ -396,6 +396,18 @@ def images_games_details(request, game_id):
             )
 
         ls_project_id = glp.ls_project_id
+        if ls_project_id == "" or ls_project_id is None:
+            return render(
+                request,
+                "images_results.html",
+                {
+                    "results": {
+                        "status": "error",
+                        "message": f"No LS project mapped glp: {glp}",
+                    }
+                },
+            )
+
         game = Game.objects.filter(id=game_id).first()
         games = Game.objects.all()
         images = Image.objects.filter(imagegame__game_id=game_id)
