@@ -90,7 +90,7 @@ def send_labelstudio(project_id):
         raise RuntimeError(f"Error sending images to Label Studio: {exc}") from exc
 
 
-def export_and_download_snapshot(project_id):
+def export_and_download_snapshot(project_id, outdir):
     """Export project JSON snapshot
 
     This example demonstrates how to:
@@ -157,7 +157,7 @@ def export_and_download_snapshot(project_id):
         raise ApiError(status_code=500, body=f"Export failed: {job}")
 
     # Download export as JSON to local file
-    out_dir = Path(".")
+    out_dir = Path(outdir)
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"project_{project_id}_export_{export_id}.json"
 

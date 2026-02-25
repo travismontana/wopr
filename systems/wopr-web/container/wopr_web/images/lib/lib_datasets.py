@@ -1,7 +1,7 @@
 import os
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
-from .lib_labelstudio import export_and_download_snapshot
+from .lib_labelstudio import export_and_download_snapshot, convert_snapshot
 
 logger = setup_logger()
 config = get_config()
@@ -78,9 +78,9 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     # directory
     dataset_base = WOPRS["models"]["datasets"]
     dataset_path = f"{dataset_base}/{mldataset_name}"
-    os.makedirs(os.path.dirname(dataset_path), exist_ok=True)
+    os.makedirs(dataset_path), exist_ok=True)
     logger.info(f"Created dataset directory at {dataset_path}")
-    export_id = export_and_download_snapshot(ls_project_id)
+    export_id = export_and_download_snapshot(ls_project_id, dataset_path)
     logger.info(f"Downloaded export snapshot with ID {export_id}")
     export_type = "JSON"
     convert_snapshot(ls_project_id, dataset_path, export_type, export_id)
