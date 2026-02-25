@@ -12,6 +12,7 @@ from .models import (
     Turn,
     ImageGame,
     GameLabelproj,
+    MLDataset,
 )
 
 # Register your models here.
@@ -26,3 +27,4 @@ admin.site.register(Move)
 admin.site.register(Round)
 admin.site.register(Turn)
 admin.site.register(GameLabelproj)
+admin.site.register(MLDataset)
