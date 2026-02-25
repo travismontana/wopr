@@ -5,7 +5,7 @@
 {% if images_list %}
     <h2>Images for Game: {% if game.name %}{{ game.name }}{%else%}Images with no games{% endif %}</h2>
     <p>Game Id: {{game.id}}</p>
-    <p>LS Project ID: {{ game.ls_project_id }}</p>
+    <p>LS Project ID: {{ ls_project_id }}</p>
     <table>
         <tr>
             <td>Images in db</td>
@@ -36,7 +36,7 @@
             </li>
             {% endfor %}
         </ul>
-        <button type="submit" name="project_id" value="{{ game.ls_project_id }}">Add Images to Label Studio</button><br>
+        <button type="submit" name="project_id" value="{{ ls_project_id }}">Add Images to Label Studio</button><br>
     {% else %}
         <p>No images available.</p>
     {% endif %}
