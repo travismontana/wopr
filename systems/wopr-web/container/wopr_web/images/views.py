@@ -545,7 +545,9 @@ def add_to_labelstudio(request):
         len(selected_images),
         project_id,
     )
-
+    if not project_id:
+        results.append({"status": "error", "message": "project_id is required"})
+        return render(request, "images_results.html", {"results": results})
     # ++ filter on ls_project_id, not project_id (field name fix) ++
     glp = GameLabelproj.objects.filter(ls_project_id=project_id).first()
     if not glp:
