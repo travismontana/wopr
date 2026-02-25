@@ -64,14 +64,20 @@ def image_ls_projfile_action(project_id, max_tasks=None):
 
 
 def send_labelstudio(project_id):
-    logger.info("Starting send_labelstudio function")
-    logger.info(f"Sending images to Label Studio project {project_id}")
+    logger.info("Sending images to Label Studio project %s", project_id)
     ls = LabelStudio(
         base_url=config["api"]["labels_url"], api_key=LABEL_STUDIO_TOKEN, timeout=60
     )
     try:
-        res = ls.storages.localfiles.sync(id=1, project_id=project_id)
+        # ++ look up storage ID for this project instead of hardcoding ++
+        storages = list(ls.import_storage.local.list(project=project_id))
+        if not storages:
+            raise RuntimeError(f"No local storage configured for project {project_id}")
+        storage_id = storages[0].id
+        logger.info("Found storage ID %s for project %s", storage_id, project_id)
+        return ls.import_storage.local.sync(id=storage_id)
+    except RuntimeError:
+        raise
     except Exception as exc:
         logger.exception("Error sending images to Label Studio")
-        raise RuntimeError(f"Error sending images to Label Studio: {exc}")
-    return res
+        raise RuntimeError(f"Error sending images to Label Studio: {exc}") from exc
