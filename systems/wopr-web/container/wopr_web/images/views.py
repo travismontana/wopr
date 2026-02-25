@@ -609,21 +609,21 @@ def datasets_mgmt(request):
     if request.method != "POST":
         results.append({"status": "error", "message": "Invalid method"})
         return render(request, "images_results.html", {"results": results})
-    else:
-        game_id = request.POST.get("game_id")
-        game = Game.objects.filter(id=game_id).first()
-        ls_project_id = GameLabelproj.objects.filter(game=game).first()
-        results = work_datasets_mgmt(game_id)
-        for result in results:
-            if result["status"] == "error":
-                return render(request, "images_results.html", {"results": results})
-            else:
-                ds = result["message"]
-                return render(
-                    request,
-                    "images_mldataset_detail.html",
-                    {"dataset": ds, "game": game, "ls_project_id": ls_project_id},
-                )
+
+    game_id = request.POST.get("game_id")
+    game = Game.objects.filter(id=game_id).first()
+    ls_project_id = GameLabelproj.objects.filter(game=game).first()
+    results = work_datasets_mgmt(game_id)
+    for result in results:
+        if result["status"] == "error":
+            return render(request, "images_results.html", {"results": results})
+        else:
+            ds = result["message"]
+            return render(
+                request,
+                "images_mldataset_detail.html",
+                {"dataset": ds, "game": game, "ls_project_id": ls_project_id},
+            )
 
 
 def create_mldatasets(request):

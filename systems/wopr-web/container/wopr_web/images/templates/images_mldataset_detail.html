@@ -10,17 +10,19 @@
         <th>Description</th>
         <th>Created At</th>
     </tr>
-    {% for dataset in dataset %}
-    <tr>
-        <td>{{ dataset.name }}</td>
-        <td>{{ dataset.description }}</td>
-        <td>{{ dataset.created_at }}</td>
-    </tr>
+    {% if dataset %}
+        {% for dataset in dataset %}
+        <tr>
+            <td>{{ dataset.name }}</td>
+            <td>{{ dataset.description }}</td>
+            <td>{{ dataset.created_at }}</td>
+        </tr>
+        {% endfor %}
     {% else %}
-    <tr>
-        <td colspan="3">No datasets available</td>
-    </tr>
-    {% endfor %}
+        <tr>
+            <td colspan="3">No datasets available</td>
+        </tr>
+    {% endif%}
 </table>
 <hr><br>
 <form action="{% url 'create_mldatasets' %}" method="post">
