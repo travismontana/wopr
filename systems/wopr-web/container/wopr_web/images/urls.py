@@ -30,4 +30,5 @@ urlpatterns = [
         name="images_games_details",
     ),
     path("change_image_game", views.change_image_game, name="change_image_game"),
+    path("add_to_labelstudio", views.add_to_labelstudio, name="add_to_labelstudio"),
 ]

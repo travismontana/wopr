@@ -2,12 +2,16 @@ import hashlib
 import os
 from urllib.parse import parse_qs, urlparse
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from core.models import Game, GameLabelproj, Image, ImageGame
 from lib.helpers import get_config, setup_logger
 from .lib.lib_images import get_images_ondisk, image_sort
-from .lib.lib_labelstudio import image_ls_list_projects_action, image_ls_projfile_action
+from .lib.lib_labelstudio import (
+    image_ls_list_projects_action,
+    image_ls_projfile_action,
+    send_labelstudio,
+)
 
 logger = setup_logger()
 config = get_config()
@@ -37,11 +41,13 @@ WOPRS = {
     "images": {
         "incoming": f"{BASE_PATH}/{IMAGES_SUBDIR}/{INCOMING_SUBDIR}",
         "archive": f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}",
+        "games": f"{BASE_PATH}/{IMAGES_SUBDIR}/{config['storage']['games_subdir']}",
         "backups": f"{BASE_PATH}/{IMAGES_SUBDIR}/{config['storage']['backups_subdir']}",
     },
     "ls": {
         "source": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_SOURCE_SUBDIR}",
         "target": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_TARGET_SUBDIR}",
+        "games": f"{BASE_PATH}/{LABEL_SUBDIR}/{config['storage']['games_subdir']}",
     },
     "models": {
         "weights": f"{BASE_PATH}/{MODELS_SUBDIR}/{WEIGHTS_SUBDIR}",
@@ -405,7 +411,7 @@ def images_games_details(request, game_id):
         images_not_in_tasks = []
 
         for image in images:
-            spec_url = f"{url_base}/images/games/{game.shortname}/{image.filename}"
+            spec_url = f"{url_base}c"
             images_list.append(
                 {
                     "image_full_url": spec_url,
@@ -419,6 +425,7 @@ def images_games_details(request, game_id):
                         "image_full_url": spec_url,
                         "thumb_url": f"{THUMB_URL_BASE}/{spec_url}",
                         "filename": image.filename,
+                        "ls_project_id": ls_project_id,
                     }
                 )
 
@@ -431,6 +438,7 @@ def images_games_details(request, game_id):
                 "game": game,
                 "tasks": tasks,
                 "images_not_in_tasks": images_not_in_tasks,
+                "ls_project_id": ls_project_id,
             },
         )
 
@@ -518,3 +526,51 @@ def change_image_game(request):
         results.append({"status": "error", "message": "No changes made"})
 
     return render(request, "images_results.html", {"results": results})
+
+
+def add_to_labelstudio(request):
+    results = []
+    if request.method != "POST":
+        results.append({"status": "error", "message": "Invalid method"})
+        return render(request, "images_results.html", {"results": results})
+    else:
+        selected_images = request.POST.getlist("selected_images")
+        project_id = request.POST.get("project_id")
+
+        logger.info(
+            "Adding %s to Label Studio request received for project_id: %s",
+            len(selected_images),
+            project_id,
+        )
+        # Get the game id from
+        game_id = GameLabelproj.objects.filter(project_id=project_id).first()
+        if game_id:
+            game_shortname = game_id.game.shortname
+            game_filename = game_id.game.filename
+            source_file = WOPR["images"]["games"] / {game_shortname} / {game_filename}
+            dest_file = WOPR["ls"]["games"] / {game_shortname} / {game_filename}
+            try:
+                os.makedirs(os.path.dirname(dest_file), exist_ok=True)
+                os.rename(source_file, dest_file)
+                results.append(
+                    {
+                        "status": "success",
+                        "message": f"Moved {game_filename} to {game_shortname}",
+                    }
+                )
+            except OSError as exc:
+                logger.exception("Error moving image %s", game_filename)
+                results.append(
+                    {
+                        "status": "error",
+                        "message": f"Error moving {game_filename} to {game_shortname}: {exc}",
+                    }
+                )
+            try:
+                ret = send_labelstudio(project_id)
+            except RuntimeError as exc:
+                results.append({"status": "error", "message": str(exc)})
+            return redirect("images_games_index")
+        else:
+            results.append({"status": "error", "message": "Game not found"})
+            return render(request, "images_results.html", {"results": results})

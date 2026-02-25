@@ -24,6 +24,8 @@
     <br>
     <h2>
     <h2>Images not in labelsudio</h2>
+    <form method="post" action="{% url 'add_to_labelstudio' %}">
+    {% csrf_token %}    
     {% if images_not_in_tasks %}
         <ul style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; list-style: none; padding: 0;">
             {% for image in images_not_in_tasks %}
@@ -33,6 +35,7 @@
             </li>
             {% endfor %}
         </ul>
+        <button type="submit" name="project_id" value="{{ game.ls_project_id }}">Add Images to Label Studio</button><br>
     {% else %}
         <p>No images available.</p>
     {% endif %}
