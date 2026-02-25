@@ -22,7 +22,8 @@ BASE_PATH = config["storage"]["base_path"]
 IMAGES_SUBDIR = config["storage"]["images_subdir"]
 INCOMING_SUBDIR = config["storage"]["incoming_subdir"]
 ARCHIVE_SUBDIR = config["storage"]["archive_subdir"]
-
+GAMES_SUBDIR = "games"
+BACKUPS_SUBDIR = "backups"
 LABEL_SUBDIR = config["storage"]["label_subdir"]
 LABEL_SOURCE_SUBDIR = config["storage"]["label_source_subdir"]
 LABEL_TARGET_SUBDIR = config["storage"]["label_target_subdir"]
@@ -42,13 +43,13 @@ WOPRS = {
     "images": {
         "incoming": f"{BASE_PATH}/{IMAGES_SUBDIR}/{INCOMING_SUBDIR}",
         "archive": f"{BASE_PATH}/{IMAGES_SUBDIR}/{ARCHIVE_SUBDIR}",
-        "games": f"{BASE_PATH}/{IMAGES_SUBDIR}/{config['storage']['games_subdir']}",
-        "backups": f"{BASE_PATH}/{IMAGES_SUBDIR}/{config['storage']['backups_subdir']}",
+        "games": f"{BASE_PATH}/{IMAGES_SUBDIR}/{GAMES_SUBDIR}",
+        "backups": f"{BASE_PATH}/{IMAGES_SUBDIR}/{BACKUPS_SUBDIR}",
     },
     "ls": {
         "source": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_SOURCE_SUBDIR}",
         "target": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_TARGET_SUBDIR}",
-        "games": f"{BASE_PATH}/{LABEL_SUBDIR}/{config['storage']['games_subdir']}",
+        "games": f"{BASE_PATH}/{LABEL_SUBDIR}/{GAMES_SUBDIR}",
     },
     "models": {
         "weights": f"{BASE_PATH}/{MODELS_SUBDIR}/{WEIGHTS_SUBDIR}",
