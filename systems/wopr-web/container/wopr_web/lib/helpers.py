@@ -75,6 +75,7 @@ def get_config() -> dict:
                 "incoming_subdir": "incoming",
                 "archive_subdir": "archive",
                 "backups_subdir": "backup",
+                "games_subdir": "games",
                 "label_subdir": "labelstudio",
                 "label_source_subdir": "source",
                 "label_target_subdir": "target",
