@@ -11,11 +11,11 @@
         <th>Created At</th>
     </tr>
     {% if dataset %}
-        {% for dataset in dataset %}
+        {% for ds in dataset %}
         <tr>
-            <td>{{ dataset.name }}</td>
-            <td>{{ dataset.description }}</td>
-            <td>{{ dataset.created_at }}</td>
+            <td>{{ ds.uuid }}</td>
+            <td>{{ ds.description }}</td>
+            <td>{{ ds.created_at }}</td>
         </tr>
         {% endfor %}
     {% else %}
@@ -28,7 +28,7 @@
 <form action="{% url 'create_mldatasets' %}" method="post">
     {% csrf_token %}
     <input type="hidden" name="game_id" value="{{ game.id }}">
-    <input type="hidden" name="ls_project_id" value="{{ ls_project_id.id }}">
+    <input type="hidden" name="ls_project_id" value="{{ ls_project_id.ls_project_id }}">
     <button name="action" value="create">Create ML Dataset</button>
 </form>
 {% endblock%}
