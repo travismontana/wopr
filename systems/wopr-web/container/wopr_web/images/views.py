@@ -1,5 +1,6 @@
 import hashlib
 import os
+import shutil  # ++ added for shutil.copy2 ++
 from urllib.parse import parse_qs, urlparse
 
 from django.shortcuts import render, redirect
@@ -411,7 +412,7 @@ def images_games_details(request, game_id):
         images_not_in_tasks = []
 
         for image in images:
-            spec_url = f"{url_base}c"
+            spec_url = f"{url_base}/images/games/{game.shortname}/{image.filename}"
             images_list.append(
                 {
                     "image_full_url": spec_url,
@@ -530,47 +531,57 @@ def change_image_game(request):
 
 def add_to_labelstudio(request):
     results = []
+
     if request.method != "POST":
         results.append({"status": "error", "message": "Invalid method"})
         return render(request, "images_results.html", {"results": results})
-    else:
-        selected_images = request.POST.getlist("selected_images")
-        project_id = request.POST.get("project_id")
 
-        logger.info(
-            "Adding %s to Label Studio request received for project_id: %s",
-            len(selected_images),
-            project_id,
-        )
-        # Get the game id from
-        game_id = GameLabelproj.objects.filter(project_id=project_id).first()
-        if game_id:
-            game_shortname = game_id.game.shortname
-            game_filename = game_id.game.filename
-            source_file = WOPR["images"]["games"] / {game_shortname} / {game_filename}
-            dest_file = WOPR["ls"]["games"] / {game_shortname} / {game_filename}
-            try:
-                os.makedirs(os.path.dirname(dest_file), exist_ok=True)
-                os.rename(source_file, dest_file)
-                results.append(
-                    {
-                        "status": "success",
-                        "message": f"Moved {game_filename} to {game_shortname}",
-                    }
-                )
-            except OSError as exc:
-                logger.exception("Error moving image %s", game_filename)
-                results.append(
-                    {
-                        "status": "error",
-                        "message": f"Error moving {game_filename} to {game_shortname}: {exc}",
-                    }
-                )
-            try:
-                ret = send_labelstudio(project_id)
-            except RuntimeError as exc:
-                results.append({"status": "error", "message": str(exc)})
-            return redirect("images_games_index")
-        else:
-            results.append({"status": "error", "message": "Game not found"})
+    selected_images = request.POST.getlist("selected_images")
+    project_id = request.POST.get("project_id")
+
+    logger.info(
+        "Adding %d images to Label Studio for project_id: %s",
+        len(selected_images),
+        project_id,
+    )
+
+    # ++ filter on ls_project_id, not project_id (field name fix) ++
+    glp = GameLabelproj.objects.filter(ls_project_id=project_id).first()
+    if not glp:
+        results.append({"status": "error", "message": "Game not found for project"})
+        return render(request, "images_results.html", {"results": results})
+
+    game_shortname = glp.game.shortname
+
+    # ++ iterate selected_images; use os.path.join for path construction ++
+    # ++ shutil.copy2 preserves metadata and is a copy, not a move ++
+    for image_name in selected_images:
+        source_file = os.path.join(WOPRS["images"]["games"], game_shortname, image_name)
+        dest_file = os.path.join(WOPRS["ls"]["games"], game_shortname, image_name)
+
+        try:
+            os.makedirs(os.path.dirname(dest_file), exist_ok=True)
+            shutil.copy2(source_file, dest_file)
+            logger.info("Copied %s to labelstudio staging", image_name)
+            results.append(
+                {
+                    "status": "success",
+                    "message": f"Copied {image_name} to labelstudio staging",
+                }
+            )
+        except OSError as exc:
+            logger.exception("Error copying image %s", image_name)
+            results.append(
+                {"status": "error", "message": f"Error copying {image_name}: {exc}"}
+            )
+            # ++ bail on copy failure before attempting sync ++
             return render(request, "images_results.html", {"results": results})
+
+    # ++ sync only after all copies succeed; redirect only on success ++
+    try:
+        send_labelstudio(project_id)
+    except RuntimeError as exc:
+        results.append({"status": "error", "message": str(exc)})
+        return render(request, "images_results.html", {"results": results})
+
+    return redirect("images_games_index")
