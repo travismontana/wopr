@@ -49,7 +49,7 @@ WOPRS = {
     "ls": {
         "source": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_SOURCE_SUBDIR}",
         "target": f"{BASE_PATH}/{LABEL_SUBDIR}/{LABEL_TARGET_SUBDIR}",
-        "games": f"{BASE_PATH}/{LABEL_SUBDIR}/{GAMES_SUBDIR}",
+        "games": f"{BASE_PATH}/{LABEL_SUBDIR}",
     },
     "models": {
         "weights": f"{BASE_PATH}/{MODELS_SUBDIR}/{WEIGHTS_SUBDIR}",
