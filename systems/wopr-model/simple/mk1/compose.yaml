@@ -1,5 +1,5 @@
 services:
-  trainer:
+  trainer_simple_mk1:
     image: ultralytics/ultralytics:latest
     container_name: trainer_simple_mk1
     volumes:
