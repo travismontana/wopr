@@ -6,9 +6,15 @@ services:
       - /remote/wopr/models/ua/weights:/ultralytics/weights
       - /remote/wopr/models/ua/runs:/ultralytics/runs
       - /remote/wopr/models/ua/datasets:/ultralytics/datasets
+      - /remote/wopr/models/ua/weights:/remote/wopr/models/ua/weights
+      - /remote/wopr/models/ua/runs:/remote/wopr/models/ua/runs
+      - /remote/wopr/models/ua/datasets:/remote/wopr/models/ua/datasets
     shm_size: '4gb'
     runtime: nvidia
-    command: yolo train model=${MODEL:-yolo11n.pt} data=${DATASET:-coco8.yaml} project=${RUNS:-/ultralytics/runs}
+    command: >
+      sh -c "sed -i 's|/remote/wopr/models/ua/datasets|/ultralytics/datasets|g'
+      /ultralytics/datasets/swd/edce7ab3-dd4c-47e0-8dc0-81fe1a190dd4/yolo/dataset.yaml && 
+      yolo train model=${MODEL:-yolo11n.pt} data=${DATASET} project=${RUNS:-/ultralytics/runs}"
     working_dir: /ultralytics
     stdin_open: true
     tty: true
