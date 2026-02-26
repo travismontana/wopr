@@ -14,6 +14,7 @@ dependencies = [
   "whitenoise",
   "requests",
   "label-studio-sdk",
+  "scikit-learn",
 ]
 
 [project.optional-dependencies]
