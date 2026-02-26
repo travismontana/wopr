@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import requests
+import hashlib
 from zipfile import ZipFile
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
@@ -155,8 +156,7 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     lookup = {}
     for task in tasks:
         url = task["data"]["image"]
-        filename = url.split("/")[-1]  # full filename: a257ec6c-...-uuid.jpg
-        short_uuid = filename.replace(".jpg", "")[:8]
+        short_uuid = hashlib.md5(url.encode()).hexdigest()[:8]
         lookup[short_uuid] = url
     logger.info(f"Created lookup dictionary with {len(lookup)} entries")
 
