@@ -172,13 +172,15 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
             logger.warning(f"No image found in lookup for label: {label_filename}")
             return
         response = requests.get(image_url, stream=True)
+        logger.info(f"Downloading image from {image_url}")
         if response.status_code == 200:
             fd, source_image = tempfile.mkstemp()
             with os.fdopen(fd, "wb") as f:
                 shutil.copyfileobj(response.raw, f)
             try:
                 dest_path = os.path.join(images_dest_dir, f"{short_uuid}.jpg")
-                shutil.move(source_image, dest_path)
+                shutil.copy2(source_image, dest_path)
+                os.unlink(source_image)
             except Exception as e:
                 logger.error(
                     f"Error copying image {source_image} to {images_dest_dir}: {e}"
@@ -190,16 +192,19 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
 
     # move labels and copy images for each split
     for f_train in train:
-        shutil.move(f"{yolo_dir}/labels/{f_train}", labels_train_dir)
+        shutil.copy2(f"{yolo_dir}/labels/{f_train}", labels_train_dir)
+        os.unlink(f"{yolo_dir}/labels/{f_train}")
         copy_image(f_train, images_train_dir)
 
     # FIX 3: val and test were missing image copy logic entirely
     for f_val in val:
-        shutil.move(f"{yolo_dir}/labels/{f_val}", labels_val_dir)
+        shutil.copy2(f"{yolo_dir}/labels/{f_val}", labels_val_dir)
+        os.unlink(f"{yolo_dir}/labels/{f_val}")
         copy_image(f_val, images_val_dir)
 
     for f_test in test:
-        shutil.move(f"{yolo_dir}/labels/{f_test}", labels_test_dir)
+        shutil.copy2(f"{yolo_dir}/labels/{f_test}", labels_test_dir)
+        os.unlink(f"{yolo_dir}/labels/{f_test}")
         copy_image(f_test, images_test_dir)
 
     # FIX 4: generate dataset.yaml — ultralytics requires this for training
