@@ -156,8 +156,11 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     lookup = {}
     for task in tasks:
         url = task["data"]["image"]
+        url_new_base = "https://images.wopr.tailandtraillabs.org/images/games/"
+        url_short = "/".join(url.split("/")[6:])
+        new_url = f"{url_new_base}/{url_short}"
         short_uuid = hashlib.md5(url.encode()).hexdigest()[:8]
-        lookup[short_uuid] = url
+        lookup[short_uuid] = new_url
     logger.info(f"Created lookup dictionary with {len(lookup)} entries")
 
     def copy_image(label_filename, images_dest_dir):
