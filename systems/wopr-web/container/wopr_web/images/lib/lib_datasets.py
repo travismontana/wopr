@@ -192,18 +192,21 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
 
     # move labels and copy images for each split
     for f_train in train:
-        shutil.copy2(f"{yolo_dir}/labels/{f_train}", labels_train_dir)
+        dest = f_train.replace("__.txt", "")
+        shutil.copy2(f"{yolo_dir}/labels/{f_train}", f"{labels_train_dir}/{dest}.txt")
         os.unlink(f"{yolo_dir}/labels/{f_train}")
         copy_image(f_train, images_train_dir)
 
     # FIX 3: val and test were missing image copy logic entirely
     for f_val in val:
-        shutil.copy2(f"{yolo_dir}/labels/{f_val}", labels_val_dir)
+        dest = f_val.replace("__.txt", "")
+        shutil.copy2(f"{yolo_dir}/labels/{f_val}", f"{labels_val_dir}/{dest}.txt")
         os.unlink(f"{yolo_dir}/labels/{f_val}")
         copy_image(f_val, images_val_dir)
 
     for f_test in test:
-        shutil.copy2(f"{yolo_dir}/labels/{f_test}", labels_test_dir)
+        dest = f_test.replace("__.txt", "")
+        shutil.copy2(f"{yolo_dir}/labels/{f_test}", f"{labels_test_dir}/{dest}.txt")
         os.unlink(f"{yolo_dir}/labels/{f_test}")
         copy_image(f_test, images_test_dir)
 
