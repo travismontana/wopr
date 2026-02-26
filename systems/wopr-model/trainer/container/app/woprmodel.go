@@ -1,4 +1,4 @@
-package woprmodel
+package main
 
 import (
 	"fmt"
