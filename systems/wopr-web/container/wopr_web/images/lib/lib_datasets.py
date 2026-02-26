@@ -208,4 +208,9 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     )
 
     stuff["dataset_yaml"] = dataset_yaml
+
+    images = Image.objects.filter(game=game_shortname)
+    for image in images:
+        
+
     return stuff

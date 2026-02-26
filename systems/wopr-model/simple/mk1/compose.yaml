@@ -11,10 +11,7 @@ services:
       - /remote/wopr/models/ua/datasets:/remote/wopr/models/ua/datasets
     shm_size: '4gb'
     runtime: nvidia
-    command: >
-      sh -c "sed -i 's|/remote/wopr/models/ua/datasets|/ultralytics/datasets|g'
-      ${DATASET} && 
-      yolo train model=${MODEL:-yolo11n.pt} data=${DATASET} project=${RUNS:-/ultralytics/runs}"
+    command: yolo train model=${MODEL:-yolo11n.pt} data=${DATASET} project=${RUNS:-/ultralytics/runs}"
     working_dir: /ultralytics
     stdin_open: true
     tty: true
