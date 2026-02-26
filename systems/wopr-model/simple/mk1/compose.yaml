@@ -1,0 +1,14 @@
+services:
+  trainer:
+    image: ultralytics/ultralytics:latest
+    container_name: trainer_simple_mk1
+    volumes:
+      - /remote/wopr/models/ua/weights:/ultralytics/weights
+      - /remote/wopr/models/ua/runs:/ultralytics/runs
+      - /remote/wopr/models/ua/datasets:/ultralytics/datasets
+    shm_size: '4gb'
+    runtime: nvidia
+    command: yolo train model=${MODEL:-yolo11n.pt} data=${DATASET:-coco8.yaml} project=${RUNS:-/ultralytics/runs}
+    working_dir: /ultralytics
+    stdin_open: true
+    tty: true
