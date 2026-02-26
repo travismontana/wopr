@@ -11,7 +11,16 @@ services:
       - /remote/wopr/models/ua/datasets:/remote/wopr/models/ua/datasets
     shm_size: '4gb'
     runtime: nvidia
-    command: yolo train model=${MODEL:-yolo11n.pt} data=${DATASET} project=${RUNS:-/ultralytics/runs}"
+    command: yolo \
+      train \
+      model=${MODEL:-yolo11n.pt} \
+      data=${DATASET} \
+      project=${RUNS:-/ultralytics/runs} \
+      imgsz=1280 \
+      epochs=35 \
+      patience=20 \
+      batch=16 \
+      augment=True
     working_dir: /ultralytics
     stdin_open: true
     tty: true
