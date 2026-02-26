@@ -1,6 +1,7 @@
 services:
   trainer:
     tty: true
+    stdin_open: true
     shm_size: '4gb'
     runtime: nvidia
     build:

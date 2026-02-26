@@ -80,9 +80,10 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
         game_id,
         ls_project_id,
     )
-
+    game = Game.objects.get(id=game_id)
+    game_shortname = game.shortname
     # directory setup
-    dataset_base = f"{WOPRS['models']['datasets']}"
+    dataset_base = f"{WOPRS['models']['datasets']}/{game_shortname}"
     dataset_path = f"{dataset_base}/{mldataset_name}"
     os.makedirs(dataset_path, exist_ok=True)
     logger.info(f"Created dataset directory at {dataset_path}")
@@ -116,10 +117,6 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     stuff["json_fname"] = json_fname
     stuff["yolo_file"] = yolo_file
     stuff["yolo_dir"] = yolo_dir
-
-    # FIX 1: was Game.objects.filter(game=game) — wrong method and wrong field
-    game = Game.objects.get(id=game_id)
-    game_shortname = game.shortname
 
     # train/val/test split
     labelsdir_list = os.listdir(f"{yolo_dir}/labels")
