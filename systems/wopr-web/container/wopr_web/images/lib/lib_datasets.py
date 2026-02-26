@@ -1,4 +1,5 @@
 import os
+from zipfile import ZipFile
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
 from .lib_labelstudio import export_and_download_snapshot, convert_snapshot
@@ -88,6 +89,12 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     export_type = "YOLO"
     convert_snapshot(ls_project_id, dataset_path, export_type, export_id)
     logger.info(f"Converted export snapshot to {export_type} format")
+
+    yolo_file = f"{dataset_path}/{mldataset_name}.yolo"
+    yolo_dir = f"{dataset_path}/yolo"
+    os.makedirs(yolo_dir, exist_ok=True)
+    with ZipFile(yolo_file, "r") as zip_ref:
+        zip_ref.extractall(yolo_dir)
     stuff = {}
     stuff["mldataset_name"] = mldataset_name
     return stuff
