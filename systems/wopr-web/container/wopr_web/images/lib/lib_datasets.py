@@ -77,7 +77,7 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
         ls_project_id,
     )
     # directory
-    dataset_base = WOPRS["models"]["datasets"]
+    dataset_base = f"{WOPRS['models']['datasets']}/ua"
     dataset_path = f"{dataset_base}/{mldataset_name}"
     os.makedirs(dataset_path, exist_ok=True)
     logger.info(f"Created dataset directory at {dataset_path}")
