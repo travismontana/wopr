@@ -1,5 +1,10 @@
 services:
   trainer:
+    shm_size: '4gb'
+    runtime: nvidia
+    build:
+      context: container/
+      dockerfile: Dockerfile
     volumes:
       - /remote/wopr/models/ua/weights:/ultralytics/weights
       - /remote/wopr/models/ua/runs:/ultralytics/runs
