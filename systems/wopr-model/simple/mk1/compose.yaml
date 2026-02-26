@@ -13,7 +13,7 @@ services:
     runtime: nvidia
     command: >
       sh -c "sed -i 's|/remote/wopr/models/ua/datasets|/ultralytics/datasets|g'
-      /ultralytics/datasets/swd/edce7ab3-dd4c-47e0-8dc0-81fe1a190dd4/yolo/dataset.yaml && 
+      ${DATASET} && 
       yolo train model=${MODEL:-yolo11n.pt} data=${DATASET} project=${RUNS:-/ultralytics/runs}"
     working_dir: /ultralytics
     stdin_open: true

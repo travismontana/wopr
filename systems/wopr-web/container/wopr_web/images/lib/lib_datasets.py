@@ -193,10 +193,10 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     classes_txt = f"{yolo_dir}/classes.txt"
     with open(classes_txt, "r") as f:
         class_names = [line.strip() for line in f.readlines() if line.strip()]
-
+    ua_ds_dir = f"/ultralytics/{game_shortname}/{mldataset_name}"
     dataset_yaml = f"{yolo_dir}/dataset.yaml"
     with open(dataset_yaml, "w") as f:
-        f.write(f"path: {yolo_dir}\n")
+        f.write(f"path: {ua_ds_dir}\n")
         f.write(f"train: images/train\n")
         f.write(f"val: images/val\n")
         f.write(f"test: images/test\n")
