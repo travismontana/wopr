@@ -16,4 +16,4 @@ echo "Running migrations..."
 python manage.py migrate --noinput
 
 echo "Starting gunicorn..."
-exec gunicorn --bind 0.0.0.0:8000 --workers 4 wopr_web.wsgi:application
+exec gunicorn --bind 0.0.0.0:8000 --timeout 300 --workers 4 wopr_web.wsgi:application
