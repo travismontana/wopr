@@ -20,7 +20,7 @@ services:
       - "imgsz=1280"
       - "epochs=35"
       - "patience=20"
-      - "batch=16"
+      - "batch=8"
       - "augment=True"
     working_dir: /ultralytics
     stdin_open: true
