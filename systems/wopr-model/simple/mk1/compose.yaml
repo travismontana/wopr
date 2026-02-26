@@ -17,7 +17,7 @@ services:
       - "model=${MODEL:-yolo11n.pt}"
       - "data=${DATASET}"
       - "project=${RUNS:-/ultralytics/runs}"
-      - "imgsz=1280"
+      - "imgsz=960"
       - "epochs=35"
       - "patience=20"
       - "batch=8"
