@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import requests
 from zipfile import ZipFile
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
@@ -25,7 +26,6 @@ MODELS_SUBDIR = config["storage"]["models_subdir"]
 WEIGHTS_SUBDIR = config["storage"]["weights_subdir"]
 RUNS_SUBDIR = config["storage"]["runs_subdir"]
 DISTFILES_SUBDIR = config["storage"]["distfiles_subdir"]
-BACKUPS_SUBDIR = config["storage"]["backups_subdir"]
 MODELS_ARCHIVE_SUBDIR = config["storage"]["archive_subdir"]
 
 IMAGES_URL = config["api"]["images_url"]
@@ -157,22 +157,31 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
         url = task["data"]["image"]
         filename = url.split("/")[-1]  # full filename: a257ec6c-...-uuid.jpg
         short_uuid = filename.replace(".jpg", "")[:8]
-        lookup[short_uuid] = filename
+        lookup[short_uuid] = url
     logger.info(f"Created lookup dictionary with {len(lookup)} entries")
 
     def copy_image(label_filename, images_dest_dir):
         """Helper to resolve and copy an image for a given label file."""
         short_uuid = label_filename.replace("__.txt", "")
-        image_filename = lookup.get(short_uuid)
-        if not image_filename:
+        image_url = lookup.get(short_uuid)
+        if not image_url:
             logger.warning(f"No image found in lookup for label: {label_filename}")
             return
-        source_image = f"{WOPRS['images']['games']}/{game_shortname}/{image_filename}"
-        try:
-            shutil.copy(source_image, images_dest_dir)
-        except Exception as e:
+        response = requests.get(image_url, stream=True)
+        if response.status_code == 200:
+            fd, source_image = tempfile.mkstemp()
+            with os.fdopen(fd, "wb") as f:
+                shutil.copyfileobj(response.raw, f)
+            try:
+                dest_path = os.path.join(images_dest_dir, f"{short_uuid}.jpg")
+                shutil.move(source_image, dest_path)
+            except Exception as e:
+                logger.error(
+                    f"Error copying image {source_image} to {images_dest_dir}: {e}"
+                )
+        else:
             logger.error(
-                f"Error copying image {source_image} to {images_dest_dir}: {e}"
+                f"Failed to download image from {image_url}, status code: {response.status_code}"
             )
 
     # move labels and copy images for each split
@@ -208,9 +217,5 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     )
 
     stuff["dataset_yaml"] = dataset_yaml
-
-    images = Image.objects.filter(game=game_shortname)
-    for image in images:
-        
 
     return stuff
