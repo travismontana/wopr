@@ -25,3 +25,5 @@ services:
     working_dir: /ultralytics
     stdin_open: true
     tty: true
+    environment:
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
