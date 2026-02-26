@@ -90,11 +90,20 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     convert_snapshot(ls_project_id, dataset_path, export_type, export_id)
     logger.info(f"Converted export snapshot to {export_type} format")
 
-    yolo_file = f"{dataset_path}/{mldataset_name}.yolo"
+    fname = f"project_{ls_project_id}_export_{export_id}"
+    json_fname = f"{dataset_path}/{fname}.json"
+    yolo_file = f"{dataset_path}/{fname}.yolo"
     yolo_dir = f"{dataset_path}/yolo"
+    logger.info(
+        f"Came up with: json_fname={json_fname}, yolo_file={yolo_file}, yolo_dir={yolo_dir}"
+    )
     os.makedirs(yolo_dir, exist_ok=True)
     with ZipFile(yolo_file, "r") as zip_ref:
         zip_ref.extractall(yolo_dir)
     stuff = {}
     stuff["mldataset_name"] = mldataset_name
+    stuff["export_id"] = export_id
+    stuff["json_fname"] = json_fname
+    stuff["yolo_file"] = yolo_file
+    stuff["yolo_dir"] = yolo_dir
     return stuff
