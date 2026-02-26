@@ -3,6 +3,7 @@ import json
 import shutil
 import requests
 import hashlib
+import tempfile
 from zipfile import ZipFile
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
 from lib.helpers import get_config, setup_logger
