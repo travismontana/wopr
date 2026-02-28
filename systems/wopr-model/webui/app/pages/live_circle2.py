@@ -197,6 +197,24 @@ def process_image(raw: bytes):
     else:
         return bgr, gray, resulting_image, notes
 
+    mark_x = markers[0].center[0]
+    mark_y = markers[0].center[1]
+    circle_x = circles[0][0]
+    circle_y = circles[0][1]
+    mark_circle_rho = mark_circ_dist
+    mark_circle_theta = math.atan2(circle_y - mark_y, circle_x - mark_x)
+    notes.append(
+        {"mark_circle_rho": mark_circle_rho, "mark_circle_theta": mark_circle_theta}
+    )
+
+    cv2.line(
+        resulting_image,
+        (int(markers[0].center[0]), int(markers[0].center[1])),
+        (int(circles[0][0]), int(circles[0][1])),
+        (0, 255, 0),
+        2,
+    )
+
     gray_canny = canny(gray)
 
     resulting_image, lines = get_lines(gray_canny, mark_circ_dist, resulting_image)
