@@ -230,20 +230,22 @@ raw_c950 = fetch_snapshot(f"{CAMURL}:5101/snapshot")
 raw_c960 = fetch_snapshot(f"{CAMURL}:5100/snapshot")
 logger.info(f"Fetched snapshots: C950={len(raw_c950)} bytes, C960={len(raw_c960)} bytes")
 
-bgr_c950, gray_c950, final_c950 = process_image(raw_c950)
+bgr_c950, gray_c950, final_c950, notes_c950 = process_image(raw_c950)
 logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
 
-bgr_c960, gray_c960, final_c960 = process_image(raw_c960)
+bgr_c960, gray_c960, final_c960, notes_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
 c950, c960 = st.columns(2)
 with c950:
     st.image(final_c950, caption="Final C950")
+    st.write(notes_c950)
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
 with c960:
     st.image(final_c960, caption="Final C960")
+    st.write(notes_c960)
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
