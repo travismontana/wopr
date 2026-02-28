@@ -173,8 +173,8 @@ def process_image(raw: bytes):
                     detect_refine_edges,
                     bgr,
                 )
-
-        return bgr, gray, resulting_image, notes
+            else:
+                return bgr, gray, resulting_image, notes
     gray = gray_otsu
     ratios = get_ratios(markers[0], marker_size_mm)
     notes.append({"ratios": ratios})
