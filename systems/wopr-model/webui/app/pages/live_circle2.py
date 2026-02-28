@@ -208,18 +208,20 @@ def process_image(raw: bytes):
     notes.append(
         {"mark_circle_rho": mark_circle_rho, "mark_circle_theta": mark_circle_theta}
     )
-
+    base_line = {"start": (mark_x, mark_y), "end": (circle_x, circle_y)}
     cv2.line(
         resulting_image,
-        (int(markers[0].center[0]), int(markers[0].center[1])),
-        (int(circles[0][0]), int(circles[0][1])),
+        (int(mark_x), int(mark_y)),
+        (int(circle_x), int(circle_y)),
         (0, 255, 0),
         2,
     )
 
     gray_canny = canny(gray)
 
-    resulting_image, lines = get_lines(gray_canny, mark_circ_dist, resulting_image)
+    resulting_image, lines = get_lines(
+        gray_canny, mark_circ_dist, resulting_image, base_line
+    )
     logger.info(f"Number of lines detected: {len(lines) if lines is not None else 0}")
     notes.append({"lines": lines})
 
@@ -309,15 +311,33 @@ def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
     return cv2.Canny(image, threshold1, threshold2)
 
 
-def get_lines(image, dist, bgr):
+def get_lines(image, dist, bgr, base_line):
     logger.info("Detecting lines")
     lines = cv2.HoughLinesP(
         image, rho, theta, line_threshold, minLineLength=dist * 0.5, maxLineGap=line_gap
     )
     if lines is not None:
+        good_lines = []
         for x1, y1, x2, y2 in lines[:, 0]:
-            cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    return bgr, lines
+            line_start = np.array([x1, y1])
+            line_end = np.array([x2, y2])
+            base_start = np.array(base_line["start"])
+            base_end = np.array(base_line["end"])
+            line_theta = math.atan2(y2 - y1, x2 - x1)
+            base_theta = math.atan2(
+                base_end[1] - base_start[1], base_end[0] - base_start[0]
+            )
+            diff = (line_theta - base_theta) % math.pi
+            thirtydeg = math.radians(30)
+            tol = math.radians(15)
+            nearest = round(diff / thirtydeg) * thirtydeg
+            delta = abs(diff - nearest)
+            delta = min(delta, math.pi - delta)
+            if delta <= tol:
+                good_lines.append((x1, y1, x2, y2))
+                cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    return bgr, good_lines
 
 
 def get_ratios(markers, marker_size_mm):
