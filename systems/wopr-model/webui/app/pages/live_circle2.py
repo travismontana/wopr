@@ -18,6 +18,10 @@ min_dec_marg = st.slider(
 )
 canny_threshold1 = st.slider("Canny Threshold 1", 0, 500, 100, key="canny_threshold1")
 canny_threshold2 = st.slider("Canny Threshold 2", 0, 500, 200, key="canny_threshold2")
+rho = st.slider("Rho", 1, 10, 1, key="rho")
+theta = st.slider("Theta", 0.0, np.pi, np.pi / 180, key="theta")
+line_threshold = st.slider("Line Threshold", 0, 500, 100, key="line_threshold")
+line_gap = st.slider("Line Gap", 0, 50, 10, key="line_gap")
 img_rgb_u8_c950 = None
 raw_u8_c950 = None
 
@@ -288,7 +292,7 @@ def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
 def get_lines(image, dist, bgr):
     logger.info("Detecting lines")
     lines = cv2.HoughLinesP(
-        image, 1, np.pi / 180, 100, minLineLength=dist * 0.5, maxLineGap=10
+        image, rho, theta, line_threshold, minLineLength=dist * 0.5, maxLineGap=line_gap
     )
     if lines is not None:
         for x1, y1, x2, y2 in lines[:, 0]:
