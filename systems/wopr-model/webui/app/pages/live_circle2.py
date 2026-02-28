@@ -215,13 +215,19 @@ def get_marker(
         refine_edges=detect_refine_edges,
     )
     tags = detector.detect(image)
-
     num_tags = len(tags) if tags is not None else 0
     logger.info(f"Number of tags detected: {num_tags}")
-    if tags is not None:
+    MIN_DECISION_MARGIN = 20.0  # tune this threshold
+
+    if tags is not None and num_tags > 0:
+        # *** filter out low-confidence detections ***
+        tags = [t for t in tags if t.decision_margin >= MIN_DECISION_MARGIN]
+        num_tags = len(tags)
+        logger.info(f"Tags after confidence filter: {num_tags}")
         for tag in tags:
             cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
-    else:
+
+    if not tags:  # None or empty after filter
         if count < 3:
             logger.info(f"Retrying marker detection, attempt {count + 1}")
             bgr, tags = get_marker(
