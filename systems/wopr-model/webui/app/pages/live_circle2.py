@@ -217,7 +217,7 @@ def get_marker(
 
 def get_ratios(markers):
     corners = markers.corners
-    marker_side_length_pixels = np.linalg.norm(corners[0][0][0] - corners[0][0][1])
+    marker_side_length_pixels = np.linalg.norm(corners[0][0] - corners[0][1])
 
     pixels_to_mm_ratio = marker_side_length_pixels / marker_size_mm
     mm_to_pixels_ratio = marker_size_mm / marker_side_length_pixels
