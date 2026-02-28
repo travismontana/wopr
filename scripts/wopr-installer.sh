@@ -16,6 +16,7 @@ declare -A commands_to_check_for
 commands_to_check_for["helm"]=helm
 commands_to_check_for["kubectl"]=kubectl
 
+echo "Checking for commands"
 for key in "${!commands_to_check_for[@]}"; do
     installer=${commands_to_check_for[$key]}
     if ! command -v $key &> /dev/null; then
@@ -23,4 +24,17 @@ for key in "${!commands_to_check_for[@]}"; do
         pamac install ${installer}
     fi
 done
+
+echo "All required commands are installed."
+
+# make sure there are 3 disks of 250G each available.
+
+# make sure we have sudo
+sudo -T 10 -l > /dev/null 2>&1
+SUDO_STATUS=$?
+
+if [ $SUDO_STATUS -ne 0 ]; then
+    echo "This script requires sudo privileges. Please run as a user with sudo access."
+    exit 1
+fi
 
