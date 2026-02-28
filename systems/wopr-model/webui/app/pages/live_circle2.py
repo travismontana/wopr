@@ -3,12 +3,13 @@ import streamlit as st
 import numpy as np
 import cv2
 import os
+import math
 from PIL import Image
 from io import BytesIO
 import logging
 import sys
 from pupil_apriltags import Detector
-import math
+
 
 CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 
