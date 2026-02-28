@@ -328,14 +328,17 @@ def get_lines(image, dist, bgr, base_line):
                 base_end[1] - base_start[1], base_end[0] - base_start[0]
             )
             diff = (line_theta - base_theta) % math.pi
+            logger.info(f"Line angle difference: {math.degrees(diff)} degrees")
             thirtydeg = math.radians(30)
             tol = math.radians(15)
             nearest = round(diff / thirtydeg) * thirtydeg
             delta = abs(diff - nearest)
             delta = min(delta, math.pi - delta)
+            logger.info(f"Line angle delta: {math.degrees(delta)} degrees")
             if delta <= tol:
                 good_lines.append((x1, y1, x2, y2))
                 cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    logger.info(f"Number of good lines detected: {len(good_lines)}")
     return bgr, good_lines
 
 
