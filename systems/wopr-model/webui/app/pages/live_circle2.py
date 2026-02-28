@@ -16,6 +16,8 @@ st.title("Live CV Work")
 min_dec_marg = st.slider(
     "Minimum Decision Margin", 0.0, 50.0, 20.0, key="min_decision_margin"
 )
+canny_threshold1 = st.slider("Canny Threshold 1", 0, 500, 100, key="canny_threshold1")
+canny_threshold2 = st.slider("Canny Threshold 2", 0, 500, 200, key="canny_threshold2")
 img_rgb_u8_c950 = None
 raw_u8_c950 = None
 
@@ -177,7 +179,7 @@ def process_image(raw: bytes):
                 notes.append({"num_markers": num_markers, "markers": markers})
                 if markers is not None and num_markers != 1:
                     return bgr, gray, resulting_image, notes
-    gray = gray_otsu
+
     resulting_image = marker_result
     ratios = get_ratios(markers[0], marker_size_mm)
     notes.append({"ratios": ratios})
@@ -191,6 +193,12 @@ def process_image(raw: bytes):
         notes.append({"mark_circ_dist_mm": mcd_mm})
         return bgr, gray, resulting_image, notes
 
+    gray_canny = canny(gray)
+
+    lines = get_lines(gray_canny)
+    notes.append({"lines": lines})
+
+    gray = gray_otsu
     return bgr, gray, resulting_image, notes
 
 def grayscale(image):
@@ -268,6 +276,13 @@ def get_marker(
     return bgr, tags
 
 
+def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
+    logger.info(
+        f"Applying Canny edge detection with thresholds: {threshold1}, {threshold2}"
+    )
+    return cv2.Canny(image, threshold1, threshold2)
+
+
 def get_ratios(markers, marker_size_mm):
     corners = markers.corners
     marker_side_length_pixels = np.linalg.norm(corners[0] - corners[1])
@@ -333,6 +348,8 @@ logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
 bgr_c960, gray_c960, final_c960, notes_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
+c950_lines = next((n["lines"] for n in notes_c950 if "lines" in n), None)
+c960_lines = next((n["lines"] for n in notes_c960 if "lines" in n), None)
 
 c950_mark_circ_dist_mm = next(
     (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
@@ -364,8 +381,9 @@ with c950:
         st.write(f"Marker-Circle Distance (px): {c950_mark_circ_dist_px}")
     else:
         st.warning("C950: Distance not computed — check detection results")
-    st.image(final_c950, caption="Final C950")
+    st.image(final_c950, channels="BGR", caption="Final C950")
     st.json(notes_c950, expanded=False)
+    st.json(c950_lines, expanded=False)
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
@@ -378,8 +396,9 @@ with c960:
         st.write(f"Marker-Circle Distance (px): {c960_mark_circ_dist_px}")
     else:
         st.warning("C960: Distance not computed — check detection results")
-    st.image(final_c960, caption="Final C960")
+    st.image(final_c960, channels="BGR", caption="Final C960")
     st.json(notes_c960, expanded=False)
+    st.json(c960_lines, expanded=False)
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
