@@ -137,6 +137,43 @@ def process_image(raw: bytes):
     notes.append({"num_markers": num_markers, "markers": markers})
     if markers is not None and num_markers != 1:
         logger.info(f"Number of markers detected is not 1: {num_markers}")
+        logger.info(f"First retry")
+        next_img = gauss(gray)
+        marker_result, markers = get_marker(
+            next_img,
+            detect_tag,
+            detect_nthreads,
+            detect_quad_decimate,
+            detect_refine_edges,
+            bgr,
+        )
+        num_markers = len(markers) if markers is not None else 0
+        notes.append({"num_markers": num_markers, "markers": markers})
+        if markers is not None and num_markers != 1:
+            logger.info(f"Second retry")
+            next2_img = clahe(next_img)
+            bgr, tags = get_marker(
+                next2_img,
+                detect_tag,
+                detect_nthreads,
+                detect_quad_decimate,
+                detect_refine_edges,
+                bgr,
+            )
+            num_markers = len(markers) if markers is not None else 0
+            notes.append({"num_markers": num_markers, "markers": markers})
+            if markers is not None and num_markers != 1:
+                logger.info("Third retry")
+                next3_img = filter2d(next2_img)
+                bgr, tags = get_marker(
+                    next3_img,
+                    detect_tag,
+                    detect_nthreads,
+                    detect_quad_decimate,
+                    detect_refine_edges,
+                    bgr,
+                )
+
         return bgr, gray, resulting_image, notes
 
     ratios = get_ratios(markers[0], marker_size_mm)
@@ -227,46 +264,6 @@ def get_marker(
         logger.info(f"Tags after confidence filter: {num_tags}")
         for tag in tags:
             cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
-
-    if not tags:  # None or empty after filter
-        if count < 3:
-            logger.info(f"Retrying marker detection, attempt {count + 1}")
-            match (count):
-                case 0:
-                    logger.info(f"First retry")
-                    bgr, tags = get_marker(
-                        gauss(image),
-                        detect_tag,
-                        detect_nthreads,
-                        detect_quad_decimate,
-                        detect_refine_edges,
-                        bgr,
-                        count + 1,
-                    )
-                case 1:
-                    logger.info(f"Second retry")
-                    bgr, tags = get_marker(
-                        filter2d(image),
-                        detect_tag,
-                        detect_nthreads,
-                        detect_quad_decimate,
-                        detect_refine_edges,
-                        bgr,
-                        count + 1,
-                    )
-                case 2:
-                    logger.info("Third retry")
-                    bgr, tags = get_marker(
-                        clahe(image),
-                        detect_tag,
-                        detect_nthreads,
-                        detect_quad_decimate,
-                        detect_refine_edges,
-                        bgr,
-                        count + 1,
-                    )
-                case _:
-                    logger.info(f"Retry attempt {count + 1}")
 
     return bgr, tags
 
