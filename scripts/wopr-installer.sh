@@ -2,6 +2,7 @@
 
 set -e
 
+# Dont run this from a curl/wget/fetch
 pppid=$(ps -o comm= -p $(ps -o ppid= -p $$ | tr -d ' ' ))
 web_getters = ("curl", "wget", "fetch")
 for web_getter in "${web_getters[@]}"; do
