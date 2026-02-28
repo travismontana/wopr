@@ -99,12 +99,15 @@ def process_image(raw: bytes):
     gray = grayscale(rgb)
 
     gray_gauss = gauss(gray)
+    gray = gray_gauss
 
-    gray_otsu = otsu(gray_gauss)
+    gray_otsu = otsu(gray)
+    gray = gray_otsu
 
     circle_result, circles = circle(
-        gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
+        gray, dp, minDist, param1, param2, minRadius, maxRadius, bgr
     )
+    resulting_image = circle_result
     num_circles = len(circles) if circles is not None else 0
     notes.append({"num_circles": num_circles, "circles": circles})
     if circles is not None and num_circles != 1:
@@ -134,7 +137,6 @@ def process_image(raw: bytes):
     notes.append({"num_markers": num_markers, "markers": markers})
     if markers is not None and num_markers != 1:
         logger.info(f"Number of markers detected is not 1: {num_markers}")
-        resulting_image = circle_result
         return bgr, gray, resulting_image, notes
 
     ratios = get_ratios(markers[0], marker_size_mm)
@@ -149,8 +151,6 @@ def process_image(raw: bytes):
         notes.append({"mark_circ_dist_mm": mcd_mm})
         return bgr, gray, resulting_image, notes
 
-    resulting_image = circle_result
-    gray = gray_otsu
     return bgr, gray, resulting_image, notes
 
 def grayscale(image):
