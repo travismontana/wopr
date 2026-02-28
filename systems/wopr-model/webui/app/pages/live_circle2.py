@@ -66,7 +66,7 @@ def fetch_snapshot(url: str) -> bytes:
     return buf.getvalue()
 
 
-@st.cache_data
+# @st.cache_data
 def process_image(raw: bytes):
     logger.info(f"Processing image of size: {len(raw)} bytes")
     notes = []
