@@ -184,7 +184,7 @@ def process_image(raw: bytes):
     notes.append({"ratios": ratios})
 
     mark_circ_dist = get_distance(markers[0], circles[0])
-
+    resulting_image = marker_result
     if mark_circ_dist is not None:
         logger.info(f"Distance between marker and circle: {mark_circ_dist}px")
         notes.append({"mark_circ_dist_px": mark_circ_dist})
@@ -200,7 +200,7 @@ def process_image(raw: bytes):
     notes.append({"lines": lines})
 
     gray = gray_otsu
-    resulting_image = marker_result
+
     return bgr, gray, resulting_image, notes
 
 def grayscale(image):
