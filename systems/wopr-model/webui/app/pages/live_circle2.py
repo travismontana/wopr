@@ -71,13 +71,33 @@ def process_image(raw: bytes):
     scale = 0.25
     rgb = cv2.resize(rgb_normal, (0, 0), fx=scale, fy=scale)
     logger.info(f"Image shape: {rgb.shape}")
+    height, width, c_chan = rgb.shape
 
     bgr = rgb_bgr(rgb)
     gray = grayscale(rgb)
 
-    gray = gauss(gray)
+    gray_gauss = gauss(gray)
 
-    gray = otsu(gray)
+    gray_otsu = otsu(gray_gauss)
+
+    # Width of the histogram bars 1-2
+    dp = 1.75
+
+    # minDist, min distance between the center of the circles 0-sizeofimage
+    minDist = 1
+
+    # param1, higher, stronger the edge has to be, 50-100-200,
+    param1 = 50
+
+    # param2, if not ALT, confidence level 0-circumfrence in pixels, if ALT, roundness, 0-1, .8-.95 normal
+    param2 = 30
+
+    # minRadius, minimum radius of the circles, in pixels
+    minRadius = int(height / 5)
+    # maxRadius, maximum radius of the circles, in pixels
+    maxRadius = int(height / 2)
+
+    gray_circle = circle(gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius)
 
     return bgr, gray
 
@@ -101,6 +121,26 @@ def otsu(image):
     logger.info(f"Applying Otsu's thresholding")
     ret, binary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return binary
+
+
+def circle(image, dp, minDist, param1, param2, minRadius, maxRadius):
+    logger.info(f"Detecting circles")
+    circles = cv2.HoughCircles(
+        image,
+        cv2.HOUGH_GRADIENT,
+        dp=dp,
+        minDist=minDist,
+        param1=param1,
+        param2=param2,
+        minRadius=minRadius,
+        maxRadius=maxRadius,
+    )
+    if circles is not None:
+        circles = np.round(circles[0, :]).astype("int")
+        for x, y, r in circles:
+            cv2.circle(image, (x, y), r, (0, 255, 0), 4)
+    return image
+
 
 def get_images(url):
     try:
