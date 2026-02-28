@@ -344,8 +344,20 @@ def get_lines(image, dist, bgr, base_line):
             delta = min(delta, math.pi - delta)
             logger.info(f"Line angle delta: {math.degrees(delta)} degrees")
             if delta <= tol:
-                good_lines.append((x1, y1, x2, y2))
-                cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                # Check if the line runs within 100px of the base_end point
+                line_startend = line_end - line_start
+                linestart_baseend = base_end - line_start
+                t = np.clip(
+                    np.dot(linestart_baseend, line_startend)
+                    / np.dot(line_startend, line_startend),
+                    0,
+                    1,
+                )
+                closest_point = line_start + t * line_startend
+                if np.linalg.norm(closest_point - base_end) <= 100:
+                    good_lines.append((x1, y1, x2, y2))
+                    cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
     logger.info(f"Number of good lines detected: {len(good_lines)}")
     return bgr, good_lines
 
