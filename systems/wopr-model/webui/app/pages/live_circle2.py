@@ -242,10 +242,7 @@ def get_marker(
     detect_quad_decimate,
     detect_refine_edges,
     bgr,
-    count,
-    prev=[],
 ):
-
     detector = Detector(
         families=detect_tag,
         nthreads=detect_nthreads,
