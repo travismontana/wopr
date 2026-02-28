@@ -69,7 +69,8 @@ def process_image(raw: bytes):
     logger.info(f"Processing image of size: {len(raw)} bytes")
     notes = []
     scale = 0.25
-    marker_size_mm = 35
+    msmm_org = 35
+    marker_size_mm = msmm_org * scale
     image = Image.open(BytesIO(raw))
     org_image_size = image.size
     notes.append({"original_size": org_image_size})
