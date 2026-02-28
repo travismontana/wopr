@@ -71,7 +71,7 @@ def process_image(raw: bytes):
     scale = 0.25
 
     image = Image.open(BytesIO(raw))
-    org_image_size = image.shape
+    org_image_size = image.size
     notes.append({"original_size": org_image_size})
 
     rgb_normal = np.array(image)
