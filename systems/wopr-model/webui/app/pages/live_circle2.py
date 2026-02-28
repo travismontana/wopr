@@ -97,13 +97,20 @@ def process_image(raw: bytes):
     # maxRadius, maximum radius of the circles, in pixels
     maxRadius = int(height / 2)
 
-    gray_circle = circle(
+    circle_result, circles = circle(
         gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
     )
 
-    gray = gray_circle
+    if circles is not None and circles != 1:
+        logger.info(f"Number of circles detected is not 1: {len(circles)}")
+        resulting_image = circle_result
+        return bgr, gray, resulting_image
 
-    return bgr, gray
+    # marker = get_marker()
+
+    resulting_image = circle_result
+
+    return bgr, gray, resulting_image
 
 def grayscale(image):
     logger.info(f"Converting image to grayscale")
@@ -139,14 +146,15 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
         minRadius=minRadius,
         maxRadius=maxRadius,
     )
+
+    num_circles = len(circles) if circles is not None else 0
+    logger.info(f"Number of circles detected: {num_circles}")
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
-        logger.info(f"Found {len(circles)} circles")
         for x, y, r in circles:
             cv2.circle(bgr, (x, y), r, (0, 255, 0), 4)
-    else:
-        logger.info("No circles found")
-    return bgr
+
+    return bgr, circles
 
 
 def get_images(url):
@@ -176,18 +184,20 @@ raw_c950 = fetch_snapshot(f"{CAMURL}:5101/snapshot")
 raw_c960 = fetch_snapshot(f"{CAMURL}:5100/snapshot")
 logger.info(f"Fetched snapshots: C950={len(raw_c950)} bytes, C960={len(raw_c960)} bytes")
 
-bgr_c950, gray_c950 = process_image(raw_c950)
+bgr_c950, gray_c950, final_c950 = process_image(raw_c950)
 logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
 
-bgr_c960, gray_c960 = process_image(raw_c960)
+bgr_c960, gray_c960, final_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
 c950, c960 = st.columns(2)
 with c950:
+    st.image(final_c950, caption="Final C950")
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
 with c960:
+    st.image(final_c960, caption="Final C960")
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
