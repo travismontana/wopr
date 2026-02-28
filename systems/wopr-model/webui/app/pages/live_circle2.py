@@ -97,7 +97,9 @@ def process_image(raw: bytes):
     # maxRadius, maximum radius of the circles, in pixels
     maxRadius = int(height / 2)
 
-    gray_circle = circle(gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius)
+    gray_circle = circle(
+        gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
+    )
 
     gray = gray_circle
 
@@ -125,7 +127,7 @@ def otsu(image):
     return binary
 
 
-def circle(image, dp, minDist, param1, param2, minRadius, maxRadius):
+def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
     logger.info(f"Detecting circles")
     circles = cv2.HoughCircles(
         image,
@@ -141,10 +143,10 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius):
         circles = np.round(circles[0, :]).astype("int")
         logger.info(f"Found {len(circles)} circles")
         for x, y, r in circles:
-            cv2.circle(image, (x, y), r, (0, 255, 0), 4)
+            cv2.circle(bgr, (x, y), r, (0, 255, 0), 4)
     else:
         logger.info("No circles found")
-    return image
+    return bgr
 
 
 def get_images(url):
@@ -176,6 +178,7 @@ logger.info(f"Fetched snapshots: C950={len(raw_c950)} bytes, C960={len(raw_c960)
 
 bgr_c950, gray_c950 = process_image(raw_c950)
 logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
+
 bgr_c960, gray_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
