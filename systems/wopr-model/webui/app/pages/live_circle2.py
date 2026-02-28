@@ -142,6 +142,8 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius):
         logger.info(f"Found {len(circles)} circles")
         for x, y, r in circles:
             cv2.circle(image, (x, y), r, (0, 255, 0), 4)
+    else:
+        logger.info("No circles found")
     return image
 
 
