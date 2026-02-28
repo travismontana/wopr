@@ -195,7 +195,7 @@ def process_image(raw: bytes):
 
     gray_canny = canny(gray_gauss)
 
-    lines = get_lines(gray_canny, mark_circ_dist)
+    resulting_image, lines = get_lines(gray_canny, mark_circ_dist, resulting_image)
     logger.info(f"Number of lines detected: {len(lines) if lines is not None else 0}")
     notes.append({"lines": lines})
 
@@ -285,12 +285,15 @@ def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
     return cv2.Canny(image, threshold1, threshold2)
 
 
-def get_lines(image, dist):
+def get_lines(image, dist, bgr):
     logger.info("Detecting lines")
     lines = cv2.HoughLinesP(
         image, 1, np.pi / 180, 100, minLineLength=dist * 0.8, maxLineGap=10
     )
-    return lines
+    if lines is not None:
+        for x1, y1, x2, y2 in lines[:, 0]:
+            cv2.line(bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    return bgr, lines
 
 
 def get_ratios(markers, marker_size_mm):
