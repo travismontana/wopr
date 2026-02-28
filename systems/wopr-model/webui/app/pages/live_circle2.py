@@ -131,7 +131,6 @@ def process_image(raw: bytes):
         detect_quad_decimate,
         detect_refine_edges,
         bgr,
-        0,
     )
     num_markers = len(markers) if markers is not None else 0
     notes.append({"num_markers": num_markers, "markers": markers})
