@@ -206,6 +206,7 @@ def get_marker(
     detect_refine_edges,
     bgr,
     count,
+    prev=[],
 ):
 
     detector = Detector(
@@ -230,15 +231,31 @@ def get_marker(
     if not tags:  # None or empty after filter
         if count < 3:
             logger.info(f"Retrying marker detection, attempt {count + 1}")
-            bgr, tags = get_marker(
-                gauss(image),
-                detect_tag,
-                detect_nthreads,
-                detect_quad_decimate,
-                detect_refine_edges,
-                bgr,
-                count + 1,
-            )
+            match (count):
+                case 1:
+                    logger.info(f"First retry")
+                    bgr, tags = get_marker(
+                        gauss(image),
+                        detect_tag,
+                        detect_nthreads,
+                        detect_quad_decimate,
+                        detect_refine_edges,
+                        bgr,
+                        count + 1,
+                    )
+                case 2:
+                    logger.info(f"Second retry")
+                    bgr, tags = get_marker(
+                        clahe(image),
+                        detect_tag,
+                        detect_nthreads,
+                        detect_quad_decimate,
+                        detect_refine_edges,
+                        bgr,
+                        count + 1,
+                    )
+                case _:
+                    logger.info(f"Retry attempt {count + 1}")
 
     return bgr, tags
 
@@ -261,6 +278,11 @@ def get_distance(markers, circles):
         np.array([circle_x, circle_y]) - np.array(marker_center)
     )
     return dist_between
+
+
+def clahe(image):
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    return clahe.apply(image)
 
 
 def get_images(url):
