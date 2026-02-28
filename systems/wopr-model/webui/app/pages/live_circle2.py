@@ -69,7 +69,7 @@ def process_image(raw: bytes):
     logger.info(f"Processing image of size: {len(raw)} bytes")
     notes = []
     scale = 0.25
-
+    marker_size_mm = 35
     image = Image.open(BytesIO(raw))
     org_image_size = image.size
     notes.append({"original_size": org_image_size})
@@ -134,6 +134,18 @@ def process_image(raw: bytes):
         logger.info(f"Number of markers detected is not 1: {num_markers}")
         resulting_image = circle_result
         return bgr, gray, resulting_image, notes
+    circle_x, circle_y, radius = circles[0]
+
+    ratios = get_ratios(markers)
+    notes.append({"ratios": ratios})
+
+    mark_circ_dist = get_distance(markers, circles, ratios)
+
+    if mark_circ_dist is not None:
+        logger.info(f"Distance between marker and circle: {mark_circ_dist}px")
+        notes.append({"mark_circ_dist_px": mark_circ_dist})
+        mcd_mm = mark_circ_dist * ratios[1]
+        notes.append({"mark_circ_dist_mm": mcd_mm})
 
     resulting_image = circle_result
     gray = gray_otsu
@@ -200,7 +212,33 @@ def get_marker(
     if tags is not None:
         for tag in tags:
             cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
+
     return bgr, tags
+
+
+def get_ratios(markers):
+    corners = markers.corners
+    marker_side_length_pixels = np.linalg.norm(corners[0][0][0] - corners[0][0][1])
+
+    pixels_to_mm_ratio = marker_side_length_pixels / marker_size_mm
+    mm_to_pixels_ratio = marker_size_mm / marker_side_length_pixels
+    notes.append(
+        {
+            "pixels_to_mm_ratio": pixels_to_mm_ratio,
+            "mm_to_pixels_ratio": mm_to_pixels_ratio,
+        }
+    )
+    return (pixels_to_mm_ratio, mm_to_pixels_ratio)
+
+
+def get_distance(markers, circles):
+    circle_x, circle_y, radius = circles[0]
+    marker_center = markers.center
+
+    dist_between = np.linalg.norm(
+        np.array([circle_x, circle_y]) - np.array(marker_center)
+    )
+    return dist_between
 
 
 def get_images(url):
@@ -239,13 +277,13 @@ logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 c950, c960 = st.columns(2)
 with c950:
     st.image(final_c950, caption="Final C950")
-    st.write(notes_c950)
+    st.json(notes_c950, collapsed=True)
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
 with c960:
     st.image(final_c960, caption="Final C960")
-    st.write(notes_c960)
+    st.json(notes_c960, collapsed=True)
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
