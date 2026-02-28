@@ -251,11 +251,12 @@ def get_marker(
     tags = detector.detect(image)
     num_tags = len(tags) if tags is not None else 0
     logger.info(f"Number of tags detected: {num_tags}")
-    MIN_DECISION_MARGIN = 20.0  # tune this threshold
+    # MIN_DECISION_MARGIN = 20.0  # tune this threshold
 
+    min_dec_marg = st.slider("Minimum Decision Margin", 0.0, 100.0, 20.0)
     if tags is not None and num_tags > 0:
         # *** filter out low-confidence detections ***
-        tags = [t for t in tags if t.decision_margin >= MIN_DECISION_MARGIN]
+        tags = [t for t in tags if t.decision_margin >= min_dec_marg]
         num_tags = len(tags)
         logger.info(f"Tags after confidence filter: {num_tags}")
         for tag in tags:
@@ -285,11 +286,13 @@ def get_distance(markers, circles):
 
 
 def clahe(image):
+    logger.info("Applying CLAHE")
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     return clahe.apply(image)
 
 
 def filter2d(image):
+    logger.info("Applying 2D filter")
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
     return cv2.filter2D(image, -1, kernel)
 
