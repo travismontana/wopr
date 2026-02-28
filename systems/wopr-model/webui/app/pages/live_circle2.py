@@ -206,31 +206,31 @@ def get_marker(
     count,
 ):
 
-        detector = Detector(
-            families=detect_tag,
-            nthreads=detect_nthreads,
-            quad_decimate=detect_quad_decimate,
-            refine_edges=detect_refine_edges,
-        )
-        tags = detector.detect(image)
+    detector = Detector(
+        families=detect_tag,
+        nthreads=detect_nthreads,
+        quad_decimate=detect_quad_decimate,
+        refine_edges=detect_refine_edges,
+    )
+    tags = detector.detect(image)
 
-        num_tags = len(tags) if tags is not None else 0
-        logger.info(f"Number of tags detected: {num_tags}")
-        if tags is not None:
-            for tag in tags:
-                cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
-        else:
-            if count < 3:
-                logger.info(f"Retrying marker detection, attempt {count + 1}")
-                bgr, tags = get_marker(
-                    gauss(image),
-                    detect_tag,
-                    detect_nthreads,
-                    detect_quad_decimate,
-                    detect_refine_edges,
-                    bgr,
-                    count + 1,
-                )
+    num_tags = len(tags) if tags is not None else 0
+    logger.info(f"Number of tags detected: {num_tags}")
+    if tags is not None:
+        for tag in tags:
+            cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
+    else:
+        if count < 3:
+            logger.info(f"Retrying marker detection, attempt {count + 1}")
+            bgr, tags = get_marker(
+                gauss(image),
+                detect_tag,
+                detect_nthreads,
+                detect_quad_decimate,
+                detect_refine_edges,
+                bgr,
+                count + 1,
+            )
 
     return bgr, tags
 
