@@ -15,6 +15,7 @@ dependencies = [
     "pydantic",
     "pylint",
     "label_studio_sdk",
+    "pupil-apriltags",
 ]
 
 [project.optional-dependencies]
