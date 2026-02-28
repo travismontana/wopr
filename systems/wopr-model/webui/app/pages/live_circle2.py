@@ -109,7 +109,7 @@ def process_image(raw: bytes):
     # marker = get_marker()
 
     resulting_image = circle_result
-
+    gray = gray_otsu
     return bgr, gray, resulting_image
 
 def grayscale(image):
