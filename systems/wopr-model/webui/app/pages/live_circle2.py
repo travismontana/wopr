@@ -246,6 +246,17 @@ def get_marker(
                 case 1:
                     logger.info(f"Second retry")
                     bgr, tags = get_marker(
+                        filter2d(image),
+                        detect_tag,
+                        detect_nthreads,
+                        detect_quad_decimate,
+                        detect_refine_edges,
+                        bgr,
+                        count + 1,
+                    )
+                case 2:
+                    logger.info("Third retry")
+                    bgr, tags = get_marker(
                         clahe(image),
                         detect_tag,
                         detect_nthreads,
@@ -283,6 +294,11 @@ def get_distance(markers, circles):
 def clahe(image):
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     return clahe.apply(image)
+
+
+def filter2d(image):
+    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    return cv2.filter2D(image, -1, kernel)
 
 
 def get_images(url):
