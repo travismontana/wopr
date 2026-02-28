@@ -195,7 +195,7 @@ def process_image(raw: bytes):
 
     gray_canny = canny(gray)
 
-    lines = get_lines(gray_canny)
+    lines = get_lines(gray_canny, mark_circ_dist)
     notes.append({"lines": lines})
 
     gray = gray_otsu
@@ -281,6 +281,14 @@ def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
         f"Applying Canny edge detection with thresholds: {threshold1}, {threshold2}"
     )
     return cv2.Canny(image, threshold1, threshold2)
+
+
+def get_lines(image, dist):
+    logger.info("Detecting lines")
+    lines = cv2.HoughLinesP(
+        image, 1, np.pi / 180, 100, minLineLength=dist * 0.8, maxLineGap=10
+    )
+    return lines
 
 
 def get_ratios(markers, marker_size_mm):
