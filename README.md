@@ -7,6 +7,8 @@ WOPR tracks tabletop game state through computer vision.  Players use a web inte
 
 WOPR is a homage to the **W**ar **O**peration **P**lan **R**esponse computer from the 1983 film *WarGames*. This project has no affiliation with the film or its rights holders. The name is used respectfully as a nod to classic computing culture.
 
+The only winning move is to let the wookiee win.
+
 ## License
 
 Copyright (c) 2025 Bob Bomar
