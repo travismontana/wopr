@@ -138,7 +138,7 @@ def process_image(raw: bytes):
     ratios = get_ratios(markers[0])
     notes.append({"ratios": ratios})
 
-    mark_circ_dist = get_distance(markers[0], circles[0])
+    mark_circ_dist = get_distance(markers[0], circles[0], marker_size_mm)
 
     if mark_circ_dist is not None:
         logger.info(f"Distance between marker and circle: {mark_circ_dist}px")
@@ -215,7 +215,7 @@ def get_marker(
     return bgr, tags
 
 
-def get_ratios(markers):
+def get_ratios(markers, marker_size_mm):
     corners = markers.corners
     marker_side_length_pixels = np.linalg.norm(corners[0][0] - corners[0][1])
 
