@@ -294,7 +294,9 @@ with c950:
     c950_mark_circ_dist_mm = next(
         (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
     )
-    st.write(f"Marker-Circle Distance (mm): {c950_mark_circ_dist_mm}")
+    st.write(
+        f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm} | {c950_mark_circ_dist_mm/.25}"
+    )
     st.image(final_c950, caption="Final C950")
     st.json(notes_c950, expanded=False)
     st.image(raw_c950, caption="Raw C950")
@@ -305,7 +307,9 @@ with c960:
     c960_mark_circ_dist_mm = next(
         (n["mark_circ_dist_mm"] for n in notes_c960 if "mark_circ_dist_mm" in n), None
     )
-    st.write(f"Marker-Circle Distance (mm): {c960_mark_circ_dist_mm}")
+    st.write(
+        f"Marker-Circle Distance (mm)(scaled): {c960_mark_circ_dist_mm} | {c960_mark_circ_dist_mm/.25}"
+    )
     st.image(final_c960, caption="Final C960")
     st.json(notes_c960, expanded=False)
     st.image(raw_c960, caption="Raw C960")
