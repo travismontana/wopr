@@ -221,12 +221,7 @@ def get_ratios(markers, marker_size_mm):
 
     pixels_to_mm_ratio = marker_side_length_pixels / marker_size_mm
     mm_to_pixels_ratio = marker_size_mm / marker_side_length_pixels
-    notes.append(
-        {
-            "pixels_to_mm_ratio": pixels_to_mm_ratio,
-            "mm_to_pixels_ratio": mm_to_pixels_ratio,
-        }
-    )
+
     return (pixels_to_mm_ratio, mm_to_pixels_ratio)
 
 
