@@ -127,6 +127,7 @@ def process_image(raw: bytes):
         detect_quad_decimate,
         detect_refine_edges,
         bgr,
+        0,
     )
     num_markers = len(markers) if markers is not None else 0
     notes.append({"num_markers": num_markers, "markers": markers})
@@ -196,21 +197,38 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
 
 
 def get_marker(
-    image, detect_tag, detect_nthreads, detect_quad_decimate, detect_refine_edges, bgr
+    image,
+    detect_tag,
+    detect_nthreads,
+    detect_quad_decimate,
+    detect_refine_edges,
+    bgr,
+    count,
 ):
-    detector = Detector(
-        families=detect_tag,
-        nthreads=detect_nthreads,
-        quad_decimate=detect_quad_decimate,
-        refine_edges=detect_refine_edges,
-    )
-    tags = detector.detect(image)
+    if count < 3:
+        detector = Detector(
+            families=detect_tag,
+            nthreads=detect_nthreads,
+            quad_decimate=detect_quad_decimate,
+            refine_edges=detect_refine_edges,
+        )
+        tags = detector.detect(image)
 
-    num_tags = len(tags) if tags is not None else 0
-    logger.info(f"Number of tags detected: {num_tags}")
-    if tags is not None:
-        for tag in tags:
-            cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
+        num_tags = len(tags) if tags is not None else 0
+        logger.info(f"Number of tags detected: {num_tags}")
+        if tags is not None:
+            for tag in tags:
+                cv2.polylines(bgr, [tag.corners.astype(int)], True, (0, 255, 0), 2)
+    else:
+        bgr, tag = get_marker(
+            gauss(image),
+            detect_tag,
+            detect_nthreads,
+            detect_quad_decimate,
+            detect_refine_edges,
+            bgr,
+            count + 1,
+        )
 
     return bgr, tags
 
