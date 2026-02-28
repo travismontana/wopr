@@ -129,11 +129,11 @@ def process_image(raw: bytes):
         bgr,
     )
     num_markers = len(markers) if markers is not None else 0
+    notes.append({"num_markers": num_markers, "markers": markers})
     if markers is not None and num_markers != 1:
         logger.info(f"Number of markers detected is not 1: {num_markers}")
         resulting_image = circle_result
-        return bgr, gray, resulting_image
-    notes.append({"num_markers": num_markers, "markers": markers})
+        return bgr, gray, resulting_image, notes
 
     resulting_image = circle_result
     gray = gray_otsu
