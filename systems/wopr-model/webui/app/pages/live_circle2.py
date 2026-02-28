@@ -8,6 +8,7 @@ from io import BytesIO
 import logging
 import sys
 from pupil_apriltags import Detector
+import math
 
 CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 
