@@ -100,9 +100,9 @@ def process_image(raw: bytes):
     circle_result, circles = circle(
         gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
     )
-
-    if circles is not None and circles != 1:
-        logger.info(f"Number of circles detected is not 1: {len(circles)}")
+    num_circles = len(circles) if circles is not None else 0
+    if circles is not None and num_circles != 1:
+        logger.info(f"Number of circles detected is not 1: {num_circles}")
         resulting_image = circle_result
         return bgr, gray, resulting_image
 
