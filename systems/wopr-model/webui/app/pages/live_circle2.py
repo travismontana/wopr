@@ -14,7 +14,7 @@ CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 st.title("Live CV Work")
 min_dec_marg = st.slider(
-    "Minimum Decision Margin", 0.0, 100.0, 20.0, key="min_decision_margin"
+    "Minimum Decision Margin", 0.0, 50.0, 20.0, key="min_decision_margin"
 )
 img_rgb_u8_c950 = None
 raw_u8_c950 = None
@@ -178,6 +178,7 @@ def process_image(raw: bytes):
                 if markers is not None and num_markers != 1:
                     return bgr, gray, resulting_image, notes
     gray = gray_otsu
+    resulting_image = marker_result
     ratios = get_ratios(markers[0], marker_size_mm)
     notes.append({"ratios": ratios})
 
