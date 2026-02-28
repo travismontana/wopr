@@ -134,12 +134,11 @@ def process_image(raw: bytes):
         logger.info(f"Number of markers detected is not 1: {num_markers}")
         resulting_image = circle_result
         return bgr, gray, resulting_image, notes
-    circle_x, circle_y, radius = circles[0]
 
     ratios = get_ratios(markers)
     notes.append({"ratios": ratios})
 
-    mark_circ_dist = get_distance(markers, circles, ratios)
+    mark_circ_dist = get_distance(markers[0], circles[0], ratios)
 
     if mark_circ_dist is not None:
         logger.info(f"Distance between marker and circle: {mark_circ_dist}px")
@@ -232,7 +231,7 @@ def get_ratios(markers):
 
 
 def get_distance(markers, circles):
-    circle_x, circle_y, radius = circles[0]
+    circle_x, circle_y, radius = circles
     marker_center = markers.center
 
     dist_between = np.linalg.norm(
