@@ -296,9 +296,11 @@ with c950:
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
+    logger.info(notes_c950)
 with c960:
     st.image(final_c960, caption="Final C960")
     st.json(notes_c960, expanded=False)
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
+    logger.info(notes_c960)
