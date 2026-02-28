@@ -147,6 +147,7 @@ def process_image(raw: bytes):
         notes.append({"mark_circ_dist_px": mark_circ_dist})
         mcd_mm = mark_circ_dist * ratios[1]
         notes.append({"mark_circ_dist_mm": mcd_mm})
+        return bgr, gray, resulting_image, notes
 
     resulting_image = circle_result
     gray = gray_otsu
@@ -297,6 +298,13 @@ c960_mark_circ_dist_mm = next(
     (n["mark_circ_dist_mm"] for n in notes_c960 if "mark_circ_dist_mm" in n), None
 )
 
+c950_mark_circ_dist_px = next(
+    (n["mark_circ_dist_px"] for n in notes_c950 if "mark_circ_dist_px" in n), None
+)
+c960_mark_circ_dist_px = next(
+    (n["mark_circ_dist_px"] for n in notes_c960 if "mark_circ_dist_px" in n), None
+)
+
 if c950_mark_circ_dist_mm is not None and c960_mark_circ_dist_mm is not None:
     percent_difference = (
         abs(c950_mark_circ_dist_mm - c960_mark_circ_dist_mm)
@@ -310,6 +318,7 @@ with c950:
         st.write(
             f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm:.2f} | {c950_mark_circ_dist_mm/.25:.2f}"
         )
+        st.write(f"Marker-Circle Distance (px): {c950_mark_circ_dist_px}")
     else:
         st.warning("C950: Distance not computed — check detection results")
     st.image(final_c950, caption="Final C950")
@@ -323,6 +332,7 @@ with c960:
         st.write(
             f"Marker-Circle Distance (mm)(scaled): {c960_mark_circ_dist_mm:.2f} | {c960_mark_circ_dist_mm/.25:.2f}"
         )
+        st.write(f"Marker-Circle Distance (px): {c960_mark_circ_dist_px}")
     else:
         st.warning("C960: Distance not computed — check detection results")
     st.image(final_c960, caption="Final C960")
