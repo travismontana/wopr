@@ -318,14 +318,22 @@ def get_lines(image, dist, bgr, base_line):
     )
     if lines is not None:
         good_lines = []
+        logger.info(f"Number of lines detected: {len(lines)}")
+        base_start = np.array(base_line["start"])
+        base_end = np.array(base_line["end"])
+        base_theta = math.atan2(
+            base_end[1] - base_start[1], base_end[0] - base_start[0]
+        )
+        logger.info(
+            f"Base line start: {base_line['start']}, Base line end: {base_line['end']}, Base line theta: {math.degrees(base_theta)} degrees"
+        )
         for x1, y1, x2, y2 in lines[:, 0]:
             line_start = np.array([x1, y1])
             line_end = np.array([x2, y2])
-            base_start = np.array(base_line["start"])
-            base_end = np.array(base_line["end"])
+
             line_theta = math.atan2(y2 - y1, x2 - x1)
-            base_theta = math.atan2(
-                base_end[1] - base_start[1], base_end[0] - base_start[0]
+            logger.info(
+                f"Line start: {line_start}, Line end: {line_end}, Line theta: {math.degrees(line_theta)} degrees"
             )
             diff = (line_theta - base_theta) % math.pi
             logger.info(f"Line angle difference: {math.degrees(diff)} degrees")
