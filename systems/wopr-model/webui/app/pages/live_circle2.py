@@ -193,9 +193,10 @@ def process_image(raw: bytes):
         notes.append({"mark_circ_dist_mm": mcd_mm})
         return bgr, gray, resulting_image, notes
 
-    gray_canny = canny(gray)
+    gray_canny = canny(gray_gauss)
 
     lines = get_lines(gray_canny, mark_circ_dist)
+    logger.info(f"Number of lines detected: {len(lines) if lines is not None else 0}")
     notes.append({"lines": lines})
 
     gray = gray_otsu
