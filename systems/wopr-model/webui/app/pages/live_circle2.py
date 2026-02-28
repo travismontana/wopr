@@ -105,11 +105,11 @@ def process_image(raw: bytes):
         gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
     )
     num_circles = len(circles) if circles is not None else 0
+    notes.append({"num_circles": num_circles, "circles": circles})
     if circles is not None and num_circles != 1:
         logger.info(f"Number of circles detected is not 1: {num_circles}")
         resulting_image = circle_result
-        return bgr, gray, resulting_image
-    notes.append({"num_circles": num_circles, "circles": circles})
+        return bgr, gray, resulting_image, notes
 
     # detect_tag, type of tag to detect
     detect_tag = "tag36h11"
