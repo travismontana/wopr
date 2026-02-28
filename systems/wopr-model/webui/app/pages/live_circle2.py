@@ -101,13 +101,12 @@ def process_image(raw: bytes):
     gray = grayscale(rgb)
 
     gray_gauss = gauss(gray)
-    gray = gray_gauss
+    # gray = gray_gauss
 
-    gray_otsu = otsu(gray)
-    gray = gray_otsu
+    gray_otsu = otsu(gray_gauss)
 
     circle_result, circles = circle(
-        gray, dp, minDist, param1, param2, minRadius, maxRadius, bgr
+        gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
     )
     resulting_image = circle_result
     num_circles = len(circles) if circles is not None else 0
@@ -127,7 +126,7 @@ def process_image(raw: bytes):
     detect_refine_edges = 1
 
     marker_result, markers = get_marker(
-        gray,
+        gray_gauss,
         detect_tag,
         detect_nthreads,
         detect_quad_decimate,
@@ -153,7 +152,7 @@ def process_image(raw: bytes):
         if markers is not None and num_markers != 1:
             logger.info(f"Second retry")
             next2_img = clahe(next_img)
-            bgr, tags = get_marker(
+            marker_result, markers = get_marker(
                 next2_img,
                 detect_tag,
                 detect_nthreads,
@@ -166,7 +165,7 @@ def process_image(raw: bytes):
             if markers is not None and num_markers != 1:
                 logger.info("Third retry")
                 next3_img = filter2d(next2_img)
-                bgr, tags = get_marker(
+                marker_result, markers = get_marker(
                     next3_img,
                     detect_tag,
                     detect_nthreads,
@@ -176,7 +175,7 @@ def process_image(raw: bytes):
                 )
 
         return bgr, gray, resulting_image, notes
-
+    gray = gray_otsu
     ratios = get_ratios(markers[0], marker_size_mm)
     notes.append({"ratios": ratios})
 
