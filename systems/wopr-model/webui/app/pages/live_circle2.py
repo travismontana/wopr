@@ -84,7 +84,7 @@ def process_image(raw: bytes):
     dp = 1.75
 
     # minDist, min distance between the center of the circles 0-sizeofimage
-    minDist = 1
+    minDist = max(height, width)
 
     # param1, higher, stronger the edge has to be, 50-100-200,
     param1 = 50
