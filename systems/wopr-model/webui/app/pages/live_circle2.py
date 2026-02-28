@@ -232,7 +232,7 @@ def get_marker(
         if count < 3:
             logger.info(f"Retrying marker detection, attempt {count + 1}")
             match (count):
-                case 1:
+                case 0:
                     logger.info(f"First retry")
                     bgr, tags = get_marker(
                         gauss(image),
@@ -243,7 +243,7 @@ def get_marker(
                         bgr,
                         count + 1,
                     )
-                case 2:
+                case 1:
                     logger.info(f"Second retry")
                     bgr, tags = get_marker(
                         clahe(image),
