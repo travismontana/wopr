@@ -289,7 +289,7 @@ logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
 bgr_c960, gray_c960, final_c960, notes_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
-c950, c960 = st.columns(2)
+
 c950_mark_circ_dist_mm = next(
     (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
 )
@@ -304,6 +304,7 @@ if c950_mark_circ_dist_mm is not None and c960_mark_circ_dist_mm is not None:
         * 100
     )
     st.write(f"Percent difference: {percent_difference:.2f}%")
+c950, c960 = st.columns(2)
 with c950:
     if c950_mark_circ_dist_mm is not None:
         st.write(
