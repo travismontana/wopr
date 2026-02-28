@@ -99,6 +99,8 @@ def process_image(raw: bytes):
 
     gray_circle = circle(gray_otsu, dp, minDist, param1, param2, minRadius, maxRadius)
 
+    gray = gray_circle
+
     return bgr, gray
 
 def grayscale(image):
