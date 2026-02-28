@@ -4,7 +4,7 @@ set -e
 
 # Dont run this from a curl/wget/fetch
 pppid=$(ps -o comm= -p $(ps -o ppid= -p $$ | tr -d ' ' ))
-web_getters = ("curl", "wget", "fetch")
+web_getters=("curl" "wget" "fetch")
 for web_getter in "${web_getters[@]}"; do
     if [[ ${pppid} == ${web_getter} ]]; then
         echo "Don't curl | $0, it's bad juju"
