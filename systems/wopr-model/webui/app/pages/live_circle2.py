@@ -288,7 +288,7 @@ def canny(image, threshold1=canny_threshold1, threshold2=canny_threshold2):
 def get_lines(image, dist, bgr):
     logger.info("Detecting lines")
     lines = cv2.HoughLinesP(
-        image, 1, np.pi / 180, 100, minLineLength=dist * 0.8, maxLineGap=10
+        image, 1, np.pi / 180, 100, minLineLength=dist * 0.5, maxLineGap=10
     )
     if lines is not None:
         for x1, y1, x2, y2 in lines[:, 0]:
