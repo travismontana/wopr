@@ -176,7 +176,6 @@ def process_image(raw: bytes):
                 num_markers = len(markers) if markers is not None else 0
                 notes.append({"num_markers": num_markers, "markers": markers})
                 if markers is not None and num_markers != 1:
-                else:
                     return bgr, gray, resulting_image, notes
     gray = gray_otsu
     ratios = get_ratios(markers[0], marker_size_mm)
