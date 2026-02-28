@@ -394,6 +394,10 @@ with c950:
         st.write(f"Marker-Circle Distance (px): {c950_mark_circ_dist_px}")
     else:
         st.warning("C950: Distance not computed — check detection results")
+    if c950_lines is not None:
+        st.write("Lines:")
+        for c950_line in c950_lines:
+            st.write(c950_line)
     st.image(final_c950, channels="BGR", caption="Final C950")
     st.json(notes_c950, expanded=False)
     st.json(c950_lines, expanded=False)
@@ -409,6 +413,10 @@ with c960:
         st.write(f"Marker-Circle Distance (px): {c960_mark_circ_dist_px}")
     else:
         st.warning("C960: Distance not computed — check detection results")
+    if c960_lines is not None:
+        st.write("Lines:")
+        for c960_line in c960_lines:
+            st.write(c960_line)
     st.image(final_c960, channels="BGR", caption="Final C960")
     st.json(notes_c960, expanded=False)
     st.json(c960_lines, expanded=False)
