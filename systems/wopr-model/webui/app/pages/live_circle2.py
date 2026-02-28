@@ -193,7 +193,7 @@ def process_image(raw: bytes):
     else:
         return bgr, gray, resulting_image, notes
 
-    gray_canny = canny(gray_gauss)
+    gray_canny = canny(gray)
 
     resulting_image, lines = get_lines(gray_canny, mark_circ_dist, resulting_image)
     logger.info(f"Number of lines detected: {len(lines) if lines is not None else 0}")
