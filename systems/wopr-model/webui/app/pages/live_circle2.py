@@ -291,22 +291,22 @@ logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
 c950, c960 = st.columns(2)
 with c950:
-    st.image(final_c950, caption="Final C950")
     c950_mark_circ_dist_mm = next(
         (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
     )
     st.write(f"Marker-Circle Distance (mm): {c950_mark_circ_dist_mm}")
+    st.image(final_c950, caption="Final C950")
     st.json(notes_c950, expanded=False)
     st.image(raw_c950, caption="Raw C950")
     st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
     logger.info(notes_c950)
 with c960:
-    st.image(final_c960, caption="Final C960")
     c960_mark_circ_dist_mm = next(
         (n["mark_circ_dist_mm"] for n in notes_c960 if "mark_circ_dist_mm" in n), None
     )
     st.write(f"Marker-Circle Distance (mm): {c960_mark_circ_dist_mm}")
+    st.image(final_c960, caption="Final C960")
     st.json(notes_c960, expanded=False)
     st.image(raw_c960, caption="Raw C960")
     st.image(bgr_c960, channels="BGR", caption="Camera C960")
