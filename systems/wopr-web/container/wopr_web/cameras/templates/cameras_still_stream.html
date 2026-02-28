@@ -10,13 +10,11 @@ Welcome to the Cameras page.
         <th>C950 - 1080P</th>
         <th>rPi Cam</th>
     </tr>
-    {% for stream in streams %}
     <tr>
         <td>{{ {% url 'c960_stream' %} width=300 height=200 }}</td>
         <td>{{ {% url 'c950_stream' %} width=300 height=200 }}</td>
         <td><blink>Coming Soon!</blink></td>
     </tr>
-    {% endfor %}
     <tr>
         <td><a href="http://wopr-cam:5100/snapshot">
             <img src="https://imgproxy.wopr.tailandtraillabs.org/insecure/resize:fill:300:200/plain/http://wopr-cam:5100/snapshot"></a></td>
