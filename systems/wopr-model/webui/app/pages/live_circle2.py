@@ -203,7 +203,7 @@ def process_image(raw: bytes):
     logger.info(f"Number of lines detected: {len(lines) if lines is not None else 0}")
     notes.append({"lines": lines})
 
-    gray = gray_otsu
+    gray = gray_canny
 
     return bgr, gray, resulting_image, notes
 
@@ -405,8 +405,8 @@ with c950:
     st.image(final_c950, channels="BGR", caption="Final C950")
     st.json(notes_c950, expanded=False)
     st.json(c950_lines, expanded=False)
-    st.image(raw_c950, caption="Raw C950")
-    st.image(bgr_c950, channels="BGR", caption="Camera C950")
+    # st.image(raw_c950, caption="Raw C950")
+    # st.image(bgr_c950, channels="BGR", caption="Camera C950")
     st.image(gray_c950, caption="Result C950")
     logger.info(notes_c950)
 with c960:
@@ -424,7 +424,7 @@ with c960:
     st.image(final_c960, channels="BGR", caption="Final C960")
     st.json(notes_c960, expanded=False)
     st.json(c960_lines, expanded=False)
-    st.image(raw_c960, caption="Raw C960")
-    st.image(bgr_c960, channels="BGR", caption="Camera C960")
+    # st.image(raw_c960, caption="Raw C960")
+    # st.image(bgr_c960, channels="BGR", caption="Camera C960")
     st.image(gray_c960, caption="Result C960")
     logger.info(notes_c960)
