@@ -69,6 +69,18 @@ def process_image(raw: bytes):
     logger.info(f"Processing image of size: {len(raw)} bytes")
     notes = []
     scale = 0.25
+
+    image = Image.open(BytesIO(raw))
+    org_image_size = image.shape
+    notes.append({"original_size": org_image_size})
+
+    rgb_normal = np.array(image)
+    rgb = cv2.resize(rgb_normal, (0, 0), fx=scale, fy=scale)
+    scale_size = rgb.shape
+    logger.info(f"Image shape: {rgb.shape}")
+    notes.append({"scaled_size": scale_size})
+    height, width, c_chan = rgb.shape
+
     # Width of the histogram bars 1-2
     dp = 1.75
     # minDist, min distance between the center of the circles 0-sizeofimage
@@ -81,25 +93,6 @@ def process_image(raw: bytes):
     minRadius = int(height / 5)
     # maxRadius, maximum radius of the circles, in pixels
     maxRadius = int(height / 2)
-    # detect_tag, type of tag to detect
-    detect_tag = "tag36h11"
-    # detect_nthreads, number of threads for detect
-    detect_nthreads = 4
-    # detect_quad_decimage, downsampling factor used before searching for tag quads, more makes it a smaller image
-    detect_quad_decimate = 1.0
-    # detect_refine_edges, sharp (1) or weak (0) corners,
-    detect_refine_edges = 1
-
-    image = Image.open(BytesIO(raw))
-    org_image_size = image.shape
-    notes.append({"original_size": org_image_size})
-
-    rgb_normal = np.array(image)
-    rgb = cv2.resize(rgb_normal, (0, 0), fx=scale, fy=scale)
-    scale_size = rgb.shape
-    logger.info(f"Image shape: {rgb.shape}")
-    notes.append({"scaled_size": scale_size})
-    height, width, c_chan = rgb.shape
 
     bgr = rgb_bgr(rgb)
     gray = grayscale(rgb)
@@ -117,6 +110,15 @@ def process_image(raw: bytes):
         resulting_image = circle_result
         return bgr, gray, resulting_image
     notes.append({"num_circles": num_circles, "circles": circles})
+
+    # detect_tag, type of tag to detect
+    detect_tag = "tag36h11"
+    # detect_nthreads, number of threads for detect
+    detect_nthreads = 4
+    # detect_quad_decimage, downsampling factor used before searching for tag quads, more makes it a smaller image
+    detect_quad_decimate = 1.0
+    # detect_refine_edges, sharp (1) or weak (0) corners,
+    detect_refine_edges = 1
 
     marker_result, markers = get_marker(
         gray,
