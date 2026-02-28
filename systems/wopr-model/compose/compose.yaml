@@ -25,6 +25,7 @@ services:
       - /remote/wopr/models/ua/runs:/ultralytics/runs
       - /remote/wopr/models/ua/datasets:/ultralytics/datasets
   wopr-model-webui:
+    #network_mode: host
     build:
       context: ../webui
       dockerfile: Dockerfile

@@ -15,7 +15,7 @@ from label_studio_sdk._extensions.label_studio_tools.core.utils.io import get_lo
 RUNS = "/ultralytics/runs"
 WEIGHTS = "/ultralytics/weights"
 DATASETS = "/ultralytics/datasets"
-
+CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "http://localhost:8080")
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN", "changeme")
 

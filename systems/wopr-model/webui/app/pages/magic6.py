@@ -1,18 +1,51 @@
+import requests
 import streamlit as st
 import numpy as np
 import cv2
+import os
+from PIL import Image
+from io import BytesIO
 
+CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 st.title("CV Pipeline")
 
-uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
+# uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is None:
-    st.info("Upload an image to get started.")
+
+# if uploaded_file is None:
+#    st.info("Upload an image to get started.")
+#    st.stop()
+@st.cache_data(ttl=30)
+def fetch_snapshot(url: str) -> bytes:
+    response = requests.get(url, timeout=5)
+    response.raise_for_status()
+    return response.content
+
+
+cam_options = [
+    {"name": "c950", "endpoint": f"{CAMURL}:5101/snapshot"},
+    {"name": "c960", "endpoint": f"{CAMURL}:5100/snapshot"},
+    {"name": "rPi", "endpoint": f"{CAMURL}:5102/snapshot"},
+]
+
+selected_cam = st.selectbox(
+    "Select camera", options=cam_options, format_func=lambda cam: cam["name"]
+)
+
+image_url = selected_cam["endpoint"]
+
+try:
+    raw_bytes = fetch_snapshot(image_url)
+    image = Image.open(BytesIO(raw_bytes))
+except Exception as e:
+    st.error(f"Failed to fetch snapshot from {image_url}: {e}")
     st.stop()
 
+img = image
+
 # Decode uploaded image
-raw_bytes = uploaded_file.read()
+# raw_bytes = uploaded_file.read()
 raw_buf_u8 = np.frombuffer(raw_bytes, dtype=np.uint8)
 img_bgr_u8 = cv2.imdecode(raw_buf_u8, cv2.IMREAD_COLOR)
 img_gray_u8 = cv2.cvtColor(img_bgr_u8, cv2.COLOR_BGR2GRAY)
