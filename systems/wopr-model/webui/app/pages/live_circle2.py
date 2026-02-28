@@ -290,13 +290,21 @@ bgr_c960, gray_c960, final_c960, notes_c960 = process_image(raw_c960)
 logger.info(f"Processed images: C960={bgr_c960.shape}, C960={bgr_c960.shape}")
 
 c950, c960 = st.columns(2)
+c950_mark_circ_dist_mm = next(
+    (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
+)
+c960_mark_circ_dist_mm = next(
+    (n["mark_circ_dist_mm"] for n in notes_c960 if "mark_circ_dist_mm" in n), None
+)
+
+if c950_mark_circ_dist_mm is not None and c960_mark_circ_dist_mm is not None:
+    percent_difference = (
+        abs(c950_mark_circ_dist_mm - c960_mark_circ_dist_mm)
+        / ((c950_mark_circ_dist_mm + c960_mark_circ_dist_mm) / 2)
+        * 100
+    )
+    st.write(f"Percent difference: {percent_difference:.2f}%")
 with c950:
-    c950_mark_circ_dist_mm = next(
-        (n["mark_circ_dist_mm"] for n in notes_c950 if "mark_circ_dist_mm" in n), None
-    )
-    st.write(
-        f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm} | {c950_mark_circ_dist_mm/.25}"
-    )
     if c950_mark_circ_dist_mm is not None:
         st.write(
             f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm:.2f} | {c950_mark_circ_dist_mm/.25:.2f}"
@@ -310,9 +318,6 @@ with c950:
     st.image(gray_c950, caption="Result C950")
     logger.info(notes_c950)
 with c960:
-    c960_mark_circ_dist_mm = next(
-        (n["mark_circ_dist_mm"] for n in notes_c960 if "mark_circ_dist_mm" in n), None
-    )
     if c960_mark_circ_dist_mm is not None:
         st.write(
             f"Marker-Circle Distance (mm)(scaled): {c960_mark_circ_dist_mm:.2f} | {c960_mark_circ_dist_mm/.25:.2f}"
