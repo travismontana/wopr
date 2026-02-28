@@ -13,7 +13,9 @@ CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 st.title("Live CV Work")
-
+min_dec_marg = st.slider(
+    "Minimum Decision Margin", 0.0, 100.0, 20.0, key="min_decision_margin"
+)
 img_rgb_u8_c950 = None
 raw_u8_c950 = None
 
@@ -253,9 +255,6 @@ def get_marker(
     logger.info(f"Number of tags detected: {num_tags}")
     # MIN_DECISION_MARGIN = 20.0  # tune this threshold
 
-    min_dec_marg = st.slider(
-        "Minimum Decision Margin", 0.0, 100.0, 20.0, key="min_decision_margin"
-    )
     if tags is not None and num_tags > 0:
         # *** filter out low-confidence detections ***
         tags = [t for t in tags if t.decision_margin >= min_dec_marg]
