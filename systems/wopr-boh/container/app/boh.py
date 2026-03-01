@@ -8,4 +8,13 @@ st.set_page_config(layout="wide")
 # Control Models
 # Logical Systems Controls <---
 
-pg = st.navigation(["logical_systems_control.py","reality_controls.py"])
+pages = {
+    "Logical Systems Controls": [
+        st.Page("cognition_oversight.py", title="Congnition Oversight")
+    ],
+    "Reality Controls": [
+        st.Page("perception_oversight.py", title="Persception Oversight")
+    ],
+}
+pg = st.navigation(pages)
+pg.run()

@@ -29,5 +29,5 @@ COPY --chown=wopr:wopr pyproject.toml .
 RUN pip install -e .
 USER wopr
 COPY --chown=wopr:wopr app/ .
-CMD ["streamlit", "run", "boh.py", "--server.port=8888", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "boh.py", "--server.port=8000", "--server.address=0.0.0.0"]
 
