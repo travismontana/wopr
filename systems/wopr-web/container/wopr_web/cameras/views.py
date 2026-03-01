@@ -22,12 +22,10 @@ def c950_stream(request):
     c950_url = f"http://{c950_host}:{c950_port}/stream"
     logger.info(f"Accessing C950 stream at {c950_url}")
     c950_stream = requests.get(c950_url, stream=True)
-    context["c950_stream"] = StreamingHttpResponse(
+    return context["c950_stream"] = StreamingHttpResponse(
         c950_stream.iter_content(chunk_size=1024),
         content_type="multipart/x-mixed-replace; boundary=boundarydonotcross",
     )
-    return render(request, "cameras_still_stream.html", context)
-
 
 def c960_stream(request):
     context = {}
@@ -36,11 +34,10 @@ def c960_stream(request):
     c960_url = f"http://{c960_host}:{c960_port}/stream"
     logger.info(f"Accessing C960 stream at {c960_url}")
     c960_stream = requests.get(c960_url, stream=True)
-    context["c960_stream"] = StreamingHttpResponse(
+    return context["c960_stream"] = StreamingHttpResponse(
         c960_stream.iter_content(chunk_size=1024),
         content_type="multipart/x-mixed-replace; boundary=boundarydonotcross",
     )
-    return render(request, "cameras_still_stream.html", context)
 
 
 def grab_snapshot(request):
