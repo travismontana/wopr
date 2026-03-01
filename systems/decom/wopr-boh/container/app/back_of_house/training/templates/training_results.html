@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<h2>Training Send Page</h2>
+{% endblock %}
+
+{% block content %}
+<p><strong>Training Run:</strong></p><br>
+{{ training_run }}
+<br>
+<p><strong>Model Version:</strong></p><br>
+{{ model_ver }}
+<br>
+<p><strong>Dataset:</strong></p><br>
+{{ dataset }}
+<br>
+<p><strong>Training Parameters:</strong></p><br>
+{{ training_params }}
+{% endblock %}

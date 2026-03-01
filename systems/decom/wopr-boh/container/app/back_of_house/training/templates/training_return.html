@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<p>Training</p>
+{% endblock %}
+
+{% block content %}
+<h2>Operation Results</h2>
+
+{% if results %}
+    <ul>
+    {% for result in results %}
+        <li>
+            <strong>Status:</strong> {{ result.status }}<br>
+            <strong>Type:</strong> {{ result.type }}<br>
+            <strong>Message:</strong> {{ result.message }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No results to display.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,39 +1,33 @@
-# syntax=docker/dockerfile:1
+FROM ultralytics/ultralytics:latest
+LABEL maintainer="Bob Bomar"
+LABEL description="WOPR back_of_house"
 
-FROM python:3.13-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 
-
+    PYTHONDONTWRITEBYTECODE=1
+RUN ping -c 1 8.8.8.8 -w 1 && echo "Network OK" || echo "Network unreachable, check your network settings."
 RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
-    libpq-dev \
-    git \
+    curl \
+    net-tools \
     && pip install --upgrade pip setuptools wheel \
     && apt clean \
     && apt autoclean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* 
 
-# Create non-root user
-RUN useradd -m -u 2222 wopr
+RUN useradd -m -u 2222 wopr && \
+    mkdir -p /app /var/log/wopr && \
+    chown -R wopr:wopr /app /var/log/wopr
+
+RUN touch /var/log/wopr.log
+RUN chown wopr:wopr /var/log/wopr.log
 
 WORKDIR /app
 
-# Install dependencies as root
-COPY requirements.txt pyproject.toml ./
-RUN pip install -r requirements.txt && pip install -e .
-
-# Copy app code to /app (back_of_house/ will be at /app/back_of_house/)
-COPY --chown=wopr:wopr app/back_of_house/ ./
-COPY --chown=wopr:wopr app/back_of_house/back_of_house/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-# Switch to non-root user
+COPY --chown=wopr:wopr pyproject.toml .
+RUN pip install -e .
 USER wopr
+COPY --chown=wopr:wopr app/ .
+CMD ["streamlit", "run", "boh.py", "--server.port=8888", "--server.address=0.0.0.0"]
 
-EXPOSE 8000
-ENTRYPOINT ["/app/entrypoint.sh"]
-# Module path: back_of_house.wsgi (because /app is in PYTHONPATH)
-#CMD ["python", "manage.py", "migrate", "--noinput"]
-#CMD ["python", "manage.py", "collectstatic", "--noinput"]
-#CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "back_of_house.wsgi:application"]

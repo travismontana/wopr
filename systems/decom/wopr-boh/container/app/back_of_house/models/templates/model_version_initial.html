@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block main_subheader %}
+<p>Models - <a href="{% url 'model_add'%}">Add New Model</a> - <a href="{% url 'model_family_add' %}">Add New Model Family</a></p>
+{% endblock %}
+
+{% block content %}
+<h2>Add Initial Model Version</h2>
+
+{% if results %}
+  Results:
+  {% for result in results %}
+      <strong>Status: </strong>{{ result.status }}<br>
+      <strong>Code: </strong>{{ result.type }}<br>
+      {% if result.data %}
+      <ul>
+        {% for field, value in result.data.items %}
+          <li><strong>{{ field }}:</strong> {{ value }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No results.</p>
+      {% endif %}
+  {% endfor %}
+{% endif %}
+{% endblock %}

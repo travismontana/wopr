@@ -1,0 +1,74 @@
+wopr-baseapp:
+  app:
+    name: wopr-boh
+  replicaCount: 1
+
+  image:
+    registry: ghcr.io
+    repository: travismontana/wopr/wopr-boh
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: wopr-traefik
+    hosts:
+      - host: boh.wopr.tailandtraillabs.org
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: 
+      - secretName: wopr-boh-tls
+        hosts:
+          - boh.wopr.tailandtraillabs.org
+  readinessProbe:
+    enabled: false
+  livenessProbe:
+    enabled: false
+  volumeMounts:
+  - name: config
+    mountPath: /config
+  volumes:
+    - name: config
+      configMap:
+        name: wopr-json
+  env:
+    - name: LABEL_STUDIO_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: labelstudio-token-secret
+          key: labelstudio-token
+    - name: WOPR_API_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_API_URL
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-cluster-app
+          key: host
+    - name: DB_PORT
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-cluster-app
+          key: port
+    - name: DB_DATABASE
+      valueFrom:
+        configMapKeyRef:
+          name: wopr-config
+          key: WOPR_METADATA_DB
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wopr-db-user-credentials
+          key: password
