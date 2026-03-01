@@ -22,7 +22,7 @@ def c950_stream(request):
     c950_url = f"http://{c950_host}:{c950_port}/stream"
     logger.info(f"Accessing C950 stream at {c950_url}")
     c950_stream = requests.get(c950_url, stream=True)
-    return context["c950_stream"] = StreamingHttpResponse(
+    return StreamingHttpResponse(
         c950_stream.iter_content(chunk_size=1024),
         content_type="multipart/x-mixed-replace; boundary=boundarydonotcross",
     )
@@ -34,7 +34,7 @@ def c960_stream(request):
     c960_url = f"http://{c960_host}:{c960_port}/stream"
     logger.info(f"Accessing C960 stream at {c960_url}")
     c960_stream = requests.get(c960_url, stream=True)
-    return context["c960_stream"] = StreamingHttpResponse(
+    return StreamingHttpResponse(
         c960_stream.iter_content(chunk_size=1024),
         content_type="multipart/x-mixed-replace; boundary=boundarydonotcross",
     )
