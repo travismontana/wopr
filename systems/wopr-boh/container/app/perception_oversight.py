@@ -43,6 +43,14 @@ if "knobs" not in st.session_state:
                 "max": 6,
                 "type": "slider",
             },
+            "frames_to_process": {
+                "key": "frames_to_process",
+                "help": "Number of frames to process at a time",
+                "default": 1,
+                "min": 1,
+                "max": 100,
+                "type": "slider",
+            },
             "image_processing_scale": {
                 "key": "img_proc_scale",
                 "help": "Scale factor for image processing",
@@ -197,7 +205,7 @@ if "knobs" not in st.session_state:
                 "max": 255,
                 "type": "slider",
             },
-        }
+        },
     }
 
 # Controls Column

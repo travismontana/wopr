@@ -9,6 +9,7 @@ from pupil_apriltags import Detector
 
 from lib.helpers import setup_logger
 from lib.helpers import wopr_json
+
 logger = setup_logger()
 
 
@@ -24,17 +25,51 @@ class MJPEGStream:
 
     def read(self):
         # Feed buffer until we have a complete JPEG
-        while True:
-            self.buf += self.sock.recv(65536)
-            start = self.buf.find(b"\xff\xd8")  # JPEG SOI
-            end = self.buf.find(b"\xff\xd9")  # JPEG EOI
-            if start != -1 and end != -1 and end > start:
-                jpg = self.buf[start : end + 2]
-                self.buf = self.buf[end + 2 :]
-                frame = cv2.imdecode(np.frombuffer(jpg, np.uint8), cv2.IMREAD_COLOR)
-                return frame is not None, frame
-            if len(self.buf) > 10_000_000:  # 10MB safety valve
-                self.buf = b""
+        if "frames_to_process" in st.session_state.knobs["System"]:
+            frames_to_process = st.session_state.knobs["System"]["frames_to_process"][
+                "value"
+            ]
+        else:
+            frames_to_process = 10
+
+        # grab the number of frames requested to be processed
+        frames = []
+        for count in range(frames_to_process):
+            # Inner loop: accumulate until we have a complete frame
+            while True:
+                self.buf += self.sock.recv(65536)
+                start = self.buf.find(b"\xff\xd8")
+                end = self.buf.find(b"\xff\xd9")
+                # FIX: circuit breaker - bail if buffer grows without a valid frame
+                if len(self.buf) > 10_000_000:
+                    logger.warning(
+                        f"Buffer overflow without valid frame on frame {count}, flushing buffer"
+                    )
+                    self.buf = b""
+                    break
+                if start != -1 and end != -1 and end > start:
+                    logger.debug(
+                        f"Frame {count}: complete JPEG found at [{start}:{end+2}], buf size={len(self.buf)}"
+                    )
+                    break  # got a complete frame
+                else:
+                    logger.debug(
+                        f"Frame {count}: incomplete JPEG in buffer, accumulating (buf size={len(self.buf)})"
+                    )
+
+            jpg = self.buf[start : end + 2]
+            self.buf = self.buf[end + 2 :]
+            frame = cv2.imdecode(np.frombuffer(jpg, np.uint8), cv2.IMREAD_COLOR)
+            if frame is not None:
+                logger.debug(
+                    f"Frame {count}: decoded successfully, shape={frame.shape}"
+                )
+                frames.append(frame)
+            else:
+                logger.warning(f"Frame {count}: cv2.imdecode returned None, skipping")
+
+        logger.info(f"Read complete: {len(frames)}/{frames_to_process} frames captured")
+        return frames
 
     def release(self):
         self.sock.close()
@@ -45,8 +80,8 @@ def process_frame(frame):
     notes = {"info": {}, "image": {}}
     notes["info"]["frame_shape"] = frame.shape
 
-    # Make a copy, do we dont change the original
-    original_image = frame
+    original_image = frame.copy()
+    logger.debug("Frame copied for processing")
 
     # Scaling
     scale = st.session_state.knobs["System"]["image_processing_scale"]["value"]
@@ -55,7 +90,9 @@ def process_frame(frame):
     notes["info"]["resized_shape"] = resized_image.shape
 
     # Marker
-    marker_mm = st.session_state.knobs["System"]["image_processing_marker_size_mm"]["value"]
+    marker_mm = st.session_state.knobs["System"]["image_processing_marker_size_mm"][
+        "value"
+    ]
     logger.info(f"Marker size (mm): {marker_mm}")
     notes["info"]["marker_size_mm"] = marker_mm
     marker_scaled_mm = marker_mm * scale
@@ -76,8 +113,14 @@ def process_frame(frame):
     dp = st.session_state.knobs["Hough Circles"]["hg_circles_dp"]["value"]
     param1 = st.session_state.knobs["Hough Circles"]["hg_circles_param1"]["value"]
     param2 = st.session_state.knobs["Hough Circles"]["hg_circles_param2"]["value"]
-    minRadius = int(height / st.session_state.knobs["Hough Circles"]["hg_circles_minRadius"]["value"])
-    maxRadius = int(height / st.session_state.knobs["Hough Circles"]["hg_circles_maxRadius"]["value"])
+    minRadius = int(
+        height
+        / st.session_state.knobs["Hough Circles"]["hg_circles_minRadius"]["value"]
+    )
+    maxRadius = int(
+        height
+        / st.session_state.knobs["Hough Circles"]["hg_circles_maxRadius"]["value"]
+    )
     minDist = max(height, width)
 
     circle_result, circles = circle(
@@ -90,7 +133,9 @@ def process_frame(frame):
         notes["info"]["circles"] = circles
         notes["image"]["resulting_image"] = resulting_image
     else:
-        circle_path = st.session_state.knobs["Hough Circles"]["hg_circles_path"]["value"]
+        circle_path = st.session_state.knobs["Hough Circles"]["hg_circles_path"][
+            "value"
+        ]
         next_img = gray_gauss_otsu
         for step in circle_path:
 
@@ -110,6 +155,9 @@ def process_frame(frame):
                 notes["image"]["resulting_image"] = circle_result
                 break
         else:
+            logger.warning(
+                "Circle detection exhausted all path steps without finding a circle"
+            )
             notes["status"] = "failed"
             notes["message"] = "No circles detected"
             return notes
@@ -125,8 +173,9 @@ def process_frame(frame):
         detect_tag,
         detect_nthreads,
         detect_quad_decimate,
+        detect_quad_sigma,
         detect_refine_edges,
-        bgr
+        bgr,
     )
 
     num_markers = len(marker) if marker else 0
@@ -134,38 +183,52 @@ def process_frame(frame):
     notes["info"]["markers"] = marker
 
     marker_path = st.session_state.knobs["Marker"]["marker_detection_path"]["value"]
-    next_img = gray
-    for step in marker_path:
-        if num_markers == 1:
-            notes["info"]["num_markers"] = num_markers
-            notes["image"]["resulting_image"] = marker_result
-            break
-        logger.info(f"Retrying marker detection with step: {step}")
-        step_fn = MARKER_DETECTION_STEPS.get(step)
-        if step_fn is None:
-            logger.warning(f"Step function not found for step: {step}")
-            continue
-        logger.info(f"Applying step function: {step}")
-        next_img = step_fn(next_img)
-        marker_result, markers = get_marker(
-            next_img,
-            detect_tag,
-            detect_nthreads,
-            detect_quad_decimate,
-            detect_refine_edges,
-            bgr,
-        )
-        num_markers = len(markers) if markers else 0
+
+    if num_markers == 1:
+        logger.info("Marker found on initial detection, skipping path retry")
         notes["info"]["num_markers"] = num_markers
-        notes["info"]["markers"] = markers
+        notes["image"]["resulting_image"] = marker_result
     else:
-        notes["status"] = "failed"
-        notes["message"] = "No markers detected"
-        return notes
+        logger.info(
+            f"Initial marker detection found {num_markers}, entering path retry with {len(marker_path)} steps"
+        )
+        next_img = gray
+        for step in marker_path:
+            logger.info(f"Retrying marker detection with step: {step}")
+            step_fn = MARKER_DETECTION_STEPS.get(step)
+            if step_fn is None:
+                logger.warning(f"Step function not found for step: {step}")
+                continue
+            logger.info(f"Applying step function: {step}")
+            next_img = step_fn(next_img)
+            marker_result, markers = get_marker(
+                next_img,
+                detect_tag,
+                detect_nthreads,
+                detect_quad_decimate,
+                detect_quad_sigma,
+                detect_refine_edges,
+                bgr,
+            )
+            num_markers = len(markers) if markers else 0
+            notes["info"]["num_markers"] = num_markers
+            notes["info"]["markers"] = markers
+            if num_markers == 1:
+                logger.info(f"Marker found after step '{step}'")
+                notes["image"]["resulting_image"] = marker_result
+                break
+        else:
+            logger.warning(
+                "Marker detection exhausted all path steps without finding a marker"
+            )
+            notes["status"] = "failed"
+            notes["message"] = "No markers detected"
+            return notes
+
     return notes
 
 
-def grayscale(image): 
+def grayscale(image):
     logger.info(f"Converting image to grayscale")
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -204,8 +267,8 @@ def filter2d(image):
 
 
 def canny(image):
-    threshold1=st.session_state.knobs["Canny"]["canny_threshold1"]["value"] 
-    threshold2=st.session_state.knobs["Canny"]["canny_threshold2"]["value"]
+    threshold1 = st.session_state.knobs["Canny"]["canny_threshold1"]["value"]
+    threshold2 = st.session_state.knobs["Canny"]["canny_threshold2"]["value"]
     logger.info(
         f"Applying Canny edge detection with thresholds: {threshold1}, {threshold2}"
     )
@@ -235,39 +298,57 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
 
     return bgr_out, circles
 
+
 @st.cache_resource
-def get_detector(families, nthreads, quad_decimate, refine_edges):
+def get_detector(families, nthreads, quad_decimate, quad_sigma, refine_edges):
+    logger.info(
+        f"Creating detector: families={families}, nthreads={nthreads}, quad_decimate={quad_decimate}, quad_sigma={quad_sigma}, refine_edges={refine_edges}"
+    )
     return Detector(
         families=families,
         nthreads=nthreads,
         quad_decimate=quad_decimate,
+        quad_sigma=quad_sigma,
         refine_edges=refine_edges,
     )
+
+
 def get_marker(
     image,
     detect_tag,
     detect_nthreads,
     detect_quad_decimate,
+    detect_quad_sigma,
     detect_refine_edges,
     bgr,
 ):
     bgr_out = bgr.copy()
-    detector = get_detector(detect_tag, detect_nthreads, detect_quad_decimate, detect_refine_edges)
+    detector = get_detector(
+        detect_tag,
+        detect_nthreads,
+        detect_quad_decimate,
+        detect_quad_sigma,
+        detect_refine_edges,
+    )
     tags = detector.detect(image)
     num_tags = len(tags) if tags is not None else 0
     logger.info(f"Number of tags detected: {num_tags}")
-    # MIN_DECISION_MARGIN = 20.0  # tune this threshold
 
     if tags is not None and num_tags > 0:
         # *** filter out low-confidence detections ***
-        min_decision_margin = st.session_state.knobs["Marker"]["min_decision_margin"]["value"]
+        min_decision_margin = st.session_state.knobs["Marker"]["min_decision_margin"][
+            "value"
+        ]
         tags = [t for t in tags if t.decision_margin >= min_decision_margin]
         num_tags = len(tags)
-        logger.info(f"Tags after confidence filter: {num_tags}")
+        logger.info(
+            f"Tags after confidence filter (min_margin={min_decision_margin}): {num_tags}"
+        )
         for tag in tags:
             cv2.polylines(bgr_out, [tag.corners.astype(int)], True, (0, 255, 0), 2)
 
     return bgr_out, tags
+
 
 MARKER_DETECTION_STEPS = {
     "clahe": clahe,
