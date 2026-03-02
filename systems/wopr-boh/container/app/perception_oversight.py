@@ -5,50 +5,135 @@ import time
 from lib.image_processing import (
     process_frame,
     open_camera,
+    start_process,
+    build_winner,
     MARKER_DETECTION_STEPS,
     CIRCLE_DETECTION_STEPS,
 )
-
+import pandas as pd
 from lib.helpers import setup_logger
 from lib.helpers import wopr_json
 logger = setup_logger()
 
 
 st.title("Perception Oversight")
+logger.info("starting out")
 
 # Get the cameras
 cameras = wopr_json["camera"]["camDict"]
+logger.info(f"Camera configuration: {cameras}")
 num_cameras = len(cameras)
 num_cols = num_cameras + 1
 logger.info(f"Number of cameras: {num_cameras}")
 
+captures = {}
+for i in range(num_cameras):
+    camera = cameras[str(i)]
+    try:
+        captures[i] = open_camera(camera["host"], camera["port"])
+    except Exception as e:
+        logger.error(f"Failed to open camera {i}: {e}")
+
 cols = st.columns(num_cols)
-placeholders = [[cols[i].empty(), cols[i].empty(), cols[i].empty()] for i in range(num_cameras)]
+placeholders = [
+    [cols[i].empty(), cols[i].empty(), cols[i].empty()] for i in range(num_cameras)
+]
+
+
+def loop():
+    loop_start = time.time()
+    for i, capture in captures.items():
+        logger.info(f"Processing camera {i}")
+        frames = capture.read()
+        logger.info(f"Captured {len(frames)} frames from camera {i}")
+        raw_placeholder, processed_placeholder, info_placeholder = placeholders[i]
+        if frames:
+            ranked_frames = start_process(frames)
+        logger.info(f"Ranked frames: {ranked_frames}")
+        top_frames = ranked_frames[
+            : st.session_state.knobs["System"]["num_top_frames"]["value"]
+        ]
+        num_ranked_frames = len(ranked_frames)
+
+        for frame_data in top_frames:
+            image = frame_data["frame"]
+            # Raw image
+            raw_placeholder.image(image, channels="BGR")
+            # Process the frames
+            resulting_data = process_frame(image)
+            # check if circle or marker not found and bail early
+            num_markers = resulting_data["info"].get("num_markers", 0)
+            num_circles = resulting_data["info"].get("num_circles", 0)
+            if num_markers == 0 or num_circles == 0:
+                logger.warning(
+                    f"Camera {i}: No markers or circles detected, skipping frame"
+                )
+                continue
+            processed_frame, process_results = build_winner(image, resulting_data)
+            with processed_placeholder.container():
+                st.image(processed_frame, channels="BGR")
+            with info_placeholder.container():
+                info = resulting_data["info"]
+                if process_results["status"] == "success":
+                    st.success("Processing successful")
+                else:
+                    st.warning(
+                        f"Processing failed: {process_results.get('message', 'Unknown error')}"
+                    )
+                # ~~~~~~~~~~~~~~~~~~~ CHANGED: dict-driven table instead of manual st.text() ~~~~~~~~~~~~~~~~~~~
+                table_data = {
+                    "Metric": [
+                        "Original Frame Size",
+                        "Resized Frame Size",
+                        "Marker Size (mm)",
+                        "Marker Size (scaled mm)",
+                        "Num Circles",
+                        "Circle Center",
+                        "Num Markers",
+                        "Marker Center",
+                    ],
+                    "Value": [
+                        f"{info.get('frame_shape', ['N/A','N/A'])[0]}x{info.get('frame_shape', ['N/A','N/A'])[1]}",
+                        f"{info.get('resized_shape', ['N/A','N/A'])[0]}x{info.get('resized_shape', ['N/A','N/A'])[1]}",
+                        info.get("marker_size_mm", "N/A"),
+                        info.get("marker_scaled_mm", "N/A"),
+                        info.get("num_circles", "N/A"),
+                        (
+                            str(info["circles"])
+                            if info.get("circles") is not None
+                            else "N/A"
+                        ),
+                        info.get("num_markers", "N/A"),
+                        str(info["marker"][0].center) if info.get("marker") else "N/A",
+                    ],
+                }
+                df = pd.DataFrame(table_data)
+                df["Value"] = df["Value"].astype(
+                    str
+                )  # force homogeneous types for Arrow
+                st.dataframe(df, hide_index=True, width="stretch")
+                st.json(process_results, expanded=False)
+                st.json(resulting_data["info"], expanded=False)
+
 
 if "knobs" not in st.session_state:
     st.session_state.knobs = {}
     st.session_state.knobs = {
         "System": {
-            "stream_snap": {
-                "key": "stream_snap",
-                "help": "Stream or Snapshot (False is snapshot, True is stream)",
-                "default": False,
-                "type": "checkbox",
-            },
-            "target_fps": {
-                "key": "target_fps",
-                "help": "Target frames per second for the video stream",
-                "default": 1,
-                "min": 1,
-                "max": 6,
-                "type": "slider",
-            },
             "frames_to_process": {
                 "key": "frames_to_process",
                 "help": "Number of frames to process at a time",
                 "default": 1,
                 "min": 1,
-                "max": 100,
+                "max": 16,
+                "type": "slider",
+            },
+            "num_top_frames": {
+                "key": "num_top_frames",
+                "help": "Number of top frames to select after processing",
+                "default": 1,
+                "min": 1,
+                "max": 10,
                 "type": "slider",
             },
             "image_processing_scale": {
@@ -59,12 +144,101 @@ if "knobs" not in st.session_state:
                 "max": 5.0,
                 "type": "slider",
             },
+            "tolerence": {
+                "key": "tolerence",
+                "help": "% fudge factor for image processing",
+                "default": 10,
+                "min": 1,
+                "max": 100,
+                "type": "slider",
+            },
+            "Laplacian to Tenengrad Ratio": {
+                "key": "laplacian_to_tenengrad_ratio",
+                "help": "Ratio of Laplacian to Tenengrad for image processing",
+                "default": 70,
+                "min": 1,
+                "max": 100,
+                "step": 1,
+                "type": "slider",
+            },
             "image_processing_marker_size_mm": {
                 "key": "img_proc_marker_size_mm",
                 "help": "Marker size in millimeters for image processing",
                 "default": 35,
                 "min": 1,
                 "max": 100,
+                "type": "slider",
+            },
+            "dist_btw_circle_marker_standard": {
+                "key": "dist_btw_circle_marker_standard",
+                "help": "Standard distance between circle and marker for image processing, in mm",
+                "default": 160,
+                "min": 1,
+                "max": 1000,
+                "type": "slider",
+            },
+            "circle_radius": {
+                "key": "circle_radius",
+                "help": "Radius of the circle for image processing",
+                "default": 160,
+                "min": 1,
+                "max": 1000,
+                "type": "slider",
+            },
+            "marker_color": {
+                "key": "marker_color",
+                "help": "Color of the marker for image processing",
+                "default": "#00FFAA",
+                "type": "color_picker",
+            },
+            "marker_line_thickness": {
+                "key": "marker_line_thickness",
+                "help": "Line thickness of the marker for image processing",
+                "default": 2,
+                "min": 1,
+                "max": 10,
+                "type": "slider",
+            },
+            "marker_center_color": {
+                "key": "marker_center_color",
+                "help": "Color of the marker center for image processing",
+                "default": "#0000FF",
+                "type": "color_picker",
+            },
+            "marker_center_size": {
+                "key": "marker_center_size",
+                "help": "Size of the marker center for image processing",
+                "default": 5,
+                "min": 1,
+                "max": 20,
+                "type": "slider",
+            },
+            "circle_color": {
+                "key": "circle_color",
+                "help": "Color of the circle for image processing",
+                "default": "#FF0000",
+                "type": "color_picker",
+            },
+            "circle_line_thickness": {
+                "key": "circle_line_thickness",
+                "help": "Line thickness of the circle for image processing",
+                "default": 2,
+                "min": 1,
+                "max": 10,
+                "type": "slider",
+            },
+            "circle_center_color": {
+                "key": "circle_center_color",
+                "help": "Color of the circle center for image processing",
+                "default": "#00FF00",
+                "type": "color_picker",
+            },
+            "circle_center_size": {
+                "key": "circle_center_size",
+                "help": "Size of the circle center for image processing",
+                "default": 5,
+                "min": 1,
+                "max": 20,
                 "type": "slider",
             },
         },
@@ -207,10 +381,15 @@ if "knobs" not in st.session_state:
             },
         },
     }
+    for group in st.session_state.knobs.values():
+        for knob in group.values():
+            knob["value"] = knob["default"]
 
 # Controls Column
 with cols[num_cols - 1]:
     st.subheader("Controls")
+    if st.button("Grab Reality"):
+        loop()
     # each knob has a group that it needs to be sorted by
     for group, knobs in st.session_state.knobs.items():
         with st.expander(group):
@@ -243,67 +422,9 @@ with cols[num_cols - 1]:
                         value=knob_info["default"],
                         key=knob_info["key"],
                     )
-
-captures = {}
-for i in range(num_cameras):
-    camera = cameras[str(i)]
-    try:
-        captures[i] = open_camera(camera['host'], camera['port'])
-    except Exception as e:
-        logger.error(f"Failed to open camera {i}: {e}")
-
-
-while True:
-    loop_start = time.time()
-    for i,capture in captures.items():
-        ret, frame = capture.read()
-
-        raw_placeholder, processed_placeholder, info_placeholder = placeholders[i]
-
-        if ret:
-            raw_placeholder.image(frame, channels="BGR")
-        else:
-            raw_placeholder.text("Camera disconnected")
-            continue
-
-        resulting_data = process_frame(frame)
-        logger.info(f"Received: {resulting_data}")
-
-        if "status" in resulting_data and resulting_data["status"] == "failed":
-            processed_placeholder.text(f"Message: {resulting_data.get('message', 'No message')}")
-            logger.info(f"Camera {i} frame process return: status: failed")
-            logger.info(f"Camera {i} frame process return: message: {resulting_data.get('message', 'No message')}")
-        else:
-            processed_placeholder.image(
-                resulting_data["image"]["resulting_image"], channels="BGR"
-            )
-
-        if "info" in resulting_data:
-            logger.info(f"Camera {i} info: {resulting_data['info']}")
-            with info_placeholder.container():
-                st.text("info:") 
-                frame_shape_x = resulting_data["info"]["frame_shape"][0] if "frame_shape" in resulting_data["info"] else "N/A"
-                frame_shape_y = resulting_data["info"]["frame_shape"][1] if "frame_shape" in resulting_data["info"] else "N/A"
-                resized_shape_x = resulting_data["info"]["resized_shape"][0] if "resized_shape" in resulting_data["info"] else "N/A"
-                resized_shape_y = resulting_data["info"]["resized_shape"][1] if "resized_shape" in resulting_data["info"] else "N/A"
-                marker_size_org_mm = resulting_data["info"]["marker_size_mm"] if "marker_size_mm" in resulting_data["info"] else "N/A"
-                marker_size_scaled_mm = resulting_data["info"]["marker_scaled_mm"] if "marker_scaled_mm" in resulting_data["info"] else "N/A"
-                num_circles = resulting_data["info"]["num_circles"] if "num_circles" in resulting_data["info"] else "N/A"
-                circle_center = resulting_data["info"]["circles"][0][:2] if "circles" in resulting_data["info"] and resulting_data["info"]["circles"] is not None else "N/A"
-                num_marker = resulting_data["info"]["num_markers"] if "num_markers" in resulting_data["info"] else "N/A"
-                marker_center = resulting_data["info"]["marker"][0].center if "marker" in resulting_data["info"] and resulting_data["info"]["marker"] else "N/A"
-                
-                st.text(f"Original Frame Size: {frame_shape_x}x{frame_shape_y}")
-                st.text(f"Resized Frame Size: {resized_shape_x}x{resized_shape_y}")
-                st.text(f"Marker Size (mm): {marker_size_org_mm}")
-                st.text(f"Marker Size (scaled mm): {marker_size_scaled_mm}")
-                st.text(f"Number of Circles: {num_circles}")
-                st.text(f"Circle Center: {circle_center}")
-                st.text(f"Number of Markers: {num_marker}")
-                st.text(f"Marker Center: {marker_center}")
-                st.json(resulting_data["info"], expanded=False)
-
-    target_fps = st.session_state.knobs["System"]["target_fps"]["value"]
-    elapsed = time.time() - loop_start
-    sleep_time = max(0, 1 / target_fps - elapsed)
-    time.sleep(sleep_time)
+                elif knob_info["type"] == "color_picker":
+                    knobs[knob_name]["value"] = st.color_picker(
+                        label=f"{knob_info['help']}; default: {knob_info['default']}",
+                        value=knob_info["default"],
+                        key=knob_info["key"],
+                    )

@@ -18,6 +18,7 @@ def open_camera(host, port):
 
 
 class MJPEGStream:
+    # Needs to be human re-written.
     def __init__(self, host, port):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, int(port)))
@@ -25,18 +26,16 @@ class MJPEGStream:
 
     def read(self):
         # Feed buffer until we have a complete JPEG
-        if "frames_to_process" in st.session_state.knobs["System"]:
-            frames_to_process = st.session_state.knobs["System"]["frames_to_process"][
-                "value"
-            ]
-        else:
-            frames_to_process = 10
+        frames_to_process = st.session_state.knobs["System"]["frames_to_process"][
+            "value"
+        ]
 
         # grab the number of frames requested to be processed
         frames = []
         for count in range(frames_to_process):
             # Inner loop: accumulate until we have a complete frame
             while True:
+                count += 1
                 self.buf += self.sock.recv(65536)
                 start = self.buf.find(b"\xff\xd8")
                 end = self.buf.find(b"\xff\xd9")
@@ -75,11 +74,80 @@ class MJPEGStream:
         self.sock.close()
 
 
+def start_process(frames):
+    """start processing frames
+    Walk through the set, and figure out which is the best by:
+    Blur/Sharpness - Laplacian
+    Edge clarity - Tenengrad
+    Over/under exposed - Histogram analysis
+    Shake/motion - FFT
+
+    Save each of the frames with their respective scores and notes
+
+    Then find the best (One, Three, or half the batch - how many to find)
+    num_top_frames = st.session_state.knobs["System"]["num_top_frames"]["value"]
+
+    return those
+
+    Args:
+        frames (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    logger.info(f"Starting process for {len(frames)} frames")
+    best_frame = None
+    notes = {"info": {"frame_shape": None, "scaled_shape": None}}
+    scores = []
+    scale = st.session_state.knobs["System"]["image_processing_scale"]["value"]
+
+    for frame in frames:
+        frame_copy = frame.copy()
+        notes["info"]["frame_shape"] = frame_copy.shape
+
+        frame_copy_scaled = scale_image(frame_copy)
+        notes["info"]["scaled_shape"] = frame_copy_scaled.shape
+
+        frame_copy_scaled_gray = grayscale(frame_copy_scaled)
+
+        score = score_frame(frame_copy_scaled_gray)
+        logger.info(f"Frame score: {score}")
+        scores.append(score)
+
+    logger.info(f"Processing complete for {len(frames)} frames")
+
+    ranked_frames = {"rank": None, "frame": None, "score": None, "combined_score": None}
+    combined_frames = []
+    ratio = st.session_state.knobs["System"]["Laplacian to Tenengrad Ratio"]["value"]
+    for frame, score in zip(frames, scores):
+        laplacian_score = score["laplacian"]
+        tenengrad_score = score["tenengrad"]
+        combined_score = laplacian_score * ratio + tenengrad_score * (1 - ratio)
+        combined_frames.append(
+            {"frame": frame, "score": score, "combined_score": combined_score}
+        )
+
+    ranked_frames = sorted(
+        combined_frames, key=lambda x: x["combined_score"], reverse=True
+    )
+
+    return ranked_frames
+
+
+def score_frame(frame):
+    logger.info("Scoring frame")
+    score = {}
+    laplacian_score = laplacian(frame)
+    tenengrad_score = tenengrad(frame)
+    score["laplacian"] = laplacian_score
+    score["tenengrad"] = tenengrad_score
+    return score
+
+
 def process_frame(frame):
-    logger.info(f"Processing frame: {frame.shape}")
+    logger.info(f"Processing frame")
     notes = {"info": {}, "image": {}}
     notes["info"]["frame_shape"] = frame.shape
-
     original_image = frame.copy()
     logger.debug("Frame copied for processing")
 
@@ -110,122 +178,49 @@ def process_frame(frame):
     gray_gauss_otsu = otsu(gray_gauss)
     notes["image"]["processed_gray"] = gray_gauss_otsu
 
-    dp = st.session_state.knobs["Hough Circles"]["hg_circles_dp"]["value"]
-    param1 = st.session_state.knobs["Hough Circles"]["hg_circles_param1"]["value"]
-    param2 = st.session_state.knobs["Hough Circles"]["hg_circles_param2"]["value"]
-    minRadius = int(
-        height
-        / st.session_state.knobs["Hough Circles"]["hg_circles_minRadius"]["value"]
-    )
-    maxRadius = int(
-        height
-        / st.session_state.knobs["Hough Circles"]["hg_circles_maxRadius"]["value"]
-    )
-    minDist = max(height, width)
-
-    circle_result, circles = circle(
-        gray_gauss_otsu, dp, minDist, param1, param2, minRadius, maxRadius, bgr
-    )
-    num_circles = len(circles) if circles is not None else 0
-    if num_circles == 1:
-        resulting_image = circle_result
-        notes["info"]["num_circles"] = num_circles
-        notes["info"]["circles"] = circles
-        notes["image"]["resulting_image"] = resulting_image
+    circle_result = circle(gray_gauss_otsu, height, width)
+    logger.info(f"Circle detection results: {circle_result}")
+    if "status" in circle_result and circle_result["status"] == "failure":
+        notes["status"] = "failed"
+        notes["message"] = "No circles detected"
+        return notes
     else:
-        circle_path = st.session_state.knobs["Hough Circles"]["hg_circles_path"][
-            "value"
-        ]
-        next_img = gray_gauss_otsu
-        for step in circle_path:
+        notes["info"]["num_circles"] = circle_result["message"].get("num_circles", 0)
+        notes["info"]["circles"] = circle_result["message"].get("circles", [])
+    logger.info(f"Notes so far: {notes}")
 
-            logger.info(f"Retrying circle detection with step: {step}")
-            step_fn = CIRCLE_DETECTION_STEPS.get(step)
-            if step_fn is None:
-                logger.warning(f"Step function not found for step: {step}")
-                continue
-            logger.info(f"Applying step function: {step}")
-            next_img = step_fn(next_img)
-            circle_result, circles = circle(
-                next_img, dp, minDist, param1, param2, minRadius, maxRadius, bgr
-            )
-            num_circles = len(circles) if circles is not None else 0
-            if num_circles == 1:
-                notes["info"]["num_circles"] = num_circles
-                notes["image"]["resulting_image"] = circle_result
-                break
-        else:
-            logger.warning(
-                "Circle detection exhausted all path steps without finding a circle"
-            )
-            notes["status"] = "failed"
-            notes["message"] = "No circles detected"
-            return notes
-
-    detect_tag = st.session_state.knobs["Marker"]["marker_type"]["value"]
-    detect_nthreads = st.session_state.knobs["Marker"]["nthreads"]["value"]
-    detect_quad_decimate = st.session_state.knobs["Marker"]["quad_decimate"]["value"]
-    detect_quad_sigma = st.session_state.knobs["Marker"]["quad_sigma"]["value"]
-    detect_refine_edges = st.session_state.knobs["Marker"]["quad_refine_edges"]["value"]
-
-    marker_result, marker = get_marker(
-        gray,
-        detect_tag,
-        detect_nthreads,
-        detect_quad_decimate,
-        detect_quad_sigma,
-        detect_refine_edges,
-        bgr,
-    )
-
-    num_markers = len(marker) if marker else 0
-    notes["info"]["num_markers"] = num_markers
-    notes["info"]["markers"] = marker
-
-    marker_path = st.session_state.knobs["Marker"]["marker_detection_path"]["value"]
-
-    if num_markers == 1:
-        logger.info("Marker found on initial detection, skipping path retry")
-        notes["info"]["num_markers"] = num_markers
-        notes["image"]["resulting_image"] = marker_result
+    # Marker time
+    marker_result = get_marker(gray)
+    logger.info(f"Marker detection results: {marker_result}")
+    if "status" in marker_result and marker_result["status"] == "failure":
+        notes["status"] = "failed"
+        notes["message"] = "No markers detected"
+        return notes
     else:
-        logger.info(
-            f"Initial marker detection found {num_markers}, entering path retry with {len(marker_path)} steps"
-        )
-        next_img = gray
-        for step in marker_path:
-            logger.info(f"Retrying marker detection with step: {step}")
-            step_fn = MARKER_DETECTION_STEPS.get(step)
-            if step_fn is None:
-                logger.warning(f"Step function not found for step: {step}")
-                continue
-            logger.info(f"Applying step function: {step}")
-            next_img = step_fn(next_img)
-            marker_result, markers = get_marker(
-                next_img,
-                detect_tag,
-                detect_nthreads,
-                detect_quad_decimate,
-                detect_quad_sigma,
-                detect_refine_edges,
-                bgr,
-            )
-            num_markers = len(markers) if markers else 0
-            notes["info"]["num_markers"] = num_markers
-            notes["info"]["markers"] = markers
-            if num_markers == 1:
-                logger.info(f"Marker found after step '{step}'")
-                notes["image"]["resulting_image"] = marker_result
-                break
-        else:
-            logger.warning(
-                "Marker detection exhausted all path steps without finding a marker"
-            )
-            notes["status"] = "failed"
-            notes["message"] = "No markers detected"
-            return notes
+        notes["info"]["num_markers"] = marker_result["message"].get("num_markers", 0)
+        notes["info"]["markers"] = marker_result["message"].get("markers", [])
 
+    logger.info(f"Returning notes: {notes}")
     return notes
+
+
+def tenengrad(image):
+    logger.info(f"Getting Tenengrad variance")
+    gx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+    gy = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+    tenengrad = float(np.mean(gx**2 + gy**2))
+    return tenengrad
+
+
+def laplacian(image):
+    logger.info(f"Getting Laplacian variance")
+    return cv2.Laplacian(image, cv2.CV_64F).var()
+
+
+def scale_image(image):
+    scale = st.session_state.knobs["System"]["image_processing_scale"]["value"]
+    logger.info(f"Scaling image by factor: {scale}")
+    return cv2.resize(image, (0, 0), fx=scale, fy=scale)
 
 
 def grayscale(image):
@@ -275,9 +270,21 @@ def canny(image):
     return cv2.Canny(image, threshold1, threshold2)
 
 
-def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
+def circle(image, height, width):
     logger.info(f"Detecting circles")
-    bgr_out = bgr.copy()
+    results = {"status": "unknown", "message": {}}
+    dp = st.session_state.knobs["Hough Circles"]["hg_circles_dp"]["value"]
+    param1 = st.session_state.knobs["Hough Circles"]["hg_circles_param1"]["value"]
+    param2 = st.session_state.knobs["Hough Circles"]["hg_circles_param2"]["value"]
+    minRadius = int(
+        height
+        / st.session_state.knobs["Hough Circles"]["hg_circles_minRadius"]["value"]
+    )
+    maxRadius = int(
+        height
+        / st.session_state.knobs["Hough Circles"]["hg_circles_maxRadius"]["value"]
+    )
+    minDist = max(height, width)
     circles = cv2.HoughCircles(
         image,
         cv2.HOUGH_GRADIENT,
@@ -291,12 +298,43 @@ def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
 
     num_circles = len(circles) if circles is not None else 0
     logger.info(f"Number of circles detected: {num_circles}")
-    if circles is not None:
-        circles = np.round(circles[0, :]).astype("int")
-        for x, y, r in circles:
-            cv2.circle(bgr_out, (x, y), r, (0, 255, 0), 4)
 
-    return bgr_out, circles
+    if num_circles != 1:
+        logger.info("Number of circles detected is not equal to 1")
+        circle_detection_path = st.session_state.knobs["Hough Circles"][
+            "hg_circles_path"
+        ]["value"]
+        for step in circle_detection_path:
+            logger.info(f"Circle detection step: {step}")
+            step_function = CIRCLE_DETECTION_STEPS.get(step)
+            if step_function:
+                image = step_function(image)
+                circles = cv2.HoughCircles(
+                    image,
+                    cv2.HOUGH_GRADIENT,
+                    dp=dp,
+                    minDist=minDist,
+                    param1=param1,
+                    param2=param2,
+                    minRadius=minRadius,
+                    maxRadius=maxRadius,
+                )
+                num_circles = len(circles) if circles is not None else 0
+                if num_circles == 1:
+                    break
+
+    if num_circles != 1:
+        logger.info("Unable to find the circle")
+        results["status"] = "failure"
+    else:
+        logger.info(
+            f"Circle detection successful: {num_circles} circle(s) found at {circles}"
+        )
+        results["status"] = "success"
+        results["message"]["num_circles"] = num_circles
+        results["message"]["circles"] = circles
+    logger.info(f"Circle detection results: {results}")
+    return results
 
 
 @st.cache_resource
@@ -313,16 +351,18 @@ def get_detector(families, nthreads, quad_decimate, quad_sigma, refine_edges):
     )
 
 
+def detect_marker(image, detector):
+    return detector.detect(image)
+
+
 def get_marker(
     image,
-    detect_tag,
-    detect_nthreads,
-    detect_quad_decimate,
-    detect_quad_sigma,
-    detect_refine_edges,
-    bgr,
 ):
-    bgr_out = bgr.copy()
+    detect_tag = st.session_state.knobs["Marker"]["marker_type"]["value"]
+    detect_nthreads = st.session_state.knobs["Marker"]["nthreads"]["value"]
+    detect_quad_decimate = st.session_state.knobs["Marker"]["quad_decimate"]["value"]
+    detect_quad_sigma = st.session_state.knobs["Marker"]["quad_sigma"]["value"]
+    detect_refine_edges = st.session_state.knobs["Marker"]["quad_refine_edges"]["value"]
     detector = get_detector(
         detect_tag,
         detect_nthreads,
@@ -330,24 +370,43 @@ def get_marker(
         detect_quad_sigma,
         detect_refine_edges,
     )
-    tags = detector.detect(image)
-    num_tags = len(tags) if tags is not None else 0
-    logger.info(f"Number of tags detected: {num_tags}")
+    results = {"status": "unknown", "message": {}}
+    markers = detect_marker(image, detector)
+    num_markers = len(markers) if markers is not None else 0
+    logger.info(f"Number of markers detected: {num_markers}")
 
-    if tags is not None and num_tags > 0:
-        # *** filter out low-confidence detections ***
-        min_decision_margin = st.session_state.knobs["Marker"]["min_decision_margin"][
-            "value"
-        ]
-        tags = [t for t in tags if t.decision_margin >= min_decision_margin]
-        num_tags = len(tags)
+    if num_markers != 1:
         logger.info(
-            f"Tags after confidence filter (min_margin={min_decision_margin}): {num_tags}"
+            f"Initial marker detection found {num_markers}, entering path retry steps"
         )
-        for tag in tags:
-            cv2.polylines(bgr_out, [tag.corners.astype(int)], True, (0, 255, 0), 2)
+        next_img = image
+        marker_path = st.session_state.knobs["Marker"]["marker_detection_path"]["value"]
+        for step in marker_path:
+            logger.info(f"Retrying marker detection with step: {step}")
+            step_fn = MARKER_DETECTION_STEPS.get(step)
+            if step_fn is None:
+                logger.warning(f"Step function not found for step: {step}")
+                continue
+            logger.info(f"Applying step function: {step}")
+            next_img = step_fn(next_img)
+            markers = detect_marker(next_img, detector)
+            num_markers = len(markers) if markers else 0
+            results["message"]["num_markers"] = num_markers
+            results["message"]["markers"] = markers
+            if num_markers == 1:
+                logger.info(f"Marker found after step '{step}'")
+                break
 
-    return bgr_out, tags
+    if num_markers != 1:
+        logger.info(f"Markers detected: {num_markers}")
+        results["status"] = "failure"
+    else:
+        logger.info("Marker found")
+        results["status"] = "success"
+    results["message"]["num_markers"] = num_markers
+    results["message"]["markers"] = markers
+    logger.info(f"Marker detection results: {results}")
+    return results
 
 
 MARKER_DETECTION_STEPS = {
@@ -364,3 +423,124 @@ CIRCLE_DETECTION_STEPS = {
     "filter2d": filter2d,
     "canny": canny,
 }
+
+
+def build_winner(image, resulting_data):
+    logger.info(f"Building image with resulting data: {resulting_data}")
+    results = {"status": "unknown", "message": {}}
+    scale = st.session_state.knobs["System"]["image_processing_scale"]["value"]
+    marker_mm = st.session_state.knobs["System"]["image_processing_marker_size_mm"][
+        "value"
+    ]
+
+    inv_scale = 1.0 / scale
+    # Markers
+    markers = resulting_data["info"]["markers"]
+    color_marker_rgb_tuple = st.session_state.knobs["System"]["marker_color"]["value"]
+    color_marker = hex_to_bgr(color_marker_rgb_tuple)
+    logger.info(f"Marker color: {color_marker}")
+    marker_line_thickness = st.session_state.knobs["System"]["marker_line_thickness"][
+        "value"
+    ]
+    marker_center_color_rgb_tuple = st.session_state.knobs["System"][
+        "marker_center_color"
+    ]["value"]
+    marker_center_color = hex_to_bgr(marker_center_color_rgb_tuple)
+    logger.info(f"Marker center color: {marker_center_color}")
+    marker_center_size = st.session_state.knobs["System"]["marker_center_size"]["value"]
+    for marker in markers:
+        scaled_corners = (marker.corners * inv_scale).astype(int)
+        cv2.polylines(
+            image, [scaled_corners], True, color_marker, marker_line_thickness
+        )
+        # Put a dot at the center
+        cv2.circle(
+            image,
+            (int(marker.center[0] * inv_scale), int(marker.center[1] * inv_scale)),
+            marker_center_size,
+            marker_center_color,
+            -1,
+        )
+    marker_side_length_px = np.linalg.norm(
+        (inv_scale * marker.corners[0]) - (inv_scale * marker.corners[1])
+    )
+    px_per_mm = marker_side_length_px / marker_mm
+    # Circles
+    circles = resulting_data["info"]["circles"]
+    color_circle_rgb_tuple = st.session_state.knobs["System"]["circle_color"]["value"]
+    color_circle = hex_to_bgr(color_circle_rgb_tuple)
+    circle_line_thickness = st.session_state.knobs["System"]["circle_line_thickness"][
+        "value"
+    ]
+    circle_center_color_rgb_tuple = st.session_state.knobs["System"][
+        "circle_center_color"
+    ]["value"]
+    circle_center_color = hex_to_bgr(circle_center_color_rgb_tuple)
+    circle_center_size = st.session_state.knobs["System"]["circle_center_size"]["value"]
+    x, y, r = np.round(circles[0, 0, :]).astype("int")
+    x = int(x * inv_scale)
+    y = int(y * inv_scale)
+    r = int(r * inv_scale)
+    cv2.circle(image, (x, y), r, color_circle, circle_line_thickness)
+    cv2.circle(image, (x, y), circle_center_size, circle_center_color, -1)
+
+    circle_center_xy = (x, y)
+    marker_center_xy = (
+        int(markers[0].center[0] * inv_scale),
+        int(markers[0].center[1] * inv_scale),
+    )
+
+    dist_btw_circle_marker_px = np.linalg.norm(
+        np.array(circle_center_xy) - np.array(marker_center_xy)
+    )
+    dist_btw_circle_marker_mm = dist_btw_circle_marker_px / px_per_mm
+
+    logger.info(
+        f"Distance between circle and marker: {dist_btw_circle_marker_px}px ({dist_btw_circle_marker_mm}mm)"
+    )
+    results["dist_btw_circle_marker_px"] = dist_btw_circle_marker_px
+    results["dist_btw_circle_marker_mm"] = dist_btw_circle_marker_mm
+
+    dist_btw_circle_marker_standard = st.session_state.knobs["System"][
+        "dist_btw_circle_marker_standard"
+    ]["value"]
+
+    circle_radius = st.session_state.knobs["System"]["circle_radius"]["value"]
+    # fudge_factor is the percentage to allow deviation from the standard distance
+    fudge_factor = st.session_state.knobs["System"]["tolerence"]["value"]
+    diff_mark_stand = abs(dist_btw_circle_marker_mm - dist_btw_circle_marker_standard)
+    fud_m_s = dist_btw_circle_marker_standard * fudge_factor / 100
+    if diff_mark_stand > fud_m_s:
+        logger.warning("Distance between circle and marker is out of tolerance")
+        results["status"] = "error"
+        results["message"] = (
+            f"Distance between circle and marker is out of tolerance: |ms: {dist_btw_circle_marker_mm} |s: {dist_btw_circle_marker_standard} |d: {diff_mark_stand} |f: {fud_m_s}"
+        )
+    else:
+        r_mm = r / px_per_mm
+        diff_r_circ = abs(r_mm - circle_radius)
+        fud_r_cir = circle_radius * fudge_factor / 100
+        if diff_r_circ > fud_r_cir:
+            logger.warning("Circle radius is out of tolerance")
+            results["status"] = "error"
+            results["message"] = (
+                f"Circle radius is out of tolerance: |r: {r_mm} |c: {circle_radius} |d: {diff_r_circ} |f: {fud_r_cir}"
+            )
+        else:
+            logger.info("Circle radius is within tolerance")
+            results["status"] = "success"
+
+    results["circle"] = {"radius": r, "center": (x, y)}
+    results["marker"] = {
+        "center": (
+            int(markers[0].center[0] * inv_scale),
+            int(markers[0].center[1] * inv_scale),
+        )
+    }
+    return image, results
+
+
+def hex_to_bgr(hex_color: str) -> tuple:
+    hex_color = hex_color.lstrip("#")
+    r, g, b = [int(hex_color[i : i + 2], 16) for i in (0, 2, 4)]
+    return (b, g, r)
