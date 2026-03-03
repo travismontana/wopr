@@ -33,6 +33,7 @@ for i in range(num_cameras):
         captures[i] = open_camera(camera["host"], camera["port"])
     except Exception as e:
         logger.error(f"Failed to open camera {i}: {e}")
+        captures[i] = None
 
 cols = st.columns(num_cols)
 placeholders = [
@@ -44,11 +45,18 @@ def loop():
     loop_start = time.time()
     for i, capture in captures.items():
         logger.info(f"Processing camera {i}")
+        if capture is None:
+            logger.warning(f"Camera {i} is not available")
+            st.warning(f"Camera {i} is not available")
+            continue
         frames = capture.read()
         logger.info(f"Captured {len(frames)} frames from camera {i}")
         raw_placeholder, processed_placeholder, info_placeholder = placeholders[i]
         if frames:
             ranked_frames = start_process(frames)
+        else:
+            st.error(f"Camera {i}: No frames captured")
+            continue
         logger.info(f"Ranked frames: {ranked_frames}")
         top_frames = ranked_frames[
             : st.session_state.knobs["System"]["num_top_frames"]["value"]
@@ -61,59 +69,106 @@ def loop():
             raw_placeholder.image(image, channels="BGR")
             # Process the frames
             resulting_data = process_frame(image)
-            # check if circle or marker not found and bail early
-            num_markers = resulting_data["info"].get("num_markers", 0)
-            num_circles = resulting_data["info"].get("num_circles", 0)
-            if num_markers == 0 or num_circles == 0:
-                logger.warning(
-                    f"Camera {i}: No markers or circles detected, skipping frame"
-                )
-                continue
-            processed_frame, process_results = build_winner(image, resulting_data)
+            processed_gray = resulting_data["image"]["processed_gray"]
+            if "roi_masked" in resulting_data["image"]:
+                roi_masked = resulting_data["image"]["roi_masked"]
+            else:
+                roi_masked = None
             with processed_placeholder.container():
-                st.image(processed_frame, channels="BGR")
-            with info_placeholder.container():
-                info = resulting_data["info"]
-                if process_results["status"] == "success":
-                    st.success("Processing successful")
-                else:
-                    st.warning(
-                        f"Processing failed: {process_results.get('message', 'Unknown error')}"
+                st.image(processed_gray, channels="GRAY", caption="Processed Gray")
+                if roi_masked is not None:
+                    st.image(roi_masked, channels="GRAY", caption="ROI Masked")
+                # check if circle or marker not found and bail early
+                num_markers = resulting_data["info"].get("num_markers", 0)
+                num_circles = resulting_data["info"].get("num_circles", 0)
+                # num_lines = resulting_data["info"]["lines"].get("num_lines", 0)
+                if num_markers == 0 or num_circles == 0:
+                    logger.warning(
+                        f"Camera {i}: No markers or circles detected, skipping frame"
                     )
-                # ~~~~~~~~~~~~~~~~~~~ CHANGED: dict-driven table instead of manual st.text() ~~~~~~~~~~~~~~~~~~~
-                table_data = {
-                    "Metric": [
-                        "Original Frame Size",
-                        "Resized Frame Size",
-                        "Marker Size (mm)",
-                        "Marker Size (scaled mm)",
-                        "Num Circles",
-                        "Circle Center",
-                        "Num Markers",
-                        "Marker Center",
-                    ],
-                    "Value": [
-                        f"{info.get('frame_shape', ['N/A','N/A'])[0]}x{info.get('frame_shape', ['N/A','N/A'])[1]}",
-                        f"{info.get('resized_shape', ['N/A','N/A'])[0]}x{info.get('resized_shape', ['N/A','N/A'])[1]}",
-                        info.get("marker_size_mm", "N/A"),
-                        info.get("marker_scaled_mm", "N/A"),
-                        info.get("num_circles", "N/A"),
-                        (
-                            str(info["circles"])
-                            if info.get("circles") is not None
-                            else "N/A"
-                        ),
-                        info.get("num_markers", "N/A"),
-                        str(info["marker"][0].center) if info.get("marker") else "N/A",
-                    ],
-                }
-                df = pd.DataFrame(table_data)
-                df["Value"] = df["Value"].astype(
-                    str
-                )  # force homogeneous types for Arrow
-                st.dataframe(df, hide_index=True, width="stretch")
-                st.json(process_results, expanded=False)
-                st.json(resulting_data["info"], expanded=False)
+                    logger.info(f"Camera {i} Data: {resulting_data}")
+                    st.error(
+                        f"Camera {i}: No markers or circles detected, skipping frame"
+                    )
+                    msg = resulting_data.get("message", {})
+                    st.error(msg.get("error", "Detection failed"))
+                    for det_type, det_steps in msg.items():
+                        if det_type == "error":
+                            continue
+                        st.subheader(f"Camera {i}: {det_type} steps")
+                        for step, step_info in det_steps.items():
+                            st.error(
+                                f"Step: {step} — found: {step_info.get('num_circles') or step_info.get('num_markers', 0)}"
+                            )
+                            work_image = step_info["image"]
+                            st.image(work_image, caption=f"Step {step}")
+                            st.write(
+                                {k: v for k, v in step_info.items() if k != "image"}
+                            )
+                else:  # p_frame: the image; p_results: the data
+                    processed_frame, process_results = build_winner(
+                        image, resulting_data
+                    )
+                    st.image(processed_frame, channels="BGR", caption="Processed Frame")
+
+                    info = resulting_data["info"]
+                    logger.info(f"Camera {i} Info: {info}")
+                    if (
+                        process_results is not None
+                        and process_results["status"] == "success"
+                    ):
+                        st.success("Processing successful")
+                        table_data = {
+                            "Metric": [
+                                "Original Frame Size",
+                                "Resized Frame Size",
+                                "Marker Size (mm)",
+                                "Marker Size (scaled mm)",
+                                "Num Circles",
+                                "Circle Center",
+                                "Circle Radius px",
+                                "Circle Radius mm",
+                                "Num Markers",
+                                "Marker Center",
+                                "Dist between Marker and Circle",
+                            ],
+                            "Value": [
+                                f"{info.get('frame_shape', ['N/A','N/A'])[0]}x{info.get('frame_shape', ['N/A','N/A'])[1]}",
+                                f"{info.get('resized_shape', ['N/A','N/A'])[0]}x{info.get('resized_shape', ['N/A','N/A'])[1]}",
+                                info.get("marker_size_mm", "N/A"),
+                                info.get("marker_scaled_mm", "N/A"),
+                                info.get("num_circles", "N/A"),
+                                (
+                                    str(info["circles"])
+                                    if info.get("circles") is not None
+                                    else "N/A"
+                                ),
+                                str(
+                                    process_results.get("circle", {}).get(
+                                        "radius", "N/A"
+                                    )
+                                ),
+                                f"{process_results.get('circle', {}).get('radius_mm', 0):.2f}mm",
+                                info.get("num_markers", "N/A"),
+                                (
+                                    str(info["markers"][0].center)
+                                    if info.get("markers")
+                                    else "N/A"
+                                ),
+                                f"{process_results.get('dist_btw_circle_marker_mm', 'N/A'):.2f}mm",
+                            ],
+                        }
+                        df = pd.DataFrame(table_data)
+                        df["Value"] = df["Value"].astype(
+                            str
+                        )  # force homogeneous types for Arrow
+                        st.dataframe(df, hide_index=True, width="stretch")
+                        st.json(process_results, expanded=False)
+                    else:
+                        st.warning(
+                            f"Processing failed: {process_results.get('message', 'Unknown error')}"
+                        )
+                    st.json(resulting_data["info"], expanded=False)
 
 
 if "knobs" not in st.session_state:
@@ -147,7 +202,7 @@ if "knobs" not in st.session_state:
             "tolerence": {
                 "key": "tolerence",
                 "help": "% fudge factor for image processing",
-                "default": 10,
+                "default": 15,
                 "min": 1,
                 "max": 100,
                 "type": "slider",
@@ -172,7 +227,7 @@ if "knobs" not in st.session_state:
             "dist_btw_circle_marker_standard": {
                 "key": "dist_btw_circle_marker_standard",
                 "help": "Standard distance between circle and marker for image processing, in mm",
-                "default": 160,
+                "default": 180,
                 "min": 1,
                 "max": 1000,
                 "type": "slider",
@@ -194,9 +249,9 @@ if "knobs" not in st.session_state:
             "marker_line_thickness": {
                 "key": "marker_line_thickness",
                 "help": "Line thickness of the marker for image processing",
-                "default": 2,
+                "default": 10,
                 "min": 1,
-                "max": 10,
+                "max": 25,
                 "type": "slider",
             },
             "marker_center_color": {
@@ -208,9 +263,9 @@ if "knobs" not in st.session_state:
             "marker_center_size": {
                 "key": "marker_center_size",
                 "help": "Size of the marker center for image processing",
-                "default": 5,
+                "default": 25,
                 "min": 1,
-                "max": 20,
+                "max": 50,
                 "type": "slider",
             },
             "circle_color": {
@@ -222,9 +277,9 @@ if "knobs" not in st.session_state:
             "circle_line_thickness": {
                 "key": "circle_line_thickness",
                 "help": "Line thickness of the circle for image processing",
-                "default": 2,
+                "default": 10,
                 "min": 1,
-                "max": 10,
+                "max": 25,
                 "type": "slider",
             },
             "circle_center_color": {
@@ -236,9 +291,9 @@ if "knobs" not in st.session_state:
             "circle_center_size": {
                 "key": "circle_center_size",
                 "help": "Size of the circle center for image processing",
-                "default": 5,
+                "default": 25,
                 "min": 1,
-                "max": 20,
+                "max": 50,
                 "type": "slider",
             },
         },
@@ -377,6 +432,53 @@ if "knobs" not in st.session_state:
                 "default": 200,
                 "min": 0,
                 "max": 255,
+                "type": "slider",
+            },
+        },
+        "Hough Lines P": {
+            "hlp_rho": {
+                "group": "Hough Lines P",
+                "key": "hlp_rho",
+                "help": "Hough Lines P rho value",
+                "default": 1,
+                "min": 1,
+                "max": 10,
+                "type": "slider",
+            },
+            "hlp_theta": {
+                "group": "Hough Lines P",
+                "key": "hlp_theta",
+                "help": "Hough Lines P theta value",
+                "default": 1,
+                "min": 1,
+                "max": 10,
+                "type": "slider",
+            },
+            "hlp_threshold": {
+                "group": "Hough Lines P",
+                "key": "hlp_threshold",
+                "help": "Hough Lines P threshold value",
+                "default": 50,
+                "min": 1,
+                "max": 100,
+                "type": "slider",
+            },
+            "hlp_min_line_length": {
+                "group": "Hough Lines P",
+                "key": "hlp_min_line_length",
+                "help": "Hough Lines P minimum line length",
+                "default": 50,
+                "min": 1,
+                "max": 200,
+                "type": "slider",
+            },
+            "hlp_max_line_gap": {
+                "group": "Hough Lines P",
+                "key": "hlp_max_line_gap",
+                "help": "Hough Lines P maximum line gap",
+                "default": 10,
+                "min": 1,
+                "max": 50,
                 "type": "slider",
             },
         },

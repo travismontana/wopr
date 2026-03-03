@@ -150,7 +150,8 @@ def process_frame(frame):
     notes["info"]["frame_shape"] = frame.shape
     original_image = frame.copy()
     logger.debug("Frame copied for processing")
-
+    circles = []
+    markers = []
     # Scaling
     scale = st.session_state.knobs["System"]["image_processing_scale"]["value"]
     logger.info(f"Image processing scale: {scale}")
@@ -182,7 +183,11 @@ def process_frame(frame):
     logger.info(f"Circle detection results: {circle_result}")
     if "status" in circle_result and circle_result["status"] == "failure":
         notes["status"] = "failed"
-        notes["message"] = "No circles detected"
+        notes["message"] = {
+            "error": "No circles detected",
+            "circle": circle_result["message"].get("steps", {}).get("circle", {}),
+        }
+        logger.info(f"Circle detection failed: {notes}")
         return notes
     else:
         notes["info"]["num_circles"] = circle_result["message"].get("num_circles", 0)
@@ -194,16 +199,41 @@ def process_frame(frame):
     logger.info(f"Marker detection results: {marker_result}")
     if "status" in marker_result and marker_result["status"] == "failure":
         notes["status"] = "failed"
-        notes["message"] = "No markers detected"
+        notes["message"] = {
+            "error": "No markers detected",
+            "circle": circle_result["message"].get("steps", {}).get("circle", {}),
+            "marker": marker_result["message"].get("steps", {}).get("marker", {}),
+        }
+        logger.info(f"Marker detection failed: {notes}")
         return notes
     else:
         notes["info"]["num_markers"] = marker_result["message"].get("num_markers", 0)
         notes["info"]["markers"] = marker_result["message"].get("markers", [])
 
+    # Lines
+    # [ x, y]
+    marker_center = (
+        marker_result["message"]["markers"][0].center
+        if marker_result["message"].get("markers")
+        else (0, 0)
+    )
+
+    # [[[ x y r ]]] needs to be [ x, y ]
+    circles = notes["info"]["circles"]
+    circle_center = circles[0][0][:2] if circles is not None else (0, 0)
+    r = circles[0][0][2] if circles is not None else 0
+    logger.info(f"Marker center: {marker_center}, Circle center: {circle_center}")
+
+    lines_result = get_lines(gray, marker_center, circle_center, r)
+    notes["info"]["lines"] = lines_result
+    # lines_image = lines_result["image"]["lines"]
+    roi_masked_image = lines_result["image"]["lines"]["roi_masked"]
+    # notes["image"]["lines"] = lines_image
+    notes["image"]["roi_masked"] = roi_masked_image
     logger.info(f"Returning notes: {notes}")
     return notes
 
-
+#######################################################################################
 def tenengrad(image):
     logger.info(f"Getting Tenengrad variance")
     gx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
@@ -272,7 +302,7 @@ def canny(image):
 
 def circle(image, height, width):
     logger.info(f"Detecting circles")
-    results = {"status": "unknown", "message": {}}
+    results = {"status": "unknown", "message": {"steps": {}}}
     dp = st.session_state.knobs["Hough Circles"]["hg_circles_dp"]["value"]
     param1 = st.session_state.knobs["Hough Circles"]["hg_circles_param1"]["value"]
     param2 = st.session_state.knobs["Hough Circles"]["hg_circles_param2"]["value"]
@@ -298,6 +328,13 @@ def circle(image, height, width):
 
     num_circles = len(circles) if circles is not None else 0
     logger.info(f"Number of circles detected: {num_circles}")
+    results["message"]["steps"]["circle"] = {}
+    results["message"]["steps"]["circle"]["gray"] = {
+        "step": "initial",
+        "num_circles": num_circles,
+        "circles": circles,
+        "image": image,
+    }
 
     if num_circles != 1:
         logger.info("Number of circles detected is not equal to 1")
@@ -320,6 +357,12 @@ def circle(image, height, width):
                     maxRadius=maxRadius,
                 )
                 num_circles = len(circles) if circles is not None else 0
+                results["message"]["steps"]["circle"][step] = {
+                    "step": step,
+                    "num_circles": num_circles,
+                    "circles": circles,
+                    "image": image,
+                }
                 if num_circles == 1:
                     break
 
@@ -370,11 +413,18 @@ def get_marker(
         detect_quad_sigma,
         detect_refine_edges,
     )
-    results = {"status": "unknown", "message": {}}
+    results = {"status": "unknown", "message": {"steps": {}}}
     markers = detect_marker(image, detector)
     num_markers = len(markers) if markers is not None else 0
     logger.info(f"Number of markers detected: {num_markers}")
-
+    results["message"]["steps"] = {}
+    results["message"]["steps"]["marker"] = {}
+    results["message"]["steps"]["marker"]["gray"] = {
+        "step": "initial",
+        "num_markers": num_markers,
+        "markers": markers,
+        "image": image,
+    }
     if num_markers != 1:
         logger.info(
             f"Initial marker detection found {num_markers}, entering path retry steps"
@@ -391,8 +441,12 @@ def get_marker(
             next_img = step_fn(next_img)
             markers = detect_marker(next_img, detector)
             num_markers = len(markers) if markers else 0
-            results["message"]["num_markers"] = num_markers
-            results["message"]["markers"] = markers
+            results["message"]["steps"]["marker"][step] = {
+                "step": step,
+                "num_markers": num_markers,
+                "markers": markers,
+                "image": next_img,
+            }
             if num_markers == 1:
                 logger.info(f"Marker found after step '{step}'")
                 break
@@ -514,7 +568,11 @@ def build_winner(image, resulting_data):
         logger.warning("Distance between circle and marker is out of tolerance")
         results["status"] = "error"
         results["message"] = (
-            f"Distance between circle and marker is out of tolerance: |ms: {dist_btw_circle_marker_mm} |s: {dist_btw_circle_marker_standard} |d: {diff_mark_stand} |f: {fud_m_s}"
+            f"Distance between circle and marker is out of tolerance: | "
+            f"Detected distance: {dist_btw_circle_marker_mm:.2f}mm | "
+            f"Defined distance: {dist_btw_circle_marker_standard}mm | "
+            f"Difference: {diff_mark_stand:.2f} | "
+            f"Max deviation: {fud_m_s:.2f}"
         )
     else:
         r_mm = r / px_per_mm
@@ -530,13 +588,18 @@ def build_winner(image, resulting_data):
             logger.info("Circle radius is within tolerance")
             results["status"] = "success"
 
-    results["circle"] = {"radius": r, "center": (x, y)}
+    results["circle"] = {"radius": r, "radius_mm": r_mm, "center": (x, y)}
     results["marker"] = {
         "center": (
             int(markers[0].center[0] * inv_scale),
             int(markers[0].center[1] * inv_scale),
         )
     }
+    lines_data = resulting_data["info"]["lines"]["message"]["lines"]["good_lines"]
+    # lines
+    for line in lines_data:
+        x1, y1, x2, y2 = map(int, line)
+        cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 25)
     return image, results
 
 
@@ -544,3 +607,110 @@ def hex_to_bgr(hex_color: str) -> tuple:
     hex_color = hex_color.lstrip("#")
     r, g, b = [int(hex_color[i : i + 2], 16) for i in (0, 2, 4)]
     return (b, g, r)
+
+
+def get_lines(image, marker_center, circle_center, circle_radius):
+    logger.info(
+        f"Marker center: {marker_center}, Circle center: {circle_center}, Circle radius: {circle_radius}"
+    )
+    results = {
+        "status": "unknown",
+        "message": {
+            "marker_center": None,
+            "circle_center": None,
+            "circle_radius": None,
+            "fudge": None,
+        },
+        "image": {"lines": {}},
+    }
+    results["message"]["marker_center"] = marker_center
+    results["message"]["circle_center"] = circle_center
+    results["message"]["circle_radius"] = circle_radius
+    working_image = image
+    x, y, r = int(circle_center[0]), int(circle_center[1]), int(circle_radius)
+    fudge = int(r * (st.session_state.knobs["System"]["tolerence"]["value"] / 100))
+    results["message"]["fudge"] = fudge
+
+    # Crop the image around the circle with a margin defined by the fudge factor
+
+    h, w = working_image.shape[:2]
+    x0 = max(0, x - r)
+    y0 = max(0, y - r)
+    x1 = min(w, x + r)
+    y1 = min(h, y + r)
+    cropped_image = working_image[y0:y1, x0:x1]
+
+    # round the corners to remove some more.
+    mask = np.zeros(cropped_image.shape[:2], dtype=np.uint8)
+    cv2.circle(mask, (r, r), r, 255, -1)  # center is now (r,r) in the cropped space
+    roi_masked = cv2.bitwise_and(cropped_image, cropped_image, mask=mask)
+    results["image"]["lines"]["roi_masked"] = roi_masked
+
+    canny_image = canny(roi_masked)
+    results["image"]["lines"]["canny"] = canny_image
+
+    lines = hough(canny_image)
+    results["image"]["lines"]["hough"] = lines
+
+    # Initialize the dictionary to hold line data
+    results["message"]["lines"] = {
+        "raw_lines": lines,
+        "good_lines": [],
+        "num_good_lines": 0,
+    }
+
+    if lines is None:
+        results["status"] = "error"
+        results["message"]["error"] = "No lines detected"
+    else:
+        results["status"] = "success"
+        good_lines = []
+        center = (r, r)
+
+        for i in range(len(lines)):
+            working_line = lines[i][0]
+            if check_point(center, working_line, r):
+                logger.info("Center is on the line")
+                good_lines.append(working_line)
+            logger.info(f"Processing line {working_line}")
+
+        # Correctly assign to the dictionary keys
+        results["message"]["lines"]["good_lines"] = good_lines
+        results["message"]["lines"]["num_good_lines"] = len(good_lines)
+
+    return results
+
+
+def check_point(point, line, circle_radius):
+    percent = st.session_state.knobs["System"]["tolerence"]["value"]
+    x, y = point
+    x1, y1, x2, y2 = line
+    # Distance from point to infinite line through (x1,y1)-(x2,y2)
+    num = abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1)
+    den = np.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2)
+    if den == 0:
+        return False
+    tolerance = circle_radius * (percent / 100)
+    return (num / den) <= tolerance
+
+
+def hough(image):
+    logger.info("Performing Hough transform")
+    # Placeholder for Hough transform implementation
+    rho = st.session_state.knobs["Hough Lines P"]["hlp_rho"]["value"]
+    theta = st.session_state.knobs["Hough Lines P"]["hlp_theta"]["value"]
+    threshold = st.session_state.knobs["Hough Lines P"]["hlp_threshold"]["value"]
+    min_line_length = st.session_state.knobs["Hough Lines P"]["hlp_min_line_length"][
+        "value"
+    ]
+    max_line_gap = st.session_state.knobs["Hough Lines P"]["hlp_max_line_gap"]["value"]
+    lines = cv2.HoughLinesP(
+        image,
+        rho,
+        theta / 180 * np.pi,
+        threshold,
+        minLineLength=min_line_length,
+        maxLineGap=max_line_gap,
+    )
+    logger.info(f"Hough lines: {lines}")
+    return lines
