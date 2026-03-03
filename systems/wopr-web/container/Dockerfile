@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1
-
-FROM python:3.13-slim
+FROM ultralytics/ultralytics:latest
+LABEL maintainer="Bob Bomar"
+LABEL description="WOPR Web UI"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
