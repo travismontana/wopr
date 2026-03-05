@@ -294,3 +294,114 @@ class MLDataset(models.Model):
 
     def __str__(self):
         return f"{self.game.shortname} - {self.short_id}"
+
+
+class VisionParameters(models.Model):
+    """Parameters for vision models."""
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    parameter = models.CharField(max_length=255, null=False, blank=False)
+    scope = models.CharField(max_length=255, null=False, blank=False)
+    default = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    value = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    min_value = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True
+    )
+    max_value = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True
+    )
+
+    camera = models.ForeignKey(
+        "Camera",
+        related_name="vision_parameters",
+        on_delete=models.CASCADE,
+        db_index=True,
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        db_table = "vision_parameters"
+        ordering = ["-created_at"]
+        unique_together = [["camera", "parameter", "scope"]]
+
+    def __str__(self):
+        return f"Vision Parameters - {self.parameter}"
+
+
+class Camera(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    label = models.CharField(max_length=255, null=False, blank=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    path = models.CharField(max_length=255, null=True, blank=True)
+    make = models.CharField(max_length=255, null=True, blank=True)
+    model = models.CharField(max_length=255, null=True, blank=True)
+    normal_resolution = models.CharField(max_length=255, null=True, blank=True)
+    max_resolution = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = "camera"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Camera - {self.make} {self.model}"
+
+
+class CameraCapabilities(models.Model):
+    """e.g. stream, snapshot, etc..."""
+
+    camera = models.ForeignKey("Camera", on_delete=models.CASCADE, db_index=True)
+    capability = models.CharField(max_length=255, null=False, blank=False)
+    """path is host:port or /dev/videoX"""
+    path = models.CharField(max_length=255, null=True, blank=True)
+    stream_type = models.CharField(max_length=255, null=False, blank=False)
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        unique=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+    label = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    class Meta:
+        db_table = "camera_capabilities"
+        unique_together = [["camera", "capability", "stream_type"]]
+        ordering = ["camera", "capability"]
+
+    def __str__(self):
+        return f"Camera Capabilities - {self.camera} - {self.capability}"
+
+
+class ImageToCamera(models.Model):
+    image = models.ForeignKey("Image", on_delete=models.CASCADE, db_index=True)
+    camera = models.ForeignKey("Camera", on_delete=models.CASCADE, db_index=True)
+
+    class Meta:
+        db_table = "image_to_camera"
+        unique_together = [["image", "camera"]]
+        ordering = ["image", "camera"]
+
+
+class SessionToCamera(models.Model):
+    session = models.ForeignKey("Session", on_delete=models.CASCADE, db_index=True)
+    camera = models.ForeignKey("Camera", on_delete=models.CASCADE, db_index=True)
+
+    class Meta:
+        db_table = "session_to_camera"
+        unique_together = [["session", "camera"]]
+        ordering = ["session", "camera"]
