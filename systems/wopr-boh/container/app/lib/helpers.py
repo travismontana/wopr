@@ -154,7 +154,7 @@ wopr_json = {
     },
     "discord": {
       "enabled": True,
-      "webhook_url": "https://discord.com/api/webhooks/1457873231133544459/3yUwg89RsfjgRu-AmZB_hr0LU586d3OMZ2HniDdoW8YpgNhOO4rcBwCSKaSLJPYq01yE"
+
     }
   },
   "vision": {
