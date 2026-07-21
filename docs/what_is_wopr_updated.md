@@ -1,4 +1,4 @@
-# WOPR - Wargaming Oversight & Position Recognition
+# WOPR - Worldstate Observation and Prediction Report
 
 ## What is WOPR?
 
