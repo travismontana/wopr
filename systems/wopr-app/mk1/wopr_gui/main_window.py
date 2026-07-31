@@ -38,10 +38,9 @@ class MainWindow(QMainWindow):
             bar.addAction(action)
         self.addToolBar(bar)
 
-
         # -- Status bar
-        self.label_fps = QLabel("CAM - ")
-        self.label_infer = QLabel("INFER - ")
+        self.label_fps = QLabel("CAM:\n - fps")
+        self.label_infer = QLabel("INFER:\n - ms")
         self.label_state = QLabel("STATE - ")
         for w in (self.label_fps, self.label_infer, self.label_state):
             w.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
