@@ -44,16 +44,12 @@ def _attached_video_indices() -> list[int]:
     return sorted(indices)
 
 def get_camera_info(index: int) -> dict:
-    """
-    Get information about a specific camera by index.
-    Returns a dictionary with camera details or None if not found.
-    """
     cameras = list_attached_cameras()
     return cameras.get(index, None)
 
 def is_camera_connected(index: int) -> bool:
     cam = cv2.VideoCapture(index)
     connected = cam.isOpened()
-    fps = cam.get(cv2.CAP_PROP_FPS)
-    cam.release()
+    if connected:
+        cam.release()
     return connected and fps > 0
