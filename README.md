@@ -1,4 +1,4 @@
-# WOPR - Worldstate Observation and Preiction Report
+# WOPR - Worldstate Observation and Preiction Resource
 What is WOPR?
 WOPR tracks tabletop game state through computer vision.  Players use a web interface to capture images of their game board. WOPR analyzes the images, detects game pieces, validates moves against rules, and maintains a complete game history.
 
