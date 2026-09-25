@@ -2,7 +2,7 @@
   name            = "wopr_gui"
   description     = "W.O.P.R. - Worldview Observation and Prediction Resource"
   version         = "0.1.0"
-  requires-python = ">3.13"
+  requires-python = ">=3.13"
   dependencies    = ["PySide6>=6.7", "PyYAML"]
 
 [project.gui-scripts]
