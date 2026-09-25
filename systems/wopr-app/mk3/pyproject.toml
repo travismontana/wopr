@@ -1,5 +1,5 @@
 [project]
-  name            = "wopr gui"
+  name            = "wopr_gui"
   description     = "W.O.P.R. - Worldview Observation and Prediction Resource"
   version         = "0.1.0"
   requires-python = ">3.13"
