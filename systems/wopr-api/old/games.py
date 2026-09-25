@@ -88,19 +88,19 @@ async def list_games(
 ):
     """
     List all games
-    
+
 
 
 @router.get("/{game_id}", response_model=GameResponse)
 async def get_game(game_id: int):
     """
     Get a specific game by ID.
-    
+
     Args:
         game_id: The game ID
     """
     logger.debug(f"Getting game {game_id}")
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -123,16 +123,16 @@ async def get_game(game_id: int):
 async def create_game(game: GameCreate):
     """
     Create a new game.
-    
+
     Args:
         game: Game data
     """
     logger.info(f"Creating game: {game.name}")
-    
+
     # Generate UUID for Directus document tracking
     game_uuid = uuid4()
     now = datetime.utcnow()
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -158,7 +158,7 @@ async def create_game(game: GameCreate):
             )
             conn.commit()
             new_game = cur.fetchone()
-            
+
             logger.info(f"Created game {new_game['id']}: {new_game['name']}")
             return new_game
 
@@ -167,32 +167,32 @@ async def create_game(game: GameCreate):
 async def update_game(game_id: int, game: GameUpdate):
     """
     Update an existing game.
-    
+
     Args:
         game_id: The game ID
         game: Updated game data
     """
     logger.info(f"Updating game {game_id}")
-    
+
     update_fields = []
     values = []
-    
+
     for field, value in game.dict(exclude_unset=True).items():
         if value is not None:
             update_fields.append(f"{field} = %s")
             values.append(value)
-    
+
     if not update_fields:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No fields to update"
         )
-    
+
     # Always update date_updated
     update_fields.append("date_updated = %s")
     values.append(datetime.utcnow())
     values.append(game_id)
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             query = f"""
@@ -201,17 +201,17 @@ async def update_game(game_id: int, game: GameUpdate):
                 WHERE id = %s
                 RETURNING *
             """
-            
+
             cur.execute(query, values)
             conn.commit()
             updated_game = cur.fetchone()
-            
+
             if not updated_game:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             logger.info(f"Updated game {game_id}")
             return updated_game
 
@@ -220,12 +220,12 @@ async def update_game(game_id: int, game: GameUpdate):
 async def delete_game(game_id: int):
     """
     Delete a game.
-    
+
     Args:
         game_id: The game ID
     """
     logger.info(f"Deleting game {game_id}")
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -234,13 +234,13 @@ async def delete_game(game_id: int):
             )
             conn.commit()
             deleted = cur.fetchone()
-            
+
             if not deleted:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             logger.info(f"Deleted game {game_id}")
 
 
@@ -248,12 +248,12 @@ async def delete_game(game_id: int):
 async def publish_game(game_id: int):
     """
     Publish a game (set status to 'published').
-    
+
     Args:
         game_id: The game ID
     """
     logger.info(f"Publishing game {game_id}")
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -267,13 +267,13 @@ async def publish_game(game_id: int):
             )
             conn.commit()
             updated_game = cur.fetchone()
-            
+
             if not updated_game:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             logger.info(f"Published game {game_id}")
             return updated_game
 
@@ -282,12 +282,12 @@ async def publish_game(game_id: int):
 async def unpublish_game(game_id: int):
     """
     Unpublish a game (set status to 'draft').
-    
+
     Args:
         game_id: The game ID
     """
     logger.info(f"Unpublishing game {game_id}")
-    
+
     with get_db() as conn:
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -301,12 +301,12 @@ async def unpublish_game(game_id: int):
             )
             conn.commit()
             updated_game = cur.fetchone()
-            
+
             if not updated_game:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Game with ID {game_id} not found"
                 )
-            
+
             logger.info(f"Unpublished game {game_id}")
             return updated_game

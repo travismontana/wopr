@@ -15,7 +15,7 @@
 wopr-baseapp:
   app:
     name: wopr-fb
-  
+
   image:
     registry: docker.io
     repository: filebrowser/filebrowser
@@ -34,7 +34,7 @@ wopr-baseapp:
         paths:
           - path: /
             pathType: Prefix
-    tls: 
+    tls:
       - secretName: wopr-filebrowser-tls
         hosts:
           - filebrowser.wopr.tailandtraillabs.org
@@ -49,7 +49,7 @@ wopr-baseapp:
       accessModes:
         - ReadWriteOnce
       storageClass: rook-ceph-block
-    
+
     - name: fb-config-pvc
       enabled: true
       size: 1Gi

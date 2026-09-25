@@ -1,21 +1,17 @@
-from pathlib import Path
-import requests
-import time
-import sys
 import os
+import sys
+import time
+from pathlib import Path
+
 # from label_studio_sdk import Client
 from label_studio_sdk import LabelStudio
-
-from core.models import Image, ImageGame, Game
-from lib.helpers import setup_logger, get_config
-from .lib_images import get_images_ondisk, image_sort
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()
 
 # from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.core.api_error import ApiError
-
 
 LABEL_STUDIO_TOKEN = os.getenv("LABEL_STUDIO_TOKEN")
 
@@ -162,13 +158,14 @@ def export_and_download_snapshot(project_id, outdir):
     out_path = out_dir / f"project_{project_id}_export_{export_id}.json"
 
     with open(out_path, "wb") as f:
-        for chunk in ls.projects.exports.download(
-            id=project_id,
-            export_pk=export_id,
-            export_type="JSON",
-            request_options={"chunk_size": 1024},
-        ):
-            f.write(chunk)
+        f.writelines(
+            ls.projects.exports.download(
+                id=project_id,
+                export_pk=export_id,
+                export_type="JSON",
+                request_options={"chunk_size": 1024},
+            )
+        )
 
     logger.info(f"Export completed. File saved to: {out_path}")
     return export_id
@@ -264,13 +261,14 @@ def convert_snapshot(project_id, outdir, export_type: str, export_id: str = None
     out_path = out_dir / f"project_{project_id}_export_{export_id}.{ext}"
 
     with open(out_path, "wb") as f:
-        for chunk in ls.projects.exports.download(
-            id=project_id,
-            export_pk=export_id,
-            export_type=export_type,
-            request_options={"chunk_size": 1024},
-        ):
-            f.write(chunk)
+        f.writelines(
+            ls.projects.exports.download(
+                id=project_id,
+                export_pk=export_id,
+                export_type=export_type,
+                request_options={"chunk_size": 1024},
+            )
+        )
 
     logger.info(f"Converted export downloaded. File saved to: {out_path}")
 

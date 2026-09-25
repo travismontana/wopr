@@ -1,16 +1,13 @@
-import os
 import logging
+import math
+import os
 import sys
 import uuid
-import requests
-import math
+
 import cv2
-
 import numpy as np
-
+import requests
 from label_studio_sdk import LabelStudio
-from label_studio_sdk.converter import Converter
-from label_studio_sdk._extensions.label_studio_tools.core.utils.io import get_local_path
 
 RUNS = "/ultralytics/runs"
 WEIGHTS = "/ultralytics/weights"
@@ -50,7 +47,7 @@ def setup_logger(logger_name="wopr") -> logging.Logger:
     return logger
 
 
-logger  = setup_logger()
+logger = setup_logger()
 
 #################################
 #
@@ -75,7 +72,8 @@ def get_models():
     """Returns a list of available YOLOv8 model weights in the WEIGHTS directory."""
     if not os.path.exists(WEIGHTS):
         return []
-    return [f for f in os.listdir(WEIGHTS) if f.endswith(('.pt', '.yaml'))]
+    return [f for f in os.listdir(WEIGHTS) if f.endswith((".pt", ".yaml"))]
+
 
 def get_projects():
     logger.info(f"Retrieving projects from Label Studio at {LABEL_STUDIO_URL}")
@@ -83,13 +81,16 @@ def get_projects():
     logger.info(f"Retrieved projects: {projects}")
     return projects
 
+
 def export_annotations(project_id):
     dataset_uuid = str(uuid.uuid4())
     payload = {
         "project_id": project_id,
         "dataset_uuid": dataset_uuid,
     }
-    logger.info(f"Exporting annotations for project {project_id} with dataset UUID {dataset_uuid}")
+    logger.info(
+        f"Exporting annotations for project {project_id} with dataset UUID {dataset_uuid}"
+    )
     # post payload to http://wopr-model/api/model_ctl
     try:
         response = requests.post(

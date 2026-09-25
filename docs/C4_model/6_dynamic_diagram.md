@@ -23,7 +23,7 @@ sequenceDiagram
         DB-->>API: Game list
         API-->>Web: Games data
         Web-->>Player: Display game options
-        
+
         Player->>Web: Click "Start New Game"
         Web->>API: GET /api/v2/session/new/{game_id}
         API->>DB: INSERT INTO sessiontracker
@@ -43,7 +43,7 @@ sequenceDiagram
         Cam->>NFS: Save image to incoming/
         NFS-->>Cam: File saved
         Cam-->>API: {status: success, path}
-        
+
         API->>DB: INSERT INTO playtracker
         Note right of API: Record play with:<br/>sessionid, filename,<br/>timestamp, status=active
         DB-->>API: play_id
@@ -56,12 +56,12 @@ sequenceDiagram
         Player->>Player: Physical move on game board
         Player->>Web: Enter move notes
         Player->>Web: Click "End Turn"
-        
+
         Web->>API: POST /api/v2/session/capture
         API->>Cam: POST /capture (end-of-turn)
         Cam->>NFS: Save image
         Cam-->>API: Success
-        
+
         API->>DB: INSERT INTO playtracker
         Note right of DB: New play record:<br/>- sessionid<br/>- playerid<br/>- note (move description)<br/>- filename
         DB-->>API: play_id
@@ -76,9 +76,9 @@ sequenceDiagram
             Web->>API: Trigger capture
             API->>Cam: Capture start-of-round
             Cam->>NFS: Save image
-            
+
             Player->>Player: Make moves
-            
+
             Player->>Web: End Round N
             Web->>API: Trigger capture
             API->>Cam: Capture end-of-round
@@ -95,20 +95,20 @@ sequenceDiagram
         API->>DB: UPDATE sessiontracker SET status='completed'
         DB-->>API: Updated
         API-->>Web: Session completed
-        
+
         Player->>Web: Click "Archive Session"
         Web->>API: POST /api/v2/tasks/archive/{session_id}
         API->>Redis: Enqueue archive_session_images task
         Redis-->>API: Task ID
         API-->>Web: Task queued {task_id}
         Web-->>Player: Archiving in progress...
-        
+
         Redis->>Worker: Dispatch task
         Worker->>DB: Get session data (uuid)
         DB-->>Worker: session data
         Worker->>DB: Get all play filenames
         DB-->>Worker: [file1.jpg, file2.jpg, ...]
-        
+
         loop For each file
             Worker->>NFS: Move incoming/{file} to archive/{file}
             alt Success
@@ -121,11 +121,11 @@ sequenceDiagram
                 Worker->>Worker: Log warning, continue
             end
         end
-        
+
         Worker->>DB: UPDATE playtracker SET status='archived'
         DB-->>Worker: Updated
         Worker->>Redis: Store result {success: [...], errors: [...]}
-        
+
         Web->>API: GET /api/v2/tasks/{task_id}/status
         API->>Redis: Query task result
         Redis-->>API: Task result
@@ -283,25 +283,25 @@ sequenceDiagram
 
     DataScientist->>Web: Select archived session
     DataScientist->>Web: Click "Export to Label Studio"
-    
+
     Web->>API: POST /api/v2/tasks/export_labelstudio/{session_id}
     API->>Redis: Enqueue export task
     Redis-->>API: Task ID
     API-->>Web: Task queued
-    
+
     Redis->>Worker: Dispatch task
     Worker->>NFS: Copy archive/{files} to labelstudio/
     Worker->>LS: Create annotation tasks
     Note right of LS: POST /api/projects/{id}/tasks<br/>with image URLs
     LS-->>Worker: Task IDs created
     Worker->>Redis: Store result
-    
+
     Web->>API: Poll task status
     API->>Redis: Get result
     Redis-->>API: Export complete
     API-->>Web: Success, N images exported
     Web-->>DataScientist: Ready for annotation
-    
+
     DataScientist->>LS: Open Label Studio
     DataScientist->>LS: Annotate game pieces
 ```
@@ -323,7 +323,7 @@ sequenceDiagram
     API-->>Web: Error response
     Web->>Web: Display error to user
     Web->>Web: Offer "Retry" button
-    
+
     alt User retries
         Web->>API: Retry capture (same payload)
     else User cancels
@@ -345,9 +345,9 @@ sequenceDiagram
     API->>API: Catch exception
     API->>API: Log error with trace ID
     API-->>Web: HTTPException 500
-    
+
     Note over API,DB: Image saved but orphaned<br/>(no database record)
-    
+
     Note over API: Recovery options:<br/>1. Retry transaction<br/>2. Background reconciliation<br/>3. Manual cleanup
 ```
 

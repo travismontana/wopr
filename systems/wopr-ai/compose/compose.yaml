@@ -7,7 +7,7 @@ services:
           memory: 8g
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
-    ports: 
+    ports:
       - "3000:8080"
     volumes:
       - /data/openwebui:/app/backend/data

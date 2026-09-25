@@ -1,6 +1,7 @@
 import os
 
 from lib.helpers import setup_logging
+
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
 
 
@@ -32,7 +33,9 @@ def get_directus_config():
         config_data = response.json()
         return config_data.get("data", [])
     except requests.RequestException as e:
-        logger.info(f"Directus: ({DIRECTUS_CONFIG_ENDPOINT}) Headers: ({DIRECTUS_HEADERS})")
+        logger.info(
+            f"Directus: ({DIRECTUS_CONFIG_ENDPOINT}) Headers: ({DIRECTUS_HEADERS})"
+        )
         logger.info(f"Error fetching config from Directus: {e}")
         exit(1)
 
@@ -43,7 +46,7 @@ logger.info("WOPR_CONFIG: %s", WOPR_CONFIG)
 if WOPR_CONFIG["nelson"] != "haha":
     logger.info("WOPR_CONFIG fetch failed or is invalid. Exiting.")
     exit(1)
-    
+
 APP_NAME = "wopr-api"
 APP_VERSION = "0.0.1"
 API_PREFIX = "/api/v3"

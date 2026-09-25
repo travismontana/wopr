@@ -34,7 +34,7 @@ wopr-baseapp:
         paths:
           - path: /
             pathType: Prefix
-    tls: 
+    tls:
       - secretName: directus-tls
         hosts:
           - directus.wopr.tailandtraillabs.orgs

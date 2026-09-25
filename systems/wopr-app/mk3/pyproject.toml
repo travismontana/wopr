@@ -1,0 +1,13 @@
+[project]
+  name            = "wopr gui"
+  description     = "W.O.P.R. - Worldview Observation and Prediction Resource"
+  version         = "0.1.0"
+  requires-python = ">3.13"
+  dependencies    = ["PySide6>=6.7", "PyYAML"]
+
+[project.gui-scripts]
+  wopr-gui = "wopr_gui.app:main"
+
+[build-system]
+  requires      = ["uv-build>=0.8"]
+  build-backend = "uv_build"

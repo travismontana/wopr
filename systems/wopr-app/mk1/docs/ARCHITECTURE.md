@@ -208,12 +208,13 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping
 import numpy as np
 
+
 @dataclass(frozen=True)
 class Frame:
-    seq: int                  # monotonic, per source, never reused
-    t_capture: float          # time.monotonic() at grab, NOT wall clock
+    seq: int  # monotonic, per source, never reused
+    t_capture: float  # time.monotonic() at grab, NOT wall clock
     source_id: str
-    image: np.ndarray         # flags.writeable = False
+    image: np.ndarray  # flags.writeable = False
     meta: Mapping[str, Any] = field(default_factory=dict)
 ```
 
@@ -237,25 +238,30 @@ staleness (`last_seq` per consumer vs. bus `seq`), and reproducible debugging
 ```python
 from typing import Literal, Protocol
 
+
 @dataclass(frozen=True)
 class Policy:
     mode: Literal["latest", "all"] = "latest"
-    max_hz: float | None = None     # None = as fast as frames arrive
-    depth: int = 1                  # only meaningful when mode == "all"
+    max_hz: float | None = None  # None = as fast as frames arrive
+    depth: int = 1  # only meaningful when mode == "all"
+
 
 @dataclass
 class ConsumerStats:
     received: int = 0
     dropped: int = 0
     last_seq: int = -1
-    last_latency_ms: float = 0.0    # now - frame.t_capture at handoff
+    last_latency_ms: float = 0.0  # now - frame.t_capture at handoff
     errors: int = 0
+
 
 class Subscription(Protocol):
     name: str
+
     def get(self, timeout: float | None = None) -> Frame | None: ...
     def stats(self) -> ConsumerStats: ...
     def close(self) -> None: ...
+
 
 class FrameBus(Protocol):
     def publish(self, frame: Frame) -> None: ...
@@ -455,31 +461,35 @@ flowchart LR
 from enum import Enum
 from typing import Protocol
 
+
 class State(Enum):
     OK = "ok"
     WARN = "warn"
     FAIL = "fail"
-    STALE = "stale"       # applied by the registry, never returned by a probe
-    UNKNOWN = "unknown"   # never run yet
+    STALE = "stale"  # applied by the registry, never returned by a probe
+    UNKNOWN = "unknown"  # never run yet
+
 
 @dataclass(frozen=True)
 class Status:
     state: State
-    detail: str           # short, human, fits in a tooltip
-    t_checked: float      # time.monotonic()
+    detail: str  # short, human, fits in a tooltip
+    t_checked: float  # time.monotonic()
     latency_ms: float = 0.0
+
 
 class Probe(Protocol):
     name: str
-    interval_s: float     # how often to run
-    timeout_s: float      # hard cap; exceeding it is a FAIL, not a hang
-    ttl_s: float          # past this without refresh → STALE (rule: >= 3x interval)
+    interval_s: float  # how often to run
+    timeout_s: float  # hard cap; exceeding it is a FAIL, not a hang
+    ttl_s: float  # past this without refresh → STALE (rule: >= 3x interval)
 
     def check(self) -> Status: ...
 
+
 class HealthRegistry(Protocol):
     def register(self, probe: Probe) -> None: ...
-    def snapshot(self) -> Mapping[str, Status]: ...   # cheap, non-blocking, TTL applied
+    def snapshot(self) -> Mapping[str, Status]: ...  # cheap, non-blocking, TTL applied
 ```
 
 Three invariants:

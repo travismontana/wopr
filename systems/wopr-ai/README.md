@@ -77,5 +77,3 @@ curl -G "$LOKI/loki/api/v1/query" \
       [5m])
     )
   )'
-
-

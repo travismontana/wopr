@@ -35,7 +35,7 @@ wopr-baseapp:
         paths:
           - path: /
             pathType: Prefix
-    tls: 
+    tls:
       - secretName: wopr-images-tls
         hosts:
           - images.wopr.tailandtraillabs.org
@@ -46,20 +46,20 @@ wopr-baseapp:
         configMapKeyRef:
           name: wopr-config
           key: WOPR_API_URL
-  
-  labels: 
+
+  labels:
     app.wopr.io/hasNginx: "true"
-  selectorLabels: 
+  selectorLabels:
     app.wopr.io/hasNginx: "true"
 
-  podAnnotations: 
+  podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "4318"
     prometheus.io/path: "/v1/metrics"
 
-  sidecarContainers: 
+  sidecarContainers:
     - name: nginx-exporter
-      image: nginx/nginx-prometheus-exporter:latest    
+      image: nginx/nginx-prometheus-exporter:latest
       args:
         - -nginx.scrape-uri=http://localhost:8080/stub_status
       ports:
@@ -98,5 +98,3 @@ wopr-baseapp:
       emptyDir: {}
     - name: run
       emptyDir: {}
-
-      

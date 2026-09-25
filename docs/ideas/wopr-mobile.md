@@ -67,7 +67,7 @@ wopr-mobile
 wopr-core modules:
 wopr-web - core UI
 wopr-db - main big database
-wopr-cam 
+wopr-cam
 wopr-model
 wopr-api
 wopr-filebrowser

@@ -20,7 +20,7 @@
         if "info" in resulting_data:
             logger.info(f"Camera {i} info: {resulting_data['info']}")
             with info_placeholder.container():
-                st.text("info:") 
+                st.text("info:")
                 frame_shape_x = resulting_data["info"]["frame_shape"][0] if "frame_shape" in resulting_data["info"] else "N/A"
                 frame_shape_y = resulting_data["info"]["frame_shape"][1] if "frame_shape" in resulting_data["info"] else "N/A"
                 resized_shape_x = resulting_data["info"]["resized_shape"][0] if "resized_shape" in resulting_data["info"] else "N/A"

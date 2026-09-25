@@ -1,6 +1,8 @@
 import logging
-import httpx
 import sys
+
+import httpx
+
 
 def setup_logging(name: str, level: str, file_path: str) -> logging.Logger:
     logger = logging.getLogger(name)
@@ -15,7 +17,9 @@ def setup_logging(name: str, level: str, file_path: str) -> logging.Logger:
     ch.setLevel(getattr(logging, level.upper(), logging.INFO))
 
     # Create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
 
@@ -24,6 +28,7 @@ def setup_logging(name: str, level: str, file_path: str) -> logging.Logger:
     logger.addHandler(ch)
 
     return logger
+
 
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
 

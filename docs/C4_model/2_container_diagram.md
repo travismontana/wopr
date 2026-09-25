@@ -29,35 +29,35 @@ C4Container
 
     Rel(player, web, "Uses", "HTTPS")
     Rel(admin, flower, "Monitors tasks", "HTTPS")
-    
+
     Rel(web, api, "Makes API calls", "HTTPS/JSON")
     Rel(web, thumbor, "Requests resized images", "HTTPS")
-    
+
     Rel(api, postgres, "Reads/writes data", "psycopg3")
     Rel(api, directus, "Reads configuration", "HTTPS/JSON")
     Rel(api, redis, "Enqueues tasks", "Redis Protocol")
     Rel(api, cam, "Triggers capture", "HTTPS/JSON")
     Rel(api, model, "Queries model status", "HTTPS/JSON")
-    
+
     Rel(cam, nfs, "Saves images", "NFS")
-    
+
     Rel(worker, postgres, "Reads session data", "psycopg3")
     Rel(worker, redis, "Consumes tasks", "Redis Protocol")
     Rel(worker, nfs, "Moves/archives images", "NFS")
     Rel(worker, labelstudio, "Exports for annotation", "API")
-    
+
     Rel(model, nfs, "Reads model files", "NFS")
-    
+
     Rel(thumbor, nfs, "Reads source images", "NFS")
-    
+
     Rel(api, loki, "Sends logs", "HTTP")
     Rel(web, loki, "Sends logs", "HTTP")
     Rel(cam, loki, "Sends logs", "HTTP")
     Rel(model, loki, "Sends logs", "HTTP")
-    
+
     Rel(api, otel, "Sends traces", "OTLP/HTTP")
     Rel(cam, otel, "Sends traces", "OTLP/gRPC")
-    
+
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
 
@@ -87,7 +87,7 @@ C4Container
   - Task orchestration (archiving, export)
   - Direct database access via Directus client
 - **Key Files**: `systems/wopr-api/container/`
-- **Endpoints**: 
+- **Endpoints**:
   - `/api/v2/games`, `/api/v2/session`, `/api/v2/plays`
   - `/api/v2/config`, `/api/v2/tasks`
 - **Instrumentation**: OpenTelemetry for tracing

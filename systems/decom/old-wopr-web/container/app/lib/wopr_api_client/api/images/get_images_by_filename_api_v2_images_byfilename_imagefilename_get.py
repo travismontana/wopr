@@ -28,7 +28,11 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+    | None
+):
     if response.status_code == 200:
         response_200 = []
         _response_200 = response.json()
@@ -54,7 +58,10 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -67,7 +74,10 @@ def sync_detailed(
     imagefilename: str,
     *,
     client: AuthenticatedClient | Client,
-) -> Response[HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+]:
     """Get Images By Filename
 
     Args:
@@ -96,7 +106,11 @@ def sync(
     imagefilename: str,
     *,
     client: AuthenticatedClient | Client,
-) -> HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+    | None
+):
     """Get Images By Filename
 
     Args:
@@ -120,7 +134,10 @@ async def asyncio_detailed(
     imagefilename: str,
     *,
     client: AuthenticatedClient | Client,
-) -> Response[HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+]:
     """Get Images By Filename
 
     Args:
@@ -147,7 +164,11 @@ async def asyncio(
     imagefilename: str,
     *,
     client: AuthenticatedClient | Client,
-) -> HTTPValidationError | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[GetImagesByFilenameApiV2ImagesByfilenameImagefilenameGetResponse200Item]
+    | None
+):
     """Get Images By Filename
 
     Args:

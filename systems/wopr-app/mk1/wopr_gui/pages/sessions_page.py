@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QVBoxLayout
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+
 
 def SessionsPage() -> QWidget:
     """The library page

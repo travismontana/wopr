@@ -10,43 +10,42 @@ Camera service for WOPR. Captures images
 via USB webcam and saves to a path.
 """
 
-import cv2
-import time
+import io
 import logging
 import sys
+import time
 from enum import Enum
-from typing import Optional
 from pathlib import Path
-import io
-from PIL import Image
 
+import cv2
+
+# Import globals module for constants
+import globals as g
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from picamera2 import Picamera2
+from fastapi.responses import JSONResponse, PlainTextResponse
 from libcamera import Transform
 
 # OTel imports
 from opentelemetry import metrics
-from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.trace.status import Status, StatusCode
+from picamera2 import Picamera2
+from PIL import Image
+from pydantic import BaseModel, Field
 
-#from wopr.config import init_config, get_str, get_int, get_bool
+# from wopr.config import init_config, get_str, get_int, get_bool
 from wopr.logging import setup_logging
-from wopr.tracing import create_tracer
 from wopr.storage import imagefilename
-
-# Import globals module for constants
-import globals as g
+from wopr.tracing import create_tracer
 
 # Initialize config first
 WOPR_API_URL = "https://api.wopr.tailandtraillabs.org/api/v2/config"
-#init_config(service_url=WOPR_API_URL)
+# init_config(service_url=WOPR_API_URL)
 
 logger = setup_logging("wopr-cam", log_file="/var/log/wopr-cam.log")
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -57,14 +56,16 @@ tracer = create_tracer(
     tracer_name=g.APP_NAME,
     tracer_version=g.APP_VERSION,
     tracer_enabled=False,
-    tracer_endpoint=g.APP_OTEL_URL+"/v1/traces"
+    tracer_endpoint=g.APP_OTEL_URL + "/v1/traces",
 )
 
 # Metrics provider setup
-resource = Resource(attributes={
-    SERVICE_NAME: g.APP_NAME,
-    SERVICE_VERSION: g.APP_VERSION,
-})
+resource = Resource(
+    attributes={
+        SERVICE_NAME: g.APP_NAME,
+        SERVICE_VERSION: g.APP_VERSION,
+    }
+)
 
 metric_reader = PeriodicExportingMetricReader(
     OTLPMetricExporter(
@@ -106,14 +107,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Subject(str, Enum):
     setup = "setup"
     capture = "capture"
     move = "move"
     thumbnail = "thumbnail"
 
+
 class CaptureRequest(BaseModel):
-    filename: Optional[str] = Field(None, description="Optional filename override")
+    filename: str | None = Field(None, description="Optional filename override")
+
 
 @app.exception_handler(ValueError)
 async def value_error_handler(request, exc: ValueError):
@@ -124,6 +128,7 @@ async def value_error_handler(request, exc: ValueError):
             "message": str(exc),
         },
     )
+
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request, exc: Exception):
@@ -144,6 +149,7 @@ def _trace_if_enabled(span_name: str):
         return tracer.start_as_current_span(span_name)
     else:
         from contextlib import nullcontext
+
         return nullcontext()
 
 
@@ -151,7 +157,7 @@ def _trace_if_enabled(span_name: str):
 def capture(req: CaptureRequest):
     with _trace_if_enabled("camera.capture") as span:
         start_time = time.time()
-        
+
         try:
             # Generate filepath
             if req.filename:
@@ -166,12 +172,12 @@ def capture(req: CaptureRequest):
             resolution = "4k"
             width = "4056"
             height = "3040"
-            
+
             if span:
                 span.set_attribute("camera.resolution", resolution)
                 span.set_attribute("camera.width", width)
                 span.set_attribute("camera.height", height)
-            
+
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
             # Camera initialization and capture
@@ -197,13 +203,15 @@ def capture(req: CaptureRequest):
             duration_ms = (time.time() - start_time) * 1000
             capture_duration.record(duration_ms, {"endpoint": "capture"})
             capture_counter.add(1, {"endpoint": "capture", "status": "success"})
-            
+
             if span:
                 span.set_status(Status(StatusCode.OK))
             return f"{filepath}\n"
-            
+
         except Exception as e:
-            capture_errors.add(1, {"error_type": type(e).__name__, "endpoint": "capture"})
+            capture_errors.add(
+                1, {"error_type": type(e).__name__, "endpoint": "capture"}
+            )
             capture_counter.add(1, {"endpoint": "capture", "status": "error"})
             if span:
                 span.set_status(Status(StatusCode.ERROR, str(e)))
@@ -216,13 +224,13 @@ def capture_ml(req: CaptureRequest):
     with _trace_if_enabled("camera.capture_ml") as span:
         start_time = time.time()
         camera_id = 0
-        
+
         try:
             # Generate filepath
             filename = req.filename if req.filename else "noname.jpg"
             base_path = "/remote/wopr"
             ml_subdir = "ml"
-            ml_dir = Path(base_path) / ml_subdir / 'incoming'
+            ml_dir = Path(base_path) / ml_subdir / "incoming"
             filepath = ml_dir / f"{filename}"
             ml_dir.mkdir(parents=True, exist_ok=True)
 
@@ -238,7 +246,7 @@ def capture_ml(req: CaptureRequest):
                 span.set_attribute("camera.resolution", resolution)
                 span.set_attribute("camera.width", width)
                 span.set_attribute("camera.height", height)
-            
+
             logger.info(f"Capturing {width}x{height} to {filepath}")
 
             if camType == "usb":
@@ -248,7 +256,9 @@ def capture_ml(req: CaptureRequest):
                     if not cap.isOpened():
                         raise RuntimeError("Camera device could not be opened")
 
-                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+                    cap.set(
+                        cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G")
+                    )
                     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
@@ -264,31 +274,30 @@ def capture_ml(req: CaptureRequest):
                 picam2 = Picamera2()
                 camera_config = picam2.create_preview_configuration(
                     main={"size": (width, height), "format": "RGB888"},
-                    transform=Transform(hflip=1,vflip=1)
+                    transform=Transform(hflip=1, vflip=1),
                 )
                 picam2.options["quality"] = 95
                 picam2.options["compress_level"] = 1
                 picam2.configure(camera_config)
                 picam2.start()
                 time.sleep(2)
-                picam2.capture_file(
-                    str(filepath),
-                    format='jpeg'
-                )
+                picam2.capture_file(str(filepath), format="jpeg")
                 picam2.stop()
                 picam2.close()
 
             duration_ms = (time.time() - start_time) * 1000
             capture_duration.record(duration_ms, {"endpoint": "capture_ml"})
             capture_counter.add(1, {"endpoint": "capture_ml", "status": "success"})
-            
+
             logger.info(f"Captured image to {filepath}")
             if span:
                 span.set_status(Status(StatusCode.OK))
             return JSONResponse({"filename": str(filepath)})
-            
+
         except Exception as e:
-            capture_errors.add(1, {"error_type": type(e).__name__, "endpoint": "capture_ml"})
+            capture_errors.add(
+                1, {"error_type": type(e).__name__, "endpoint": "capture_ml"}
+            )
             capture_counter.add(1, {"endpoint": "capture_ml", "status": "error"})
             if span:
                 span.set_status(Status(StatusCode.ERROR, str(e)))
@@ -300,6 +309,7 @@ def capture_ml(req: CaptureRequest):
 def status():
     with _trace_if_enabled("camera.status"):
         return {"status": "ready"}
+
 
 @app.get("/grab/{camera_id}")
 @app.get("/grab/{camera_id}/")
@@ -315,9 +325,9 @@ def grab_camera(camera_id: int):
     if camType == "imx477":
         picam2 = Picamera2()
         camera_config = picam2.create_preview_configuration(
-                    main={"size": (width, height), "format": "RGB888"},
-                    transform=Transform(hflip=1,vflip=1)
-                )
+            main={"size": (width, height), "format": "RGB888"},
+            transform=Transform(hflip=1, vflip=1),
+        )
         picam2.configure(camera_config)
         picam2.start()
         time.sleep(2)
@@ -327,7 +337,7 @@ def grab_camera(camera_id: int):
         image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(image_array)
         buf = io.BytesIO()
-        img.save(buf, format='JPEG')
+        img.save(buf, format="JPEG")
         return PlainTextResponse(content=buf.getvalue(), media_type="image/jpeg")
     else:
         try:
@@ -341,11 +351,13 @@ def grab_camera(camera_id: int):
             if not ret:
                 raise RuntimeError("Camera capture failed (no frame read)")
 
-            _, img_encoded = cv2.imencode('.jpg', frame)
+            _, img_encoded = cv2.imencode(".jpg", frame)
             if span:
                 span.set_status(Status(StatusCode.OK))
-            return PlainTextResponse(content=img_encoded.tobytes(), media_type="image/jpeg")
-        
+            return PlainTextResponse(
+                content=img_encoded.tobytes(), media_type="image/jpeg"
+            )
+
         except Exception as e:
             if span:
                 span.set_status(Status(StatusCode.ERROR, str(e)))

@@ -5,7 +5,9 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.create_session_api_v2_sessions_post_payload import CreateSessionApiV2SessionsPostPayload
+from ...models.create_session_api_v2_sessions_post_payload import (
+    CreateSessionApiV2SessionsPostPayload,
+)
 from ...models.http_validation_error import HTTPValidationError
 from ...types import Response
 

@@ -1,11 +1,6 @@
 from django.contrib import admin
 
-from .models import ModelFamily
-from .models import ModelInfo
-from .models import ModelVersion
-from .models import TrainingRun
-from .models import Dataset
-from .models import Result
+from .models import Dataset, ModelFamily, ModelInfo, ModelVersion, Result, TrainingRun
 
 # Register your models here.
 admin.site.register(ModelFamily)

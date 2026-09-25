@@ -37,4 +37,3 @@ if [ $SUDO_STATUS -ne 0 ]; then
     echo "This script requires sudo privileges. Please run as a user with sudo access."
     exit 1
 fi
-

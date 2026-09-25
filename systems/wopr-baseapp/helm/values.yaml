@@ -54,10 +54,10 @@ env:
     - name: OTEL_EXPORTER_OTLP_ENDPOINT
       value: https://otel.monitoring.abode.tailandtraillabs.org
 
-# labels: 
+# labels:
 #   app.wopr.io/hasNginx: "true"
 
-#podAnnotations: 
+#podAnnotations:
 #  prometheus.io/scrape: "true"
 #  prometheus.io/port: "4318"
 #  prometheus.io/path: "/v1/metrics"
@@ -74,11 +74,11 @@ ingress:
   enabled: false
   className: "wopr-traefik"
   annotations: {}
-  hosts: 
+  hosts:
     - host: chart-example.local
-      paths: 
+      paths:
         - path: /
-          pathType: Prefix 
+          pathType: Prefix
   tls:
     - secretName: chart-example-tls
       hosts:
@@ -196,7 +196,7 @@ securityContext:
 celeryWorker:
   enabled: false
   replicaCount: 1
-  
+
   # Override command/args if needed
   command: ["/home/wopr/.local/bin/celery"]
   args:
@@ -204,12 +204,12 @@ celeryWorker:
     - "app.celery_app"
     - "worker"
     - "--loglevel=info"
-  
+
   # Worker-specific env vars (merged with global env)
   env: []
   #  - name: CELERY_WORKER_PREFETCH_MULTIPLIER
   #    value: "4"
-  
+
   # Celery inspect ping probe
   livenessProbe:
     enabled: true
@@ -217,7 +217,7 @@ celeryWorker:
     periodSeconds: 120
     timeoutSeconds: 60
     failureThreshold: 3
-  
+
   resources:
     limits:
       cpu: 500m
@@ -229,7 +229,7 @@ celeryWorker:
 luigiWorker:
   enabled: false
   replicaCount: 1
-  
+
   # Override command/args if needed
   command: ["/home/wopr/.local/bin/celery"]
   args:
@@ -237,12 +237,12 @@ luigiWorker:
     - "app.celery_app"
     - "worker"
     - "--loglevel=info"
-  
+
   # Worker-specific env vars (merged with global env)
   env: []
   #  - name: CELERY_WORKER_PREFETCH_MULTIPLIER
   #    value: "4"
-  
+
   # Celery inspect ping probe
   livenessProbe:
     enabled: true
@@ -250,7 +250,7 @@ luigiWorker:
     periodSeconds: 30
     timeoutSeconds: 10
     failureThreshold: 3
-  
+
   resources:
     limits:
       cpu: 500m

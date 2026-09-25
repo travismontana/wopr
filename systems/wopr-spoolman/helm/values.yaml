@@ -21,7 +21,7 @@ wopr-baseapp:
         paths:
           - path: /
             pathType: Prefix
-    tls: 
+    tls:
       - secretName: wopr-spoolman-tls
         hosts:
           - spoolman.wopr.tailandtraillabs.org

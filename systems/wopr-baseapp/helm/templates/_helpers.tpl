@@ -35,7 +35,7 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.labels}}
 {{ toYaml .Values.labels }}            # <-- ADDED
-{{- end }} 
+{{- end }}
 {{- end }}
 
 {{/*

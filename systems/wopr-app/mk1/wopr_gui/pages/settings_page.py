@@ -2,22 +2,22 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QWidget,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QHBoxLayout,
-    QVBoxLayout,
     QFileDialog,
     QFormLayout,
     QGroupBox,
+    QHBoxLayout,
     QInputDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Qt
 
-from ..lib.config import AppSettings
 from ..lib.camera import list_attached_cameras
+from ..lib.config import AppSettings
 
 
 def _config_dir_row(current_path: Path, on_change) -> QWidget:

@@ -9,16 +9,16 @@ data:
   seed-config.sh: |
     #!/bin/sh
     set -e
-    
+
     CONFIG_FILE="/config/config.xml"
-    
+
     # Only seed if config.xml doesn't exist (first run)
     if [ ! -f "$CONFIG_FILE" ]; then
       echo "Seeding initial config.xml with authentication..."
-      
+
       # Generate password hash (SHA256)
       PASSWORD_HASH=$(echo -n "{{ .Values.appAuth.password }}" | sha256sum | awk '{print $1}')
-      
+
       # Create base config.xml with auth
       cat > "$CONFIG_FILE" << 'EOF'
     <Config>
@@ -37,10 +37,10 @@ data:
       <UpdateMechanism>Docker</UpdateMechanism>
     </Config>
     EOF
-      
+
       # Replace the password hash placeholder
       sed -i "s/\${PASSWORD_HASH}/$PASSWORD_HASH/g" "$CONFIG_FILE"
-      
+
       echo "Config seeded successfully"
     else
       echo "Config already exists, skipping seed"

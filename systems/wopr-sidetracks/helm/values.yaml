@@ -35,11 +35,11 @@ wopr-baseapp:
         paths:
           - path: /
             pathType: Prefix
-    tls: 
+    tls:
       - secretName: wopr-web-tls
         hosts:
           - wopr.tailandtraillabs.org
-  
+
   env:
     - name: WOPR_API_URL
       valueFrom:

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0006_alter_dataset_artifact_uri_alter_result_artifact_uri"),
     ]

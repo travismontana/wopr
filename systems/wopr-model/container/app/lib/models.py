@@ -1,14 +1,15 @@
 """Models model library"""
 
-from lib.helpers import get_all, setup_logger, logit
+from lib.helpers import get_all, logit, setup_logger
 
 logger = setup_logger()
+
 
 def convert_family_id(model_family_id):
     logit(f"Converting family ID: {model_family_id}")
 
     model_families = get_all("model_families")
-    logit(f"Retrieved model families", f"Got: {model_families}")
+    logit("Retrieved model families", f"Got: {model_families}")
 
     if len(model_families) == 0:
         logit("No model families found")

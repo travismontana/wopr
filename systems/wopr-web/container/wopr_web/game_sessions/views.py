@@ -1,38 +1,35 @@
-from django.shortcuts import render, redirect
-from pathlib import Path
 import json
 import uuid
+from pathlib import Path
+
+from core.models import (
+    Game,
+    Image,
+    Move,
+    Player,
+    Round,
+    Session,
+    SessionImage,
+    Turn,
+)
+from django.shortcuts import redirect, render
+from lib.helpers import get_config, setup_logger
+
 from .forms import (
     GameForm,
     GameSessionForm,
     PlayerForm,
     SessionPlayerForm,
-    SessionImageForm,
 )
-
-from core.models import (
-    Game,
-    Session,
-    SessionPlayer,
-    Player,
-    SessionImage,
-    Image,
-    Round,
-    Turn,
-    Move,
-)
-
-from .lib.captures import grab_preview, grab_capture
+from .lib.captures import grab_capture, grab_preview
 from .lib.sessions import (
-    get_session_state,
-    get_next_player,
     advance_session,
+    get_session_state,
 )
-
-from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()
+
 
 # Create your views here.
 def gs_index(request):
@@ -296,7 +293,7 @@ def capture_results(request):
 
 def run_session(request):
     """
-    Display session runner interface. 
+    Display session runner interface.
     POST with 'action=advance' to execute a move.
     """
     if request.method == "POST":

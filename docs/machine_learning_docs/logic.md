@@ -10,7 +10,7 @@ architecture_breakdown:
         - url_decode(filename) -> str
         - build_annotation_map(jsons, images) -> Dict
       returns: {image_list, annotation_map}
-    
+
     specific_logic:
       CLI: scripts/01_discover.py
       API: POST /api/v1/training/discover
@@ -26,7 +26,7 @@ architecture_breakdown:
         - validate_coordinate_ranges(annotations) -> List[Issue]
         - check_label_format(annotations) -> List[Issue]
       returns: {validation_report, valid_pairs, orphans}
-    
+
     specific_logic:
       CLI: scripts/02_validate.py
       API: POST /api/v1/training/validate
@@ -40,7 +40,7 @@ architecture_breakdown:
         - sort_and_index(labels) -> Dict[str, int]
         - generate_classes_yaml(class_map) -> str
       returns: {class_to_id_map, classes_yaml}
-    
+
     specific_logic:
       CLI: scripts/03_build_classes.py
       API: GET /api/v1/training/classes
@@ -55,7 +55,7 @@ architecture_breakdown:
         - convert_annotation(annotation, class_map) -> List[str]
         - generate_label_files(annotation_map, class_map) -> Dict[str, str]
       returns: {filename: yolo_txt_content}
-    
+
     specific_logic:
       CLI: scripts/04_convert.py
       API: POST /api/v1/training/convert
@@ -69,7 +69,7 @@ architecture_breakdown:
         - calculate_split_sizes(total, train_ratio, val_ratio, test_ratio) -> Tuple[int, int, int]
         - split_dataset(items, train_size, val_size) -> Dict[str, List]
       returns: {train_files, val_files, test_files}
-    
+
     specific_logic:
       CLI: scripts/05_split.py
       API: POST /api/v1/training/split
@@ -83,7 +83,7 @@ architecture_breakdown:
         - create_directories(paths) -> None
         - verify_permissions(base_path) -> bool
       returns: {created_paths}
-    
+
     specific_logic:
       CLI: scripts/06_create_structure.py
       API: POST /api/v1/training/create-structure
@@ -98,7 +98,7 @@ architecture_breakdown:
         - distribute_split(files, split_name, base_path, method='copy') -> List[Path]
         - ensure_matching_basenames(image_path, label_path) -> bool
       returns: {distributed_files}
-    
+
     specific_logic:
       CLI: scripts/07_distribute.py
       API: POST /api/v1/training/distribute
@@ -112,21 +112,21 @@ architecture_breakdown:
         - write_yaml(path, content) -> Path
         - validate_yaml_schema(content) -> bool
       returns: {yaml_path, yaml_content}
-    
+
     specific_logic:
       CLI: scripts/08_generate_metadata.py
       API: POST /api/v1/training/generate-metadata
       Celery: tasks.training.metadata_task
 
 orchestration:
-  
+
   business_logic:
     location: lib/training/pipeline.py
     function: run_full_pipeline(source_dir, target_dir, output_dir, config)
     calls_all_business_logic_in_sequence:
       - discovery → validation → class_mapping → conversion → split → structure → distribution → metadata
     returns: {final_structure, reports, metrics}
-  
+
   specific_logic:
     CLI: scripts/run_pipeline.py --source X --target Y --output Z
     API: POST /api/v1/training/run-pipeline (async, returns task_id)

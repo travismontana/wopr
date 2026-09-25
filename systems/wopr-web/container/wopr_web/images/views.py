@@ -2,19 +2,18 @@ import hashlib
 import os
 import shutil  # ++ added for shutil.copy2 ++
 from urllib.parse import parse_qs, urlparse
-import uuid
-
-from django.shortcuts import render, redirect
 
 from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
+from django.shortcuts import redirect, render
 from lib.helpers import get_config, setup_logger
+
+from .lib.lib_datasets import work_create_mldataset, work_datasets_mgmt
 from .lib.lib_images import get_images_ondisk, image_sort
 from .lib.lib_labelstudio import (
     image_ls_list_projects_action,
     image_ls_projfile_action,
     send_labelstudio,
 )
-from .lib.lib_datasets import work_create_mldataset, work_datasets_mgmt
 
 logger = setup_logger()
 config = get_config()

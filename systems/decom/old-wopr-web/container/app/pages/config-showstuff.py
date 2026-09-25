@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
+
 import httpx
-import os 
 import requests
+import streamlit as st
 
 st.title("WOPR ML Config System")
 st.write("Welcome to the WOPR ML Config System.")
 
-# 
+#
 # Load WOPR Config from WOPR-API, then display it.
 #
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+
 
 @st.cache_data(ttl=60)
 def fetch_games():
@@ -31,15 +32,18 @@ def fetch_games():
     r.raise_for_status()
     return r.json()
 
+
 def fetch_pieces(game_id):
     r = httpx.get(f"{API_BASE}/api/v2/pieces/gameid/{game_id}")
     r.raise_for_status()
     return r.json()
 
+
 def fetch_config():
     r = httpx.get(f"{API_BASE}/api/v2/config/all")
     r.raise_for_status()
     return r.json()
+
 
 def post_json(url: str, payload: dict) -> requests.Response:
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
@@ -47,24 +51,28 @@ def post_json(url: str, payload: dict) -> requests.Response:
     r.raise_for_status()
     return r
 
+
 def show_config():
     st.header("WOPR Configuration")
     config = fetch_config()
     st.json(config)
 
+
 def show_games():
     st.header("Games")
     games = fetch_games()
-    for game in games['data']:
+    for game in games["data"]:
         st.subheader(f"Game ID: {game['id']}")
         st.json(game)
+
 
 def show_pieces(game_id: str):
     st.header(f"Pieces for Game ID: {game_id}")
     pieces = fetch_pieces(game_id)
-    for piece in pieces['data']:
+    for piece in pieces["data"]:
         st.subheader(f"Piece ID: {piece['id']}")
         st.json(piece)
+
 
 #
 # Stuff to list:
@@ -76,8 +84,7 @@ def show_pieces(game_id: str):
 
 st.header("WOPR Data Viewer")
 option = st.selectbox(
-    "Select data to view:",
-    ("Configuration", "Games", "Pieces by Game ID")
+    "Select data to view:", ("Configuration", "Games", "Pieces by Game ID")
 )
 
 if option == "Configuration":

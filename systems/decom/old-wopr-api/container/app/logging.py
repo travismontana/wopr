@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 def configure_logging(logfile: str, level=logging.DEBUG):
     logging.basicConfig(
         filename=logfile,

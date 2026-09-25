@@ -1,5 +1,5 @@
 workflow:
-  
+
   1_discovery:
     name: "Discovery Phase"
     inputs:
@@ -44,7 +44,7 @@ workflow:
 
   4_coordinate_conversion:
     name: "Convert to YOLO format"
-    input_format: 
+    input_format:
       labelstudio: "x%, y%, width%, height% (top-left corner)"
     output_format:
       yolo: "class_id x_center y_center width height (normalized 0-1)"
@@ -111,7 +111,7 @@ workflow:
     content:
       path: /remote/wopr/models/yolococo1
       train: images/train
-      val: images/val  
+      val: images/val
       test: images/test
       nc: <count from class_to_id_map>
       names: <list from class_to_id_map ordered by id>

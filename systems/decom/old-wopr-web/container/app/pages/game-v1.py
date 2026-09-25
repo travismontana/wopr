@@ -68,12 +68,12 @@ if st.session_state.session_uuid is None:
 	selected_game_name = st.selectbox("Select a game:", options=game_names)
 	selected_game = next(g for g in games if g['name'] == selected_game_name)
 	st.session_state.selected_game = selected_game
-	
+
 	if st.button("Start New Game"):
 		st.session_state.session_uuid = newSession(selected_game['id'])
 		st.session_state.current_round = 1
 		st.session_state.round_started = False
-		
+
 		st.success(f"New game session started: {st.session_state.session_uuid}")
 		st.rerun()
 
@@ -83,7 +83,7 @@ else:
 	st.subheader(f"Playing: {game['name']}")
 	st.write(f"Session UUID: {st.session_state.session_uuid}")
 	st.write(f"Round: {st.session_state.current_round} / {game.get('max_rounds', 'Unknown')}")
-	
+
 	# Round hasn't started yet
 	if not st.session_state.round_started:
 		if st.button(f"Start Round {st.session_state.current_round}"):
@@ -96,11 +96,11 @@ else:
 			st.success(f"Round {st.session_state.current_round} started - Initial state captured")
 			st.session_state.round_started = True
 			st.rerun()
-	
+
 	# Round in progress
 	else:
 		st.info(f"Round {st.session_state.current_round} in progress...")
-		
+
 		if st.button(f"Play {st.session_state.current_round_play} Round {st.session_state.current_round}"):
 			# Capture play state
 			result = takeCapture(
@@ -118,7 +118,7 @@ else:
 				"end"
 			)
 			st.success(f"Round {st.session_state.current_round} ended - Final state captured")
-			
+
 			# Check if game is complete
 			max_rounds = game.get('max_rounds', 10)
 			if st.session_state.current_round >= max_rounds:
@@ -135,7 +135,7 @@ else:
 				st.session_state.current_round_play += 1
 				st.session_state.round_started = False
 				st.rerun()
-	
+
 	# Emergency reset
 	st.divider()
 	if st.button("End Game", type="secondary"):

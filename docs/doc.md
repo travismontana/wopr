@@ -12,7 +12,7 @@ What is WOPR? WOPR tracks tabletop game state through computer vision. Players u
 
 ## Nitty Gritty
 The captured images will pass through a pipeline/databus so they can be analyzed when needed.
-the rate will be 4Hz-ish.  4 times a second, the app will grab the current image from the defined usb web cam, and place it in the bus.  
+the rate will be 4Hz-ish.  4 times a second, the app will grab the current image from the defined usb web cam, and place it in the bus.
 anything that needs to work on that image, can.  The idea is that there will be a calibration set at the beginning of the game, and the images will need to pass through each step (each thread will pull the image it needs from the bus)
 
 User starts wopr (./wopr.py), they are presented with the app, already on the calibration screen.  They see what the camera is seeing, adn adjusts the settings for the light and such.  they click save.

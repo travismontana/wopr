@@ -1,14 +1,16 @@
-import streamlit as st
 import math
+
+import streamlit as st
 
 st.set_page_config(layout="wide")  # MUST be first Streamlit call
 
-from ultralytics import YOLO
-import cv2
 import os
-from PIL import Image
+
+import cv2
 import numpy as np
 from lib.libtools import where_are_pieces
+from PIL import Image
+from ultralytics import YOLO
 
 st.title("WOPR Object Detection")
 
@@ -24,6 +26,7 @@ CLASS_COLORS = {
     "monnok": (255, 128, 0),  # orange
     "ngok": (128, 0, 255),  # purple
 }
+
 
 @st.cache_resource
 def load_model(model_path):
@@ -186,7 +189,7 @@ if uploaded:
 
             circle_center = (kept[0][0], kept[0][1])
             circle_rho = math.isqrt(
-                int((circle_center[0] ** 2 + (circle_center[1] ** 2)))
+                int(circle_center[0] ** 2 + (circle_center[1] ** 2))
             )
             circle_rho_mm = circle_rho * pixel_to_mm
             circle_theta_deg = math.degrees(

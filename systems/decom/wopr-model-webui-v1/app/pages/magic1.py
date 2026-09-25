@@ -1,6 +1,6 @@
-import streamlit as st
-import numpy as np
 import cv2
+import numpy as np
+import streamlit as st
 
 
 def find_lines(center, corners, circle_dist, tol=10.0):
@@ -710,7 +710,7 @@ if uploaded_file is not None:
                 None,
             )
             if ret:
-                st.write(f"Found chessboard corners in the image.")
+                st.write("Found chessboard corners in the image.")
             else:
                 st.write("Found 0 chessboard corners in the image.")
 
@@ -871,7 +871,7 @@ if uploaded_file is not None:
                 None,
             )
             if ret_rgb:
-                st.write(f"Found chessboard corners in the image.")
+                st.write("Found chessboard corners in the image.")
             else:
                 st.write("Found 0 chessboard corners in the image.")
 

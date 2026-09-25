@@ -2,17 +2,17 @@ from django.contrib import admin
 
 from .models import (
     Game,
-    Session,
-    Player,
-    Image,
-    SessionPlayer,
-    Move,
-    SessionImage,
-    Round,
-    Turn,
-    ImageGame,
     GameLabelproj,
+    Image,
+    ImageGame,
     MLDataset,
+    Move,
+    Player,
+    Round,
+    Session,
+    SessionImage,
+    SessionPlayer,
+    Turn,
 )
 
 # Register your models here.

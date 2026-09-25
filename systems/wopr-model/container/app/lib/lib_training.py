@@ -1,7 +1,8 @@
 # Training function
-import os
 from pathlib import Path
+
 from ultralytics import YOLO
+
 from .helpers import setup_logger
 
 logger = setup_logger()

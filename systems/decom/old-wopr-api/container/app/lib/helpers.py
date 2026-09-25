@@ -1,7 +1,8 @@
 import httpx
 
-from app.logging import configure_logging
 import app.globals as woprvar
+from app.logging import configure_logging
+
 logger = configure_logging(woprvar.LOGFILE)
 
 

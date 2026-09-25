@@ -1,15 +1,11 @@
-import logging
-import httpx
-import time
 import hashlib
-
-from fastapi import FastAPI, HTTPException, APIRouter
-from fastapi.responses import JSONResponse, PlainTextResponse, Response
-from fastapi.middleware.cors import CORSMiddleware
-from picamera2 import Picamera2
-from libcamera import Transform
+import time
 from io import BytesIO
 
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse, Response
+from libcamera import Transform
+from picamera2 import Picamera2
 
 from .lib.helpers import setup_logger
 
@@ -20,12 +16,13 @@ APP_API_VERSION = "v1"
 
 logger.info(f"Starting {APP_NAME} application")
 
-logger.info(f"Setup variables")
+logger.info("Setup variables")
 
 # Allons Ye!
 app = FastAPI(
     title=APP_NAME,
 )
+
 
 # health page
 @app.get("/health")
@@ -81,7 +78,7 @@ def capture(payload: dict):
     logger.info("Received request for capture preview")
     width = payload.get("width", 3840)
     height = payload.get("height", 2160)
-    filepath = payload.get("filepath", f"/dev/null")
+    filepath = payload.get("filepath", "/dev/null")
     results = {}
     with Picamera2() as cam:
         camera_config = cam.create_preview_configuration(

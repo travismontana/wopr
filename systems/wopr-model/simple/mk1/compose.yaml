@@ -11,8 +11,8 @@ services:
       - /remote/wopr/models/ua/datasets:/remote/wopr/models/ua/datasets
     shm_size: '4gb'
     runtime: nvidia
-    command: 
-      - yolo 
+    command:
+      - yolo
       - train
       - "model=${MODEL:-yolo11n.pt}"
       - "data=${DATASET}"

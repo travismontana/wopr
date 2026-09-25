@@ -13,7 +13,7 @@
 # limitations under the License.
 
 label-studio:
-  global: 
+  global:
     pgConfig:
       host: "wopr-db-cluster-rw.wopr.svc.cluster.local"
       port: 5432

@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0008_alter_sessionplayer_unique_together_move_turn_and_more"),
     ]

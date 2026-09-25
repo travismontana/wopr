@@ -3,16 +3,13 @@ WOPR Frontend Helpers
 Utility functions for Streamlit UI interactions with WOPR API.
 """
 
-import streamlit as st
-import logging
 import inspect
+import logging
 import random
-import httpx
 import sys
-import re
 
-from datetime import datetime
-from pathlib import Path
+import httpx
+import streamlit as st
 
 # API configuration
 API_BASE = "https://api.wopr.tailandtraillabs.org"
@@ -27,7 +24,7 @@ PLAYPHRASES = [
     "Fear is the mind killer",
     "There is no escape",
     "You're worm food",
-    "Hasta la vista wormy"
+    "Hasta la vista wormy",
 ]
 
 LOGGER_NAME = "helpers"
@@ -36,13 +33,14 @@ LOGGER_NAME = "helpers"
 # Logging Setup
 # ------------------------
 
+
 def setup_logger() -> logging.Logger:
     """
     Configure logging for helper functions.
-    
+
     Returns:
         Configured logger instance
-        
+
     Note:
         Only configures once - subsequent calls return existing logger
     """
@@ -75,26 +73,31 @@ imgurl = "https://images.wopr.tailandtraillabs.org/ml/incoming"
 # Utility Functions
 # ------------------------
 
+
 def get_random_phrase() -> str:
     return random.choice(PLAYPHRASES)
 
-def debugit(what,message):
-    debug = st.session_state['debug']
+
+def debugit(what, message):
+    debug = st.session_state["debug"]
     if debug:
         caller = inspect.stack()[1].function
         logger.debug(f"{message}: {what}")
         st.write(f"({caller}): {message}")
         st.write(what)
 
+
 # ------------------------
 # CRUD Operations
 # ------------------------
+
 
 @st.cache_data()
 def get_all(noun: str) -> list:
     url = f"{API_BASE}/api/v2/{noun}"
     response = do_api_things("get", API_BASE, noun, "", payload=None)
     return response
+
 
 @st.cache_data()
 def get_one(noun: str, item_id: str) -> dict:
@@ -117,7 +120,7 @@ def update_item(noun: str, item_id: int, payload: dict) -> dict:
 
 def delete_item(noun: str, item_id: str) -> bool:
     url = f"{API_BASE}/api/v2/{noun}/{item_id}"
-    response = do_api_things("delete", API_BASE, noun, item_id,payload=None)
+    response = do_api_things("delete", API_BASE, noun, item_id, payload=None)
     return response
 
 
@@ -139,36 +142,37 @@ def do_api_things(action, base_url, route, path, payload):
         "post": httpx.post,
         "put": httpx.put,
         "patch": httpx.patch,
-        "delete": httpx.delete
+        "delete": httpx.delete,
     }
-    
+
     method = action_map[action.lower()]
     logger.info(f"Using HTTP method: {method.__name__}")
-    
+
     timeout = 30.0
     parts = [base_url, "api", API_VERSION, route, path]
-    url = "/".join(str(p).strip('/') for p in parts if p)
+    url = "/".join(str(p).strip("/") for p in parts if p)
     logger.info(f"Constructed URL: {url}")
-    
+
     # Build request kwargs based on HTTP method
     kwargs = {"timeout": timeout, "headers": headers}
-    
+
     if action.lower() in ["post", "put", "patch"] and payload:
         kwargs["json"] = payload
     elif action.lower() == "get" and payload:
         # If payload exists for GET, treat as query params
         kwargs["params"] = payload
-    
+
     response = method(url, **kwargs)
     response.raise_for_status()
-    #for item in response:
+    # for item in response:
     #    result.append(item.json())
     result = response.json()
     logger.info(f"Response status code: {response}")
     logger.info(f"Response result: {result}")
     logger.debug(response.text)
-    
+
     return result
 
+
 def get_config():
-    return(do_api_things("get", API_BASE, "config", "all", payload=None))
+    return do_api_things("get", API_BASE, "config", "all", payload=None)

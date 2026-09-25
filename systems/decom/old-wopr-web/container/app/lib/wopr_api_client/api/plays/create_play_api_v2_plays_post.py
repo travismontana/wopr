@@ -5,7 +5,9 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.create_play_api_v2_plays_post_payload import CreatePlayApiV2PlaysPostPayload
+from ...models.create_play_api_v2_plays_post_payload import (
+    CreatePlayApiV2PlaysPostPayload,
+)
 from ...models.http_validation_error import HTTPValidationError
 from ...types import Response
 

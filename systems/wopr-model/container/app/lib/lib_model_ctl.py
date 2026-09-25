@@ -1,20 +1,21 @@
-import os
-import time
 import json
-import yaml
-import shutil
+import os
 import random
-import ultralytics
-from pathlib import Path
+import shutil
+import time
 from datetime import datetime
+from pathlib import Path
+
+import ultralytics
+import yaml
+from label_studio_sdk import LabelStudio
+from label_studio_sdk._extensions.label_studio_tools.core.utils.io import get_local_path
+from label_studio_sdk.converter import Converter
 from tqdm import tqdm
 
-import lib.globals as globals
+from lib import globals
 from lib.helpers import logit, setup_logger
 from lib.safe_file import SafeFS
-from label_studio_sdk import LabelStudio
-from label_studio_sdk.converter import Converter
-from label_studio_sdk._extensions.label_studio_tools.core.utils.io import get_local_path
 
 logger = setup_logger()
 LABEL_STUDIO_URL = os.getenv("LABEL_STUDIO_URL", "http://label-studio:8080")
@@ -170,8 +171,7 @@ def generate_dataset(dataset: dict):
         )
 
         with open(snapshot_path, "wb") as f:
-            for data in data_iter:
-                f.write(data)
+            f.writelines(data_iter)
 
         # Load exported tasks
         with open(snapshot_path) as f:
@@ -271,7 +271,7 @@ def generate_dataset(dataset: dict):
         logger.error(f"Error generating dataset: {e}")
         return {
             "status": "error",
-            "message": f"Dataset generation failed: {str(e)}",
+            "message": f"Dataset generation failed: {e!s}",
         }
 
 
@@ -290,7 +290,7 @@ def create_data_yaml(dataset_path: str):
 
     # Read class names
     with open(classes_file, "r") as f:
-        class_names = [line.strip() for line in f.readlines()]
+        class_names = [line.strip() for line in f]
 
     # Create data.yaml structure
     data_yaml = {

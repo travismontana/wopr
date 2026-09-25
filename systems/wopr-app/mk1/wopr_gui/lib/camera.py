@@ -1,7 +1,8 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
 import cv2
+
 
 def list_attached_cameras() -> dict[int, str]:
     """
@@ -35,6 +36,7 @@ def list_attached_cameras() -> dict[int, str]:
         cap.release()
     return camera_dict
 
+
 def _attached_video_indices() -> list[int]:
     indices = []
     for entry in Path("/sys/class/video4linux").glob("video*"):
@@ -43,9 +45,11 @@ def _attached_video_indices() -> list[int]:
             indices.append(int(m.group(1)))
     return sorted(indices)
 
+
 def get_camera_info(index: int) -> dict:
     cameras = list_attached_cameras()
     return cameras.get(index, None)
+
 
 def is_camera_connected(index: int) -> bool:
     cam = cv2.VideoCapture(index)

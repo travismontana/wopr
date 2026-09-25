@@ -102,7 +102,7 @@ Class count + names from step 3
 
 
 workflow:
-  
+
   1_discovery:
     name: "Parse and map annotations"
     inputs:

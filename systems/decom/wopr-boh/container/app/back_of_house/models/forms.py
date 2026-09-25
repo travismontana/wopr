@@ -1,5 +1,5 @@
+from core.models import ModelBackup, ModelFamily, ModelInfo, ModelVersion
 from django import forms
-from core.models import ModelInfo, ModelFamily, ModelVersion, ModelBackup
 
 
 class TrainingModelForm(forms.ModelForm):
@@ -8,8 +8,9 @@ class TrainingModelForm(forms.ModelForm):
         fields = ["name", "shortname", "family", "description", "note"]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3, "cols": 40}),
-            "note": forms.Textarea(attrs={"rows": 3, "cols": 40})
+            "note": forms.Textarea(attrs={"rows": 3, "cols": 40}),
         }
+
 
 class TrainingModelFamilyForm(forms.ModelForm):
     class Meta:
@@ -49,8 +50,8 @@ class TrainingModelBackupForm(forms.ModelForm):
             "taken_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
 
+
 class ModelFamilyBulkForm(forms.Form):  # Plain Form - no model needed
     file = forms.FileField(
-        label="Upload CSV File",
-        widget=forms.FileInput(attrs={'accept': '.csv'})
+        label="Upload CSV File", widget=forms.FileInput(attrs={"accept": ".csv"})
     )

@@ -1,10 +1,11 @@
+import os
+from io import BytesIO
+
+import cv2
+import numpy as np
 import requests
 import streamlit as st
-import numpy as np
-import cv2
-import os
 from PIL import Image
-from io import BytesIO
 
 CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
@@ -125,7 +126,12 @@ def apply_threshold(img, method, params):
 def apply_single_edge(img, method, params):
     gray = ensure_gray_u8(img)
     if method == "Canny":
-        return cv2.Canny(gray, params["thresh1"], params["thresh2"], apertureSize=params["apertureSize"])
+        return cv2.Canny(
+            gray,
+            params["thresh1"],
+            params["thresh2"],
+            apertureSize=params["apertureSize"],
+        )
     elif method == "Sobel":
         k = params["kernel"]
         sx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=k)

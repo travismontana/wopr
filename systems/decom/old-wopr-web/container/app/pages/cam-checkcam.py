@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
+
 import httpx
-import os 
-import requests
+import streamlit as st
 
 st.title("WOPR ML Cam Check System")
 st.write("Welcome to the WOPR ML Cam Check System.")
 
-# 
+#
 # Load WOPR Config from WOPR-API, then display it.
 #
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+
 
 def fetch_config():
     response = httpx.get(f"{API_BASE}/api/v2/config/all")
@@ -41,9 +41,9 @@ config = fetch_config()
 #
 
 st.header("Cameras")
-cameras = config['camera']['camDict']
+cameras = config["camera"]["camDict"]
 
-camera_options = {cam['name']: cam['id'] for cam in cameras.values()}
+camera_options = {cam["name"]: cam["id"] for cam in cameras.values()}
 selected_camera_name = st.selectbox("Select a camera", list(camera_options.keys()))
 selected_camera_id = camera_options[selected_camera_name]
 

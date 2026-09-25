@@ -5,7 +5,9 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.capture_session_api_v2_session_capture_post_payload import CaptureSessionApiV2SessionCapturePostPayload
+from ...models.capture_session_api_v2_session_capture_post_payload import (
+    CaptureSessionApiV2SessionCapturePostPayload,
+)
 from ...models.http_validation_error import HTTPValidationError
 from ...types import Response
 

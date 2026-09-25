@@ -28,13 +28,19 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+    | None
+):
     if response.status_code == 200:
         response_200 = []
         _response_200 = response.json()
         for response_200_item_data in _response_200:
-            response_200_item = ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item.from_dict(
-                response_200_item_data
+            response_200_item = (
+                ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item.from_dict(
+                    response_200_item_data
+                )
             )
 
             response_200.append(response_200_item)
@@ -54,7 +60,10 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -67,7 +76,10 @@ def sync_detailed(
     project_id: int,
     *,
     client: AuthenticatedClient | Client,
-) -> Response[HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+]:
     """List Tasks
 
      List all annotation tasks (images) in a Label Studio project.
@@ -104,7 +116,11 @@ def sync(
     project_id: int,
     *,
     client: AuthenticatedClient | Client,
-) -> HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+    | None
+):
     """List Tasks
 
      List all annotation tasks (images) in a Label Studio project.
@@ -136,7 +152,10 @@ async def asyncio_detailed(
     project_id: int,
     *,
     client: AuthenticatedClient | Client,
-) -> Response[HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]]:
+) -> Response[
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+]:
     """List Tasks
 
      List all annotation tasks (images) in a Label Studio project.
@@ -171,7 +190,11 @@ async def asyncio(
     project_id: int,
     *,
     client: AuthenticatedClient | Client,
-) -> HTTPValidationError | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item] | None:
+) -> (
+    HTTPValidationError
+    | list[ListTasksApiV2VisionProjectsProjectIdTasksGetResponse200Item]
+    | None
+):
     """List Tasks
 
      List all annotation tasks (images) in a Label Studio project.

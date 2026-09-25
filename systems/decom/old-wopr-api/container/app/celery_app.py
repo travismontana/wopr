@@ -1,15 +1,10 @@
 import os
+
 from celery import Celery
 
 # Get Redis URL from environment
-CELERY_BROKER_URL = os.getenv(
-    "CELERY_BROKER_URL",
-    "redis://wopr-api-valkey:6379/0"
-)
-CELERY_RESULT_BACKEND = os.getenv(
-    "CELERY_RESULT_BACKEND", 
-    CELERY_BROKER_URL
-)
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://wopr-api-valkey:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
 
 # Create Celery app
 celery_app = Celery(
@@ -20,10 +15,10 @@ celery_app = Celery(
 
 # Configure Celery
 celery_app.conf.update(
-    task_serializer='json',
-    accept_content=['json'],
-    result_serializer='json',
-    timezone='UTC',
+    task_serializer="json",
+    accept_content=["json"],
+    result_serializer="json",
+    timezone="UTC",
     enable_utc=True,
     task_track_started=True,
     task_time_limit=30 * 60,  # 30 minutes
@@ -33,4 +28,4 @@ celery_app.conf.update(
 )
 
 # Auto-discover tasks in app.tasks module
-celery_app.autodiscover_tasks(['app.tasks'])
+celery_app.autodiscover_tasks(["app.tasks"])

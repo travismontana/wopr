@@ -1,8 +1,10 @@
-from . import router, logger
-from fastapi import APIRouter, HTTPException, status
-from app import globals as woprvar
 import requests
+from app import globals as woprvar
 from app.logging import configure_logging
+from fastapi import APIRouter, HTTPException, status
+
+from . import logger, router
+
 logger = configure_logging(woprvar.LOGFILE)
 router = APIRouter(tags=["images"])
 logger.info("Images API module loaded")
@@ -41,7 +43,9 @@ def oneGet(url: str, headers: dict, params: dict) -> list[dict]:
 @router.get("/gameid/{game_catalog_id}/", response_model=list[dict])
 @router.get("/gameid/{game_catalog_id}", response_model=list[dict])
 def get_images_by_game_catalog_id(game_catalog_id: int):
-    logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
+    logger.info(
+        f"Fetching images for game catalog ID {game_catalog_id} from the directus api"
+    )
     url = f"{woprvar.DIRECTUS_URL}/items/mlimages"
     params = {
         "filter[game_catalog_id][_eq]": game_catalog_id,
@@ -51,8 +55,10 @@ def get_images_by_game_catalog_id(game_catalog_id: int):
 
 @router.get("/gameid/names/{game_catalog_id}/", response_model=list[dict])
 @router.get("/gameid/names/{game_catalog_id}", response_model=list[dict])
-def get_images_by_game_catalog_id_names(game_catalog_id: int): 
-    logger.info(f"Fetching images for game catalog ID {game_catalog_id} from the directus api")
+def get_images_by_game_catalog_id_names(game_catalog_id: int):
+    logger.info(
+        f"Fetching images for game catalog ID {game_catalog_id} from the directus api"
+    )
     url = f"{woprvar.DIRECTUS_URL}/items/mlimages"
 
     params = {
@@ -79,6 +85,7 @@ def get_all_images():
     logger.info("Fetching all images from the directus api")
     url = f"{woprvar.DIRECTUS_URL}/items/mlimages"
     return oneGet(url, woprvar.DIRECTUS_HEADERS, {})
+
 
 @router.get("/byfilename/{imagefilename}", response_model=list[dict])
 def get_images_by_filename(imagefilename: str):

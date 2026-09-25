@@ -70,7 +70,7 @@
         {% if move.image_at_end %}
             <br>
             <a href="{{imgurl}}/{{ move.image_at_end.artifact_uri|strip_base_path }}">
-                <img src="{{thumburl}}/{{ move.image_at_end.artifact_uri|strip_base_path }}" alt="{{ move.image_at_end.filename }}" style="max-width: 200px;">      
+                <img src="{{thumburl}}/{{ move.image_at_end.artifact_uri|strip_base_path }}" alt="{{ move.image_at_end.filename }}" style="max-width: 200px;">
             </a>
         {% endif %}
     </li>

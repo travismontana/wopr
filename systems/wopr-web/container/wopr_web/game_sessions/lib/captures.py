@@ -1,9 +1,9 @@
 import requests
-
 from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()
+
 
 def grab_preview():
     url = f"http://{config['camera']['camDict']['0']['host']}:{config['camera']['camDict']['0']['port']}/api/capture_preview"

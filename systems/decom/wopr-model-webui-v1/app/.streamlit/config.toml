@@ -23,12 +23,12 @@
 
 
 [client]
-toolbarMode = "viewer"
+  toolbarMode = "viewer"
 
 [server]
-runOnSave = true
-headless = true
-showEmailPrompt = false
+  runOnSave       = true
+  headless        = true
+  showEmailPrompt = false
 
 [browser]
-gatherUsageStats = false
+  gatherUsageStats = false

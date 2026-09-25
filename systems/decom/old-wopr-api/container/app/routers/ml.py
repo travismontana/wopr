@@ -1,13 +1,12 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-import httpx
 import asyncio
-from typing import Optional
-from datetime import datetime
-
-from app import globals as woprvar
 import logging
 import sys
+from datetime import datetime
+
+import httpx
+from app import globals as woprvar
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(woprvar.APP_NAME)
 logging.basicConfig(filename="/var/log/wopr-api.log", level="DEBUG")
@@ -21,19 +20,20 @@ class CaptureRequest(BaseModel):
     game_id: int
     piece_id: int
     position_id: int
-    rotation: int = Field(ge=0, le=360, description="Rotation in degrees 0-360, in 45 degree increments")
+    rotation: int = Field(
+        ge=0, le=360, description="Rotation in degrees 0-360, in 45 degree increments"
+    )
     lighting_level: int = Field(ge=10, le=100, description="Brightness 10-100")
     lighting_temp: str = Field(description="neutral/warm/cool")
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class CaptureResponse(BaseModel):
     success: bool
-    image_metadata_id: Optional[int] = None
+    image_metadata_id: int | None = None
     message: str
     lighting_set: bool
     image_captured: bool
-
 
 
 @router.post("/captureandsetlights", response_model=CaptureResponse)
@@ -49,19 +49,15 @@ async def capture_and_set_lights(request: CaptureRequest):
     6. Returns metadata
     """
     # Map lighting_temp string to kelvin values
-    temp_to_kelvin = {
-        "neutral": 4000,
-        "warm": 3000,
-        "cool": 5500
-    }
-    
+    temp_to_kelvin = {"neutral": 4000, "warm": 3000, "cool": 5500}
+
     kelvin = temp_to_kelvin.get(request.lighting_temp.lower())
     if kelvin is None:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid lighting_temp: {request.lighting_temp}. Must be 'neutral', 'warm', or 'cool'"
+            detail=f"Invalid lighting_temp: {request.lighting_temp}. Must be 'neutral', 'warm', or 'cool'",
         )
-    
+
     lighting_set = False
     image_captured = False
     image_metadata_id = None
@@ -76,7 +72,7 @@ async def capture_and_set_lights(request: CaptureRequest):
             request.position_id,
             request.rotation,
             request.lighting_temp,
-            request.lighting_level
+            request.lighting_level,
         )
         logger.info(f"Generated filename: {filename}")
 
@@ -84,14 +80,13 @@ async def capture_and_set_lights(request: CaptureRequest):
         async with httpx.AsyncClient(timeout=30.0) as client:
             homeauto_response = await client.post(
                 "http://wopr-api:8000/api/v1/homeauto/lights/preset",
-                json={
-                    "brightness": request.lighting_level,
-                    "kelvin": kelvin
-                }
+                json={"brightness": request.lighting_level, "kelvin": kelvin},
             )
             homeauto_response.raise_for_status()
             lighting_set = True
-            logger.info(f"Lights set successfully to {kelvin}K @ {request.lighting_level}%")
+            logger.info(
+                f"Lights set successfully to {kelvin}K @ {request.lighting_level}%"
+            )
 
         # Step 3: Wait for stabilization
         logger.info("Waiting 3 seconds for lighting stabilization...")
@@ -102,16 +97,15 @@ async def capture_and_set_lights(request: CaptureRequest):
         async with httpx.AsyncClient(timeout=60.0) as client:
             camera_response = await client.post(
                 "http://wopr-api:8000/api/v1/cameras/capture",
-                json={
-                    "captureType": "ml_capture",
-                    "filename": filename
-                }
+                json={"captureType": "ml_capture", "filename": filename},
             )
             camera_response.raise_for_status()
             logger.info(f"Camera capture complete: {filename}")
 
         # Step 5: Create metadata record
-        logger.info(f"Creating metadata: game={request.game_id}, piece={request.piece_id}, pos={request.position_id}")
+        logger.info(
+            f"Creating metadata: game={request.game_id}, piece={request.piece_id}, pos={request.position_id}"
+        )
         async with httpx.AsyncClient(timeout=60.0) as client:
             metadata_response = await client.post(
                 "http://wopr-api:8000/api/v1/mlimages",
@@ -124,8 +118,8 @@ async def capture_and_set_lights(request: CaptureRequest):
                     "game_uuid": request.game_id,
                     "piece_id": request.piece_id,
                     "status": "draft",
-                    "notes": request.notes
-                }
+                    "notes": request.notes,
+                },
             )
             metadata_response.raise_for_status()
             metadata_data = metadata_response.json()
@@ -138,27 +132,23 @@ async def capture_and_set_lights(request: CaptureRequest):
             image_metadata_id=image_metadata_id,
             message=f"Image captured successfully: {filename}",
             lighting_set=lighting_set,
-            image_captured=image_captured
+            image_captured=image_captured,
         )
 
     except httpx.HTTPStatusError as e:
-        logger.error(f"HTTP error during capture: {e.response.status_code} - {e.response.text}")
+        logger.error(
+            f"HTTP error during capture: {e.response.status_code} - {e.response.text}"
+        )
         raise HTTPException(
             status_code=e.response.status_code,
-            detail=f"Upstream service error: {e.response.text}"
+            detail=f"Upstream service error: {e.response.text}",
         )
     except httpx.RequestError as e:
-        logger.error(f"Request error during capture: {str(e)}")
-        raise HTTPException(
-            status_code=503,
-            detail=f"Service unavailable: {str(e)}"
-        )
+        logger.error(f"Request error during capture: {e!s}")
+        raise HTTPException(status_code=503, detail=f"Service unavailable: {e!s}")
     except Exception as e:
-        logger.error(f"Unexpected error during capture: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Capture failed: {str(e)}"
-        )
+        logger.error(f"Unexpected error during capture: {e!s}")
+        raise HTTPException(status_code=500, detail=f"Capture failed: {e!s}")
 
 
 async def generate_ml_filename(
@@ -167,13 +157,15 @@ async def generate_ml_filename(
     position_id: int,
     rotation: int,
     color_temp: str,
-    light_intensity: int
+    light_intensity: int,
 ) -> str:
     """
     Generate ML training image filename matching frontend pattern:
     {piece}-{game}-{position}-rot{rotation}-pct{intensity}-temp{colortemp}-{timestamp}.jpg
     """
-    logger.info(f"Generating M2222L filename for game_id={game_id}, piece_id={piece_id}, position_id={position_id}, rotation={rotation}, color_temp={color_temp}, light_intensity={light_intensity}")
+    logger.info(
+        f"Generating M2222L filename for game_id={game_id}, piece_id={piece_id}, position_id={position_id}, rotation={rotation}, color_temp={color_temp}, light_intensity={light_intensity}"
+    )
     # Fetch game and piece names
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
@@ -182,23 +174,24 @@ async def generate_ml_filename(
             game_name = game_res.json().get("name", "unknown")
         except:
             game_name = "unknown"
-        
+
         try:
-            piece_res = await client.get(f"http://wopr-api:8000/api/v1/pieces/{piece_id}")
+            piece_res = await client.get(
+                f"http://wopr-api:8000/api/v1/pieces/{piece_id}"
+            )
             piece_res.raise_for_status()
             piece_name = piece_res.json().get("name", "unknown")
         except:
             piece_name = "unknown"
-    
+
     # Sanitize names
     def sanitize(s: str) -> str:
-        return ''.join(c if c.isalnum() or c == '_' else '_' for c in s.lower())
+        return "".join(c if c.isalnum() or c == "_" else "_" for c in s.lower())
 
-    
     # Generate timestamp
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d-%H%M%S")
-    
+
     # Build filename
     parts = [
         sanitize(piece_name),
@@ -207,7 +200,7 @@ async def generate_ml_filename(
         f"rot{rotation}",
         f"pct{light_intensity}",
         f"temp{sanitize(color_temp)}",
-        timestamp
+        timestamp,
     ]
     logger.info(f"*****Generated filename parts: {parts}")
     return f"{'-'.join(parts)}.jpg"

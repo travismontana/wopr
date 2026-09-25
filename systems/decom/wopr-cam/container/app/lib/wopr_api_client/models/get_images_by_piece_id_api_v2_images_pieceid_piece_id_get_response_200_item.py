@@ -5,6 +5,7 @@ from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+from typing_extensions import Self
 
 T = TypeVar("T", bound="GetImagesByPieceIdApiV2ImagesPieceidPieceIdGetResponse200Item")
 
@@ -22,12 +23,16 @@ class GetImagesByPieceIdApiV2ImagesPieceidPieceIdGetResponse200Item:
         return field_dict
 
     @classmethod
-    def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+    def from_dict(cls, src_dict: Mapping[str, Any]) -> Self:
         d = dict(src_dict)
-        get_images_by_piece_id_api_v2_images_pieceid_piece_id_get_response_200_item = cls()
+        get_images_by_piece_id_api_v2_images_pieceid_piece_id_get_response_200_item = (
+            cls()
+        )
 
         get_images_by_piece_id_api_v2_images_pieceid_piece_id_get_response_200_item.additional_properties = d
-        return get_images_by_piece_id_api_v2_images_pieceid_piece_id_get_response_200_item
+        return (
+            get_images_by_piece_id_api_v2_images_pieceid_piece_id_get_response_200_item
+        )
 
     @property
     def additional_keys(self) -> list[str]:

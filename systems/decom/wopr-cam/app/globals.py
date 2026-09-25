@@ -17,7 +17,9 @@
 Global constants and configuration for WOPR API.
 Single source of truth for all static values.
 """
+
 import os
+
 import httpx
 
 # Application Identity
@@ -30,7 +32,7 @@ APP_AUTHOR_EMAIL = "bob@bomar.us"
 APP_DOMAIN = "wopr.tailandtraillabs.org"
 APP_API_URL = "https://api." + APP_DOMAIN
 APP_OTEL_URL = "https://otel." + APP_DOMAIN
-#WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
+# WOPR_API_URL = os.getenv('WOPR_API_URL', APP_API_URL+"/api/v1")
 WOPR_API_URL = APP_API_URL + "/api/v2"
 
 APP_HOST = "0.0.0.0"
@@ -47,7 +49,7 @@ HACK_CAMERA_DICT = {
         "name": "wopr-cam",
         "url": "http://wopr-cam.hangar.bpfx.org",
         "port": 5000,
-        "capabilities": [ "games", "ml"]
+        "capabilities": ["games", "ml"],
     }
 }
 
@@ -57,6 +59,6 @@ response.raise_for_status()
 result = response.json()
 
 if result:
-    WOPR_CONFIG=result
+    WOPR_CONFIG = result
 else:
-    WOPR_CONFIG={}
+    WOPR_CONFIG = {}

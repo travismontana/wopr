@@ -23,7 +23,7 @@
             <td>{{ model.name }}</td>
             <td>{{ model.shortname }}</td>
                     <td><a href="{% url 'model_details' id=model.id %}">Details</a> |
-                        <a href="{% url 'model_edit' id=model.id %}">Edit</a> | 
+                        <a href="{% url 'model_edit' id=model.id %}">Edit</a> |
                         <a href="{% url 'model_delete' id=model.id %}">Delete</a></td>
                 </tr>
         {% endfor %}
@@ -53,7 +53,7 @@
             <td>{{ model_family.name }}</td>
             <td>{{ model_family.shortname }}</td>
             <td><a href="{% url 'model_family_details' id=model_family.id %}">Details</a> |
-                <a href="{% url 'model_family_edit' id=model_family.id %}">Edit</a> | 
+                <a href="{% url 'model_family_edit' id=model_family.id %}">Edit</a> |
                 <a href="{% url 'model_family_delete' id=model_family.id %}">Delete</a></td>
         </tr>
         {% endfor %}

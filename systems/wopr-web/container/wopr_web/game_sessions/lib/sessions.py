@@ -49,20 +49,12 @@ Each Session has players  (SessionPlayers)
 
 """
 
-from django.shortcuts import render, redirect
-from lib.helpers import get_config, setup_logger
 import json
 import uuid
 from pathlib import Path
-from game_sessions.forms import (
-    GameForm,
-    GameSessionForm,
-    PlayerForm,
-    SessionPlayerForm,
-    SessionImageForm,
-)
 
-from core.models import Game, Session, SessionPlayer, Player, SessionImage, Image, Round, Turn, Move
+from core.models import Image, Move, Round, Turn
+from lib.helpers import get_config, setup_logger
 
 from game_sessions.lib.captures import grab_capture
 

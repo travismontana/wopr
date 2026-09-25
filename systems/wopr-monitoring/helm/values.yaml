@@ -80,7 +80,7 @@ kube-prometheus-stack:
         url: http://wopr-monitoring-loki-gateway:80
         access: proxy
         isDefault: false
-    
+
     # Use envValueFrom for secret injection
     envValueFrom:
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
@@ -91,7 +91,7 @@ kube-prometheus-stack:
         secretKeyRef:
           name: grafana-oauth
           key: client_secret
-    
+
     grafana.ini:
       server:
         root_url: https://grafana.wopr.tailandtraillabs.org
@@ -241,7 +241,7 @@ loki:
     enabled: false
 
 
-tempo:  
+tempo:
   tempo:
     metricsGenerator:
       enabled: true
@@ -261,7 +261,7 @@ tempo:
             - service-graphs
             - span-metrics
             - local-blocks
-    
+
     tempoQuery:
       enabled: true
       ingress:
@@ -273,7 +273,7 @@ tempo:
           - secretName: tempo-tls
             hosts:
               - tempo.wopr.tailandtraillabs.org
-    
+
     persistence:
       enabled: true
       #storageClassName: local-path
@@ -282,7 +282,7 @@ tempo:
 alloy-operator:
   crds:
     deployPodLogsCRD: true
-    
+
 prometheus-pushgateway:
   ingress:
     enabled: true

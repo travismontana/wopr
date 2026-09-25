@@ -1,8 +1,7 @@
-import os
-import sys
 import json
 import logging
-import requests
+import os
+import sys
 from pathlib import Path
 
 LOGGER_NAME = "wopr_boh"
@@ -67,7 +66,7 @@ def get_config() -> dict:
         logger.error(f"Invalid JSON in config file: {e}")
     except PermissionError as e:
         logger.error(f"Permission denied reading config file: {e}")
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         config = {
             "storage": {
                 "base_path": os.getenv("BASE_PATH", "/tmp"),

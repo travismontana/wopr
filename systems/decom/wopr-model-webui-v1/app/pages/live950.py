@@ -1,16 +1,18 @@
-import streamlit as st
 import math
-import requests
 from io import BytesIO  # ← ADDED: BytesIO was used but never imported
+
+import requests
+import streamlit as st
 
 st.set_page_config(layout="wide")
 
-from ultralytics import YOLO
-import cv2
 import os
-from PIL import Image
+
+import cv2
 import numpy as np
 from lib.libtools import where_are_pieces
+from PIL import Image
+from ultralytics import YOLO
 
 st.title("WOPR Object Detection")
 
@@ -209,7 +211,7 @@ if img:
 
             circle_center = (kept[0][0], kept[0][1])
             circle_rho = math.isqrt(
-                int((circle_center[0] ** 2 + (circle_center[1] ** 2)))
+                int(circle_center[0] ** 2 + (circle_center[1] ** 2))
             )
             circle_rho_mm = circle_rho * pixel_to_mm
             circle_theta_deg = math.degrees(

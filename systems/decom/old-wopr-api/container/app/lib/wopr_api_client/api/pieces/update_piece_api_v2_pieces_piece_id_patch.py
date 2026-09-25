@@ -7,7 +7,9 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.http_validation_error import HTTPValidationError
-from ...models.update_piece_api_v2_pieces_piece_id_patch_payload import UpdatePieceApiV2PiecesPieceIdPatchPayload
+from ...models.update_piece_api_v2_pieces_piece_id_patch_payload import (
+    UpdatePieceApiV2PiecesPieceIdPatchPayload,
+)
 from ...types import Response
 
 

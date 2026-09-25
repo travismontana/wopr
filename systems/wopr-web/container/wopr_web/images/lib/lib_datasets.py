@@ -1,14 +1,16 @@
-import os
-import json
-import shutil
-import requests
 import hashlib
+import json
+import os
+import shutil
 import tempfile
 from zipfile import ZipFile
-from core.models import Game, GameLabelproj, Image, ImageGame, MLDataset
+
+import requests
+from core.models import Game, MLDataset
 from lib.helpers import get_config, setup_logger
-from .lib_labelstudio import export_and_download_snapshot, convert_snapshot
 from sklearn.model_selection import train_test_split
+
+from .lib_labelstudio import convert_snapshot, export_and_download_snapshot
 
 logger = setup_logger()
 config = get_config()
@@ -213,15 +215,15 @@ def work_create_mldataset(game_id, ls_project_id, mldataset_name):
     # FIX 4: generate dataset.yaml — ultralytics requires this for training
     classes_txt = f"{yolo_dir}/classes.txt"
     with open(classes_txt, "r") as f:
-        class_names = [line.strip() for line in f.readlines() if line.strip()]
+        class_names = [line.strip() for line in f if line.strip()]
     ua_ds_dir = f"/ultralytics/datasets/{game_shortname}/{mldataset_name}/yolo"
     dataset_yaml = f"{yolo_dir}/dataset.yaml"
     with open(dataset_yaml, "w") as f:
         f.write(f"path: {ua_ds_dir}\n")
-        f.write(f"train: images/train\n")
-        f.write(f"val: images/val\n")
-        f.write(f"test: images/test\n")
-        f.write(f"\n")
+        f.write("train: images/train\n")
+        f.write("val: images/val\n")
+        f.write("test: images/test\n")
+        f.write("\n")
         f.write(f"nc: {len(class_names)}\n")
         f.write(f"names: {class_names}\n")
     logger.info(

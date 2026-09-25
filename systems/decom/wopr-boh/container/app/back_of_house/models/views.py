@@ -1,21 +1,15 @@
-import threading
-
-from django.shortcuts import render, get_object_or_404, redirect
-
-from core.models import ModelFamily, ModelInfo, ModelVersion, ModelBackup
+from core.models import ModelBackup, ModelFamily, ModelInfo, ModelVersion
 from django.forms.models import model_to_dict
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import (
-    TrainingModelForm,
-    TrainingModelFamilyForm,
-    TrainingModelVersionForm,
-    TrainingModelBackupForm,
     ModelFamilyBulkForm,
+    TrainingModelFamilyForm,
+    TrainingModelForm,
 )
-
 from .lib.helpers import handle_mf_bulk
-
 from .lib.lib_model import build_vers
+
 
 # Create your views here.
 def model_index(request):

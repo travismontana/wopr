@@ -1,8 +1,6 @@
 from fastapi import APIRouter
-
 from lib import globals as woprvar
-from lib.helpers import setup_logging, do_api_things
-from lib.directus_client import get_one, get_all, post, update, delete
+from lib.helpers import do_api_things, setup_logging
 
 logger = setup_logging("wopr-api", "INFO", "/tmp/wopr-api.log")
 

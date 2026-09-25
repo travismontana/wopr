@@ -1,13 +1,14 @@
-from django.shortcuts import render
-import json
 import uuid
-import requests
 from pathlib import Path
-from lib.helpers import get_config, setup_logger
+
+import requests
 from django.http import StreamingHttpResponse
+from django.shortcuts import render
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()
+
 
 # Create your views here.
 def cameras_index(request):
@@ -26,6 +27,7 @@ def c950_stream(request):
         c950_stream.iter_content(chunk_size=1024),
         content_type="multipart/x-mixed-replace; boundary=boundarydonotcross",
     )
+
 
 def c960_stream(request):
     context = {}

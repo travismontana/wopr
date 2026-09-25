@@ -1,15 +1,13 @@
 import os
 
 import streamlit as st
-from ultralytics import YOLO
-
 from lib.libtools import (
     WEIGHTS,
+    export_annotations,
     get_models,
     get_projects,
-    export_annotations,
 )
-
+from ultralytics import YOLO
 
 st.title("Dejarik: YOLOv8 Object Detection")
 model = None
@@ -23,7 +21,9 @@ PROJECT_LIST = list(get_projects())
 # I need PROJECT_LIST["results"][X]["id"] and ["title"] to get the project ID, and I want to display the project name in the dropdown
 projects = {proj.id: proj.title for proj in get_projects()}
 project_id = None
-project_id = st.selectbox("Select a Label Studio project", projects.keys(), format_func=lambda x: projects[x])
+project_id = st.selectbox(
+    "Select a Label Studio project", projects.keys(), format_func=lambda x: projects[x]
+)
 
 if model is not None:
     st.success(f"Selected model: {model_name}")

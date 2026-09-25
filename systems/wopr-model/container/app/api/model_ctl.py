@@ -1,24 +1,13 @@
 from typing import Any
-from pathlib import Path
-import hashlib
-import inspect
-import httpx
-from fastapi import APIRouter, Request, BackgroundTasks
+
 import requests
-
+from fastapi import APIRouter, BackgroundTasks
 from lib.helpers import (
-    setup_logger,
     logit,
-    check_for_file_in_dir,
-    copy_file_to_dist,
-    copy_modfam_to_model,
-    backup_dist_file,
+    setup_logger,
 )
-
-from lib.lib_model_ctl import initialize_model, generate_dataset
+from lib.lib_model_ctl import generate_dataset, initialize_model
 from lib.lib_training import train_yolo_model
-
-from lib.safe_file import SafeFS
 
 logger = setup_logger()
 
@@ -128,7 +117,7 @@ async def model_control(body: dict, background_tasks: BackgroundTasks):
     payload = body.get("payload", {})
     action = payload.get("action")
 
-    logger.info(f"Note: (model_control)")
+    logger.info("Note: (model_control)")
     logger.debug(f"Data: (body: {body})")
 
     match action:

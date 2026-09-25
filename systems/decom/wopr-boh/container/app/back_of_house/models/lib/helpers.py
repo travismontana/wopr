@@ -1,9 +1,7 @@
-import os
 import csv
-import requests
-from django.core.management.base import BaseCommand
+import os
 
-from core.models import ModelFamily, ModelInfo
+from core.models import ModelFamily
 
 MODEL_URL = os.getenv("MODEL_URL")
 

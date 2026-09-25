@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QApplication
 
 from .main_window import MainWindow
 
+
 def _dark_palette() -> QPalette:
     palette = QPalette()
     palette.setColor(QPalette.ColorRole.Window, QColor(43, 45, 48))
@@ -61,7 +62,7 @@ def wopr_palette() -> QPalette:
     # --- bevel/border shading Fusion uses for frames & button edges ---
     p.setColor(QPalette.ColorRole.Mid, QColor("#44474c"))  # --line
     p.setColor(QPalette.ColorRole.Dark, QColor("#000000"))
-    p.setColor(QPalette.ColorRole.Midlight, QColor("#3a3d41"))  #
+    p.setColor(QPalette.ColorRole.Midlight, QColor("#3a3d41"))
 
     # --- disabled state carries --text-dim automatically this way ---
     dim = QColor("#8a8f96")
@@ -81,6 +82,7 @@ def main() -> int:
     window = MainWindow()
     window.show()
     return app.exec()
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

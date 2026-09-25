@@ -9,7 +9,7 @@
 
 <form method="post" action="{% url 'start_training' %}">
     {% csrf_token %}
-    
+
     <label for="version_select"><strong>Model Version:</strong></label>
     <select name="version_id" id="version_select" required>
         <option value="">Select a model version</option>

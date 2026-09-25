@@ -1,14 +1,11 @@
-import streamlit as st
-import cv2
-import sys
-import numpy as np
-import math
 import socket
 
+import cv2
+import numpy as np
+import streamlit as st
 from pupil_apriltags import Detector
 
 from lib.helpers import setup_logger
-from lib.helpers import wopr_json
 
 logger = setup_logger()
 
@@ -48,7 +45,7 @@ class MJPEGStream:
                     break
                 if start != -1 and end != -1 and end > start:
                     logger.debug(
-                        f"Frame {count}: complete JPEG found at [{start}:{end+2}], buf size={len(self.buf)}"
+                        f"Frame {count}: complete JPEG found at [{start}:{end + 2}], buf size={len(self.buf)}"
                     )
                     break  # got a complete frame
                 else:
@@ -145,7 +142,7 @@ def score_frame(frame):
 
 
 def process_frame(frame):
-    logger.info(f"Processing frame")
+    logger.info("Processing frame")
     notes = {"info": {}, "image": {}}
     notes["info"]["frame_shape"] = frame.shape
     original_image = frame.copy()
@@ -233,9 +230,10 @@ def process_frame(frame):
     logger.info(f"Returning notes: {notes}")
     return notes
 
+
 #######################################################################################
 def tenengrad(image):
-    logger.info(f"Getting Tenengrad variance")
+    logger.info("Getting Tenengrad variance")
     gx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
     gy = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
     tenengrad = float(np.mean(gx**2 + gy**2))
@@ -243,7 +241,7 @@ def tenengrad(image):
 
 
 def laplacian(image):
-    logger.info(f"Getting Laplacian variance")
+    logger.info("Getting Laplacian variance")
     return cv2.Laplacian(image, cv2.CV_64F).var()
 
 
@@ -254,27 +252,27 @@ def scale_image(image):
 
 
 def grayscale(image):
-    logger.info(f"Converting image to grayscale")
+    logger.info("Converting image to grayscale")
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 
 def rgb_bgr(image):
-    logger.info(f"Converting image from RGB to BGR")
+    logger.info("Converting image from RGB to BGR")
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
 def bgr_rgb(image):
-    logger.info(f"Converting image from BGR to RGB")
+    logger.info("Converting image from BGR to RGB")
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
 def gaussian_blur(image):
-    logger.info(f"Applying Gaussian blur")
+    logger.info("Applying Gaussian blur")
     return cv2.GaussianBlur(image, (5, 5), 0)
 
 
 def otsu(image):
-    logger.info(f"Applying Otsu's thresholding")
+    logger.info("Applying Otsu's thresholding")
     ret, binary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return binary
 
@@ -301,7 +299,7 @@ def canny(image):
 
 
 def circle(image, height, width):
-    logger.info(f"Detecting circles")
+    logger.info("Detecting circles")
     results = {"status": "unknown", "message": {"steps": {}}}
     dp = st.session_state.knobs["Hough Circles"]["hg_circles_dp"]["value"]
     param1 = st.session_state.knobs["Hough Circles"]["hg_circles_param1"]["value"]

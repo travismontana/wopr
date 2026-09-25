@@ -1,17 +1,20 @@
-from typing import TypeVar, Generic, Type, Callable, Optional
+from collections.abc import Callable
+from typing import Generic, TypeVar
+
 from fastapi import APIRouter, status
 from pydantic import BaseModel
-from app.directus_client import get_one, get_all, post, update, delete
+
+from app.directus_client import delete, get_all, get_one, post, update
 from app.logging import configure_logging
+
 logger = configure_logging("wopr-api")
 
-T = TypeVar('T', bound=BaseModel)
-TCreate = TypeVar('TCreate', bound=BaseModel)
-TUpdate = TypeVar('TUpdate', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
+TCreate = TypeVar("TCreate", bound=BaseModel)
+TUpdate = TypeVar("TUpdate", bound=BaseModel)
 
 
 class CRUDRouter(Generic[T, TCreate, TUpdate]):
-
     def __init__(
         self,
         table_name: str,
@@ -45,7 +48,9 @@ class CRUDRouter(Generic[T, TCreate, TUpdate]):
         @self.router.patch("/{item_id}", response_model=response_model)
         async def update_item(item_id: str, payload: update_model):
             logger.info(f"Updating {self.table} {item_id}")
-            return update(self.table, item_id, payload.model_dump(mode='json', exclude_unset=True))
+            return update(
+                self.table, item_id, payload.model_dump(mode="json", exclude_unset=True)
+            )
 
         @self.router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
         async def delete_item(item_id: str):
@@ -53,11 +58,7 @@ class CRUDRouter(Generic[T, TCreate, TUpdate]):
             return delete(self.table, item_id)
 
     def add_custom_route(
-        self,
-        path: str,
-        methods: list[str],
-        handler: Callable,
-        **kwargs
+        self, path: str, methods: list[str], handler: Callable, **kwargs
     ):
         """Add custom routes beyond CRUD"""
         self.router.add_api_route(path, handler, methods=methods, **kwargs)

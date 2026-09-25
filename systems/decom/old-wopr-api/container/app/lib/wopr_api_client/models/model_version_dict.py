@@ -5,11 +5,14 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+from typing_extensions import Self
 
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.model_version_dict_previous_versions_type_0 import ModelVersionDictPreviousVersionsType0
+    from ..models.model_version_dict_previous_versions_type_0 import (
+        ModelVersionDictPreviousVersionsType0,
+    )
 
 
 T = TypeVar("T", bound="ModelVersionDict")
@@ -33,7 +36,9 @@ class ModelVersionDict:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.model_version_dict_previous_versions_type_0 import ModelVersionDictPreviousVersionsType0
+        from ..models.model_version_dict_previous_versions_type_0 import (
+            ModelVersionDictPreviousVersionsType0,
+        )
 
         current_version = self.current_version
 
@@ -74,8 +79,10 @@ class ModelVersionDict:
         return field_dict
 
     @classmethod
-    def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.model_version_dict_previous_versions_type_0 import ModelVersionDictPreviousVersionsType0
+    def from_dict(cls, src_dict: Mapping[str, Any]) -> Self:
+        from ..models.model_version_dict_previous_versions_type_0 import (
+            ModelVersionDictPreviousVersionsType0,
+        )
 
         d = dict(src_dict)
         current_version = d.pop("current_version")
@@ -98,7 +105,9 @@ class ModelVersionDict:
 
         wopr_version = _parse_wopr_version(d.pop("wopr_version", UNSET))
 
-        def _parse_previous_versions(data: object) -> ModelVersionDictPreviousVersionsType0 | None | Unset:
+        def _parse_previous_versions(
+            data: object,
+        ) -> ModelVersionDictPreviousVersionsType0 | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -106,7 +115,9 @@ class ModelVersionDict:
             try:
                 if not isinstance(data, dict):
                     raise TypeError()
-                previous_versions_type_0 = ModelVersionDictPreviousVersionsType0.from_dict(data)
+                previous_versions_type_0 = (
+                    ModelVersionDictPreviousVersionsType0.from_dict(data)
+                )
 
                 return previous_versions_type_0
             except (TypeError, ValueError, AttributeError, KeyError):

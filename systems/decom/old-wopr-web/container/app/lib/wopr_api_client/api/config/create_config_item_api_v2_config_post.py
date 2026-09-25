@@ -5,7 +5,9 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.create_config_item_api_v2_config_post_payload import CreateConfigItemApiV2ConfigPostPayload
+from ...models.create_config_item_api_v2_config_post_payload import (
+    CreateConfigItemApiV2ConfigPostPayload,
+)
 from ...models.http_validation_error import HTTPValidationError
 from ...types import Response
 

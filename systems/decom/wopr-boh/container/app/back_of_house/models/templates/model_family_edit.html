@@ -8,7 +8,7 @@
 
 <div class="form-container">
     <h2>Edit Training Model Family</h2>
-    
+
     <form method="post">
         {% csrf_token %}
         {% if form.errors %}
@@ -23,7 +23,7 @@
             </ul>
         </div>
         {% endif %}
-        
+
         {% for field in form %}
         <div class="form-group">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -33,7 +33,7 @@
             {% endif %}
         </div>
         {% endfor %}
-        
+
         <div class="form-actions">
             <button type="submit" class="btn">Save</button>
             <button type="cancel" class="btn">Cancel</button>

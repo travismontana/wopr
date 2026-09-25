@@ -1,11 +1,13 @@
-import os
-import sys
 import json
 import logging
-import requests
+import os
+import sys
 from pathlib import Path
 
+import requests
+
 LOGGER_NAME = "wopr_boh"
+
 
 def setup_logger() -> logging.Logger:
     """

@@ -1,18 +1,17 @@
-import streamlit as st
-import cv2
 import time
 
-from lib.image_processing import (
-    process_frame,
-    open_camera,
-    start_process,
-    build_winner,
-    MARKER_DETECTION_STEPS,
-    CIRCLE_DETECTION_STEPS,
-)
 import pandas as pd
-from lib.helpers import setup_logger
-from lib.helpers import wopr_json
+import streamlit as st
+from lib.helpers import setup_logger, wopr_json
+from lib.image_processing import (
+    CIRCLE_DETECTION_STEPS,
+    MARKER_DETECTION_STEPS,
+    build_winner,
+    open_camera,
+    process_frame,
+    start_process,
+)
+
 logger = setup_logger()
 
 
@@ -133,8 +132,8 @@ def loop():
                                 "Dist between Marker and Circle",
                             ],
                             "Value": [
-                                f"{info.get('frame_shape', ['N/A','N/A'])[0]}x{info.get('frame_shape', ['N/A','N/A'])[1]}",
-                                f"{info.get('resized_shape', ['N/A','N/A'])[0]}x{info.get('resized_shape', ['N/A','N/A'])[1]}",
+                                f"{info.get('frame_shape', ['N/A', 'N/A'])[0]}x{info.get('frame_shape', ['N/A', 'N/A'])[1]}",
+                                f"{info.get('resized_shape', ['N/A', 'N/A'])[0]}x{info.get('resized_shape', ['N/A', 'N/A'])[1]}",
                                 info.get("marker_size_mm", "N/A"),
                                 info.get("marker_scaled_mm", "N/A"),
                                 info.get("num_circles", "N/A"),

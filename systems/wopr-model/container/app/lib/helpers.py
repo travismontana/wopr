@@ -3,12 +3,10 @@ WOPR Frontend Helpers
 Utility functions for Streamlit UI interactions with WOPR API.
 """
 
-import httpx
-import re
 import logging
 import sys
-from datetime import datetime
-from pathlib import Path
+
+import httpx
 
 API_BASE = "https://api.wopr.tailandtraillabs.org"
 
@@ -22,7 +20,7 @@ PLAYPHRASES = [
     "Fear is the mind killer",
     "There is no escape",
     "You're worm food",
-    "Hasta la vista wormy"
+    "Hasta la vista wormy",
 ]
 
 LOGGER_NAME = "helpers"
@@ -31,20 +29,21 @@ project_cheat = {
     "name": "Dune Imperium Uprising Project",
     "shortname": "duneup",
     "id": 6,
-    "uuid": "some-unique-uuid"
+    "uuid": "some-unique-uuid",
 }
 
 # ------------------------
 # Logging Setup
 # ------------------------
 
+
 def setup_logger() -> logging.Logger:
     """
     Configure logging for helper functions.
-    
+
     Returns:
         Configured logger instance
-        
+
     Note:
         Only configures once - subsequent calls return existing logger
     """

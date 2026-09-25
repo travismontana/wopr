@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0005_remove_move_round_remove_move_turn_round_turn_and_more"),
     ]

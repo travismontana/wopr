@@ -14,7 +14,7 @@
    - Flexible main content area
    - Header/footer auto-size, middle expands
    ---------------------------------------------------------------------------- */
-.container {  
+.container {
   display: grid;
   min-height: 100vh;
   grid-template-columns: 280px 1fr;       /* Fixed left, flexible main */
@@ -28,7 +28,7 @@
 }
 
 /* Main panel - nested grid for subheader and content */
-.main_panel {  
+.main_panel {
   display: grid;
   grid-template-rows: auto 90%;
   grid-template-areas:
@@ -39,23 +39,23 @@
   gap: 2px;
 }
 
-.main_subheader { 
-  grid-area: main_subheader; 
+.main_subheader {
+  grid-area: main_subheader;
   border: 1px solid black;
 }
 
-.main_panel_panel { 
-  grid-area: main_panel_panel; 
+.main_panel_panel {
+  grid-area: main_panel_panel;
   border: 1px solid black;
 }
 
-.main_header { 
-  grid-area: main_header; 
+.main_header {
+  grid-area: main_header;
   border: 1px solid black;
 }
 
-.corner_box { 
-  grid-area: corner_box; 
+.corner_box {
+  grid-area: corner_box;
   border: 1px solid black;
 }
 
@@ -72,25 +72,25 @@
   grid-area: left_column;
 }
 
-.left_column_main { 
-  grid-area: left_column_main; 
+.left_column_main {
+  grid-area: left_column_main;
   border: 1px solid black;
 }
 
-.left_column_subheader { 
-  grid-area: left_column_subheader; 
+.left_column_subheader {
+  grid-area: left_column_subheader;
   display: flex;
   justify-content: space-between;
   padding: 5px;
 }
 
-.main_footer { 
-  grid-area: main_footer; 
+.main_footer {
+  grid-area: main_footer;
   border: 1px solid black;
 }
 
-.funky_box { 
-  grid-area: funky_box; 
+.funky_box {
+  grid-area: funky_box;
   border: 1px solid black;
 }
 
@@ -135,7 +135,7 @@ table td.checksum {
   max-width: 300px;                 /* Limit width for long URIs */
   word-break: normal;           /* Don't break words arbitrarily */
   overflow-wrap: anywhere;      /* Allow breaks when constrained */
-  hyphens: none;  
+  hyphens: none;
 }
 
 /* Scrollable table variant - fixed header, scrollable body (~10 rows visible) */

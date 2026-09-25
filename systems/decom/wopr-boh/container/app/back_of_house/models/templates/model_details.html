@@ -2,8 +2,8 @@
 
 {% block main_subheader %}
 <p>
-  Models - 
-  <a href="{% url 'model_add'%}">Add New Model</a> - 
+  Models -
+  <a href="{% url 'model_add'%}">Add New Model</a> -
   <a href="{% url 'model_family_add' %}">Add New Model Family</a>
 </p>
 {% endblock %}
@@ -68,13 +68,13 @@
       {% endfor %}
           <td>
             {% if not model_versions %}
-              <form method="post" 
-                  action="{% url 'model_version_initial' model.id %}" 
+              <form method="post"
+                  action="{% url 'model_version_initial' model.id %}"
                   style="display: inline;">
                 {% csrf_token %}
-                <button class="action_button" 
-                      type="submit" 
-                      name="initialize" 
+                <button class="action_button"
+                      type="submit"
+                      name="initialize"
                       value="{{ model.id }}">
                   Initialize
                 </button>
@@ -115,8 +115,8 @@
 <hr>
 
 <!-- Model Dict Toggle -->
-<input type="checkbox" 
-       id="toggle-model" 
+<input type="checkbox"
+       id="toggle-model"
        class="dict-toggle-input">
 <label for="toggle-model" class="dict-toggle-label">Model</label>
 <div class="dict-content">
@@ -130,8 +130,8 @@
 <hr>
 
 <!-- Model Version Dict Toggle -->
-<input type="checkbox" 
-       id="toggle-model-version" 
+<input type="checkbox"
+       id="toggle-model-version"
        class="dict-toggle-input">
 <label for="toggle-model-version" class="dict-toggle-label">
     Model Version
@@ -147,8 +147,8 @@
 <hr>
 
 <!-- Model Backups Dict Toggle -->
-<input type="checkbox" 
-       id="toggle-model-backups" 
+<input type="checkbox"
+       id="toggle-model-backups"
        class="dict-toggle-input">
 <label for="toggle-model-backups" class="dict-toggle-label">
     Model Backups

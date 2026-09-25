@@ -153,7 +153,7 @@ async_vs_sync_decisions:
     - 4_coordinate_conversion (242 files to convert)
     - 7_file_distribution (242 files to copy)
     - orchestration (all phases)
-  
+
   sync_operations (api direct):
     - 3_class_mapping (simple set operation)
     - 5_split_calculation (quick math)
@@ -165,11 +165,11 @@ data_flow:
     - Displays results
     - Polls for updates
     - Downloads final files
-  
+
   api stores:
     - Task status in Redis
     - Task results in Redis (TTL: 24h)
-  
+
   celery stores:
     - Intermediate results in Redis
     - Final files on filesystem

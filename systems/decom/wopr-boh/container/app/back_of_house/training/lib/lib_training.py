@@ -1,11 +1,9 @@
 import os
-import requests
-from lib.helpers import setup_logger,get_config
-from django.forms.models import model_to_dict
-from label_studio_sdk import LabelStudio
 
-from core.models import TrainingRun, Dataset, Result
-from models.lib.lib_model import call_model_ctl
+import requests
+from core.models import Dataset, Result, TrainingRun
+from label_studio_sdk import LabelStudio
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()
@@ -62,7 +60,7 @@ def list_all_projects():
             {
                 "status": "error",
                 "type": "timeout",
-                "message": f"Timeout error fetching projects: {str(e)}",
+                "message": f"Timeout error fetching projects: {e!s}",
             }
         )
         return results, projects
@@ -72,7 +70,7 @@ def list_all_projects():
             {
                 "status": "error",
                 "type": "fetch",
-                "message": f"Could not fetch projects: {str(e)}",
+                "message": f"Could not fetch projects: {e!s}",
             }
         )
         return results, projects

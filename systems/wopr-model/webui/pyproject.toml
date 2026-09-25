@@ -1,14 +1,14 @@
 
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+  requires      = ["setuptools", "wheel"]
+  build-backend = "setuptools.build_meta"
 
 [project]
-name = "wopr-model-webui"
-version = "0.1.6-beta"
-description = "WOPR - Model Control"
-authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
-dependencies = [
+  name = "wopr-model-webui"
+  version = "0.1.6-beta"
+  description = "WOPR - Model Control"
+  authors = [{ name = "Bob Bomar", email = "bob@bomar.us" }]
+  dependencies = [
     "streamlit",
     "httpx",
     "requests",
@@ -16,14 +16,7 @@ dependencies = [
     "pylint",
     "label_studio_sdk",
     "pupil-apriltags",
-]
+  ]
 
 [project.optional-dependencies]
-dev = [
-  "black",
-  "django-stubs",
-  "ipdb",
-  "pip-tools",
-  "ruff",
-  "pytest",
-  ]
+  dev = ["black", "django-stubs", "ipdb", "pip-tools", "ruff", "pytest"]

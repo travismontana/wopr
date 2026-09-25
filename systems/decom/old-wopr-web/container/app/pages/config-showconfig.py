@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
+
 import httpx
-import os 
-import requests
+import streamlit as st
 
 st.title("WOPR ML Config System")
 st.write("Welcome to the WOPR ML Config System.")
 
-# 
+#
 # Load WOPR Config from WOPR-API, then display it.
 #
 API_BASE = "https://api.wopr.tailandtraillabs.org"
+
 
 def fetch_config():
     response = httpx.get(f"{API_BASE}/api/v2/config/all")

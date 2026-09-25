@@ -3,5 +3,3 @@
 
   # Instrument FastAPI with OpenTelemetry
   FastAPIInstrumentor.instrument_app(app)
-
-  

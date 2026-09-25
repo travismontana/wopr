@@ -1,15 +1,15 @@
+import logging
+import math
+import os
+import sys
+from io import BytesIO
+
+import cv2
+import numpy as np
 import requests
 import streamlit as st
-import numpy as np
-import cv2
-import os
-import math
 from PIL import Image
-from io import BytesIO
-import logging
-import sys
 from pupil_apriltags import Detector
-
 
 CAMURL = os.getenv("CAMURL", "http://localhost:8080")
 
@@ -145,7 +145,7 @@ def process_image(raw: bytes):
     notes.append({"num_markers": num_markers, "markers": markers})
     if markers is not None and num_markers != 1:
         logger.info(f"Number of markers detected is not 1: {num_markers}")
-        logger.info(f"First retry")
+        logger.info("First retry")
         next_img = gauss(gray)
         marker_result, markers = get_marker(
             next_img,
@@ -158,7 +158,7 @@ def process_image(raw: bytes):
         num_markers = len(markers) if markers is not None else 0
         notes.append({"num_markers": num_markers, "markers": markers})
         if markers is not None and num_markers != 1:
-            logger.info(f"Second retry")
+            logger.info("Second retry")
             next2_img = clahe(next_img)
             marker_result, markers = get_marker(
                 next2_img,
@@ -229,30 +229,35 @@ def process_image(raw: bytes):
 
     return bgr, gray, resulting_image, notes
 
+
 def grayscale(image):
-    logger.info(f"Converting image to grayscale")
+    logger.info("Converting image to grayscale")
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+
 def rgb_bgr(image):
-    logger.info(f"Converting image from RGB to BGR")
+    logger.info("Converting image from RGB to BGR")
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+
 def bgr_rgb(image):
-    logger.info(f"Converting image from BGR to RGB")
+    logger.info("Converting image from BGR to RGB")
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+
 def gauss(image):
-    logger.info(f"Applying Gaussian blur")
+    logger.info("Applying Gaussian blur")
     return cv2.GaussianBlur(image, (5, 5), 0)
 
+
 def otsu(image):
-    logger.info(f"Applying Otsu's thresholding")
+    logger.info("Applying Otsu's thresholding")
     ret, binary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return binary
 
 
 def circle(image, dp, minDist, param1, param2, minRadius, maxRadius, bgr):
-    logger.info(f"Detecting circles")
+    logger.info("Detecting circles")
     circles = cv2.HoughCircles(
         image,
         cv2.HOUGH_GRADIENT,
@@ -403,6 +408,7 @@ def get_images(url):
         st.error(f"Failed to fetch snapshot: {e}")
         st.stop()
 
+
 def build_images():
     global img_rgb_u8_c950, raw_u8_c950, img_rgb_u8_c960, raw_u8_c960
     img_rgb_u8_c950, raw_u8_c950 = get_images(f"{CAMURL}:5101/snapshot")
@@ -419,7 +425,9 @@ st.button("Refresh", on_click=fetch_snapshot.clear)  # *** bust the cache on cli
 
 raw_c950 = fetch_snapshot(f"{CAMURL}:5101/snapshot")
 raw_c960 = fetch_snapshot(f"{CAMURL}:5100/snapshot")
-logger.info(f"Fetched snapshots: C950={len(raw_c950)} bytes, C960={len(raw_c960)} bytes")
+logger.info(
+    f"Fetched snapshots: C950={len(raw_c950)} bytes, C960={len(raw_c960)} bytes"
+)
 
 bgr_c950, gray_c950, final_c950, notes_c950 = process_image(raw_c950)
 logger.info(f"Processed images: C950={bgr_c950.shape}, C960={bgr_c950.shape}")
@@ -455,7 +463,7 @@ c950, c960 = st.columns(2)
 with c950:
     if c950_mark_circ_dist_mm is not None:
         st.write(
-            f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm:.2f} | {c950_mark_circ_dist_mm/.25:.2f}"
+            f"Marker-Circle Distance (mm)(scaled): {c950_mark_circ_dist_mm:.2f} | {c950_mark_circ_dist_mm / 0.25:.2f}"
         )
         st.write(f"Marker-Circle Distance (px): {c950_mark_circ_dist_px}")
     else:
@@ -474,7 +482,7 @@ with c950:
 with c960:
     if c960_mark_circ_dist_mm is not None:
         st.write(
-            f"Marker-Circle Distance (mm)(scaled): {c960_mark_circ_dist_mm:.2f} | {c960_mark_circ_dist_mm/.25:.2f}"
+            f"Marker-Circle Distance (mm)(scaled): {c960_mark_circ_dist_mm:.2f} | {c960_mark_circ_dist_mm / 0.25:.2f}"
         )
         st.write(f"Marker-Circle Distance (px): {c960_mark_circ_dist_px}")
     else:

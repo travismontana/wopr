@@ -1,6 +1,5 @@
 import requests
-
-from lib.helpers import setup_logger, get_config
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 config = get_config()

@@ -1,6 +1,6 @@
-import streamlit as st
-import numpy as np
 import cv2
+import numpy as np
+import streamlit as st
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 st.title("CV Pipeline")

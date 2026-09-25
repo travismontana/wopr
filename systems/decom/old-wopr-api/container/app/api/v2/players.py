@@ -1,18 +1,17 @@
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
-import logging
-import sys
-from opentelemetry import trace
-from typing import Optional
-from app.directus_client import get_one, get_all, post, update, delete
 from app import globals as woprvar
+from app.directus_client import delete, get_all, get_one, post, update
 from app.logging import configure_logging
+from fastapi import APIRouter
+from opentelemetry import trace
+from pydantic import BaseModel
+
 logger = configure_logging(woprvar.LOGFILE)
 
 router = APIRouter(tags=["players"])
 
 try:
     from app import globals as woprvar
+
     tracer = trace.get_tracer(woprvar.APP_NAME, woprvar.APP_VERSION)
 except Exception:
     tracer = None
@@ -20,7 +19,7 @@ except Exception:
 
 class PlayerPayload(BaseModel):
     name: str
-    isbot: Optional[bool] = False
+    isbot: bool | None = False
 
 
 # Helper function
@@ -82,13 +81,13 @@ async def create_players(payload: PlayerPayload):
 async def post_humans(payload: PlayerPayload):
     """Create a new human player (forces isbot=false)"""
     logger.info(f"Creating human player: {payload.name}")
-    
+
     # Check if exists
     existing = await doesplayerexist(payload.name)
     if len(existing) > 0:
         logger.info(f"Player {payload.name} already exists")
         return existing[0]
-    
+
     # Force isbot=False and create
     payload.isbot = False
     return post("players", payload.model_dump())
@@ -101,13 +100,13 @@ async def post_humans(payload: PlayerPayload):
 async def post_bots(payload: PlayerPayload):
     """Create a new bot player (forces isbot=true)"""
     logger.info(f"Creating bot player: {payload.name}")
-    
+
     # Check if exists
     existing = await doesplayerexist(payload.name)
     if len(existing) > 0:
         logger.info(f"Player {payload.name} already exists")
         return existing[0]
-    
+
     # Force isbot=True and create
     payload.isbot = True
     return post("players", payload.model_dump())

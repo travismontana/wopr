@@ -1,19 +1,18 @@
 import json
 import threading
 
+from core.models import Dataset, ModelInfo, ModelVersion, TrainingRun
 from django.contrib import messages
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from django.urls import reverse
-from django.shortcuts import render, redirect
-from django.forms.models import model_to_dict
-from core.models import ModelVersion, ModelInfo, TrainingRun, Dataset, Result
-
-from .lib.lib_training import list_all_projects, get_training_uuid
-from django.utils.timezone import now
 from lib.helpers import setup_logger
 from models.lib.lib_model import call_model_ctl  # Single consistent import
+
+from .lib.lib_training import get_training_uuid, list_all_projects
 
 logger = setup_logger()
 
@@ -215,7 +214,7 @@ def generate_dataset(request):
                 {
                     "status": "error",
                     "type": "dataset_generation",
-                    "message": f"Dataset generation failed: {str(e)}",
+                    "message": f"Dataset generation failed: {e!s}",
                 }
             )
     else:
@@ -393,7 +392,7 @@ def training_results(request):
             return redirect("index")
         except Exception as e:
             logger.error(f"Training start failed: {e}")
-            messages.error(request, f"Training start failed: {str(e)}")
+            messages.error(request, f"Training start failed: {e!s}")
             return redirect("index")
 
     return redirect("index")

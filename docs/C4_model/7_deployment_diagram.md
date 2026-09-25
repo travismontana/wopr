@@ -26,9 +26,9 @@ This document describes the architecture of a Kubernetes deployment including ke
 - **Function**: Proper configuration of infrastructure is critical for effective resource management and performance optimization.
 
 ## Architecture Diagram
-![Kubernetes Deployment Architecture Diagram](path/to/architecture-diagram.png)  
+![Kubernetes Deployment Architecture Diagram](path/to/architecture-diagram.png)
 
-*Replace the above image path with a valid link to your architecture diagram.*  
+*Replace the above image path with a valid link to your architecture diagram.*
 
 ## Conclusion
 Kubernetes deployment architecture encompasses several critical components that work together to provide a scalable, resilient, and efficient environment for running applications. By understanding these components, one can design better deployments and manage resources effectively.

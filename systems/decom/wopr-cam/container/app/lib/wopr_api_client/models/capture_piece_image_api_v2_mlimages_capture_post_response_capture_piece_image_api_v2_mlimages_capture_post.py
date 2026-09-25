@@ -5,8 +5,12 @@ from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+from typing_extensions import Self
 
-T = TypeVar("T", bound="CapturePieceImageApiV2MlimagesCapturePostResponseCapturePieceImageApiV2MlimagesCapturePost")
+T = TypeVar(
+    "T",
+    bound="CapturePieceImageApiV2MlimagesCapturePostResponseCapturePieceImageApiV2MlimagesCapturePost",
+)
 
 
 @_attrs_define
@@ -22,16 +26,12 @@ class CapturePieceImageApiV2MlimagesCapturePostResponseCapturePieceImageApiV2Mli
         return field_dict
 
     @classmethod
-    def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+    def from_dict(cls, src_dict: Mapping[str, Any]) -> Self:
         d = dict(src_dict)
-        capture_piece_image_api_v2_mlimages_capture_post_response_capture_piece_image_api_v2_mlimages_capture_post = (
-            cls()
-        )
+        capture_piece_image_api_v2_mlimages_capture_post_response_capture_piece_image_api_v2_mlimages_capture_post = cls()
 
         capture_piece_image_api_v2_mlimages_capture_post_response_capture_piece_image_api_v2_mlimages_capture_post.additional_properties = d
-        return (
-            capture_piece_image_api_v2_mlimages_capture_post_response_capture_piece_image_api_v2_mlimages_capture_post
-        )
+        return capture_piece_image_api_v2_mlimages_capture_post_response_capture_piece_image_api_v2_mlimages_capture_post
 
     @property
     def additional_keys(self) -> list[str]:

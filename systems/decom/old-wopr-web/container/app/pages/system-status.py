@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
-import httpx
-import os 
-import requests
 
+import requests
+import streamlit as st
 
 st.set_page_config(layout="wide")
 st.title("WOPR ML Systems Status")
@@ -32,11 +30,13 @@ things = [
     "build-wopr-api",
 ]
 
+
 def check_up(name):
     if name == "build-wopr-api":
         return f"https://github.com/travismontana/wopr/actions/workflows/{name}.yaml/badge.svg"
-    else: 
-        return "...."   # TODO: replace
+    else:
+        return "...."  # TODO: replace
+
 
 def check_func(name):
     if name == "build-wopr-api":
@@ -47,14 +47,13 @@ def check_func(name):
                 return response.text
             return f"Failed to fetch: {response.status_code}"
         except Exception as e:
-            return f"Error: {str(e)}"
+            return f"Error: {e!s}"
     else:
-        return "...."   # TODO: replace
+        return "...."  # TODO: replace
+
 
 def render_row(name):
-    col_thing, col_up, col_func, col_time, col_action = st.columns(
-        [3, 1, 1, 2, 1]
-    )
+    col_thing, col_up, col_func, col_time, col_action = st.columns([3, 1, 1, 2, 1])
 
     with col_thing:
         st.text(name)
@@ -63,10 +62,9 @@ def render_row(name):
         badge_url = check_up(name)
         st.markdown(f'<img src="{badge_url}" alt="status">', unsafe_allow_html=True)
 
-    with col_func:
-        with st.expander("YAML"):
-            yaml_content = check_func(name)
-            st.code(yaml_content, language="yaml")
+    with col_func, st.expander("YAML"):
+        yaml_content = check_func(name)
+        st.code(yaml_content, language="yaml")
 
     with col_time:
         st.text("----")

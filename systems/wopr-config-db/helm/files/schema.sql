@@ -113,7 +113,7 @@ INSERT INTO settings (key, value, value_type, description, environment) VALUES
 -- Game Statuses
 ('game_statuses', '["setup", "in_progress", "completed", "abandoned"]', 'list', 'Valid game statuses', 'default'),
 
--- Analysis Statuses  
+-- Analysis Statuses
 ('analysis_statuses', '["pending", "processing", "completed", "failed"]', 'list', 'Valid analysis statuses', 'default'),
 
 -- Image Subjects

@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && pip install --upgrade pip setuptools wheel \
     && apt clean \
     && apt autoclean \
-    && rm -rf /var/lib/apt/lists/* 
+    && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 2222 wopr && \
     mkdir -p /app /var/log/wopr && \

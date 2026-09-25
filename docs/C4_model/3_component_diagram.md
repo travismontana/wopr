@@ -52,25 +52,25 @@ C4Component
     Rel(session_router, directus, "Uses")
     Rel(plays_router, directus, "Uses")
     Rel(config_router, directus, "Uses")
-    
+
     Rel(games_router, crud, "Extends")
     Rel(plays_router, crud, "Extends")
-    
+
     Rel(tasks_router, celery_app, "Dispatches tasks via")
     Rel(tasks_router, tasks, "Triggers")
-    
+
     Rel(directus, postgres, "Queries", "psycopg3")
-    
+
     Rel(celery_app, redis, "Connects to", "Redis Protocol")
     Rel(tasks, celery_app, "Registered with")
-    
+
     Rel(archive_task, directus, "Reads session data")
     Rel(archive_task, safefile, "Uses for file ops")
     Rel(archive_task, nfs, "Moves files on")
-    
+
     Rel(labelstudio_task, safefile, "Uses for checks")
     Rel(labelstudio_task, nfs, "Checks files on")
-    
+
     Rel(status_task, safefile, "Uses for checks")
     Rel(status_task, nfs, "Checks files on")
 
@@ -245,14 +245,14 @@ C4Component
     Rel(pages, game_page, "Includes")
     Rel(pages, session_page, "Includes")
     Rel(pages, singleplayer, "Includes")
-    
+
     Rel(game_page, helpers, "Uses")
     Rel(session_page, helpers, "Uses")
     Rel(singleplayer, helpers, "Uses")
-    
+
     Rel(game_page, models, "Validates with")
     Rel(session_page, models, "Validates with")
-    
+
     Rel(helpers, api, "Calls", "HTTPS/JSON")
     Rel(game_page, thumbor, "Requests images", "HTTPS")
     Rel(session_page, thumbor, "Requests images", "HTTPS")
@@ -368,11 +368,11 @@ C4Component
 - **Structure**:
   ```python
   {
-    "storage": {
-      "base_path": "/mnt/nfs",
-      "models_subdir": "models",
-      "models_backup_subdir": "backups"
-    }
+      "storage": {
+          "base_path": "/mnt/nfs",
+          "models_subdir": "models",
+          "models_backup_subdir": "backups",
+      }
   }
   ```
 

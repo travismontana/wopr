@@ -1,4 +1,4 @@
-**wopr-cam** - Camera service 
+**wopr-cam** - Camera service
 
 - Flask API, port 5000
 - EMEET SmartCam C960 4K

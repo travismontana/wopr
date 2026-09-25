@@ -1,15 +1,14 @@
-import streamlit as st
-import httpx
-import os 
-import requests
-import pandas as pd
+import os
 import re
+
+import pandas as pd
+import streamlit as st
 
 # Get the token from the env var SPOTIFY_API_TOKEN
 SPOTIFY_API_TOKEN = os.getenv("SPOTIFY_API_TOKEN")
 if not SPOTIFY_API_TOKEN:
     raise ValueError("SPOTIFY_API_TOKEN environment variable is not set")
-else: 
+else:
     logger.info("Got SPOTIFY_API_TOKEN")
 
 LINE_RE = re.compile(
@@ -22,6 +21,7 @@ LINE_RE = re.compile(
     re.VERBOSE,
 )
 
+
 def parse_tracklist(text: str):
     rows = []
     for raw in text.splitlines():
@@ -31,8 +31,9 @@ def parse_tracklist(text: str):
 
         m = LINE_RE.match(line)
         if m:
-            rows.append({"artist": m.group("artist").strip(),
-                         "title": m.group("title").strip()})
+            rows.append(
+                {"artist": m.group("artist").strip(), "title": m.group("title").strip()}
+            )
         else:
             rows.append({"artist": "", "title": line})
     return rows
@@ -53,10 +54,10 @@ if text:
     rows = parse_tracklist(text)
     df = pd.DataFrame(rows)
     edited_df = st.data_editor(
-        df, 
+        df,
         width="stretch",
         num_rows="dynamic",
-        )
+    )
     st.write("Edited data:")
     st.dataframe(edited_df)
     st.download_button(

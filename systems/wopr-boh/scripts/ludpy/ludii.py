@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-import os
+import argparse
 import csv
 import logging
-import argparse
-import textwrap
+import os
 import shutil
+import textwrap
+
 import jpype
 import jpype.imports
+
 print("start")
 
 
@@ -33,11 +35,11 @@ jpype.startJVM(
 )
 logger.debug("JVM started.")
 
+from java.io import File
+from java.util import ArrayList
+from other import GameLoader
 from other.context import Context
 from other.trial import Trial
-from other import GameLoader
-from java.io import File
-from java.util import ArrayList, List
 from utils import RandomAI
 
 
@@ -285,7 +287,7 @@ def inspect(obj, show_inherited=False):
 
 def results_print(results):
     for result in results:
-        print(f"** Move Results: **")
+        print("** Move Results: **")
         print(f"Piece: {result.get('piece_id')}")
         print(f"Source: {result.get('source_cell')}")
         print(f"Destination: {result.get('dest_cell')}")

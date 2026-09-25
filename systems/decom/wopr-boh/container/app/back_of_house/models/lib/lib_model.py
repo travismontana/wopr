@@ -1,12 +1,10 @@
 import os
-import requests
-import json
-from pathlib import Path
-from django.utils.timezone import now
 
-from core.models import ModelVersion, ModelBackup, ModelFamily
+import requests
+from core.models import ModelBackup, ModelFamily, ModelVersion
 from django.forms.models import model_to_dict
-from lib.helpers import setup_logger, get_config
+from django.utils.timezone import now
+from lib.helpers import get_config, setup_logger
 
 logger = setup_logger()
 
@@ -76,7 +74,7 @@ def build_vers(model):
             {
                 "status": "error",
                 "type": "Error: ModelVersion Creation Failed",
-                "data": e
+                "data": e,
             }
         )
         return results

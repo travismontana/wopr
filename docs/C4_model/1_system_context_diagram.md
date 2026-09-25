@@ -8,9 +8,9 @@ C4Context
 
     Person(player, "Game Player", "Tabletop wargame player who wants to track game state")
     Person(admin, "System Administrator", "Manages WOPR infrastructure and configurations")
-    
+
     System(wopr, "WOPR System", "Tracks tabletop game state through computer vision, analyzes images, detects game pieces, and validates moves")
-    
+
     System_Ext(directus, "Directus CMS", "Content management system for configuration and data storage")
     System_Ext(postgres, "PostgreSQL Database", "Stores game data, sessions, plays, and configuration")
     System_Ext(nfs, "NFS Storage", "Network file storage for captured images")
@@ -18,10 +18,10 @@ C4Context
     System_Ext(otel, "OpenTelemetry Collector", "Collects traces and metrics for monitoring")
     System_Ext(redis, "Redis", "Task queue backend for Celery")
     System_Ext(labelstudio, "Label Studio", "Image annotation and ML training platform")
-    
+
     Rel(player, wopr, "Captures game images, views game state", "HTTPS")
     Rel(admin, wopr, "Configures system, monitors health", "HTTPS")
-    
+
     Rel(wopr, directus, "Reads configuration, manages content", "HTTPS/API")
     Rel(wopr, postgres, "Stores and retrieves game data", "PostgreSQL Protocol")
     Rel(wopr, nfs, "Stores captured images", "NFS Protocol")
@@ -29,7 +29,7 @@ C4Context
     Rel(wopr, otel, "Sends traces and metrics", "OTLP")
     Rel(wopr, redis, "Enqueues background tasks", "Redis Protocol")
     Rel(wopr, labelstudio, "Exports images for annotation", "API")
-    
+
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="2")
 ```
 

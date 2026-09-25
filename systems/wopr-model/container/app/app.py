@@ -1,16 +1,8 @@
-import logging
-import httpx
 import torch
-
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse, PlainTextResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from ultralytics.utils.torch_utils import select_device
-
-from lib.helpers import setup_logger
-
 from api import model_ctl
+from fastapi import FastAPI
+from lib.helpers import setup_logger
+from ultralytics.utils.torch_utils import select_device
 
 logger = setup_logger()
 
@@ -19,12 +11,12 @@ APP_API_VERSION = "v1"
 
 logger.info(f"Starting {APP_NAME} application")
 
-logger.info(f"Setup variables")
+logger.info("Setup variables")
 
 # Allons Ye!
 app = FastAPI(
     title=APP_NAME,
-    )
+)
 
 # Load api's
 app.include_router(model_ctl.model_ctl, prefix="/api/model_ctl", tags=["models"])
@@ -42,29 +34,29 @@ paths = {
     "models_path": models_path,
     "models_backup_path": models_backup_path,
     "models_download_path": models_download_path,
-    "models_distfiles_path": models_distfiles_path
+    "models_distfiles_path": models_distfiles_path,
 }
 
 app.state.paths = paths
 app.state.config = {"app_name": APP_NAME, "app_api_version": APP_API_VERSION}
 # Here
 
+
 # health page
 @app.get("/health")
 def get_health():
     return "healthy"
 
+
 @app.get("/nelson")
 def nelson():
     return "haha"
 
+
 @app.get("/status")
 def get_status():
     status = []
-    global_vars = {
-        "paths": app.state.paths,
-        "config": app.state.config
-    }
+    global_vars = {"paths": app.state.paths, "config": app.state.config}
     device = select_device(
         device="", verbose=False
     )  # "" = auto-select, same as default

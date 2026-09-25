@@ -34,10 +34,8 @@ def _parse_response(
     | None
 ):
     if response.status_code == 200:
-        response_200 = (
-            GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet.from_dict(
-                response.json()
-            )
+        response_200 = GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet.from_dict(
+            response.json()
         )
 
         return response_200
@@ -56,7 +54,8 @@ def _parse_response(
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet | HTTPValidationError
+    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet
+    | HTTPValidationError
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -71,7 +70,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient | Client,
 ) -> Response[
-    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet | HTTPValidationError
+    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet
+    | HTTPValidationError
 ]:
     """Get Project
 
@@ -146,7 +146,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient | Client,
 ) -> Response[
-    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet | HTTPValidationError
+    GetProjectApiV2VisionProjectsProjectIdGetResponseGetProjectApiV2VisionProjectsProjectIdGet
+    | HTTPValidationError
 ]:
     """Get Project
 

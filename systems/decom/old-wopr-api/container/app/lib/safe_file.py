@@ -6,7 +6,6 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
 
 
 class SafeFSError(Exception):
@@ -41,9 +40,12 @@ class SafeFS:
           - forbid_symlinks=True blocks operating on symlinks and (optionally) paths that traverse symlinked dirs.
       - Operations avoid shell execution and prefer atomic primitives where possible.
     """
+
     base_dir: Path
     forbid_symlinks: bool = True
-    forbid_symlink_traversal: bool = True  # stronger: rejects any symlink in parent chain
+    forbid_symlink_traversal: bool = (
+        True  # stronger: rejects any symlink in parent chain
+    )
     allow_overwrite: bool = False
 
     def __post_init__(self):
@@ -65,7 +67,7 @@ class SafeFS:
         """
         self._reject_absolute(rel)
 
-        candidate = (self.base_dir / rel)
+        candidate = self.base_dir / rel
 
         # Resolve without requiring existence first (so we can create new targets).
         # But for must_exist paths, resolve() will also canonicalize fully.
@@ -94,12 +96,14 @@ class SafeFS:
                 # Walk from base_dir to resolved, checking each component.
                 current = self.base_dir
                 for part in Path(rel).parts:
-                    current = (current / part)
+                    current = current / part
                     # If it exists and is a symlink, block.
                     # For non-existing path components (e.g., creating new files),
                     # we stop checking deeper.
                     if current.exists() and current.is_symlink():
-                        raise SymlinkNotAllowedError(f"Symlink traversal not allowed at: {current}")
+                        raise SymlinkNotAllowedError(
+                            f"Symlink traversal not allowed at: {current}"
+                        )
                     if not current.exists():
                         break
 
@@ -192,7 +196,9 @@ class SafeFS:
         # dirs_exist_ok is py3.8+; we keep it strict unless overwrite is allowed
         shutil.copytree(src, dst, dirs_exist_ok=self.allow_overwrite)
 
-    def atomic_write_text(self, rel_path: str, data: str, encoding: str = "utf-8") -> None:
+    def atomic_write_text(
+        self, rel_path: str, data: str, encoding: str = "utf-8"
+    ) -> None:
         dst = self._resolve_rel(rel_path, must_exist=False)
         if dst.exists() and dst.is_dir():
             raise SafeFSError(f"Expected file path, got directory: {rel_path}")

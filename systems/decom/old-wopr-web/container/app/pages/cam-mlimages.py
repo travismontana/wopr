@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import streamlit as st
+import time
+
 import httpx
 import requests
-import time
+import streamlit as st
 
 st.set_page_config(page_title="WOPR ML Image Capture", layout="centered")
 
@@ -34,15 +35,18 @@ def fetch_games():
     r.raise_for_status()
     return r.json()
 
+
 def fetch_pieces(game_id):
     r = httpx.get(f"{API_BASE}/api/v2/pieces/gameid/{game_id}")
     r.raise_for_status()
     return r.json()
 
+
 def fetch_config():
     r = httpx.get(f"{API_BASE}/api/v2/config/all")
     r.raise_for_status()
     return r.json()
+
 
 def post_json(url: str, payload: dict) -> requests.Response:
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
@@ -62,12 +66,15 @@ def init_state():
 
     ss.setdefault("selected_piece_name", None)
     ss.setdefault("selected_piece_id", None)
-    ss.setdefault("piece_game_id", None)  # track which game the current piece belongs to
+    ss.setdefault(
+        "piece_game_id", None
+    )  # track which game the current piece belongs to
 
-    ss.setdefault("lightIntensity", None)   # value
-    ss.setdefault("lightTemp", None)        # key
-    ss.setdefault("objectRotationIdx", 0)   # index into rotations list
+    ss.setdefault("lightIntensity", None)  # value
+    ss.setdefault("lightTemp", None)  # key
+    ss.setdefault("objectRotationIdx", 0)  # index into rotations list
     ss.setdefault("objectPositionKey", None)  # key into positions dict
+
 
 init_state()
 
@@ -173,7 +180,9 @@ def popover_select_light_temp(config):
     if st.session_state.lightTemp not in keys:
         st.session_state.lightTemp = keys[0]
 
-    def disp(k): return f"{k} ({temps[k]})"
+    def disp(k):
+        return f"{k} ({temps[k]})"
+
     options = [disp(k) for k in keys]
     cur_disp = disp(st.session_state.lightTemp)
     disp_to_key = {disp(k): k for k in keys}
@@ -255,8 +264,12 @@ def build_capture_payload(config, single_temp=None, single_intensity=None):
     payload = {
         "game_catalog_id": st.session_state.selected_game_id,
         "piece_id": st.session_state.selected_piece_id,
-        "light_intensity": single_intensity if single_intensity is not None else st.session_state.lightIntensity,
-        "color_temp": single_temp if single_temp is not None else st.session_state.lightTemp,
+        "light_intensity": single_intensity
+        if single_intensity is not None
+        else st.session_state.lightIntensity,
+        "color_temp": single_temp
+        if single_temp is not None
+        else st.session_state.lightTemp,
         "object_rotation": rotation_deg,
         "object_position": pos_value,
     }
@@ -268,30 +281,42 @@ def run_all_lights(config):
     for cTemp in config["lightSettings"]["temp"].keys():
         for cIntensity in config["lightSettings"]["intensity"]:
             status_line.write(f"Capturing: temp={cTemp}, intensity={cIntensity}")
-            payload = build_capture_payload(config, single_temp=cTemp, single_intensity=cIntensity)
+            payload = build_capture_payload(
+                config, single_temp=cTemp, single_intensity=cIntensity
+            )
             post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
             time.sleep(1)
     status_line.write("Done.")
-    notifications(f"All-light capture requests complete, piece: {st.session_state.selected_piece_name}")
+    notifications(
+        f"All-light capture requests complete, piece: {st.session_state.selected_piece_name}"
+    )
 
 
 def run_single_light(config):
     payload = build_capture_payload(config)
     post_json(f"{API_BASE}/api/v2/mlimages/capture", payload)
-    notifications(f"Single light capture request complete, piece: {st.session_state.selected_piece_name}.")
+    notifications(
+        f"Single light capture request complete, piece: {st.session_state.selected_piece_name}."
+    )
 
 
 def reset_all():
     # Keep it simple: clear the selection state, let defaults repopulate on rerun
     for k in [
-        "selected_game_name", "selected_game_id",
-        "selected_piece_name", "selected_piece_id", "piece_game_id",
-        "lightIntensity", "lightTemp",
-        "objectRotationIdx", "objectPositionKey",
+        "selected_game_name",
+        "selected_game_id",
+        "selected_piece_name",
+        "selected_piece_id",
+        "piece_game_id",
+        "lightIntensity",
+        "lightTemp",
+        "objectRotationIdx",
+        "objectPositionKey",
     ]:
         if k in st.session_state:
             del st.session_state[k]
     st.rerun()
+
 
 def notifications(message: str):
     # API/api/v2/notifications
@@ -302,11 +327,12 @@ def notifications(message: str):
             {
                 "title": "WOPR ML Image Capture",
                 "description": message,
-                "color": "149502"
+                "color": "149502",
             }
-        ]
+        ],
     }
     post_json(f"{API_BASE}/api/v2/notifications", payload)
+
 
 # -----------------------
 # Main UI
@@ -348,20 +374,32 @@ positions = config["object"]["positions"]
 game_line = st.session_state.selected_game_name or "(none)"
 piece_line = st.session_state.selected_piece_name or "(none)"
 temp_line = st.session_state.lightTemp or "(none)"
-intensity_line = st.session_state.lightIntensity if st.session_state.lightIntensity is not None else "(none)"
-rotation_line = f"{rotations[st.session_state.objectRotationIdx]}°" if rotations else "(none)"
+intensity_line = (
+    st.session_state.lightIntensity
+    if st.session_state.lightIntensity is not None
+    else "(none)"
+)
+rotation_line = (
+    f"{rotations[st.session_state.objectRotationIdx]}°" if rotations else "(none)"
+)
 pos_key = st.session_state.objectPositionKey or "(none)"
-pos_val = positions.get(st.session_state.objectPositionKey) if st.session_state.objectPositionKey in positions else "(none)"
+pos_val = (
+    positions.get(st.session_state.objectPositionKey)
+    if st.session_state.objectPositionKey in positions
+    else "(none)"
+)
 
 st.code(
-    "\n".join([
-        f"Game:            {game_line}",
-        f"Piece:           {piece_line}",
-        f"Light Temp:      {temp_line}",
-        f"Light Intensity: {intensity_line}",
-        f"Rotation:        {rotation_line}",
-        f"Position:        {pos_key} -> {pos_val}",
-    ])
+    "\n".join(
+        [
+            f"Game:            {game_line}",
+            f"Piece:           {piece_line}",
+            f"Light Temp:      {temp_line}",
+            f"Light Intensity: {intensity_line}",
+            f"Rotation:        {rotation_line}",
+            f"Position:        {pos_key} -> {pos_val}",
+        ]
+    )
 )
 
 st.divider()
@@ -370,13 +408,15 @@ st.divider()
 st.subheader("Actions")
 
 # Basic guardrails
-ready = all([
-    st.session_state.selected_game_id,
-    st.session_state.selected_piece_id,
-    st.session_state.lightTemp,
-    st.session_state.lightIntensity is not None,
-    st.session_state.objectPositionKey,
-])
+ready = all(
+    [
+        st.session_state.selected_game_id,
+        st.session_state.selected_piece_id,
+        st.session_state.lightTemp,
+        st.session_state.lightIntensity is not None,
+        st.session_state.objectPositionKey,
+    ]
+)
 
 c1, c2, c3, c4 = st.columns(4)
 
